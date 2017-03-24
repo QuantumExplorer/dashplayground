@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FB2906671E85799F00A31092 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906661E85799F00A31092 /* AppDelegate.m */; };
+		FB29066A1E85799F00A31092 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906691E85799F00A31092 /* main.m */; };
+		FB29066D1E85799F00A31092 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* ViewController.m */; };
+		FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB29066E1E85799F00A31092 /* Assets.xcassets */; };
+		FB2906721E85799F00A31092 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB2906701E85799F00A31092 /* Main.storyboard */; };
+		FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FB2906791E85799F00A31092 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FB29065A1E85799F00A31092 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB2906611E85799F00A31092;
+			remoteInfo = dashPlayground;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		FB2906621E85799F00A31092 /* dashPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB2906651E85799F00A31092 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		FB2906661E85799F00A31092 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		FB2906691E85799F00A31092 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		FB29066B1E85799F00A31092 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		FB29066C1E85799F00A31092 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		FB29066E1E85799F00A31092 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FB2906711E85799F00A31092 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FB2906731E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FB2906781E85799F00A31092 /* dashPlaygroundTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dashPlaygroundTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = dashPlaygroundTests.m; sourceTree = "<group>"; };
+		FB29067E1E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FB29065F1E85799F00A31092 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2906751E85799F00A31092 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FB2906591E85799F00A31092 = {
+			isa = PBXGroup;
+			children = (
+				FB2906641E85799F00A31092 /* dashPlayground */,
+				FB29067B1E85799F00A31092 /* dashPlaygroundTests */,
+				FB2906631E85799F00A31092 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FB2906631E85799F00A31092 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FB2906621E85799F00A31092 /* dashPlayground.app */,
+				FB2906781E85799F00A31092 /* dashPlaygroundTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FB2906641E85799F00A31092 /* dashPlayground */ = {
+			isa = PBXGroup;
+			children = (
+				FB2906651E85799F00A31092 /* AppDelegate.h */,
+				FB2906661E85799F00A31092 /* AppDelegate.m */,
+				FB29066B1E85799F00A31092 /* ViewController.h */,
+				FB29066C1E85799F00A31092 /* ViewController.m */,
+				FB29066E1E85799F00A31092 /* Assets.xcassets */,
+				FB2906701E85799F00A31092 /* Main.storyboard */,
+				FB2906731E85799F00A31092 /* Info.plist */,
+				FB2906681E85799F00A31092 /* Supporting Files */,
+			);
+			path = dashPlayground;
+			sourceTree = "<group>";
+		};
+		FB2906681E85799F00A31092 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FB2906691E85799F00A31092 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FB29067B1E85799F00A31092 /* dashPlaygroundTests */ = {
+			isa = PBXGroup;
+			children = (
+				FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */,
+				FB29067E1E85799F00A31092 /* Info.plist */,
+			);
+			path = dashPlaygroundTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FB2906611E85799F00A31092 /* dashPlayground */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB2906811E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlayground" */;
+			buildPhases = (
+				FB29065E1E85799F00A31092 /* Sources */,
+				FB29065F1E85799F00A31092 /* Frameworks */,
+				FB2906601E85799F00A31092 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = dashPlayground;
+			productName = dashPlayground;
+			productReference = FB2906621E85799F00A31092 /* dashPlayground.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FB2906771E85799F00A31092 /* dashPlaygroundTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB2906841E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlaygroundTests" */;
+			buildPhases = (
+				FB2906741E85799F00A31092 /* Sources */,
+				FB2906751E85799F00A31092 /* Frameworks */,
+				FB2906761E85799F00A31092 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FB29067A1E85799F00A31092 /* PBXTargetDependency */,
+			);
+			name = dashPlaygroundTests;
+			productName = dashPlaygroundTests;
+			productReference = FB2906781E85799F00A31092 /* dashPlaygroundTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FB29065A1E85799F00A31092 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = dashfoundation;
+				TargetAttributes = {
+					FB2906611E85799F00A31092 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 44RJ69WHFF;
+						ProvisioningStyle = Automatic;
+					};
+					FB2906771E85799F00A31092 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 44RJ69WHFF;
+						ProvisioningStyle = Automatic;
+						TestTargetID = FB2906611E85799F00A31092;
+					};
+				};
+			};
+			buildConfigurationList = FB29065D1E85799F00A31092 /* Build configuration list for PBXProject "dashPlayground" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FB2906591E85799F00A31092;
+			productRefGroup = FB2906631E85799F00A31092 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FB2906611E85799F00A31092 /* dashPlayground */,
+				FB2906771E85799F00A31092 /* dashPlaygroundTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FB2906601E85799F00A31092 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */,
+				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2906761E85799F00A31092 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FB29065E1E85799F00A31092 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB29066D1E85799F00A31092 /* ViewController.m in Sources */,
+				FB29066A1E85799F00A31092 /* main.m in Sources */,
+				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB2906741E85799F00A31092 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FB29067A1E85799F00A31092 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB2906611E85799F00A31092 /* dashPlayground */;
+			targetProxy = FB2906791E85799F00A31092 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FB2906701E85799F00A31092 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FB2906711E85799F00A31092 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FB29067F1E85799F00A31092 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		FB2906801E85799F00A31092 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		FB2906821E85799F00A31092 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				INFOPLIST_FILE = dashPlayground/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlayground;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		FB2906831E85799F00A31092 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				INFOPLIST_FILE = dashPlayground/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlayground;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		FB2906851E85799F00A31092 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				INFOPLIST_FILE = dashPlaygroundTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlaygroundTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dashPlayground.app/Contents/MacOS/dashPlayground";
+			};
+			name = Debug;
+		};
+		FB2906861E85799F00A31092 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				INFOPLIST_FILE = dashPlaygroundTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlaygroundTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dashPlayground.app/Contents/MacOS/dashPlayground";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FB29065D1E85799F00A31092 /* Build configuration list for PBXProject "dashPlayground" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB29067F1E85799F00A31092 /* Debug */,
+				FB2906801E85799F00A31092 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FB2906811E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlayground" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB2906821E85799F00A31092 /* Debug */,
+				FB2906831E85799F00A31092 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		FB2906841E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlaygroundTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB2906851E85799F00A31092 /* Debug */,
+				FB2906861E85799F00A31092 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FB29065A1E85799F00A31092 /* Project object */;
+}
