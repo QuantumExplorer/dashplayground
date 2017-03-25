@@ -9,10 +9,21 @@
 /* Begin PBXBuildFile section */
 		FB2906671E85799F00A31092 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906661E85799F00A31092 /* AppDelegate.m */; };
 		FB29066A1E85799F00A31092 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906691E85799F00A31092 /* main.m */; };
-		FB29066D1E85799F00A31092 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* ViewController.m */; };
+		FB29066D1E85799F00A31092 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* LoginViewController.m */; };
 		FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB29066E1E85799F00A31092 /* Assets.xcassets */; };
 		FB2906721E85799F00A31092 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB2906701E85799F00A31092 /* Main.storyboard */; };
 		FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */; };
+		FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
+		FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
+		FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */; };
+		FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
+		FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
+		FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */; };
+		FBBFEB5D1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */; };
+		FBBFEB701E872B8A00BE41BE /* Masternode+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB6D1E872B8A00BE41BE /* Masternode+CoreDataClass.m */; };
+		FBBFEB711E872B8A00BE41BE /* Masternode+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB6D1E872B8A00BE41BE /* Masternode+CoreDataClass.m */; };
+		FBBFEB721E872B8A00BE41BE /* Masternode+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB6F1E872B8A00BE41BE /* Masternode+CoreDataProperties.m */; };
+		FBBFEB731E872B8A00BE41BE /* Masternode+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB6F1E872B8A00BE41BE /* Masternode+CoreDataProperties.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,19 +36,46 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		FB2906FF1E857E4C00A31092 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		FB2906621E85799F00A31092 /* dashPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2906651E85799F00A31092 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FB2906661E85799F00A31092 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		FB2906691E85799F00A31092 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		FB29066B1E85799F00A31092 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		FB29066C1E85799F00A31092 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		FB29066B1E85799F00A31092 /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
+		FB29066C1E85799F00A31092 /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		FB29066E1E85799F00A31092 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FB2906711E85799F00A31092 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FB2906731E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FB2906781E85799F00A31092 /* dashPlaygroundTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = dashPlaygroundTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = dashPlaygroundTests.m; sourceTree = "<group>"; };
 		FB29067E1E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FB39482A1E85B418009D115F /* DPMasternodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPMasternodeController.h; sourceTree = "<group>"; };
+		FB39482B1E85B418009D115F /* DPMasternodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPMasternodeController.m; sourceTree = "<group>"; };
+		FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlaygroundModel.xcdatamodel; sourceTree = "<group>"; };
+		FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodesViewController.h; sourceTree = "<group>"; };
+		FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodesViewController.m; sourceTree = "<group>"; };
+		FBBFEB281E86EED600BE41BE /* Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
+		FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SWAdditions.h"; sourceTree = "<group>"; };
+		FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SWAdditions.m"; sourceTree = "<group>"; };
+		FBBFEB641E872B0A00BE41BE /* dashPlayground-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dashPlayground-Bridging-Header.h"; sourceTree = "<group>"; };
+		FBBFEB651E872B0A00BE41BE /* dashPlaygroundTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "dashPlaygroundTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		FBBFEB6C1E872B8A00BE41BE /* Masternode+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Masternode+CoreDataClass.h"; path = "../Masternode+CoreDataClass.h"; sourceTree = "<group>"; };
+		FBBFEB6D1E872B8A00BE41BE /* Masternode+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Masternode+CoreDataClass.m"; path = "../Masternode+CoreDataClass.m"; sourceTree = "<group>"; };
+		FBBFEB6E1E872B8A00BE41BE /* Masternode+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Masternode+CoreDataProperties.h"; path = "../Masternode+CoreDataProperties.h"; sourceTree = "<group>"; };
+		FBBFEB6F1E872B8A00BE41BE /* Masternode+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Masternode+CoreDataProperties.m"; path = "../Masternode+CoreDataProperties.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +102,8 @@
 				FB2906641E85799F00A31092 /* dashPlayground */,
 				FB29067B1E85799F00A31092 /* dashPlaygroundTests */,
 				FB2906631E85799F00A31092 /* Products */,
+				FBBFEB641E872B0A00BE41BE /* dashPlayground-Bridging-Header.h */,
+				FBBFEB651E872B0A00BE41BE /* dashPlaygroundTests-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,14 +119,23 @@
 		FB2906641E85799F00A31092 /* dashPlayground */ = {
 			isa = PBXGroup;
 			children = (
+				FBBFEB741E872B9000BE41BE /* Model */,
+				FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */,
+				FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */,
 				FB2906651E85799F00A31092 /* AppDelegate.h */,
 				FB2906661E85799F00A31092 /* AppDelegate.m */,
-				FB29066B1E85799F00A31092 /* ViewController.h */,
-				FB29066C1E85799F00A31092 /* ViewController.m */,
+				FB29066B1E85799F00A31092 /* LoginViewController.h */,
+				FB29066C1E85799F00A31092 /* LoginViewController.m */,
+				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
+				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
 				FB2906731E85799F00A31092 /* Info.plist */,
 				FB2906681E85799F00A31092 /* Supporting Files */,
+				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
+				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
+				FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */,
+				FBBFEB281E86EED600BE41BE /* Defines.h */,
 			);
 			path = dashPlayground;
 			sourceTree = "<group>";
@@ -108,6 +157,17 @@
 			path = dashPlaygroundTests;
 			sourceTree = "<group>";
 		};
+		FBBFEB741E872B9000BE41BE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FBBFEB6C1E872B8A00BE41BE /* Masternode+CoreDataClass.h */,
+				FBBFEB6D1E872B8A00BE41BE /* Masternode+CoreDataClass.m */,
+				FBBFEB6E1E872B8A00BE41BE /* Masternode+CoreDataProperties.h */,
+				FBBFEB6F1E872B8A00BE41BE /* Masternode+CoreDataProperties.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -118,6 +178,7 @@
 				FB29065E1E85799F00A31092 /* Sources */,
 				FB29065F1E85799F00A31092 /* Frameworks */,
 				FB2906601E85799F00A31092 /* Resources */,
+				FB2906FF1E857E4C00A31092 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -158,11 +219,13 @@
 					FB2906611E85799F00A31092 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 44RJ69WHFF;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					FB2906771E85799F00A31092 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 44RJ69WHFF;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = FB2906611E85799F00A31092;
 					};
@@ -211,7 +274,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB29066D1E85799F00A31092 /* ViewController.m in Sources */,
+				FBBFEB721E872B8A00BE41BE /* Masternode+CoreDataProperties.m in Sources */,
+				FB29066D1E85799F00A31092 /* LoginViewController.m in Sources */,
+				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
+				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
+				FBBFEB701E872B8A00BE41BE /* Masternode+CoreDataClass.m in Sources */,
+				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
+				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
 			);
@@ -221,7 +290,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBBFEB5D1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
+				FBBFEB711E872B8A00BE41BE /* Masternode+CoreDataClass.m in Sources */,
 				FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */,
+				FBBFEB731E872B8A00BE41BE /* Masternode+CoreDataProperties.m in Sources */,
+				FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */,
+				FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,12 +412,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/dashPlayground",
+				);
 				INFOPLIST_FILE = dashPlayground/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "dashPlayground-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -351,12 +433,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/dashPlayground",
+				);
 				INFOPLIST_FILE = dashPlayground/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "dashPlayground-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -364,12 +453,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/dashPlayground",
+				);
 				INFOPLIST_FILE = dashPlaygroundTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlaygroundTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "dashPlaygroundTests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dashPlayground.app/Contents/MacOS/dashPlayground";
 			};
 			name = Debug;
@@ -378,12 +475,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/dashPlayground",
+				);
 				INFOPLIST_FILE = dashPlaygroundTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlaygroundTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "dashPlaygroundTests-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/dashPlayground.app/Contents/MacOS/dashPlayground";
 			};
 			name = Release;
@@ -407,6 +511,7 @@
 				FB2906831E85799F00A31092 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FB2906841E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlaygroundTests" */ = {
 			isa = XCConfigurationList;
@@ -415,8 +520,22 @@
 				FB2906861E85799F00A31092 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */,
+			);
+			currentVersion = FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */;
+			path = PlaygroundModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = FB29065A1E85799F00A31092 /* Project object */;
 }

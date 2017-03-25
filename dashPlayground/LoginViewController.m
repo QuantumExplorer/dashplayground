@@ -6,9 +6,10 @@
 //  Copyright © 2017 dashfoundation. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "LoginViewController.h"
+#import "DPMasternodeController.h"
 
-@implementation ViewController
+@implementation LoginViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -22,6 +23,10 @@
 
     // Update the view, if already loaded.
 }
+- (IBAction)pressStartIntances:(id)sender {
+    [[DPMasternodeController sharedInstance] startInstances:[self.startCountField integerValue]];
+}
+
 
 
 @end

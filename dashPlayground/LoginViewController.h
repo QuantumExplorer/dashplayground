@@ -8,8 +8,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface ViewController : NSViewController
+@interface LoginViewController : NSViewController
 
+@property (nonatomic,strong) IBOutlet NSTextField * startCountField;
+
+- (IBAction)pressStartIntances:(id)sender;
 
 @end
 
