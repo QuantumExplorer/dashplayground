@@ -15,4 +15,6 @@
 
 - (IBAction)retreiveInstances:(id)sender;
 
+- (IBAction)sshIn:(id)sender;
+
 @end

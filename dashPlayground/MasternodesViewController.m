@@ -11,6 +11,7 @@
 
 @interface MasternodesViewController ()
 @property (strong) IBOutlet NSArrayController *arrayController;
+@property (strong) IBOutlet NSTableView *tableView;
 
 @end
 
@@ -24,6 +25,18 @@
 - (IBAction)retreiveInstances:(id)sender {
     [[DPMasternodeController sharedInstance] getInstances];
 
+}
+
+- (IBAction)sshIn:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] sshIn:[object valueForKey:@"publicIP"]];
+}
+
+- (IBAction)stopInstance:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] stopInstance:[object valueForKey:@"instanceId"]];
 }
 
 -(AppDelegate*)appDelegate {

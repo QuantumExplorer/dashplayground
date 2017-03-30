@@ -9,17 +9,24 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
+typedef enum InstanceState {
+    InstanceState_Stopped = 0,
+    InstanceState_Running = 1,
+    InstanceState_Terminated = 2,
+    InstanceState_Pending = 3,
+    InstanceState_Stopping = 4,
+    InstanceState_Rebooting = 5,
+    InstanceState_Shutting_Down = 6,
+} InstanceState;
+
 @interface DPMasternodeController : NSObject
-
-@property (readonly, strong, nonatomic) NSManagedObjectContext *mainObjectContext;
-@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
-@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-
-- (void)saveContext;
 
 +(DPMasternodeController*)sharedInstance;
 
 -(void)startInstances:(NSInteger)count;
+- (void)stopInstance:(NSString*)instanceId;
 -(void)getInstances;
+
+- (void)sshIn:(NSString*)ip;
 
 @end
