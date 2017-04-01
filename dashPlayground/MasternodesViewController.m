@@ -33,10 +33,23 @@
     [[DPMasternodeController sharedInstance] sshIn:[object valueForKey:@"publicIP"]];
 }
 
+- (IBAction)startInstance:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] startInstance:[object valueForKey:@"instanceId"]];
+}
+
+
 - (IBAction)stopInstance:(id)sender {
     NSInteger row = self.tableView.selectedRow;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     [[DPMasternodeController sharedInstance] stopInstance:[object valueForKey:@"instanceId"]];
+}
+
+- (IBAction)terminateInstance:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] terminateInstance:[object valueForKey:@"instanceId"]];
 }
 
 -(AppDelegate*)appDelegate {

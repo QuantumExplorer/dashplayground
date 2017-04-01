@@ -24,7 +24,7 @@
     // Update the view, if already loaded.
 }
 - (IBAction)pressStartIntances:(id)sender {
-    [[DPMasternodeController sharedInstance] startInstances:[self.startCountField integerValue]];
+    [[DPMasternodeController sharedInstance] runInstances:[self.startCountField integerValue]];
 }
 
 

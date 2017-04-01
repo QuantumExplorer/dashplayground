@@ -8,23 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-
-typedef enum InstanceState {
-    InstanceState_Stopped = 0,
-    InstanceState_Running = 1,
-    InstanceState_Terminated = 2,
-    InstanceState_Pending = 3,
-    InstanceState_Stopping = 4,
-    InstanceState_Rebooting = 5,
-    InstanceState_Shutting_Down = 6,
-} InstanceState;
+#import "InstanceStateTransformer.h"
 
 @interface DPMasternodeController : NSObject
 
 +(DPMasternodeController*)sharedInstance;
 
--(void)startInstances:(NSInteger)count;
+-(void)runInstances:(NSInteger)count;
+- (void)startInstance:(NSString*)instanceId;
 - (void)stopInstance:(NSString*)instanceId;
+- (void)terminateInstance:(NSString*)instanceId;
 -(void)getInstances;
 
 - (void)sshIn:(NSString*)ip;

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "InstanceStateTransformer.h"
 
 typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
@@ -20,6 +21,8 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 -(NSArray*)allMasternodes;
 
 -(NSArray*)allMasternodesInContext:(NSManagedObjectContext*)context;
+
+-(void)updateMasternode:(NSString*)masternodeId withState:(InstanceState)state;
 
 - (NSManagedObject*)addMasternode:(NSDictionary*)values saveContext:(BOOL)saveContext;
 

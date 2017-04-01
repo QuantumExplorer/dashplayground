@@ -28,6 +28,8 @@
 		FB0683B61E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683B21E87662F00F1AFB4 /* libchilkatCocoa.a */; };
 		FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB06841C1E87674F00F1AFB4 /* empty.cpp */; };
 		FB06841F1E87674F00F1AFB4 /* empty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB06841C1E87674F00F1AFB4 /* empty.cpp */; };
+		FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */; };
+		FB0684241E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */; };
 		FB2906671E85799F00A31092 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906661E85799F00A31092 /* AppDelegate.m */; };
 		FB29066A1E85799F00A31092 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906691E85799F00A31092 /* main.m */; };
 		FB29066D1E85799F00A31092 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* LoginViewController.m */; };
@@ -206,6 +208,8 @@
 		FB06841B1E87663900F1AFB4 /* CkoZipProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoZipProgress.h; sourceTree = "<group>"; };
 		FB06841C1E87674F00F1AFB4 /* empty.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = empty.cpp; sourceTree = "<group>"; };
 		FB06841D1E87674F00F1AFB4 /* empty.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = empty.hpp; sourceTree = "<group>"; };
+		FB0684211E8CCDED00F1AFB4 /* InstanceStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstanceStateTransformer.h; sourceTree = "<group>"; };
+		FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceStateTransformer.m; sourceTree = "<group>"; };
 		FB2906621E85799F00A31092 /* dashPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2906651E85799F00A31092 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FB2906661E85799F00A31092 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -426,6 +430,15 @@
 			path = include;
 			sourceTree = "<group>";
 		};
+		FB0684201E8CCDC200F1AFB4 /* Transformers */ = {
+			isa = PBXGroup;
+			children = (
+				FB0684211E8CCDED00F1AFB4 /* InstanceStateTransformer.h */,
+				FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */,
+			);
+			name = Transformers;
+			sourceTree = "<group>";
+		};
 		FB2906591E85799F00A31092 = {
 			isa = PBXGroup;
 			children = (
@@ -448,6 +461,7 @@
 		FB2906641E85799F00A31092 /* dashPlayground */ = {
 			isa = PBXGroup;
 			children = (
+				FB0684201E8CCDC200F1AFB4 /* Transformers */,
 				FBBFEB741E872B9000BE41BE /* Model */,
 				FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */,
 				FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */,
@@ -616,6 +630,7 @@
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
+				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				FB06839E1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
@@ -627,6 +642,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB06839B1E875A9800F1AFB4 /* DFSSHConnectionType.m in Sources */,
+				FB0684241E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FBBFEB5D1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
 				FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */,

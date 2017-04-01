@@ -48,6 +48,30 @@
     return masternode;
 }
 
+-(void)updateMasternode:(NSString*)masternodeId withState:(InstanceState)state {
+    [self updateMasternode:masternodeId withState:state inContext:self.mainContext];
+}
+
+-(NSManagedObject*)updateMasternode:(NSString*)masternodeId withState:(InstanceState)state inContext:(NSManagedObjectContext*)context {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Masternode"
+                                              inManagedObjectContext:context];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"instanceId == %@",masternodeId]];
+    [fetchRequest setEntity:entity];
+    
+    NSError *error = nil;
+    
+    NSArray *masternodes = [self executeFetchRequest:fetchRequest inContext:context error:&error];
+    if (!masternodes) {
+        return nil;
+    } else  {
+        [[masternodes objectAtIndex:0] setValue:@(state) forKey:@"instanceState"];
+        [self saveContext:context];
+        return [masternodes objectAtIndex:0];
+    }
+
+}
+
 
 #pragma mark - General
 

@@ -883,7 +883,11 @@
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                     <connections>
-                                                                        <binding destination="XkW-Zc-VMU" name="value" keyPath="objectValue.instanceState" id="DrB-Yg-HB7"/>
+                                                                        <binding destination="XkW-Zc-VMU" name="value" keyPath="objectValue.instanceState" id="bp1-3t-Uit">
+                                                                            <dictionary key="options">
+                                                                                <string key="NSValueTransformerName">InstanceStateTransformer</string>
+                                                                            </dictionary>
+                                                                        </binding>
                                                                     </connections>
                                                                 </textField>
                                                             </subviews>
@@ -936,6 +940,28 @@
                                 </buttonCell>
                                 <connections>
                                     <action selector="stopInstance:" target="Inw-N2-PBT" id="4NV-qU-HOM"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QPT-Pe-1Ok">
+                                <rect key="frame" x="451" y="61" width="95" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Terminate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cPm-cC-0rb">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="terminateInstance:" target="Inw-N2-PBT" id="Z1h-T8-WH6"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lBj-kM-swQ">
+                                <rect key="frame" x="277" y="61" width="81" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="nmO-Po-qlp">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="startInstance:" target="Inw-N2-PBT" id="gwQ-Om-2V6"/>
                                 </connections>
                             </button>
                         </subviews>

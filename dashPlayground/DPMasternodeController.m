@@ -234,31 +234,65 @@
     return output;
 }
 
-- (void)startInstances:(NSInteger)count {
+- (void)runInstances:(NSInteger)count {
     NSString *output = [self runCommandString:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-a259d3c2 --count %ld --instance-type t2.micro --key-name SSH_KEY_DASH_PLAYGROUND --security-group-ids sg-8a11f5f1 --instance-initiated-shutdown-behavior terminate --subnet-id subnet-b764acd2",(long)count]];
     NSLog(@"%@",output);
 }
 
-- (void)stopInstance:(NSString*)instanceId {
-    NSString *output = [self runCommandString:[NSString stringWithFormat:@"ec2 stop-instances --instance-ids %@",instanceId]];
+- (void)startInstance:(NSString*)instanceId {
+    NSDictionary *output = [self runCommandJSON:[NSString stringWithFormat:@"ec2 start-instances --instance-ids %@",instanceId]];
+    if (output[@"StartingInstances"]) {
+        for (NSDictionary * instance in output[@"StartingInstances"]) {
+            if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
+                [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+            }
+        }
+    }
     NSLog(@"%@",output);
 }
 
--(NSUInteger)stateForStateName:(NSString*)string {
-    
-    InstanceState_Stopped = 0,
-    InstanceState_Running = 1,
-    InstanceState_Terminated = 2,
-    InstanceState_Pending = 3,
-    InstanceState_Stopping = 4,
-    InstanceState_Rebooting = 5,
-    InstanceState_Shutting_Down = 6,
-    
-    if ([string isEqualToString:@"running"]) {
-        return 0;
-    } else if ([string isEqualToString:@"pending"]) {
-        
+- (void)stopInstance:(NSString*)instanceId {
+    NSDictionary *output = [self runCommandJSON:[NSString stringWithFormat:@"ec2 stop-instances --instance-ids %@",instanceId]];
+    if (output[@"StoppingInstances"]) {
+        for (NSDictionary * instance in output[@"StoppingInstances"]) {
+            if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
+                [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+            }
+        }
     }
+    NSLog(@"%@",output);
+}
+
+- (void)terminateInstance:(NSString*)instanceId {
+    NSDictionary *output = [self runCommandJSON:[NSString stringWithFormat:@"ec2 terminate-instances --instance-ids %@",instanceId]];
+    if (output[@"TerminatingInstances"]) {
+        for (NSDictionary * instance in output[@"TerminatingInstances"]) {
+            if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
+                [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+            }
+        }
+    }
+    NSLog(@"%@",output);
+}
+
+-(InstanceState)stateForStateName:(NSString*)string {
+    if ([string isEqualToString:@"running"]) {
+        return InstanceState_Running;
+    } else if ([string isEqualToString:@"pending"]) {
+        return InstanceState_Pending;
+    } else if ([string isEqualToString:@"stopped"]) {
+        return InstanceState_Stopped;
+    } else if ([string isEqualToString:@"terminated"]) {
+        return InstanceState_Terminated;
+    } else if ([string isEqualToString:@"stopping"]) {
+        return InstanceState_Stopping;
+    } else if ([string isEqualToString:@"rebooting"]) {
+        return InstanceState_Rebooting;
+    } else if ([string isEqualToString:@"shutting-down"]) {
+        return InstanceState_Shutting_Down;
+    }
+    
+    return InstanceState_Stopped;
 }
 
 -(void)getInstances {
@@ -271,18 +305,30 @@
             NSDictionary * rDict = [NSMutableDictionary dictionary];
             [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
             [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
-            [rDict setValue:([[dictionary valueForKeyPath:@"State.Name"]  isEqual:@"running"]?@(1):@(0)) forKey:@"instanceState"];
+            [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
             [instances addObject:rDict];
         }
     }
-    NSArray * array = [[[DPDataStore sharedInstance] allMasternodes] arrayReferencedByKeyPath:@"instanceId"];
+    NSDictionary * knownInstances = [[[DPDataStore sharedInstance] allMasternodes] dictionaryReferencedByKeyPath:@"instanceId"];
     
     NSDictionary * referencedInstances = [instances dictionaryReferencedByKeyPath:@"instanceId"];
     BOOL needsSave = FALSE;
     for (NSString* reference in referencedInstances) {
-        if ([array containsObject:reference]) continue;
+        if ([knownInstances objectForKey:reference]) {
+            if (![[[knownInstances objectForKey:reference] valueForKey:@"instanceState"] isEqualToNumber:[referencedInstances[reference] valueForKey:@"instanceState"]]) {
+                needsSave = TRUE;
+            [[knownInstances objectForKey:reference] setValue:[referencedInstances[reference] valueForKey:@"instanceState"] forKey:@"instanceState"];
+            }
+        } else {
         needsSave = TRUE;
         [[DPDataStore sharedInstance] addMasternode:referencedInstances[reference] saveContext:FALSE];
+        }
+    }
+    for (NSString* knownInstance in knownInstances) {
+        if (!referencedInstances[knownInstance]) {
+            needsSave = TRUE;
+            [[[DPDataStore sharedInstance] mainContext] deleteObject:knownInstances[knownInstance]];
+        }
     }
     if (needsSave) {
         [[DPDataStore sharedInstance] saveContext];
