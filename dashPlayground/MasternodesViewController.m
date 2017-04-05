@@ -8,6 +8,7 @@
 
 #import "MasternodesViewController.h"
 #import "DPMasternodeController.h"
+#import "DPDataStore.h"
 
 @interface MasternodesViewController ()
 @property (strong) IBOutlet NSArrayController *arrayController;
@@ -24,17 +25,68 @@
 
 - (IBAction)retreiveInstances:(id)sender {
     [[DPMasternodeController sharedInstance] getInstances];
-
+    
 }
 
-- (IBAction)sshIn:(id)sender {
+- (IBAction)getKey:(id)sender {
     NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] sshIn:[object valueForKey:@"publicIP"]];
+    if (![object valueForKey:@"key"]) {
+        NSString * key = [[[DPMasternodeController sharedInstance] runDashRPCCommandString:@"-testnet masternode genkey"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if ([key length] == 51) {
+            [object setValue:key forKey:@"key"];
+        }
+        
+        [[DPDataStore sharedInstance] saveContext];
+    }
+}
+
+- (IBAction)setUp:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] setUp:object];
+}
+
+- (IBAction)configure:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    if (![object valueForKey:@"key"]) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can configure it.";
+        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+        [[NSApplication sharedApplication] presentError:error];
+        return;
+    }
+    [[DPMasternodeController sharedInstance] configureMasternode:object];
+}
+
+- (IBAction)startRemote:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    if (![object valueForKey:@"key"]) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
+        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+        [[NSApplication sharedApplication] presentError:error];
+        return;
+    }
+    if (![object valueForKey:@"instanceId"]) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
+        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+        [[NSApplication sharedApplication] presentError:error];
+        return;
+    }
+    [[DPMasternodeController sharedInstance] startRemote:object];
 }
 
 - (IBAction)startInstance:(id)sender {
     NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     [[DPMasternodeController sharedInstance] startInstance:[object valueForKey:@"instanceId"]];
 }
@@ -42,12 +94,14 @@
 
 - (IBAction)stopInstance:(id)sender {
     NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     [[DPMasternodeController sharedInstance] stopInstance:[object valueForKey:@"instanceId"]];
 }
 
 - (IBAction)terminateInstance:(id)sender {
     NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     [[DPMasternodeController sharedInstance] terminateInstance:[object valueForKey:@"instanceId"]];
 }

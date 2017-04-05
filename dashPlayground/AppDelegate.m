@@ -157,15 +157,19 @@
         NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"PlaygroundModel.storedata"];
         if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) {
             // Replace this implementation with code to handle the error appropriately.
-            
-            /*
-             Typical reasons for an error here include:
-             * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-             * The device is out of space.
-             * The store could not be migrated to the current model version.
-             Check the error message to determine what the actual problem was.
-             */
-            coordinator = nil;
+            error = nil;
+            [[NSFileManager defaultManager] removeItemAtURL:url error:nil];
+            if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) {
+                // Replace this implementation with code to handle the error appropriately.
+                /*
+                 Typical reasons for an error here include:
+                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+                 * The device is out of space.
+                 * The store could not be migrated to the current model version.
+                 Check the error message to determine what the actual problem was.
+                 */
+                coordinator = nil;
+            }
         }
         _persistentStoreCoordinator = coordinator;
     }

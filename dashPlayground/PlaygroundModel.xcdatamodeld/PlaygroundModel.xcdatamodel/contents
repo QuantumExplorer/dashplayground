@@ -5,11 +5,14 @@
         <attribute name="gitCommit" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="instanceId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="instanceState" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="key" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="masternodeState" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="publicIP" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rpcPassword" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="transactionId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="version" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="150"/>
+        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="195"/>
     </elements>
 </model>

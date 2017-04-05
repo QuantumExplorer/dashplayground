@@ -14,12 +14,16 @@
 
 +(DPMasternodeController*)sharedInstance;
 
--(void)runInstances:(NSInteger)count;
+- (void)runInstances:(NSInteger)count;
 - (void)startInstance:(NSString*)instanceId;
 - (void)stopInstance:(NSString*)instanceId;
 - (void)terminateInstance:(NSString*)instanceId;
--(void)getInstances;
+- (void)getInstances;
 
-- (void)sshIn:(NSString*)ip;
+- (void)setUp:(NSManagedObject*)masternode;
+- (void)configureMasternode:(NSManagedObject*)masternode;
+- (void)startRemote:(NSManagedObject*)masternode;
+
+- (NSString *)runDashRPCCommandString:(NSString *)commandToRun;
 
 @end

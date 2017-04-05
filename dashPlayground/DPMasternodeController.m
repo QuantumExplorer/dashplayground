@@ -11,6 +11,7 @@
 #import "AppDelegate.h"
 #import "NSArray+SWAdditions.h"
 #import "DPDataStore.h"
+#import "CkoSFtp.h"
 #import "CkoSsh.h"
 #import "CkoSshKey.h"
 #import "CkoStringBuilder.h"
@@ -18,16 +19,48 @@
 //#import "DFSSHConnector.h"
 //#import "DFSSHOperator.h"
 
+#define MASTERNODE_PRIVATE_KEY_STRING @"[MASTERNODE_PRIVATE_KEY]"
+#define RPC_PASSWORD_STRING @"[RPC_PASSWORD]"
+#define EXTERNAL_IP_STRING @"[EXTERNAL_IP]"
+
 @interface DPMasternodeController ()
+
 
 @end
 
 @implementation DPMasternodeController
 
 
+- (NSData *)runDashRPCCommand:(NSString *)commandToRun
+{
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/Users/samuelw/Documents/src/dash/src/dash-cli"];
+    
+    NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
+    NSLog(@"run command:%@", commandToRun);
+    [task setArguments:arguments];
+    
+    NSPipe *pipe = [NSPipe pipe];
+    [task setStandardOutput:pipe];
+    
+    NSFileHandle *file = [pipe fileHandleForReading];
+    
+    [task launch];
+    
+    return [file readDataToEndOfFile];
+}
 
 
-
+-(NSString*)randomPassword:(NSUInteger)length {
+NSString *alphabet  = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZY0123456789";
+NSMutableString *s = [NSMutableString stringWithCapacity:20];
+for (NSUInteger i = 0U; i < length; i++) {
+    u_int32_t r = arc4random() % [alphabet length];
+    unichar c = [alphabet characterAtIndex:r];
+    [s appendFormat:@"%C", c];
+}
+    return s;
+}
 
 - (NSData *)runCommand:(NSString *)commandToRun
 {
@@ -48,7 +81,184 @@
     return [file readDataToEndOfFile];
 }
 
-- (void)sshIn:(NSString*)ip
+-(NSString*)gitCommand:(NSString*)command onSSH:(CkoSsh *)ssh channelNum:(int)channelNum {
+    return [self sendCommandList:@[@"cd src/dash/\n",[NSString stringWithFormat:@"git %@",command]] onSSH:ssh channelNum:channelNum];
+}
+
+
+-(NSString*)sendCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh channelNum:(int)channelNum {
+    
+    
+    //  Construct a StringBuilder with multiple commands, one per line.
+    //  Note: The line-endings are potentially important.  Some SSH servers may
+    //  require either LF or CRLF line endings.  (Unix/Linux/OSX servers typically
+    //  use bare-LF line endings.  Windows servers likely use CRLF line endings.)
+    CkoStringBuilder *sbCommands = [[CkoStringBuilder alloc] init];
+    for (NSString * command in commands) {
+        [sbCommands Append:command];
+    }
+    
+    //  For our last command, we're going to echo a marker string that
+    //  we'll use in ChannelReceiveUntilMatch below.
+    //  The use of single quotes around 'IS' is a trick so that the output
+    //  of the command is "THIS IS THE END OF THE SCRIPT", but the terminal echo
+    //  includes the single quotes.  This allows us to read until we see the actual
+    //  output of the last command.
+    [sbCommands Append: @"echo THIS 'IS' THE END OF THE SCRIPT\n"];
+    
+    //  Send the commands..
+    BOOL success = [ssh ChannelSendString: [NSNumber numberWithInt: channelNum] strData: [sbCommands GetAsString] charset: @"ansi"];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
+    //  Send an EOF to indicate no more commands will be sent.
+    //  For brevity, we're not checking the return values of each method call.
+    //  Your code should check the success/failure of each call.
+    success = [ssh ChannelSendEof: [NSNumber numberWithInt: channelNum]];
+    
+    //  Receive output up to our marker.
+    success = [ssh ChannelReceiveUntilMatch: [NSNumber numberWithInt: channelNum] matchPattern: @"THIS IS THE END OF THE SCRIPT" charset: @"ansi" caseSensitive: YES];
+    
+    //  Close the channel.
+    //  It is important to close the channel only after receiving the desired output.
+    success = [ssh ChannelSendClose: [NSNumber numberWithInt: channelNum]];
+    
+    //  Get any remaining output..
+    success = [ssh ChannelReceiveToClose: [NSNumber numberWithInt: channelNum]];
+    
+    //  Get the complete output for all the commands in the session.
+    NSLog(@"%@",@"--- output ----");
+    return [ssh GetReceivedText: [NSNumber numberWithInt: channelNum] charset: @"ansi"];
+}
+
+-(CkoSshKey *)getServerKeyForMasternode:(NSManagedObject*)masternode {
+    CkoSshKey *key = [[CkoSshKey alloc] init];
+    
+    //  Read the PEM file into a string variable:
+    //  (This does not load the PEM file into the key.  The LoadText
+    //  method is a convenience method for loading the full contents of ANY text
+    //  file into a string variable.)
+    NSString *privKey = [key LoadText: @"/Users/samuelw/Documents/SSH_KEY_DASH_PLAYGROUND.pem"];
+    if (key.LastMethodSuccess != YES) {
+        NSLog(@"%@",key.LastErrorText);
+        return nil;
+    }
+    
+    //  Load a private key from a PEM string:
+    //  (Private keys may be loaded from OpenSSH and Putty formats.
+    //  Both encrypted and unencrypted private key file formats
+    //  are supported.  This example loads an unencrypted private
+    //  key in OpenSSH format.  PuTTY keys typically use the .ppk
+    //  file extension, while OpenSSH keys use the PEM format.
+    //  (For PuTTY keys, call FromPuttyPrivateKey instead.)
+    BOOL success = [key FromOpenSshPrivateKey: privKey];
+    if (success != YES) {
+        NSLog(@"%@",key.LastErrorText);
+        return nil;
+    }
+    return key;
+}
+
+-(void)setRPCPassword:(NSManagedObject*)masternode {
+    
+}
+
+
+-(NSString*)createConfigDashFileForMasternode:(NSManagedObject*)masternode {
+    if (![masternode valueForKey:@"rpcPassword"]) {
+        [masternode setValue:[self randomPassword:15] forKey:@"rpcPassword"];
+        [[DPDataStore sharedInstance] saveContext];
+    }
+    // First we need to make a proper configuration file
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource: @"dash" ofType: @"conf"];
+    NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:MASTERNODE_PRIVATE_KEY_STRING withString:[masternode valueForKey:@"key"]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:EXTERNAL_IP_STRING withString:[masternode valueForKey:@"publicIP"]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[masternode valueForKey:@"rpcPassword"]];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachesDirectory = [paths objectAtIndex:0];
+    
+    //make a file name to write the data to using the documents directory:
+    NSString *fileName = [NSString stringWithFormat:@"%@/dash.conf",
+                          cachesDirectory];
+    //create content - four lines of text
+    NSString *content = configFileContents;
+    //save content to the documents directory
+    [content writeToFile:fileName
+              atomically:NO
+                encoding:NSStringEncodingConversionAllowLossy
+                   error:nil];
+    
+    return fileName;
+}
+
+- (void)configureMasternode:(NSManagedObject*)masternode {
+    
+    NSString *localFilePath = [self createConfigDashFileForMasternode:masternode];
+    
+    //  Important: It is helpful to send the contents of the
+    //  sftp.LastErrorText property when requesting support.
+    
+    CkoSFtp *sftp = [[CkoSFtp alloc] init];
+    
+    //  Any string automatically begins a fully-functional 30-day trial.
+    BOOL success = [sftp UnlockComponent: @"Anything for 30-day trial"];
+    if (success != YES) {
+        NSLog(@"%@",sftp.LastErrorText);
+        return;
+    }
+    
+    //  Set some timeouts, in milliseconds:
+    sftp.ConnectTimeoutMs = [NSNumber numberWithInt:15000];
+    sftp.IdleTimeoutMs = [NSNumber numberWithInt:15000];
+    
+    //  Connect to the SSH server.
+    //  The standard SSH port = 22
+    //  The hostname may be a hostname or IP address.
+    int port = 22;
+    NSString *hostname = [masternode valueForKey:@"publicIP"];
+    success = [sftp Connect: hostname port: [NSNumber numberWithInt: port]];
+    if (success != YES) {
+        NSLog(@"%@",sftp.LastErrorText);
+        return;
+    }
+    
+    CkoSshKey * key = [self getServerKeyForMasternode:masternode];
+    if (!key) return;
+    //  Authenticate with the SSH server using the login and
+    //  private key.  (The corresponding public key should've
+    //  been installed on the SSH server beforehand.)
+    success = [sftp AuthenticatePk: @"ubuntu" privateKey: key];
+    if (success != YES) {
+        NSLog(@"%@",sftp.LastErrorText);
+        return;
+    }
+    NSLog(@"%@",@"Public-Key Authentication Successful!");
+    
+    //  After authenticating, the SFTP subsystem must be initialized:
+    success = [sftp InitializeSftp];
+    if (success != YES) {
+        NSLog(@"%@",sftp.LastErrorText);
+        return;
+    }
+    
+    //  Upload from the local file to the SSH server.
+    //  Important -- the remote filepath is the 1st argument,
+    //  the local filepath is the 2nd argument;
+    NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
+    
+    success = [sftp UploadFileByName: remoteFilePath localFilePath: localFilePath];
+    if (success != YES) {
+        NSLog(@"%@",sftp.LastErrorText);
+        return;
+    }
+    
+    NSLog(@"%@",@"Success.");
+}
+
+- (void)setUp:(NSManagedObject*)masternode
 {
     //  Important: It is helpful to send the contents of the
     //  sftp.LastErrorText property when sending email
@@ -72,39 +282,15 @@
     //  The hostname may be a hostname or IP address.
     int port;
     NSString *hostname = 0;
-    hostname = ip;
+    hostname = [masternode valueForKey:@"publicIP"];
     port = 22;
     success = [ssh Connect: hostname port: [NSNumber numberWithInt: port]];
     if (success != YES) {
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
-    
-    CkoSshKey *key = [[CkoSshKey alloc] init];
-    
-    //  Read the PEM file into a string variable:
-    //  (This does not load the PEM file into the key.  The LoadText
-    //  method is a convenience method for loading the full contents of ANY text
-    //  file into a string variable.)
-    NSString *privKey = [key LoadText: @"/Users/samuelw/Documents/SSH_KEY_DASH_PLAYGROUND.pem"];
-    if (key.LastMethodSuccess != YES) {
-        NSLog(@"%@",key.LastErrorText);
-        return;
-    }
-    
-    //  Load a private key from a PEM string:
-    //  (Private keys may be loaded from OpenSSH and Putty formats.
-    //  Both encrypted and unencrypted private key file formats
-    //  are supported.  This example loads an unencrypted private
-    //  key in OpenSSH format.  PuTTY keys typically use the .ppk
-    //  file extension, while OpenSSH keys use the PEM format.
-    //  (For PuTTY keys, call FromPuttyPrivateKey instead.)
-    success = [key FromOpenSshPrivateKey: privKey];
-    if (success != YES) {
-        NSLog(@"%@",key.LastErrorText);
-        return;
-    }
-    
+    CkoSshKey * key = [self getServerKeyForMasternode:masternode];
+    if (!key) return;
     //  Authenticate with the SSH server using the login and
     //  private key.  (The corresponding public key should've
     //  been installed on the SSH server beforehand.)
@@ -123,106 +309,48 @@
         return;
     }
     
-    //  Construct a StringBuilder with multiple commands, one per line.
-    //  Note: The line-endings are potentially important.  Some SSH servers may
-    //  require either LF or CRLF line endings.  (Unix/Linux/OSX servers typically
-    //  use bare-LF line endings.  Windows servers likely use CRLF line endings.)
-    CkoStringBuilder *sbCommands = [[CkoStringBuilder alloc] init];
-    [sbCommands Append: @"ls\n"];
-    [sbCommands Append: @"cd src\n"];
-    [sbCommands Append: @"ls\n"];
-    [sbCommands Append: @"df\n"];
-    
-    //  For our last command, we're going to echo a marker string that
-    //  we'll use in ChannelReceiveUntilMatch below.
-    //  The use of single quotes around 'IS' is a trick so that the output
-    //  of the command is "THIS IS THE END OF THE SCRIPT", but the terminal echo
-    //  includes the single quotes.  This allows us to read until we see the actual
-    //  output of the last command.
-    [sbCommands Append: @"echo THIS 'IS' THE END OF THE SCRIPT\n"];
-    
-    //  Send the commands..
-    success = [ssh ChannelSendString: [NSNumber numberWithInt: channelNum] strData: [sbCommands GetAsString] charset: @"ansi"];
-    if (success != YES) {
+    //  Send some commands and get the output.
+    NSString *strOutput = [ssh QuickCommand: @"ls src | grep dash" charset: @"ansi"];
+    if (ssh.LastMethodSuccess != YES) {
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
+    BOOL justCloned = FALSE;
+        if (![strOutput hasPrefix:@"dash"]) {
+            justCloned = TRUE;
+            [ssh QuickCommand: @"git clone https://github.com/QuantumExplorer/dash.git ~/src/dash" charset: @"ansi"];
+            if (ssh.LastMethodSuccess != YES) {
+                NSLog(@"%@",ssh.LastErrorText);
+                return;
+            }
+        }
+    if (!justCloned) {
+        strOutput = [self sendCommandList:@[@"cd src/dash/\n",@"git pull\n"] onSSH:ssh channelNum:channelNum];
+    }
     
-    //  Send an EOF to indicate no more commands will be sent.
-    //  For brevity, we're not checking the return values of each method call.
-    //  Your code should check the success/failure of each call.
-    success = [ssh ChannelSendEof: [NSNumber numberWithInt: channelNum]];
-    
-    //  Receive output up to our marker.
-    success = [ssh ChannelReceiveUntilMatch: [NSNumber numberWithInt: channelNum] matchPattern: @"THIS IS THE END OF THE SCRIPT" charset: @"ansi" caseSensitive: YES];
-    
-    //  Close the channel.
-    //  It is important to close the channel only after receiving the desired output.
-    success = [ssh ChannelSendClose: [NSNumber numberWithInt: channelNum]];
-    
-    //  Get any remaining output..
-    success = [ssh ChannelReceiveToClose: [NSNumber numberWithInt: channelNum]];
-    
-    //  Get the complete output for all the commands in the session.
-    NSLog(@"%@",@"--- output ----");
-    NSLog(@"%@",[ssh GetReceivedText: [NSNumber numberWithInt: channelNum] charset: @"ansi"]);
-    
-//    //  Send some commands and get the output.
-//    NSString *strOutput = [ssh QuickCommand: @"ls | grep src" charset: @"ansi"];
-//    if (ssh.LastMethodSuccess != YES) {
-//        NSLog(@"%@",ssh.LastErrorText);
-//        return;
-//    }
-//    if (![strOutput isEqualToString:@"src"]) {
-//        [ssh QuickCommand: @"mkdir src" charset: @"ansi"];
-//        if (ssh.LastMethodSuccess != YES) {
-//            NSLog(@"%@",ssh.LastErrorText);
-//            return;
-//        }
-//    }
-//    [ssh QuickCommand: @"cd src" charset: @"ansi"];
-//    if (ssh.LastMethodSuccess != YES) {
-//        NSLog(@"%@",ssh.LastErrorText);
-//        return;
-//    }
-//    strOutput = [ssh QuickCommand: @"ls | grep dash" charset: @"ansi"];
-//    if (ssh.LastMethodSuccess != YES) {
-//        NSLog(@"%@",ssh.LastErrorText);
-//        return;
-//    }
-//    BOOL justCloned = FALSE;
-//        if (![strOutput isEqualToString:@"dash"]) {
-//            justCloned = TRUE;
-//            [ssh QuickCommand: @"git clone https://github.com/QuantumExplorer/dash.git" charset: @"ansi"];
-//            if (ssh.LastMethodSuccess != YES) {
-//                NSLog(@"%@",ssh.LastErrorText);
-//                return;
-//            }
-//        }
-//    [ssh QuickCommand: @"cd dash" charset: @"ansi"];
-//    if (ssh.LastMethodSuccess != YES) {
-//        NSLog(@"%@",ssh.LastErrorText);
-//        return;
-//    }
-//    if (!justCloned) {
-//        [ssh QuickCommand: @"git pull" charset: @"ansi"];
-//        if (ssh.LastMethodSuccess != YES) {
-//            NSLog(@"%@",ssh.LastErrorText);
-//            return;
-//        }
-//    }
-//    NSLog(@"%@",@"---- ls | grep src ----");
-//    NSLog(@"%@",strOutput);
+    NSString * commitHash = [self gitCommand:@"rev-parse HEAD" onSSH:ssh channelNum:channelNum];
+    NSLog(@"%@",strOutput);
     
     [ssh Disconnect];
     
     return;
 }
 
+- (void)startRemote:(NSManagedObject*)masternode {
+    
+}
+
 - (NSString *)runCommandString:(NSString *)commandToRun
 {
     
     NSString *output = [[NSString alloc] initWithData:[self runCommand:commandToRun] encoding:NSUTF8StringEncoding];
+    return output;
+}
+
+- (NSString *)runDashRPCCommandString:(NSString *)commandToRun
+{
+    
+    NSString *output = [[NSString alloc] initWithData:[self runDashRPCCommand:commandToRun] encoding:NSUTF8StringEncoding];
     return output;
 }
 

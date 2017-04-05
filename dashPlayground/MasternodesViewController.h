@@ -14,7 +14,10 @@
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
 - (IBAction)retreiveInstances:(id)sender;
+- (IBAction)getKey:(id)sender;
 
-- (IBAction)sshIn:(id)sender;
+- (IBAction)setUp:(id)sender;
+- (IBAction)configure:(id)sender;
+- (IBAction)startRemote:(id)sender;
 
 @end

@@ -30,6 +30,10 @@
 		FB06841F1E87674F00F1AFB4 /* empty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB06841C1E87674F00F1AFB4 /* empty.cpp */; };
 		FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */; };
 		FB0684241E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */; };
+		FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684261E92DA2000F1AFB4 /* RPCViewController.m */; };
+		FB0684281E92DA2000F1AFB4 /* RPCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684261E92DA2000F1AFB4 /* RPCViewController.m */; };
+		FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */ = {isa = PBXBuildFile; fileRef = FB0684291E941DD700F1AFB4 /* dash.conf */; };
+		FB06842B1E941DD700F1AFB4 /* dash.conf in Resources */ = {isa = PBXBuildFile; fileRef = FB0684291E941DD700F1AFB4 /* dash.conf */; };
 		FB2906671E85799F00A31092 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906661E85799F00A31092 /* AppDelegate.m */; };
 		FB29066A1E85799F00A31092 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906691E85799F00A31092 /* main.m */; };
 		FB29066D1E85799F00A31092 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* LoginViewController.m */; };
@@ -210,6 +214,9 @@
 		FB06841D1E87674F00F1AFB4 /* empty.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = empty.hpp; sourceTree = "<group>"; };
 		FB0684211E8CCDED00F1AFB4 /* InstanceStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstanceStateTransformer.h; sourceTree = "<group>"; };
 		FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceStateTransformer.m; sourceTree = "<group>"; };
+		FB0684251E92DA2000F1AFB4 /* RPCViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCViewController.h; sourceTree = "<group>"; };
+		FB0684261E92DA2000F1AFB4 /* RPCViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPCViewController.m; sourceTree = "<group>"; };
+		FB0684291E941DD700F1AFB4 /* dash.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dash.conf; sourceTree = "<group>"; };
 		FB2906621E85799F00A31092 /* dashPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2906651E85799F00A31092 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FB2906661E85799F00A31092 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -473,6 +480,8 @@
 				FB29066C1E85799F00A31092 /* LoginViewController.m */,
 				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
 				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
+				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
+				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
 				FB2906731E85799F00A31092 /* Info.plist */,
@@ -493,6 +502,7 @@
 		FB2906681E85799F00A31092 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				FB0684291E941DD700F1AFB4 /* dash.conf */,
 				FB2906691E85799F00A31092 /* main.m */,
 			);
 			name = "Supporting Files";
@@ -602,6 +612,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */,
+				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -610,6 +621,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB06842B1E941DD700F1AFB4 /* dash.conf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -624,6 +636,7 @@
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FB0683A01E875A9800F1AFB4 /* DFSSHServer.m in Sources */,
+				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB06839A1E875A9800F1AFB4 /* DFSSHConnectionType.m in Sources */,
 				FB06839C1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */,
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
@@ -651,6 +664,7 @@
 				FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				FB0683A11E875A9800F1AFB4 /* DFSSHServer.m in Sources */,
 				FB06839F1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */,
+				FB0684281E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB06839D1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
