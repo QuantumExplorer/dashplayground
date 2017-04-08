@@ -12,5 +12,9 @@
 @property (strong) IBOutlet NSTextField *commandField;
 - (IBAction)runCommand:(id)sender;
 @property (strong) IBOutlet NSTextView *terminalOutput;
+@property (strong) IBOutlet NSTextField *serverStatusLabel;
+- (IBAction)checkServer:(id)sender;
+- (IBAction)startServer:(id)sender;
+@property (strong) IBOutlet NSButton *startStopButton;
 
 @end

@@ -42,6 +42,14 @@
 		FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */; };
 		FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
 		FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
+		FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
+		FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
+		FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
+		FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
+		FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
+		FB9EBCF21E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
+		FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */; };
+		FB9EBCF61E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */; };
 		FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */; };
 		FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
 		FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
@@ -231,6 +239,14 @@
 		FB29067E1E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FB39482A1E85B418009D115F /* DPMasternodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPMasternodeController.h; sourceTree = "<group>"; };
 		FB39482B1E85B418009D115F /* DPMasternodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPMasternodeController.m; sourceTree = "<group>"; };
+		FB46AE891E95618400D4B034 /* DPLocalNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPLocalNodeController.h; sourceTree = "<group>"; };
+		FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPLocalNodeController.m; sourceTree = "<group>"; };
+		FB9EBCEB1E96F22200AE8AC3 /* InstanceTypeTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstanceTypeTransformer.h; sourceTree = "<group>"; };
+		FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceTypeTransformer.m; sourceTree = "<group>"; };
+		FB9EBCEF1E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeSyncStatusTransformer.h; sourceTree = "<group>"; };
+		FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodeSyncStatusTransformer.m; sourceTree = "<group>"; };
+		FB9EBCF31E98752500AE8AC3 /* MasternodeStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeStateTransformer.h; sourceTree = "<group>"; };
+		FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodeStateTransformer.m; sourceTree = "<group>"; };
 		FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlaygroundModel.xcdatamodel; sourceTree = "<group>"; };
 		FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodesViewController.h; sourceTree = "<group>"; };
 		FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodesViewController.m; sourceTree = "<group>"; };
@@ -442,6 +458,12 @@
 			children = (
 				FB0684211E8CCDED00F1AFB4 /* InstanceStateTransformer.h */,
 				FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */,
+				FB9EBCEB1E96F22200AE8AC3 /* InstanceTypeTransformer.h */,
+				FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */,
+				FB9EBCEF1E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.h */,
+				FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */,
+				FB9EBCF31E98752500AE8AC3 /* MasternodeStateTransformer.h */,
+				FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */,
 			);
 			name = Transformers;
 			sourceTree = "<group>";
@@ -488,6 +510,8 @@
 				FB2906681E85799F00A31092 /* Supporting Files */,
 				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
 				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
+				FB46AE891E95618400D4B034 /* DPLocalNodeController.h */,
+				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
 				FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */,
 				FBBFEB281E86EED600BE41BE /* Defines.h */,
 				FB0683B71E87663900F1AFB4 /* include */,
@@ -637,15 +661,19 @@
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FB0683A01E875A9800F1AFB4 /* DFSSHServer.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
+				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
 				FB06839A1E875A9800F1AFB4 /* DFSSHConnectionType.m in Sources */,
 				FB06839C1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */,
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
+				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
+				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				FB06839E1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */,
+				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -659,12 +687,16 @@
 				FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FBBFEB5D1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
 				FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */,
+				FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				FB06841F1E87674F00F1AFB4 /* empty.cpp in Sources */,
+				FB9EBCF21E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				FB0683A11E875A9800F1AFB4 /* DFSSHServer.m in Sources */,
 				FB06839F1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */,
 				FB0684281E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
+				FB9EBCF61E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
+				FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 				FB06839D1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

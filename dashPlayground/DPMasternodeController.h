@@ -20,10 +20,9 @@
 - (void)terminateInstance:(NSString*)instanceId;
 - (void)getInstances;
 
-- (void)setUp:(NSManagedObject*)masternode;
+- (void)setUpMasternodeDashd:(NSManagedObject*)masternode;
 - (void)configureMasternode:(NSManagedObject*)masternode;
-- (void)startRemote:(NSManagedObject*)masternode;
 
-- (NSString *)runDashRPCCommandString:(NSString *)commandToRun;
+-(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode;
 
 @end
