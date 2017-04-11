@@ -7,6 +7,9 @@
 //
 
 #import "AppDelegate.h"
+#import "DPMasternodeController.h"
+#import "DPDataStore.h"
+#import "MasternodeStateTransformer.h"
 
 @interface AppDelegate ()
 
@@ -16,6 +19,10 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"masternodeState == %@",@(MasternodeState_Checking)]];
+    for (NSManagedObject * masternode in checkingMasternodes) {
+        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+    }
 }
 
 

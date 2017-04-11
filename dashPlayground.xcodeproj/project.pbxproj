@@ -44,6 +44,7 @@
 		FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
 		FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
 		FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
+		FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */; };
 		FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
 		FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
 		FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
@@ -241,6 +242,8 @@
 		FB39482B1E85B418009D115F /* DPMasternodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPMasternodeController.m; sourceTree = "<group>"; };
 		FB46AE891E95618400D4B034 /* DPLocalNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPLocalNodeController.h; sourceTree = "<group>"; };
 		FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPLocalNodeController.m; sourceTree = "<group>"; };
+		FB5A31C01E9D2F04003D4DD8 /* TrackingTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackingTransformer.h; sourceTree = "<group>"; };
+		FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackingTransformer.m; sourceTree = "<group>"; };
 		FB9EBCEB1E96F22200AE8AC3 /* InstanceTypeTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstanceTypeTransformer.h; sourceTree = "<group>"; };
 		FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceTypeTransformer.m; sourceTree = "<group>"; };
 		FB9EBCEF1E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeSyncStatusTransformer.h; sourceTree = "<group>"; };
@@ -464,6 +467,8 @@
 				FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */,
 				FB9EBCF31E98752500AE8AC3 /* MasternodeStateTransformer.h */,
 				FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */,
+				FB5A31C01E9D2F04003D4DD8 /* TrackingTransformer.h */,
+				FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */,
 			);
 			name = Transformers;
 			sourceTree = "<group>";
@@ -670,6 +675,7 @@
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
+				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				FB06839E1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */,

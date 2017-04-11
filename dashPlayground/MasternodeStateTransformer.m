@@ -29,14 +29,14 @@
         case MasternodeState_Checking:
             return @"Checking";
             break;
+        case MasternodeState_Installed:
+            return @"Installed";
+            break;
         case MasternodeState_Configured:
             return @"Configured";
             break;
         case MasternodeState_Running:
             return @"Running";
-            break;
-        case MasternodeState_Stopped:
-            return @"Stopped";
             break;
         case MasternodeState_Error:
             return @"Error";

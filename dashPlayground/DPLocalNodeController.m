@@ -7,6 +7,7 @@
 //
 
 #import "DPLocalNodeController.h"
+#import "DPMasternodeController.h"
 
 @implementation DPLocalNodeController
 
@@ -207,6 +208,44 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 - (void)startRemote:(NSManagedObject*)masternode {
     NSString * string = [NSString stringWithFormat:@"-testnet masternode start-alias %@",[masternode valueForKey:@"instanceId"]];
     //return string;
+}
+
+-(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashClb)clb {
+    __block NSManagedObject * object = masternode;
+    [self stopDash:^(BOOL success, NSString *message) {
+        if (success) {
+            NSString *fullpath = @"/Users/samuelw/Library/Application Support/Dashcore/testnet3/masternode.conf";
+            NSError * error = nil;
+            NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
+            NSMutableArray * lines = [[contents componentsSeparatedByString:@"\n"] mutableCopy];
+            NSMutableArray * specialLines = [NSMutableArray array];
+            for (int i = ((int)[lines count]) - 1;i> -1;i--) {
+                if ([lines[i] hasPrefix:@"#"]) {
+                    [specialLines addObject:[lines objectAtIndex:i]];
+                    [lines removeObjectAtIndex:i];
+                } else
+                    if ([lines[i] isEqualToString:@""]) {
+                        [lines removeObjectAtIndex:i];
+                    } else
+                        if ([lines[i] hasPrefix:[object valueForKey:@"instanceId"]]) {
+                            [lines removeObjectAtIndex:i];
+                        }
+            }
+            [lines addObject:[NSString stringWithFormat:@"%@ %@:19999 %@ %@ %@",[object valueForKey:@"instanceId"],[object valueForKey:@"publicIP"],[object valueForKey:@"key"],[object valueForKey:@"transactionId"],[object valueForKey:@"transactionOutputIndex"]]];
+            NSString * content = [[[specialLines componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"] stringByAppendingString:[lines componentsJoinedByString:@"\n"]];
+            [content writeToFile:fullpath
+                      atomically:NO
+                        encoding:NSStringEncodingConversionAllowLossy
+                           error:nil];
+            if (error) {
+                NSLog(@"error");
+            } else {
+                [[DPMasternodeController sharedInstance] configureMasternode:object];
+            }
+        } else {
+            clb(FALSE,@"Error stoping dash server to place configuration file.");
+        }
+    }];
 }
 
 

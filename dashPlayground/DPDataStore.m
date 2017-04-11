@@ -14,6 +14,63 @@
 @implementation DPDataStore
 
 
+#pragma mark - git
+
+-(NSManagedObject*)branchNamed:(NSString*)string onRepositoryURLPath:(NSString*)repositoryURLPath {
+    return [self branchNamed:string onRepositoryURLPath:repositoryURLPath inContext:self.mainContext];
+}
+
+-(NSManagedObject*)branchNamed:(NSString*)branchName onRepositoryURLPath:(NSString*)repositoryURLPath inContext:(NSManagedObjectContext*)context {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repository"
+                                              inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    [fetchRequest setReturnsObjectsAsFaults:FALSE];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"url == %@",repositoryURLPath]];
+    
+    NSError *error = nil;
+    
+    NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
+    NSManagedObject * repo = nil;
+    NSManagedObject * branch = nil;
+    if (!repositories || !repositories.count) {
+        repo = [self createRepositoryForURLPath:repositoryURLPath inContext:context saveContext:FALSE];
+        branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
+    } else  {
+        repo = [repositories firstObject];
+        branch = [self branchNamed:branchName inRepository:repo];
+        if (!branch) {
+            branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
+        }
+    }
+    return branch;
+}
+
+-(NSManagedObject*)branchNamed:(NSString*)branchName inRepository:(NSManagedObject*)repository {
+    NSSet * set = [repository valueForKey:@"branches"];
+    set = [set filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"name == %@",branchName]];
+    if (!set || ![set count]) return nil;
+    return [set anyObject];
+}
+
+-(NSManagedObject*)createRepositoryForURLPath:(NSString*)repositoryURLPath inContext:(NSManagedObjectContext*)context saveContext:(BOOL)saveContext {
+    NSManagedObject *repository = (NSManagedObject*)[self createInsertedNewObjectForEntityNamed:@"Repository" inContext:context];
+    [repository setValue:repositoryURLPath forKey:@"url"];
+    if (saveContext)
+        [self saveContext:context];
+    return repository;
+}
+
+-(NSManagedObject*)createBranch:(NSString*)branchName onRepository:(NSManagedObject*)repository saveContext:(BOOL)saveContext {
+    NSManagedObject *branch = (NSManagedObject*)[self createInsertedNewObjectForEntityNamed:@"Branch" inContext:repository.managedObjectContext];
+    [branch setValue:branchName forKey:@"name"];
+    [branch setValue:repository forKey:@"repository"];
+    if (saveContext)
+        [self saveContext:repository.managedObjectContext];
+    return branch;
+}
+
+
 #pragma mark - Masternodes
 
 -(NSArray*)allMasternodes {
@@ -25,6 +82,26 @@
                                               inManagedObjectContext:context];
     [fetchRequest setEntity:entity];
     
+    NSError *error = nil;
+    
+    NSArray *masternodes = [self executeFetchRequest:fetchRequest inContext:context error:&error];
+    if (!masternodes) {
+        return @[];
+    } else  {
+        return masternodes;
+    }
+}
+
+-(NSArray*)allMasternodesWithPredicate:(NSPredicate*)predicate {
+    return [self allMasternodesWithPredicate:predicate inContext:self.mainContext];
+}
+
+-(NSArray*)allMasternodesWithPredicate:(NSPredicate*)predicate inContext:(NSManagedObjectContext*)context {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Masternode"
+                                              inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
     NSError *error = nil;
     
     NSArray *masternodes = [self executeFetchRequest:fetchRequest inContext:context error:&error];
@@ -69,7 +146,7 @@
         [self saveContext:context];
         return [masternodes objectAtIndex:0];
     }
-
+    
 }
 
 
@@ -87,14 +164,14 @@ __strong static NSMutableDictionary * mDict = nil;
 -(NSArray *)executeFetchRequest:(NSFetchRequest*)request inContext:(NSManagedObjectContext*)context error:(__autoreleasing NSError**)error {
     if ([NSThread isMainThread]) {
         //LGLog(@"executing fetch request on main thread");
-        #if LOG_BACKGROUND_CALLS
+#if LOG_BACKGROUND_CALLS
         NSDate * date = [NSDate date];
-        #endif
+#endif
         id returnData = [context executeFetchRequest:request error:error];
-        #if LOG_BACKGROUND_CALLS
+#if LOG_BACKGROUND_CALLS
         NSTimeInterval thisInterval = [[NSDate date] timeIntervalSinceDate:date];
         totalTime += thisInterval;
-        #endif
+#endif
         //LGLog(@"took %.5f (%.5f)",thisInterval,totalTime);
         return returnData;
         
@@ -138,7 +215,7 @@ __strong static NSMutableDictionary * mDict = nil;
 }
 
 -(void)executeFetchRequestAsynchronously:(NSFetchRequest*)request inContext:(NSManagedObjectContext*)context completion:(FetchRequestCompletion)completion {
-
+    
     [context performBlock:^{
         NSError *rError = nil;
         NSArray * requestArray = [context executeFetchRequest:request error:&rError];
@@ -218,65 +295,65 @@ __strong static NSMutableDictionary * mDict = nil;
     static NSTimeInterval totalTime = 0.0f;
     clock_t start = clock();
 #endif
-//    //trying this out
-//    [context performBlock:^{
-        NSError * error = nil;
-        if (context != nil) {
-            if ([context hasChanges] && ![context save:&error]) {
-                // If Cocoa generated the error...
-                if ([[error domain] isEqualToString:@"NSCocoaErrorDomain"]) {
-                    // ...check whether there's an NSDetailedErrors array
-                    NSDictionary *userInfo = [error userInfo];
-                    if ([userInfo valueForKey:@"NSDetailedErrors"] != nil) {
-                        // ...and loop through the array, if so.
-                        NSArray *errors = [userInfo valueForKey:@"NSDetailedErrors"];
-                        for (NSError *anError in errors) {
-                            
-                            NSDictionary *subUserInfo = [anError userInfo];
-                            // Granted, this indents the NSValidation keys rather a lot
-                            // ...but it's a small loss to keep the code more readable.
-                            NSLog(@"error info %@", userInfo);
-                            NSLog(@"Core Data Save Error\n\n \
-                                  NSValidationErrorKey\n%@\n\n \
-                                  NSValidationErrorPredicate\n%@\n\n \
-                                  NSValidationErrorObject\n%@\n\n \
-                                  NSLocalizedDescription\n%@",
-                                  [subUserInfo valueForKey:@"NSValidationErrorKey"],
-                                  [subUserInfo valueForKey:@"NSValidationErrorPredicate"],
-                                  [subUserInfo valueForKey:@"NSValidationErrorObject"],
-                                  [subUserInfo valueForKey:@"NSLocalizedDescription"]);
-                        }
-                    }
-                    // If there was no NSDetailedErrors array, print values directly
-                    // from the top-level userInfo object. (Hint: all of these keys
-                    // will have null values when you've got multiple errors sitting
-                    // behind the NSDetailedErrors key.
-                    else {
+    //    //trying this out
+    //    [context performBlock:^{
+    NSError * error = nil;
+    if (context != nil) {
+        if ([context hasChanges] && ![context save:&error]) {
+            // If Cocoa generated the error...
+            if ([[error domain] isEqualToString:@"NSCocoaErrorDomain"]) {
+                // ...check whether there's an NSDetailedErrors array
+                NSDictionary *userInfo = [error userInfo];
+                if ([userInfo valueForKey:@"NSDetailedErrors"] != nil) {
+                    // ...and loop through the array, if so.
+                    NSArray *errors = [userInfo valueForKey:@"NSDetailedErrors"];
+                    for (NSError *anError in errors) {
+                        
+                        NSDictionary *subUserInfo = [anError userInfo];
+                        // Granted, this indents the NSValidation keys rather a lot
+                        // ...but it's a small loss to keep the code more readable.
                         NSLog(@"error info %@", userInfo);
                         NSLog(@"Core Data Save Error\n\n \
                               NSValidationErrorKey\n%@\n\n \
                               NSValidationErrorPredicate\n%@\n\n \
                               NSValidationErrorObject\n%@\n\n \
                               NSLocalizedDescription\n%@",
-                              [userInfo valueForKey:@"NSValidationErrorKey"],
-                              [userInfo valueForKey:@"NSValidationErrorPredicate"],
-                              [userInfo valueForKey:@"NSValidationErrorObject"],
-                              [userInfo valueForKey:@"NSLocalizedDescription"]);
-                        
+                              [subUserInfo valueForKey:@"NSValidationErrorKey"],
+                              [subUserInfo valueForKey:@"NSValidationErrorPredicate"],
+                              [subUserInfo valueForKey:@"NSValidationErrorObject"],
+                              [subUserInfo valueForKey:@"NSLocalizedDescription"]);
                     }
                 }
-                // Handle mine--or 3rd party-generated--errors
+                // If there was no NSDetailedErrors array, print values directly
+                // from the top-level userInfo object. (Hint: all of these keys
+                // will have null values when you've got multiple errors sitting
+                // behind the NSDetailedErrors key.
                 else {
-                    NSLog(@"Custom Error: %@", [error localizedDescription]);
+                    NSLog(@"error info %@", userInfo);
+                    NSLog(@"Core Data Save Error\n\n \
+                          NSValidationErrorKey\n%@\n\n \
+                          NSValidationErrorPredicate\n%@\n\n \
+                          NSValidationErrorObject\n%@\n\n \
+                          NSLocalizedDescription\n%@",
+                          [userInfo valueForKey:@"NSValidationErrorKey"],
+                          [userInfo valueForKey:@"NSValidationErrorPredicate"],
+                          [userInfo valueForKey:@"NSValidationErrorObject"],
+                          [userInfo valueForKey:@"NSLocalizedDescription"]);
+                    
                 }
-            }else {
-#if LOG_DATASTORE_SAVE_CONTEXT_STACKTRACE
-                NSLog(@"Context saved successfully");
-#endif
             }
+            // Handle mine--or 3rd party-generated--errors
+            else {
+                NSLog(@"Custom Error: %@", [error localizedDescription]);
+            }
+        }else {
+#if LOG_DATASTORE_SAVE_CONTEXT_STACKTRACE
+            NSLog(@"Context saved successfully");
+#endif
         }
+    }
     
-
+    
     
 #if LOG_DATASTORE_SAVE_CONTEXT_MAIN_THREAD_TIMER
     BOOL shouldShowStackTrace = FALSE;

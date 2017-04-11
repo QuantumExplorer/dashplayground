@@ -23,6 +23,10 @@
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode;
 - (void)configureMasternode:(NSManagedObject*)masternode;
 
+-(void)checkMasternode:(NSManagedObject*)masternode;
+
+-(NSDictionary*)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode;
+
 -(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode;
 
 @end

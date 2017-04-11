@@ -16,9 +16,17 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 +(DPDataStore*)sharedInstance;
 
+#pragma mark - git
+
+-(NSManagedObject*)branchNamed:(NSString*)string onRepositoryURLPath:(NSString*)repositoryURLPath;
+
 #pragma mark - Masternodes
 
 -(NSArray*)allMasternodes;
+
+-(NSArray*)allMasternodesWithPredicate:(NSPredicate*)predicate;
+
+-(NSArray*)allMasternodesWithPredicate:(NSPredicate*)predicate inContext:(NSManagedObjectContext*)context;
 
 -(NSArray*)allMasternodesInContext:(NSManagedObjectContext*)context;
 

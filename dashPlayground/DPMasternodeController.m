@@ -34,15 +34,111 @@
 
 #pragma mark - Connectivity
 
+-(NSString*)sendGitCommand:(NSString*)command onSSH:(CkoSsh *)ssh {
+    return [[self sendGitCommands:@[command] onSSH:ssh] valueForKey:command];
+}
 
--(NSString*)sendGitCommand:(NSString*)command onSSH:(CkoSsh *)ssh channelNum:(NSUInteger)channelNum {
-    return [self sendCommandList:@[@"cd src/dash/\n",[NSString stringWithFormat:@"git %@",command]] onSSH:ssh channelNum:channelNum];
+-(NSDictionary*)sendGitCommands:(NSArray*)commands onSSH:(CkoSsh *)ssh {
+    
+    NSInteger channelNum = [[ssh QuickShell] integerValue];
+    if (channelNum < 0) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
+    
+    //  This is the prompt we'll be expecting to find in
+    //  the output of the remote shell.
+    NSString *myPrompt = @":~/src/dash$";
+    //   Run the 1st command in the remote shell, which will be to
+    //   "cd" to a subdirectory.
+    BOOL success = [ssh ChannelSendString: @(channelNum) strData: @"cd src/dash/\n" charset: @"ansi"];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
+    
+    //    NSNumber * v = [ssh ChannelReadAndPoll:@(channelNum) pollTimeoutMs:@(5000)];
+    //
+    //    NSString *cmdOutpu2t = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+    //    if (ssh.LastMethodSuccess != YES) {
+    //        NSLog(@"%@",ssh.LastErrorText);
+    //        return nil;
+    //    };
+    //  Retrieve the output.
+    success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
+    
+    //   Display what we've received so far.  This clears
+    //   the internal receive buffer, which is important.
+    //   After we send the command, we'll be reading until
+    //   the next command prompt.  If the command prompt
+    //   is already in the internal receive buffer, it'll think it's
+    //   already finished...
+    NSString *cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+    if (ssh.LastMethodSuccess != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    };
+    NSMutableDictionary * rDict = [NSMutableDictionary dictionaryWithCapacity:commands.count];
+    for (NSString * gitCommand in commands) {
+        //   Run the 2nd command in the remote shell, which will be
+        //   to "ls" the directory.
+        success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"git %@\n",gitCommand] charset: @"ansi"];
+        if (success != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return nil;
+        }
+        
+        //  Retrieve and display the output.
+        success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+        if (success != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return nil;
+        }
+        
+        cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+        if (ssh.LastMethodSuccess != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return nil;
+        }
+        NSArray * components = [cmdOutput componentsSeparatedByString:@"\r\n"];
+        if ([components count] > 2) {
+            if ([[NSString stringWithFormat:@"git %@",gitCommand] isEqualToString:components[0]]) {
+                [rDict setObject:components[1] forKey:gitCommand];
+            }
+        }
+    }
+    
+    //  Send an EOF.  This tells the server that no more data will
+    //  be sent on this channel.  The channel remains open, and
+    //  the SSH client may still receive output on this channel.
+    success = [ssh ChannelSendEof: @(channelNum)];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
+    
+    //  Close the channel:
+    success = [ssh ChannelSendClose: @(channelNum)];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
+    
+    return rDict;
 }
 
 
--(NSString*)sendCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh channelNum:(NSUInteger)channelNum {
+-(NSString*)sendCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh {
     
-    
+    NSInteger channelNum = [[ssh QuickShell] integerValue];
+    if (channelNum < 0) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
     //  Construct a StringBuilder with multiple commands, one per line.
     //  Note: The line-endings are potentially important.  Some SSH servers may
     //  require either LF or CRLF line endings.  (Unix/Linux/OSX servers typically
@@ -163,7 +259,11 @@
     return sftp;
 }
 
--(CkoSsh*)sshIn:(NSManagedObject*)masternode channelNum:(NSUInteger *)channelNum {
+-(CkoSsh*)sshIn:(NSManagedObject*)masternode {
+    return [self sshIn:masternode channelNum:nil];
+}
+
+-(CkoSsh*)sshIn:(NSManagedObject*)masternode channelNum:(NSInteger *)channelNum {
     //  Important: It is helpful to send the contents of the
     //  sftp.LastErrorText property when sending email
     //  to support@chilkatsoft.com
@@ -205,12 +305,14 @@
     }
     NSLog(@"%@",@"Public-Key Authentication Successful!");
     
-    //  Start a shell session.
-    //  (The QuickShell method was added in Chilkat v9.5.0.65)
-    *channelNum = [[ssh QuickShell] unsignedIntegerValue];
-    if (channelNum < 0) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return nil;
+    if (channelNum) {
+        //  Start a shell session.
+        //  (The QuickShell method was added in Chilkat v9.5.0.65)
+        *channelNum = [[ssh QuickShell] integerValue];
+        if (channelNum < 0) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return nil;
+        }
     }
     return ssh;
 }
@@ -219,8 +321,7 @@
 
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode
 {
-    NSUInteger channelNum = 0;
-    CkoSsh * ssh = [self sshIn:masternode channelNum:&channelNum];
+    CkoSsh * ssh = [self sshIn:masternode];
     if (!ssh) return;
     //  Send some commands and get the output.
     NSString *strOutput = [ssh QuickCommand: @"ls src | grep dash" charset: @"ansi"];
@@ -229,24 +330,37 @@
         return;
     }
     BOOL justCloned = FALSE;
-        if (![strOutput hasPrefix:@"dash"]) {
-            justCloned = TRUE;
-            [ssh QuickCommand: @"git clone https://github.com/QuantumExplorer/dash.git ~/src/dash" charset: @"ansi"];
-            if (ssh.LastMethodSuccess != YES) {
-                NSLog(@"%@",ssh.LastErrorText);
-                return;
-            }
+    if (![strOutput hasPrefix:@"dash"]) {
+        justCloned = TRUE;
+        [ssh QuickCommand: @"git clone https://github.com/QuantumExplorer/dash.git ~/src/dash" charset: @"ansi"];
+        if (ssh.LastMethodSuccess != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return;
         }
+    }
+    NSDictionary * gitValues = nil;
     if (!justCloned) {
-        strOutput = [self sendCommandList:@[@"cd src/dash/\n",@"git pull\n"] onSSH:ssh channelNum:channelNum];
+        gitValues = [self sendGitCommands:@[@"pull",@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
+    } else {
+        gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
+    }
+    NSString * remote = nil;
+    NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
+    
+    if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
+        remote = remoteInfoLine[1];
     }
     
-    NSString * commitHash = [self sendGitCommand:@"rev-parse HEAD" onSSH:ssh channelNum:channelNum];
-    NSLog(@"%@",strOutput);
-    
     [ssh Disconnect];
-    
-    return;
+    [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+    if (remote) {
+        NSManagedObject * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
+        if (branch) {
+            [masternode setValue:branch forKey:@"branch"];
+        }
+    }
+    [masternode setValue:gitValues[@"rev-parse HEAD"] forKey:@"gitCommit"];
+    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
 }
 
 - (void)configureMasternode:(NSManagedObject*)masternode {
@@ -271,11 +385,17 @@
 }
 
 
-#pragma mark - Query Remote
+#pragma mark - RPC Query Remote
 
 -(NSData *)sendRPCCommand:(NSString*)command toMasternode:(NSManagedObject*)masternode {
     NSString * fullCommand = [NSString stringWithFormat:@"-testnet -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@",[masternode valueForKey:@"publicIP"],[masternode valueForKey:@"rpcPassword"], command];
     return [[DPLocalNodeController sharedInstance] runDashRPCCommand:fullCommand];
+}
+
+-(NSDictionary *)sendRPCCommandJSONDictionary:(NSString*)command toMasternode:(NSManagedObject*)masternode error:(NSError**)error {
+    
+    NSData * data = [self sendRPCCommand:command toMasternode:masternode];
+    return [NSJSONSerialization JSONObjectWithData:data options:0 error:error];
 }
 
 -(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode {
@@ -283,6 +403,129 @@
     return [[DPLocalNodeController sharedInstance] runDashRPCCommandString:fullCommand];
 }
 
+-(NSDictionary *)getInfo:(NSManagedObject*)masternode {
+    NSError * error = nil;
+    NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"getinfo" toMasternode:masternode error:&error];
+    if (!error) {
+        return dictionary;
+    }
+    else return nil;
+}
+
+#pragma mark - SSH Query Remote
+
+-(void)updateGitInfoForMasternode:(NSManagedObject*)masternode {
+    [self updateGitInfoForMasternode:masternode saveContext:YES hasChanges:nil];
+}
+
+-(void)updateGitInfoForMasternode:(NSManagedObject*)masternode saveContext:(BOOL)saveContext hasChanges:(BOOL *)hasChanges {
+    CkoSsh * ssh = [self sshIn:masternode];
+    if (!ssh) return;
+    
+    NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
+    [ssh Disconnect];
+    NSString * remote = nil;
+    NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
+    
+    if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
+        remote = remoteInfoLine[1];
+    }
+    
+    if (remote) {
+        NSManagedObject * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
+        if (branch && ![[masternode valueForKey:@"branch"] isEqual:branch]) {
+            [masternode setValue:branch forKey:@"branch"];
+            if (hasChanges) *hasChanges = YES;
+        }
+    }
+    if (![[masternode valueForKey:@"gitCommit"] isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
+        [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+        if (hasChanges) *hasChanges = YES;
+    }
+    [ssh Disconnect];
+    if (saveContext) {
+        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+    }
+}
+
+#pragma mark - Masternode Auto Update
+
+-(NSDictionary*)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode {
+    NSInteger channelNum = 0;
+    CkoSsh * ssh = [self sshIn:masternode channelNum:&channelNum];
+    if (!ssh) return nil;
+    //  Send some commands and get the output.
+    NSString *strOutput = [ssh QuickCommand: @"cat .dashcore/dash.conf" charset: @"ansi"];
+    if (ssh.LastMethodSuccess != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return nil;
+    }
+    NSArray * lines = [strOutput componentsSeparatedByString:@"\n"];
+    NSMutableDictionary * rDict = [NSMutableDictionary dictionary];
+    for (NSString * line in lines) {
+        if ([line hasPrefix:@"#"] || ![line containsString:@"="]) continue;
+        NSArray * valueKeys =[line componentsSeparatedByString:@"="];
+        [rDict setObject:valueKeys[1] forKey:valueKeys[0]];
+    }
+    [ssh Disconnect];
+    return [rDict copy];
+}
+
+-(void)checkMasternode:(NSManagedObject*)masternode {
+    [self checkMasternode:masternode saveContext:TRUE];
+}
+
+-(BOOL)checkMasternodeIsProperlyConfigured:(NSManagedObject *)masternode {
+    return TRUE;
+}
+
+-(void)checkMasternode:(NSManagedObject*)masternode saveContext:(BOOL)saveContext {
+    //we are going to check if a masternode is running, configured, etc...
+    //first let's check to see if we have access to rpc
+    if ([masternode valueForKey:@"rpcPassword"]) {
+        //we most likely have access to rpc, it's running
+        NSDictionary * dictionary = [self getInfo:masternode];
+        if (dictionary) {
+            [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
+            [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
+            
+        } else {
+            if ([self checkMasternodeIsProperlyConfigured:masternode]) {
+                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+            } else {
+                [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+            }
+            
+        }
+        
+    } else { //we don't have access to the rpc, let's ssh in and retrieve it.
+        NSDictionary * info = [self retrieveConfigurationInfoThroughSSH:masternode];
+        if (![info[@"externalip"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
+            //the masternode has never been configured
+            [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+        } else {
+            [masternode setValue:info[@"rpcpassword"] forKey:@"rpcPassword"];
+            [masternode setValue:info[@"masternodeprivkey"] forKey:@"key"];
+            NSDictionary * dictionary = [self getInfo:masternode];
+            if (dictionary) {
+                [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
+                [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
+            } else {
+                if ([self checkMasternodeIsProperlyConfigured:masternode]) {
+                    [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                } else {
+                    [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                }
+            }
+        }
+        
+    }
+    BOOL hasGitChanges = NO;
+    [self updateGitInfoForMasternode:masternode saveContext:NO hasChanges:&hasGitChanges];
+    if (saveContext || hasGitChanges) {
+        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+    }
+}
 
 #pragma mark - AWS Core
 
@@ -388,7 +631,7 @@
     NSArray * reservations = output[@"Reservations"];
     NSMutableArray * instances = [NSMutableArray array];
     for (NSDictionary * reservation in reservations) {
-     //NSLog(@"%@",reservation[@"Instances"]);
+        //NSLog(@"%@",reservation[@"Instances"]);
         for (NSDictionary * dictionary in reservation[@"Instances"]) {
             NSDictionary * rDict = [NSMutableDictionary dictionary];
             [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
@@ -401,16 +644,18 @@
     
     NSDictionary * referencedInstances = [instances dictionaryReferencedByKeyPath:@"instanceId"];
     BOOL needsSave = FALSE;
+    NSMutableArray * masternodesNeedingChecks = [NSMutableArray array];
     for (NSString* reference in referencedInstances) {
         if ([knownInstances objectForKey:reference]) {
             if (![[[knownInstances objectForKey:reference] valueForKey:@"instanceState"] isEqualToNumber:[referencedInstances[reference] valueForKey:@"instanceState"]]) {
                 needsSave = TRUE;
-            [[knownInstances objectForKey:reference] setValue:[referencedInstances[reference] valueForKey:@"instanceState"] forKey:@"instanceState"];
+                [[knownInstances objectForKey:reference] setValue:[referencedInstances[reference] valueForKey:@"instanceState"] forKey:@"instanceState"];
             }
         } else {
-        needsSave = TRUE;
+            needsSave = TRUE;
             [referencedInstances[reference] setValue:@(MasternodeState_Checking) forKey:@"masternodeState"];
-        [[DPDataStore sharedInstance] addMasternode:referencedInstances[reference] saveContext:FALSE];
+            NSManagedObject * masternode = [[DPDataStore sharedInstance] addMasternode:referencedInstances[reference] saveContext:FALSE];
+            [masternodesNeedingChecks addObject:masternode];
         }
     }
     for (NSString* knownInstance in knownInstances) {
@@ -418,6 +663,9 @@
             needsSave = TRUE;
             [[[DPDataStore sharedInstance] mainContext] deleteObject:knownInstances[knownInstance]];
         }
+    }
+    for (NSManagedObject * masternode in masternodesNeedingChecks) {
+        [self checkMasternode:masternode];
     }
     if (needsSave) {
         [[DPDataStore sharedInstance] saveContext];

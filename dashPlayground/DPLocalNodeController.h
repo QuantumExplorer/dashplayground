@@ -41,6 +41,8 @@ typedef void (^dashSyncClb)(BOOL active);
 
 - (void)startRemote:(NSManagedObject*)masternode;
 
+-(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashClb)clb;
+
 +(DPLocalNodeController*)sharedInstance;
 
 @end

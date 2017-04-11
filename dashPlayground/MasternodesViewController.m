@@ -51,47 +51,6 @@
     [[DPMasternodeController sharedInstance] setUpMasternodeDashd:object];
 }
 
--(void)configureStep2:(NSManagedObject*)object {
-    [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
-        if (success) {
-            NSString *fullpath = @"/Users/samuelw/Library/Application Support/Dashcore/testnet3/masternode.conf";
-            NSError * error = nil;
-            NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
-            NSMutableArray * lines = [[contents componentsSeparatedByString:@"\n"] mutableCopy];
-            NSMutableArray * specialLines = [NSMutableArray array];
-            for (int i = ((int)[lines count]) - 1;i> -1;i--) {
-                if ([lines[i] hasPrefix:@"#"]) {
-                    [specialLines addObject:[lines objectAtIndex:i]];
-                    [lines removeObjectAtIndex:i];
-                } else
-                    if ([lines[i] isEqualToString:@""]) {
-                        [lines removeObjectAtIndex:i];
-                    } else
-                        if ([lines[i] hasPrefix:[object valueForKey:@"instanceId"]]) {
-                            [lines removeObjectAtIndex:i];
-                        }
-            }
-            [lines addObject:[NSString stringWithFormat:@"%@ %@:19999 %@ %@ %@",[object valueForKey:@"instanceId"],[object valueForKey:@"publicIP"],[object valueForKey:@"key"],[object valueForKey:@"transactionId"],[object valueForKey:@"transactionOutputIndex"]]];
-            NSString * content = [[[specialLines componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"] stringByAppendingString:[lines componentsJoinedByString:@"\n"]];
-            [content writeToFile:fullpath
-                      atomically:NO
-                        encoding:NSStringEncodingConversionAllowLossy
-                           error:nil];
-            if (error) {
-                NSLog(@"error");
-            } else {
-                [[DPMasternodeController sharedInstance] configureMasternode:object];
-            }
-        } else {
-            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-            dict[NSLocalizedDescriptionKey] = @"Error stoping dash server to place configuration file.";
-            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-            [[NSApplication sharedApplication] presentError:error];
-            return;
-        }
-    }];
-}
-
 - (IBAction)configure:(id)sender {
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
@@ -104,7 +63,14 @@
         return;
     }
     if ([object valueForKey:@"transactionId"]) {
-        [self configureStep2:object];
+        [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:object clb:^(BOOL success, NSString *message) {
+            if (!success) {
+                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                dict[NSLocalizedDescriptionKey] = message;
+                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                [[NSApplication sharedApplication] presentError:error];
+            }
+        }];
     } else {
     [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
         if (success) {
@@ -119,7 +85,14 @@
                 [object setValue:outputs[0][0] forKey:@"transactionId"];
                 [object setValue:@([outputs[0][1] integerValue])  forKey:@"transactionOutputIndex"];
                 [[DPDataStore sharedInstance] saveContext];
-                [self configureStep2:object];
+                [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:object clb:^(BOOL success, NSString *message) {
+                    if (!success) {
+                        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                        dict[NSLocalizedDescriptionKey] = message;
+                        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                        [[NSApplication sharedApplication] presentError:error];
+                    }
+                }];
             } else {
                 NSMutableDictionary *dict = [NSMutableDictionary dictionary];
                 dict[NSLocalizedDescriptionKey] = @"No valid outputs (1000 DASH) in local wallet.";
