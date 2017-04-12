@@ -210,8 +210,31 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     //return string;
 }
 
+-(NSDictionary*)masternodeInfoInMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode {
+    NSString *fullpath = @"/Users/samuelw/Library/Application Support/Dashcore/testnet3/masternode.conf";
+    NSError * error = nil;
+    NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
+    NSArray * lines = [contents componentsSeparatedByString:@"\n"];
+    NSString * importantLine = nil;
+    for (int i = ((int)[lines count]) - 1;i> -1;i--) {
+
+                if ([lines[i] hasPrefix:[masternode valueForKey:@"instanceId"]]) {
+                    importantLine = lines[i];
+                }
+    }
+    if (importantLine) {
+        NSArray * info = [importantLine componentsSeparatedByString:@" "];
+        if ([info count] == 5) {
+            NSString * publicIP = [info[1] componentsSeparatedByString:@":"][0];
+            return @{@"instanceId":info[0],@"publicIP":publicIP,@"key":info[2],@"transactionId":info[3],@"transactionOutputIndex":@([info[4] intValue])};
+        }
+    }
+    return @{};
+}
+
 -(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashClb)clb {
     __block NSManagedObject * object = masternode;
+    [self checkDash:^(BOOL active) {
     [self stopDash:^(BOOL success, NSString *message) {
         if (success) {
             NSString *fullpath = @"/Users/samuelw/Library/Application Support/Dashcore/testnet3/masternode.conf";
@@ -238,13 +261,26 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
                         encoding:NSStringEncodingConversionAllowLossy
                            error:nil];
             if (error) {
-                NSLog(@"error");
+                if (active) {
+                    [self startDash:^(BOOL success, NSString *message) {
+                        return clb(FALSE,@"Error writing to file");
+                    }];
+                } else {
+                    return clb(FALSE,@"Error writing to file");
+                }
             } else {
-                [[DPMasternodeController sharedInstance] configureMasternode:object];
+                if (active) {
+                    [self startDash:^(BOOL success, NSString *message) {
+                        return clb(success,message);
+                    }];
+                } else {
+                    return clb(TRUE,nil);
+                }
             }
         } else {
             clb(FALSE,@"Error stoping dash server to place configuration file.");
         }
+    }];
     }];
 }
 

@@ -54,62 +54,15 @@
 - (IBAction)configure:(id)sender {
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
-    __block NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    if (![object valueForKey:@"key"]) {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-        dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can configure it.";
-        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-        [[NSApplication sharedApplication] presentError:error];
-        return;
-    }
-    if ([object valueForKey:@"transactionId"]) {
-        [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:object clb:^(BOOL success, NSString *message) {
-            if (!success) {
-                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                dict[NSLocalizedDescriptionKey] = message;
-                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                [[NSApplication sharedApplication] presentError:error];
-            }
-        }];
-    } else {
-    [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
-        if (success) {
-            NSMutableArray * outputs = [[[DPLocalNodeController sharedInstance] outputs] mutableCopy];
-            NSArray * knownOutputs = [[[DPDataStore sharedInstance] allMasternodes] arrayOfArraysReferencedByKeyPaths:@[@"transactionId",@"transactionOutputIndex"] requiredKeyPaths:@[@"transactionId",@"transactionOutputIndex"]];
-            for (int i = (int)[outputs count] -1;i> -1;i--) {
-                for (NSArray * knownOutput in knownOutputs) {
-                    if ([outputs[i][0] isEqualToString:knownOutput[0]] && ([outputs[i][1] integerValue] == [knownOutput[1] integerValue])) [outputs removeObjectAtIndex:i];
-                }
-            }
-            if ([outputs count]) {
-                [object setValue:outputs[0][0] forKey:@"transactionId"];
-                [object setValue:@([outputs[0][1] integerValue])  forKey:@"transactionOutputIndex"];
-                [[DPDataStore sharedInstance] saveContext];
-                [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:object clb:^(BOOL success, NSString *message) {
-                    if (!success) {
-                        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                        dict[NSLocalizedDescriptionKey] = message;
-                        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                        [[NSApplication sharedApplication] presentError:error];
-                    }
-                }];
-            } else {
-                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                dict[NSLocalizedDescriptionKey] = @"No valid outputs (1000 DASH) in local wallet.";
-                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                [[NSApplication sharedApplication] presentError:error];
-                return;
-            }
-        } else {
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:object clb:^(BOOL success, NSString *message) {
+        if (!success) {
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-            dict[NSLocalizedDescriptionKey] = @"Dash server did not start.";
+            dict[NSLocalizedDescriptionKey] = message;
             NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
             [[NSApplication sharedApplication] presentError:error];
-            return;
         }
     }];
-    
-    }
 }
 
 - (IBAction)startRemote:(id)sender {

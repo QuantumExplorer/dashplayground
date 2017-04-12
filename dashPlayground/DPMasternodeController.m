@@ -363,7 +363,66 @@
     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
 }
 
-- (void)configureMasternode:(NSManagedObject*)masternode {
+- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb {
+    __block NSManagedObject * object = masternode;
+    if (![masternode valueForKey:@"key"]) {
+        [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
+            if (!success) return clb(success,message);
+            NSString * key = [[[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"-testnet masternode genkey"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            if ([key length] == 51) {
+                [object setValue:key forKey:@"key"];
+                [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                [self setUpMasternodeConfiguration:object clb:clb];
+            } else {
+                if (!success) return clb(FALSE,@"Error generating masternode key");
+            }
+        }];
+        return;
+    }
+    
+    
+    if ([masternode valueForKey:@"transactionId"] && [masternode valueForKey:@"transactionOutputIndex"]) {
+        [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
+            if (success) {
+                [self configureRemoteMasternode:object];
+                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+            }
+            return clb(success,message);
+        }];
+    } else {
+        [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
+            if (success) {
+                NSMutableArray * outputs = [[[DPLocalNodeController sharedInstance] outputs] mutableCopy];
+                NSArray * knownOutputs = [[[DPDataStore sharedInstance] allMasternodes] arrayOfArraysReferencedByKeyPaths:@[@"transactionId",@"transactionOutputIndex"] requiredKeyPaths:@[@"transactionId",@"transactionOutputIndex"]];
+                for (int i = (int)[outputs count] -1;i> -1;i--) {
+                    for (NSArray * knownOutput in knownOutputs) {
+                        if ([outputs[i][0] isEqualToString:knownOutput[0]] && ([outputs[i][1] integerValue] == [knownOutput[1] integerValue])) [outputs removeObjectAtIndex:i];
+                    }
+                }
+                if ([outputs count]) {
+                    [masternode setValue:outputs[0][0] forKey:@"transactionId"];
+                    [masternode setValue:@([outputs[0][1] integerValue]) forKey:@"transactionOutputIndex"];
+                    [[DPDataStore sharedInstance] saveContext];
+                    [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
+                        if (success) {
+                            [self configureRemoteMasternode:object];
+                            [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                            [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                        }
+                        return clb(success,message);
+                    }];
+                } else {
+                    return clb(FALSE,@"No valid outputs (1000 DASH) in local wallet.");
+                }
+            } else {
+                return clb(FALSE,@"Dash server had a problem starting.");
+            }
+        }];
+    }
+}
+
+- (void)configureRemoteMasternode:(NSManagedObject*)masternode {
     
     NSString *localFilePath = [self createConfigDashFileForMasternode:masternode];
     
@@ -475,6 +534,24 @@
     [self checkMasternode:masternode saveContext:TRUE];
 }
 
+- (BOOL)checkMasternodeIsInstalled:(NSManagedObject*)masternode
+{
+    CkoSsh * ssh = [self sshIn:masternode];
+    if (!ssh) return NO;
+    //  Send some commands and get the output.
+    NSString *strOutput = [[ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (ssh.LastMethodSuccess != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return NO;
+    }
+    [ssh Disconnect];
+    if ([strOutput isEqualToString:@"dash"]) {
+        return YES;
+    }
+    return NO;
+}
+
+
 -(BOOL)checkMasternodeIsProperlyConfigured:(NSManagedObject *)masternode {
     return TRUE;
 }
@@ -490,8 +567,14 @@
             [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
             
         } else {
-            if ([self checkMasternodeIsProperlyConfigured:masternode]) {
-                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+            if ([self checkMasternodeIsInstalled:masternode]) {
+                NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
+                if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
+                    [masternode setValuesForKeysWithDictionary:dictionary];
+                    [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                } else {
+                    [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                }
             } else {
                 [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
             }
@@ -502,7 +585,11 @@
         NSDictionary * info = [self retrieveConfigurationInfoThroughSSH:masternode];
         if (![info[@"externalip"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
             //the masternode has never been configured
-            [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+            if ([self checkMasternodeIsInstalled:masternode]) {
+                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+            } else {
+                [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+            }
         } else {
             [masternode setValue:info[@"rpcpassword"] forKey:@"rpcPassword"];
             [masternode setValue:info[@"masternodeprivkey"] forKey:@"key"];
@@ -511,8 +598,14 @@
                 [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
                 [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
             } else {
-                if ([self checkMasternodeIsProperlyConfigured:masternode]) {
-                    [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                if ([self checkMasternodeIsInstalled:masternode]) {
+                    NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
+                    if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
+                        [masternode setValuesForKeysWithDictionary:dictionary];
+                        [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                    } else {
+                        [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                    }
                 } else {
                     [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
                 }
@@ -521,7 +614,10 @@
         
     }
     BOOL hasGitChanges = NO;
-    [self updateGitInfoForMasternode:masternode saveContext:NO hasChanges:&hasGitChanges];
+    MasternodeState state = [[masternode valueForKey:@"masternodeState"] integerValue];
+    if (state == MasternodeState_Installed || state == MasternodeState_Configured || state == MasternodeState_Running) {
+        [self updateGitInfoForMasternode:masternode saveContext:NO hasChanges:&hasGitChanges];
+    }
     if (saveContext || hasGitChanges) {
         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
     }

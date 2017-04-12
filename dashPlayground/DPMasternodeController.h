@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 #import "InstanceStateTransformer.h"
+#import "DPLocalNodeController.h"
 
 @interface DPMasternodeController : NSObject
 
@@ -21,7 +22,8 @@
 - (void)getInstances;
 
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode;
-- (void)configureMasternode:(NSManagedObject*)masternode;
+- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb;
+- (void)configureRemoteMasternode:(NSManagedObject*)masternode;
 
 -(void)checkMasternode:(NSManagedObject*)masternode;
 
