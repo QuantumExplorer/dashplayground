@@ -11,6 +11,8 @@
 #import "InstanceStateTransformer.h"
 #import "DPLocalNodeController.h"
 
+typedef void (^dashPercentageClb)(NSString * call,float percentage);
+
 @interface DPMasternodeController : NSObject
 
 +(DPMasternodeController*)sharedInstance;

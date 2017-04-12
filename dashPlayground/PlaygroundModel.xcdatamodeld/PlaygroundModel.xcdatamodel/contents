@@ -19,7 +19,7 @@
         <attribute name="syncStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="transactionId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="transactionOutputIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="version" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="version" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="branch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="masternodes" inverseEntity="Branch" syncable="YES"/>
     </entity>
     <entity name="Repository" representedClassName="Repository" syncable="YES" codeGenerationType="class">

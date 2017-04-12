@@ -131,55 +131,96 @@
     return rDict;
 }
 
+-(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh {
+    [self sendDashCommandList:commands onSSH:ssh commandExpectedLineCounts:nil percentageClb:nil];
+}
 
--(NSString*)sendCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh {
+
+-(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts percentageClb:(dashPercentageClb)clb {
+    //expected line counts are used to give back a percentage complete on this function;
     
     NSInteger channelNum = [[ssh QuickShell] integerValue];
     if (channelNum < 0) {
         NSLog(@"%@",ssh.LastErrorText);
-        return nil;
-    }
-    //  Construct a StringBuilder with multiple commands, one per line.
-    //  Note: The line-endings are potentially important.  Some SSH servers may
-    //  require either LF or CRLF line endings.  (Unix/Linux/OSX servers typically
-    //  use bare-LF line endings.  Windows servers likely use CRLF line endings.)
-    CkoStringBuilder *sbCommands = [[CkoStringBuilder alloc] init];
-    for (NSString * command in commands) {
-        [sbCommands Append:command];
+        return;
     }
     
-    //  For our last command, we're going to echo a marker string that
-    //  we'll use in ChannelReceiveUntilMatch below.
-    //  The use of single quotes around 'IS' is a trick so that the output
-    //  of the command is "THIS IS THE END OF THE SCRIPT", but the terminal echo
-    //  includes the single quotes.  This allows us to read until we see the actual
-    //  output of the last command.
-    [sbCommands Append: @"echo THIS 'IS' THE END OF THE SCRIPT\n"];
-    
-    //  Send the commands..
-    BOOL success = [ssh ChannelSendString: @(channelNum) strData: [sbCommands GetAsString] charset: @"ansi"];
+    //  This is the prompt we'll be expecting to find in
+    //  the output of the remote shell.
+    NSString *myPrompt = @":~/src/dash$";
+    //   Run the 1st command in the remote shell, which will be to
+    //   "cd" to a subdirectory.
+    BOOL success = [ssh ChannelSendString: @(channelNum) strData: @"cd src/dash/\n" charset: @"ansi"];
     if (success != YES) {
         NSLog(@"%@",ssh.LastErrorText);
-        return nil;
+        return;
     }
-    //  Send an EOF to indicate no more commands will be sent.
-    //  For brevity, we're not checking the return values of each method call.
-    //  Your code should check the success/failure of each call.
-    success = [ssh ChannelSendEof:@(channelNum)];
     
-    //  Receive output up to our marker.
-    success = [ssh ChannelReceiveUntilMatch:@(channelNum) matchPattern: @"THIS IS THE END OF THE SCRIPT" charset: @"ansi" caseSensitive: YES];
+    //    NSNumber * v = [ssh ChannelReadAndPoll:@(channelNum) pollTimeoutMs:@(5000)];
+    //
+    //    NSString *cmdOutpu2t = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+    //    if (ssh.LastMethodSuccess != YES) {
+    //        NSLog(@"%@",ssh.LastErrorText);
+    //        return nil;
+    //    };
+    //  Retrieve the output.
+    success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return;
+    }
     
-    //  Close the channel.
-    //  It is important to close the channel only after receiving the desired output.
-    success = [ssh ChannelSendClose:@(channelNum)];
+    //   Display what we've received so far.  This clears
+    //   the internal receive buffer, which is important.
+    //   After we send the command, we'll be reading until
+    //   the next command prompt.  If the command prompt
+    //   is already in the internal receive buffer, it'll think it's
+    //   already finished...
+    NSString *cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+    if (ssh.LastMethodSuccess != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return;
+    };
+    NSMutableDictionary * rDict = [NSMutableDictionary dictionaryWithCapacity:commands.count];
+    for (NSString * command in commands) {
+        //   Run the 2nd command in the remote shell, which will be
+        //   to "ls" the directory.
+        success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"%@\n",command] charset: @"ansi"];
+        if (success != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return;
+        }
+        
+        //  Retrieve and display the output.
+        success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+        if (success != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return;
+        }
+        
+        cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+        if (ssh.LastMethodSuccess != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            return;
+        }
+        [rDict setObject:cmdOutput forKey:command];
+    }
     
-    //  Get any remaining output..
-    success = [ssh ChannelReceiveToClose:@(channelNum)];
+    //  Send an EOF.  This tells the server that no more data will
+    //  be sent on this channel.  The channel remains open, and
+    //  the SSH client may still receive output on this channel.
+    success = [ssh ChannelSendEof: @(channelNum)];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return;
+    }
     
-    //  Get the complete output for all the commands in the session.
-    NSLog(@"%@",@"--- output ----");
-    return [ssh GetReceivedText:@(channelNum) charset: @"ansi"];
+    //  Close the channel:
+    success = [ssh ChannelSendClose: @(channelNum)];
+    if (success != YES) {
+        NSLog(@"%@",ssh.LastErrorText);
+        return;
+    }
 }
 
 -(CkoSshKey *)loginPrivateKeyForMasternode:(NSManagedObject*)masternode {
@@ -324,13 +365,13 @@
     CkoSsh * ssh = [self sshIn:masternode];
     if (!ssh) return;
     //  Send some commands and get the output.
-    NSString *strOutput = [ssh QuickCommand: @"ls src | grep dash" charset: @"ansi"];
+    NSString *strOutput = [ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"];
     if (ssh.LastMethodSuccess != YES) {
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
     BOOL justCloned = FALSE;
-    if (![strOutput hasPrefix:@"dash"]) {
+    if (![strOutput isEqualToString:@"dash"]) {
         justCloned = TRUE;
         [ssh QuickCommand: @"git clone https://github.com/QuantumExplorer/dash.git ~/src/dash" charset: @"ansi"];
         if (ssh.LastMethodSuccess != YES) {
@@ -338,6 +379,8 @@
             return;
         }
     }
+    
+    //now let's get git info
     NSDictionary * gitValues = nil;
     if (!justCloned) {
         gitValues = [self sendGitCommands:@[@"pull",@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
@@ -350,9 +393,9 @@
     if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
         remote = remoteInfoLine[1];
     }
-    
-    [ssh Disconnect];
-    [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+    if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
+        [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+    }
     if (remote) {
         NSManagedObject * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
         if (branch) {
@@ -360,6 +403,12 @@
         }
     }
     [masternode setValue:gitValues[@"rev-parse HEAD"] forKey:@"gitCommit"];
+    
+    //now let's make all this shit
+    [self sendDashCommandList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh];
+    
+    [ssh Disconnect];
+    
     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
 }
 

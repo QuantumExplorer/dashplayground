@@ -1,15 +1,22 @@
 //
-//  ViewController.m
+//  RepositoriesViewController.m
 //  dashPlayground
 //
 //  Created by Sam Westrich on 3/24/17.
 //  Copyright © 2017 dashfoundation. All rights reserved.
 //
 
-#import "LoginViewController.h"
+#import "RepositoriesViewController.h"
 #import "DPMasternodeController.h"
 
-@implementation LoginViewController
+@interface RepositoriesViewController ()
+
+@property (strong) IBOutlet NSArrayController *arrayController;
+@property (strong) IBOutlet NSTableView *tableView;
+
+@end
+
+@implementation RepositoriesViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -25,6 +32,10 @@
 }
 - (IBAction)pressStartIntances:(id)sender {
     [[DPMasternodeController sharedInstance] runInstances:[self.startCountField integerValue]];
+}
+
+-(AppDelegate*)appDelegate {
+    return [NSApplication sharedApplication].delegate;
 }
 
 

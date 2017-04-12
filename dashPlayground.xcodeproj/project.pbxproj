@@ -36,7 +36,7 @@
 		FB06842B1E941DD700F1AFB4 /* dash.conf in Resources */ = {isa = PBXBuildFile; fileRef = FB0684291E941DD700F1AFB4 /* dash.conf */; };
 		FB2906671E85799F00A31092 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906661E85799F00A31092 /* AppDelegate.m */; };
 		FB29066A1E85799F00A31092 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906691E85799F00A31092 /* main.m */; };
-		FB29066D1E85799F00A31092 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* LoginViewController.m */; };
+		FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* RepositoriesViewController.m */; };
 		FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB29066E1E85799F00A31092 /* Assets.xcassets */; };
 		FB2906721E85799F00A31092 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB2906701E85799F00A31092 /* Main.storyboard */; };
 		FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */; };
@@ -230,8 +230,8 @@
 		FB2906651E85799F00A31092 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FB2906661E85799F00A31092 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		FB2906691E85799F00A31092 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		FB29066B1E85799F00A31092 /* LoginViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
-		FB29066C1E85799F00A31092 /* LoginViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		FB29066B1E85799F00A31092 /* RepositoriesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RepositoriesViewController.h; sourceTree = "<group>"; };
+		FB29066C1E85799F00A31092 /* RepositoriesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesViewController.m; sourceTree = "<group>"; };
 		FB29066E1E85799F00A31092 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FB2906711E85799F00A31092 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FB2906731E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -495,6 +495,7 @@
 		FB2906641E85799F00A31092 /* dashPlayground */ = {
 			isa = PBXGroup;
 			children = (
+				FB5A31C51E9EA205003D4DD8 /* View Controllers */,
 				FB0684201E8CCDC200F1AFB4 /* Transformers */,
 				FBBFEB741E872B9000BE41BE /* Model */,
 				FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */,
@@ -503,12 +504,6 @@
 				FB0683431E8731AD00F1AFB4 /* DPDataStore.m */,
 				FB2906651E85799F00A31092 /* AppDelegate.h */,
 				FB2906661E85799F00A31092 /* AppDelegate.m */,
-				FB29066B1E85799F00A31092 /* LoginViewController.h */,
-				FB29066C1E85799F00A31092 /* LoginViewController.m */,
-				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
-				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
-				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
-				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
 				FB2906731E85799F00A31092 /* Info.plist */,
@@ -544,6 +539,19 @@
 				FB29067E1E85799F00A31092 /* Info.plist */,
 			);
 			path = dashPlaygroundTests;
+			sourceTree = "<group>";
+		};
+		FB5A31C51E9EA205003D4DD8 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				FB29066B1E85799F00A31092 /* RepositoriesViewController.h */,
+				FB29066C1E85799F00A31092 /* RepositoriesViewController.m */,
+				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
+				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
+				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
+				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
+			);
+			name = "View Controllers";
 			sourceTree = "<group>";
 		};
 		FBBFEB741E872B9000BE41BE /* Model */ = {
@@ -661,7 +669,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB29066D1E85799F00A31092 /* LoginViewController.m in Sources */,
+				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FB0683A01E875A9800F1AFB4 /* DFSSHServer.m in Sources */,

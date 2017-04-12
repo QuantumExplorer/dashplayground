@@ -7,8 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "AppDelegate.h"
 
-@interface LoginViewController : NSViewController
+@interface RepositoriesViewController : NSViewController
+
+@property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
 @property (nonatomic,strong) IBOutlet NSTextField * startCountField;
 
