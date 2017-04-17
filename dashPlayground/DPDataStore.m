@@ -14,7 +14,7 @@
 @implementation DPDataStore
 
 
-#pragma mark - git
+#pragma mark - Repositories
 
 -(NSManagedObject*)branchNamed:(NSString*)string onRepositoryURLPath:(NSString*)repositoryURLPath {
     return [self branchNamed:string onRepositoryURLPath:repositoryURLPath inContext:self.mainContext];
@@ -380,17 +380,9 @@ __strong static NSMutableDictionary * mDict = nil;
 }
 
 -(void)deleteObject:(id)object {
-    [self verifyMainThread];
-    NSManagedObjectContext *context = [self mainContext];
-    [self deleteObject:object inContext:context];
+    [((NSManagedObject*)object).managedObjectContext deleteObject:object];
 }
 
--(void)deleteObject:(id)object inContext:(NSManagedObjectContext*)context {
-#if LOG_DATASTORE_DELETE_OBJECT_STACKTRACE
-    NSLog(@"saving stack trace of deletion of object %@ -> %@",object,[NSThread callStackSymbols]);
-#endif
-    [context deleteObject:object];
-}
 
 -(id)createInsertedNewObjectForEntityNamed:(NSString*)entityName {
     [self verifyMainThread];

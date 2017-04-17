@@ -9,13 +9,10 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 #import "MasternodeSyncStatusTransformer.h"
+#import "DashCallbacks.h"
 
 #define DASHD_PATH @"DASHD_PATH"
 #define DASHCLI_PATH @"DASHCLI_PATH"
-
-typedef void (^dashClb)(BOOL success,NSString * message);
-typedef void (^dashActiveClb)(BOOL active);
-typedef void (^dashSyncClb)(BOOL active);
 
 @interface DPLocalNodeController : NSObject
 

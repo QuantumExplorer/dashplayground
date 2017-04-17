@@ -7,18 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */; };
+		EC76ED00E89649FE175F52D1 /* libPods-dashPlayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */; };
 		FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
-		FB0683941E87599700F1AFB4 /* libssh2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683931E87599700F1AFB4 /* libssh2.a */; };
-		FB0683951E87599700F1AFB4 /* libssh2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683931E87599700F1AFB4 /* libssh2.a */; };
-		FB06839A1E875A9800F1AFB4 /* DFSSHConnectionType.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683961E875A9800F1AFB4 /* DFSSHConnectionType.m */; };
-		FB06839B1E875A9800F1AFB4 /* DFSSHConnectionType.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683961E875A9800F1AFB4 /* DFSSHConnectionType.m */; };
-		FB06839C1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683971E875A9800F1AFB4 /* DFSSHConnector.m */; };
-		FB06839D1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683971E875A9800F1AFB4 /* DFSSHConnector.m */; };
-		FB06839E1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683981E875A9800F1AFB4 /* DFSSHOperator.m */; };
-		FB06839F1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683981E875A9800F1AFB4 /* DFSSHOperator.m */; };
-		FB0683A01E875A9800F1AFB4 /* DFSSHServer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683991E875A9800F1AFB4 /* DFSSHServer.m */; };
-		FB0683A11E875A9800F1AFB4 /* DFSSHServer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683991E875A9800F1AFB4 /* DFSSHServer.m */; };
 		FB0683A91E875CDC00F1AFB4 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */; };
 		FB0683AF1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683AE1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib */; };
 		FB0683B01E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683AE1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib */; };
@@ -42,9 +34,12 @@
 		FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */; };
 		FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
 		FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
+		FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB45054B1EA441C50066C6B9 /* DPTableView.m */; };
 		FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
 		FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
 		FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */; };
+		FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */; };
+		FB5A31CA1E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */; };
 		FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
 		FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
 		FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
@@ -82,37 +77,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
+		F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
+		F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlayground.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.debug.xcconfig"; sourceTree = "<group>"; };
 		FB0683421E8731AD00F1AFB4 /* DPDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPDataStore.h; sourceTree = "<group>"; };
 		FB0683431E8731AD00F1AFB4 /* DPDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPDataStore.m; sourceTree = "<group>"; };
-		FB06837F1E87599700F1AFB4 /* channel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = channel.h; sourceTree = "<group>"; };
-		FB0683801E87599700F1AFB4 /* comp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = comp.h; sourceTree = "<group>"; };
-		FB0683811E87599700F1AFB4 /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypto.h; sourceTree = "<group>"; };
-		FB0683821E87599700F1AFB4 /* libgcrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libgcrypt.h; sourceTree = "<group>"; };
-		FB0683831E87599700F1AFB4 /* libssh2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libssh2.h; sourceTree = "<group>"; };
-		FB0683841E87599700F1AFB4 /* libssh2_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libssh2_priv.h; sourceTree = "<group>"; };
-		FB0683851E87599700F1AFB4 /* libssh2_publickey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libssh2_publickey.h; sourceTree = "<group>"; };
-		FB0683861E87599700F1AFB4 /* libssh2_sftp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libssh2_sftp.h; sourceTree = "<group>"; };
-		FB0683871E87599700F1AFB4 /* mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mac.h; sourceTree = "<group>"; };
-		FB0683881E87599700F1AFB4 /* mbedtls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mbedtls.h; sourceTree = "<group>"; };
-		FB0683891E87599700F1AFB4 /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = misc.h; sourceTree = "<group>"; };
-		FB06838A1E87599700F1AFB4 /* openssl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = openssl.h; sourceTree = "<group>"; };
-		FB06838B1E87599700F1AFB4 /* os400qc3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = os400qc3.h; sourceTree = "<group>"; };
-		FB06838C1E87599700F1AFB4 /* packet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = packet.h; sourceTree = "<group>"; };
-		FB06838D1E87599700F1AFB4 /* session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = session.h; sourceTree = "<group>"; };
-		FB06838E1E87599700F1AFB4 /* sftp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sftp.h; sourceTree = "<group>"; };
-		FB06838F1E87599700F1AFB4 /* transport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = transport.h; sourceTree = "<group>"; };
-		FB0683901E87599700F1AFB4 /* userauth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = userauth.h; sourceTree = "<group>"; };
-		FB0683911E87599700F1AFB4 /* wincng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wincng.h; sourceTree = "<group>"; };
-		FB0683931E87599700F1AFB4 /* libssh2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssh2.a; sourceTree = "<group>"; };
-		FB0683961E875A9800F1AFB4 /* DFSSHConnectionType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSSHConnectionType.m; sourceTree = "<group>"; };
-		FB0683971E875A9800F1AFB4 /* DFSSHConnector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSSHConnector.m; sourceTree = "<group>"; };
-		FB0683981E875A9800F1AFB4 /* DFSSHOperator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSSHOperator.m; sourceTree = "<group>"; };
-		FB0683991E875A9800F1AFB4 /* DFSSHServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSSHServer.m; sourceTree = "<group>"; };
-		FB0683A21E875AA300F1AFB4 /* DFSSHConnectionType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSSHConnectionType.h; sourceTree = "<group>"; };
-		FB0683A31E875AA300F1AFB4 /* DFSSHConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSSHConnector.h; sourceTree = "<group>"; };
-		FB0683A41E875AA300F1AFB4 /* DFSSHOperator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSSHOperator.h; sourceTree = "<group>"; };
-		FB0683A51E875AA300F1AFB4 /* DFSSHServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSSHServer.h; sourceTree = "<group>"; };
-		FB0683A61E875B3C00F1AFB4 /* libssh2_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libssh2_config.h; sourceTree = "<group>"; };
 		FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = ../../../../../usr/lib/libz.1.dylib; sourceTree = "<group>"; };
 		FB0683AA1E875D0100F1AFB4 /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = ../../../../../usr/lib/libcrypto.0.9.8.dylib; sourceTree = "<group>"; };
 		FB0683AC1E875D3A00F1AFB4 /* libcrypto.35.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.35.dylib; path = ../../../../../usr/lib/libcrypto.35.dylib; sourceTree = "<group>"; };
@@ -240,10 +211,15 @@
 		FB29067E1E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FB39482A1E85B418009D115F /* DPMasternodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPMasternodeController.h; sourceTree = "<group>"; };
 		FB39482B1E85B418009D115F /* DPMasternodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPMasternodeController.m; sourceTree = "<group>"; };
+		FB45054A1EA441C50066C6B9 /* DPTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPTableView.h; sourceTree = "<group>"; };
+		FB45054B1EA441C50066C6B9 /* DPTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPTableView.m; sourceTree = "<group>"; };
 		FB46AE891E95618400D4B034 /* DPLocalNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPLocalNodeController.h; sourceTree = "<group>"; };
 		FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPLocalNodeController.m; sourceTree = "<group>"; };
 		FB5A31C01E9D2F04003D4DD8 /* TrackingTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackingTransformer.h; sourceTree = "<group>"; };
 		FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackingTransformer.m; sourceTree = "<group>"; };
+		FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPRepositoryController.h; sourceTree = "<group>"; };
+		FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPRepositoryController.m; sourceTree = "<group>"; };
+		FB5A31CB1E9EAD21003D4DD8 /* DashCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashCallbacks.h; sourceTree = "<group>"; };
 		FB9EBCEB1E96F22200AE8AC3 /* InstanceTypeTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstanceTypeTransformer.h; sourceTree = "<group>"; };
 		FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceTypeTransformer.m; sourceTree = "<group>"; };
 		FB9EBCEF1E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeSyncStatusTransformer.h; sourceTree = "<group>"; };
@@ -256,6 +232,7 @@
 		FBBFEB281E86EED600BE41BE /* Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
 		FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SWAdditions.h"; sourceTree = "<group>"; };
 		FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SWAdditions.m"; sourceTree = "<group>"; };
+		FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -266,8 +243,8 @@
 				FB0683A91E875CDC00F1AFB4 /* libz.1.dylib in Frameworks */,
 				FB0683B31E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
 				FB0683B51E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
-				FB0683941E87599700F1AFB4 /* libssh2.a in Frameworks */,
 				FB0683AF1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
+				EC76ED00E89649FE175F52D1 /* libPods-dashPlayground.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,63 +255,22 @@
 				FB0683B61E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
 				FB0683B41E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
 				FB0683B01E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
-				FB0683951E87599700F1AFB4 /* libssh2.a in Frameworks */,
+				60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		FB06837D1E87599700F1AFB4 /* libssh2_xcode */ = {
+		7DB87EC0D2F43AE3062A55F5 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FB0683A21E875AA300F1AFB4 /* DFSSHConnectionType.h */,
-				FB0683961E875A9800F1AFB4 /* DFSSHConnectionType.m */,
-				FB0683A31E875AA300F1AFB4 /* DFSSHConnector.h */,
-				FB0683971E875A9800F1AFB4 /* DFSSHConnector.m */,
-				FB0683A41E875AA300F1AFB4 /* DFSSHOperator.h */,
-				FB0683981E875A9800F1AFB4 /* DFSSHOperator.m */,
-				FB0683A51E875AA300F1AFB4 /* DFSSHServer.h */,
-				FB0683991E875A9800F1AFB4 /* DFSSHServer.m */,
-				FB06837E1E87599700F1AFB4 /* include */,
-				FB0683921E87599700F1AFB4 /* lib */,
+				FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */,
+				2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */,
+				FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */,
+				F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */,
 			);
-			path = libssh2_xcode;
-			sourceTree = "<group>";
-		};
-		FB06837E1E87599700F1AFB4 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				FB0683A61E875B3C00F1AFB4 /* libssh2_config.h */,
-				FB06837F1E87599700F1AFB4 /* channel.h */,
-				FB0683801E87599700F1AFB4 /* comp.h */,
-				FB0683811E87599700F1AFB4 /* crypto.h */,
-				FB0683821E87599700F1AFB4 /* libgcrypt.h */,
-				FB0683831E87599700F1AFB4 /* libssh2.h */,
-				FB0683841E87599700F1AFB4 /* libssh2_priv.h */,
-				FB0683851E87599700F1AFB4 /* libssh2_publickey.h */,
-				FB0683861E87599700F1AFB4 /* libssh2_sftp.h */,
-				FB0683871E87599700F1AFB4 /* mac.h */,
-				FB0683881E87599700F1AFB4 /* mbedtls.h */,
-				FB0683891E87599700F1AFB4 /* misc.h */,
-				FB06838A1E87599700F1AFB4 /* openssl.h */,
-				FB06838B1E87599700F1AFB4 /* os400qc3.h */,
-				FB06838C1E87599700F1AFB4 /* packet.h */,
-				FB06838D1E87599700F1AFB4 /* session.h */,
-				FB06838E1E87599700F1AFB4 /* sftp.h */,
-				FB06838F1E87599700F1AFB4 /* transport.h */,
-				FB0683901E87599700F1AFB4 /* userauth.h */,
-				FB0683911E87599700F1AFB4 /* wincng.h */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
-		FB0683921E87599700F1AFB4 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				FB0683931E87599700F1AFB4 /* libssh2.a */,
-			);
-			path = lib;
+			name = Pods;
 			sourceTree = "<group>";
 		};
 		FB0683A71E875CDC00F1AFB4 /* Frameworks */ = {
@@ -343,6 +279,8 @@
 				FB0683AC1E875D3A00F1AFB4 /* libcrypto.35.dylib */,
 				FB0683AA1E875D0100F1AFB4 /* libcrypto.0.9.8.dylib */,
 				FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */,
+				F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */,
+				0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -480,6 +418,7 @@
 				FB29067B1E85799F00A31092 /* dashPlaygroundTests */,
 				FB2906631E85799F00A31092 /* Products */,
 				FB0683A71E875CDC00F1AFB4 /* Frameworks */,
+				7DB87EC0D2F43AE3062A55F5 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -495,30 +434,24 @@
 		FB2906641E85799F00A31092 /* dashPlayground */ = {
 			isa = PBXGroup;
 			children = (
+				FB4505491EA2F0CD0066C6B9 /* Utils */,
+				FB5A31C61E9EA942003D4DD8 /* Server Controllers */,
 				FB5A31C51E9EA205003D4DD8 /* View Controllers */,
 				FB0684201E8CCDC200F1AFB4 /* Transformers */,
 				FBBFEB741E872B9000BE41BE /* Model */,
-				FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */,
-				FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */,
-				FB0683421E8731AD00F1AFB4 /* DPDataStore.h */,
-				FB0683431E8731AD00F1AFB4 /* DPDataStore.m */,
 				FB2906651E85799F00A31092 /* AppDelegate.h */,
 				FB2906661E85799F00A31092 /* AppDelegate.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
 				FB2906731E85799F00A31092 /* Info.plist */,
 				FB2906681E85799F00A31092 /* Supporting Files */,
-				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
-				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
-				FB46AE891E95618400D4B034 /* DPLocalNodeController.h */,
-				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
 				FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */,
 				FBBFEB281E86EED600BE41BE /* Defines.h */,
 				FB0683B71E87663900F1AFB4 /* include */,
 				FB0683B11E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib */,
 				FB0683B21E87662F00F1AFB4 /* libchilkatCocoa.a */,
 				FB0683AE1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib */,
-				FB06837D1E87599700F1AFB4 /* libssh2_xcode */,
+				FB5A31CB1E9EAD21003D4DD8 /* DashCallbacks.h */,
 			);
 			path = dashPlayground;
 			sourceTree = "<group>";
@@ -541,6 +474,17 @@
 			path = dashPlaygroundTests;
 			sourceTree = "<group>";
 		};
+		FB4505491EA2F0CD0066C6B9 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */,
+				FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */,
+				FB45054A1EA441C50066C6B9 /* DPTableView.h */,
+				FB45054B1EA441C50066C6B9 /* DPTableView.m */,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
 		FB5A31C51E9EA205003D4DD8 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -554,9 +498,24 @@
 			name = "View Controllers";
 			sourceTree = "<group>";
 		};
+		FB5A31C61E9EA942003D4DD8 /* Server Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
+				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
+				FB46AE891E95618400D4B034 /* DPLocalNodeController.h */,
+				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
+				FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */,
+				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
+			);
+			name = "Server Controllers";
+			sourceTree = "<group>";
+		};
 		FBBFEB741E872B9000BE41BE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				FB0683421E8731AD00F1AFB4 /* DPDataStore.h */,
+				FB0683431E8731AD00F1AFB4 /* DPDataStore.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -568,10 +527,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB2906811E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlayground" */;
 			buildPhases = (
+				94B2D357CF027FDAF151CEC9 /* [CP] Check Pods Manifest.lock */,
 				FB29065E1E85799F00A31092 /* Sources */,
 				FB29065F1E85799F00A31092 /* Frameworks */,
 				FB2906601E85799F00A31092 /* Resources */,
 				FB2906FF1E857E4C00A31092 /* Embed Frameworks */,
+				71EA2F616C86A0EE853F561B /* [CP] Embed Pods Frameworks */,
+				9770C6F6B7C977D210559020 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -586,9 +548,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB2906841E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlaygroundTests" */;
 			buildPhases = (
+				8CFC32F0501D3061B0E72B31 /* [CP] Check Pods Manifest.lock */,
 				FB2906741E85799F00A31092 /* Sources */,
 				FB2906751E85799F00A31092 /* Frameworks */,
 				FB2906761E85799F00A31092 /* Resources */,
+				2685535085359E818AA297FC /* [CP] Embed Pods Frameworks */,
+				C78F8BD6BA8F87F38BA600DE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -664,19 +629,110 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2685535085359E818AA297FC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		71EA2F616C86A0EE853F561B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8CFC32F0501D3061B0E72B31 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		94B2D357CF027FDAF151CEC9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		9770C6F6B7C977D210559020 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C78F8BD6BA8F87F38BA600DE /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		FB29065E1E85799F00A31092 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
+				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
-				FB0683A01E875A9800F1AFB4 /* DFSSHServer.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
-				FB06839A1E875A9800F1AFB4 /* DFSSHConnectionType.m in Sources */,
-				FB06839C1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */,
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
@@ -684,9 +740,9 @@
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
+				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
-				FB06839E1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */,
 				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
 			);
@@ -696,7 +752,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB06839B1E875A9800F1AFB4 /* DFSSHConnectionType.m in Sources */,
 				FB0684241E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FBBFEB5D1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
@@ -706,12 +761,10 @@
 				FB06841F1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				FB9EBCF21E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
-				FB0683A11E875A9800F1AFB4 /* DFSSHServer.m in Sources */,
-				FB06839F1E875A9800F1AFB4 /* DFSSHOperator.m in Sources */,
 				FB0684281E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
+				FB5A31CA1E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FB9EBCF61E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
 				FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
-				FB06839D1E875A9800F1AFB4 /* DFSSHConnector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,6 +879,7 @@
 		};
 		FB2906821E85799F00A31092 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -842,7 +896,8 @@
 					"$(PROJECT_DIR)/dashPlayground",
 					"$(PROJECT_DIR)/dashPlayground/libssh2_xcode/lib",
 				);
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "dashPlayground-Bridging-Header.h";
@@ -853,6 +908,7 @@
 		};
 		FB2906831E85799F00A31092 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -869,7 +925,8 @@
 					"$(PROJECT_DIR)/dashPlayground",
 					"$(PROJECT_DIR)/dashPlayground/libssh2_xcode/lib",
 				);
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = org.dashfoundation.dashPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "dashPlayground-Bridging-Header.h";
@@ -879,6 +936,7 @@
 		};
 		FB2906851E85799F00A31092 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -906,6 +964,7 @@
 		};
 		FB2906861E85799F00A31092 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;

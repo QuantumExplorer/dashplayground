@@ -16,7 +16,7 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 +(DPDataStore*)sharedInstance;
 
-#pragma mark - git
+#pragma mark - Repositories
 
 -(NSManagedObject*)branchNamed:(NSString*)string onRepositoryURLPath:(NSString*)repositoryURLPath;
 
@@ -49,8 +49,6 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 -(void)saveContext:(NSManagedObjectContext*)context;
 
 -(void)deleteObject:(id)object;
-
--(void)deleteObject:(id)object inContext:(NSManagedObjectContext*)context;
 
 -(id)createInsertedNewObjectForEntityNamed:(NSString*)entityName;
 
