@@ -26,6 +26,7 @@
 		FB0684281E92DA2000F1AFB4 /* RPCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684261E92DA2000F1AFB4 /* RPCViewController.m */; };
 		FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */ = {isa = PBXBuildFile; fileRef = FB0684291E941DD700F1AFB4 /* dash.conf */; };
 		FB06842B1E941DD700F1AFB4 /* dash.conf in Resources */ = {isa = PBXBuildFile; fileRef = FB0684291E941DD700F1AFB4 /* dash.conf */; };
+		FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1D2B531EA455CD00F7BE2D /* SentinelStateTransformer.m */; };
 		FB2906671E85799F00A31092 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906661E85799F00A31092 /* AppDelegate.m */; };
 		FB29066A1E85799F00A31092 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB2906691E85799F00A31092 /* main.m */; };
 		FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29066C1E85799F00A31092 /* RepositoriesViewController.m */; };
@@ -197,6 +198,8 @@
 		FB0684251E92DA2000F1AFB4 /* RPCViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCViewController.h; sourceTree = "<group>"; };
 		FB0684261E92DA2000F1AFB4 /* RPCViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPCViewController.m; sourceTree = "<group>"; };
 		FB0684291E941DD700F1AFB4 /* dash.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dash.conf; sourceTree = "<group>"; };
+		FB1D2B521EA455CD00F7BE2D /* SentinelStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SentinelStateTransformer.h; sourceTree = "<group>"; };
+		FB1D2B531EA455CD00F7BE2D /* SentinelStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SentinelStateTransformer.m; sourceTree = "<group>"; };
 		FB2906621E85799F00A31092 /* dashPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2906651E85799F00A31092 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		FB2906661E85799F00A31092 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -405,6 +408,8 @@
 				FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */,
 				FB9EBCF31E98752500AE8AC3 /* MasternodeStateTransformer.h */,
 				FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */,
+				FB1D2B521EA455CD00F7BE2D /* SentinelStateTransformer.h */,
+				FB1D2B531EA455CD00F7BE2D /* SentinelStateTransformer.m */,
 				FB5A31C01E9D2F04003D4DD8 /* TrackingTransformer.h */,
 				FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */,
 			);
@@ -739,6 +744,7 @@
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
+				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,

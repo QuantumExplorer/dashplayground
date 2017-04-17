@@ -51,6 +51,14 @@
     // Update the view, if already loaded.
 }
 - (IBAction)pressStartIntances:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        dict[NSLocalizedDescriptionKey] = @"Please select a repository and a branch";
+        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+        [[NSApplication sharedApplication] presentError:error];
+        return;
+    }
     [[DPMasternodeController sharedInstance] runInstances:[self.startCountField integerValue]];
 }
 

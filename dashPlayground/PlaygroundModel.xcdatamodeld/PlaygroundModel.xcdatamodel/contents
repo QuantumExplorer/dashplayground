@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16D32" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16E195" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
     <entity name="Branch" representedClassName="Branch" syncable="YES" codeGenerationType="class">
         <attribute name="lastCommitSha" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
         <relationship name="masternodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="branch" inverseEntity="Masternode" syncable="YES"/>
         <relationship name="repository" maxCount="1" deletionRule="Nullify" destinationEntity="Repository" inverseName="branches" inverseEntity="Repository" syncable="YES"/>
+        <relationship name="sentinels" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="sentinelBranch" inverseEntity="Masternode" syncable="YES"/>
     </entity>
     <entity name="Masternode" representedClassName="Masternode" syncable="YES" codeGenerationType="class">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
@@ -17,19 +18,24 @@
         <attribute name="masternodeState" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="publicIP" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="rpcPassword" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sentinelGitCommit" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sentinelState" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="sentinelVersion" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="syncStatus" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="transactionId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="transactionOutputIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="version" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="branch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="masternodes" inverseEntity="Branch" syncable="YES"/>
+        <relationship name="sentinelBranch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="sentinels" inverseEntity="Branch" syncable="YES"/>
     </entity>
     <entity name="Repository" representedClassName="Repository" syncable="YES" codeGenerationType="class">
+        <attribute name="isSentinel" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="branches" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Branch" inverseName="repository" inverseEntity="Branch" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Branch" positionX="-54" positionY="99" width="128" height="105"/>
-        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="270"/>
-        <element name="Repository" positionX="-63" positionY="90" width="128" height="75"/>
+        <element name="Branch" positionX="-54" positionY="99" width="128" height="120"/>
+        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="330"/>
+        <element name="Repository" positionX="-63" positionY="90" width="128" height="90"/>
     </elements>
 </model>

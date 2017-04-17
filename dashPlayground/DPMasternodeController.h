@@ -25,12 +25,11 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode;
 - (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb;
+- (void)setUpMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)configureRemoteMasternode:(NSManagedObject*)masternode;
 
 -(void)checkMasternode:(NSManagedObject*)masternode;
 
 -(NSDictionary*)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode;
-
--(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode;
 
 @end

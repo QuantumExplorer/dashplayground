@@ -10,6 +10,7 @@
 #import "DPMasternodeController.h"
 #import "DPDataStore.h"
 #import "MasternodeStateTransformer.h"
+#import "SentinelStateTransformer.h"
 
 @interface AppDelegate ()
 
@@ -19,9 +20,13 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
-    NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"masternodeState == %@",@(MasternodeState_Checking)]];
+    NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"masternodeState == %@ || ((masternodseState == %@ || masternodseState == %@) && sentinelState == %@)",@(MasternodeState_Checking),@(MasternodeState_Installed),@(MasternodeState_Configured),@(SentinelState_Checking)]];
     for (NSManagedObject * masternode in checkingMasternodes) {
-        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+        if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
+            [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+        } else {
+            //[[DPMasternodeController sharedInstance] checkSentinel:masternode];
+        }
     }
 }
 

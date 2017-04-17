@@ -187,7 +187,6 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 
 - (NSString *)runDashRPCCommandString:(NSString *)commandToRun
 {
-    
     NSString *output = [[NSString alloc] initWithData:[self runDashRPCCommand:commandToRun] encoding:NSUTF8StringEncoding];
     return output;
 }
