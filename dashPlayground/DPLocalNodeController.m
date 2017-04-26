@@ -8,6 +8,7 @@
 
 #import "DPLocalNodeController.h"
 #import "DPMasternodeController.h"
+#import "Notification.h"
 
 @implementation DPLocalNodeController
 
@@ -76,10 +77,12 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
         }
         if (tries == timesToTry) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STOPPED object:nil];
                 clb(NO);
             });
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STARTED object:nil];
                 clb(YES);
             });
         }
@@ -95,10 +98,12 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
         }
         if (tries == 5) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STARTED object:nil];
                 clb(YES);
             });
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STOPPED object:nil];
                 clb(NO);
             });
         }
@@ -109,6 +114,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 {
     [self checkDash:^(BOOL active) {
         if (!active) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STARTING object:nil];
             NSString * commandToRun = @"-testnet";
             
             NSTask *task = [[NSTask alloc] init];
@@ -157,8 +163,10 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     
     [self checkDashStopped:^(BOOL active) {
         if (active) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STARTED object:nil];
             clb(!active,@"Dash server didn't stop successfully");
         } else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STOPPED object:nil];
             clb(!active,@"Dash server stopped");
         }
     }];
@@ -202,11 +210,6 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
         [rArray addObject:@[[components[0] stringByTrimmingCharactersInSet:quotesCharacterSet],@([[components[1] stringByTrimmingCharactersInSet:quotesCharacterSet] integerValue])]];
     }
     return [rArray copy];
-}
-
-- (void)startRemote:(NSManagedObject*)masternode {
-    NSString * string = [NSString stringWithFormat:@"-testnet masternode start-alias %@",[masternode valueForKey:@"instanceId"]];
-    //return string;
 }
 
 -(NSDictionary*)masternodeInfoInMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode {

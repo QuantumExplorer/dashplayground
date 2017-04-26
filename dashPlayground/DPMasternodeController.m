@@ -17,6 +17,7 @@
 #import "CkoStringBuilder.h"
 #import "DPLocalNodeController.h"
 #import "MasternodeStateTransformer.h"
+#import "MasternodeSyncStatusTransformer.h"
 //#import "DFSSHServer.h"
 //#import "DFSSHConnector.h"
 //#import "DFSSHOperator.h"
@@ -131,24 +132,25 @@
     return rDict;
 }
 
--(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh {
-    [self sendDashCommandList:commands onSSH:ssh commandExpectedLineCounts:nil percentageClb:nil];
+-(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh error:(NSError**)error {
+    [self sendDashCommandList:commands onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
 }
 
 
--(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts percentageClb:(dashPercentageClb)clb {
-    [self sendCommandList:commands toPath:@"~/src/dash/" onSSH:ssh commandExpectedLineCounts:expectedlineCounts percentageClb:clb];
+-(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts error:(NSError**)error percentageClb:(dashPercentageClb)clb {
+    [self sendCommandList:commands toPath:@"~/src/dash" onSSH:ssh commandExpectedLineCounts:expectedlineCounts error:error percentageClb:clb];
 }
 
--(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh {
-    [self sendCommandList:commands toPath:path onSSH:ssh commandExpectedLineCounts:nil percentageClb:nil];
+-(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh error:(NSError**)error {
+    [self sendCommandList:commands toPath:path onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
 }
 
--(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts percentageClb:(dashPercentageClb)clb {
+-(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts error:(NSError**)error percentageClb:(dashPercentageClb)clb {
     //expected line counts are used to give back a percentage complete on this function;
     
     NSInteger channelNum = [[ssh QuickShell] integerValue];
     if (channelNum < 0) {
+        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
@@ -160,6 +162,7 @@
     //   "cd" to a subdirectory.
     BOOL success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"cd %@\n",path] charset: @"ansi"];
     if (success != YES) {
+        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
@@ -174,6 +177,7 @@
     //  Retrieve the output.
     success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
     if (success != YES) {
+        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
@@ -190,28 +194,56 @@
         return;
     };
     NSMutableDictionary * rDict = [NSMutableDictionary dictionaryWithCapacity:commands.count];
-    for (NSString * command in commands) {
+    for (NSUInteger index = 0;index<[commands count];index++) {
+        NSString * command = [commands objectAtIndex:index];
+        NSNumber * numberLines = ([expectedlineCounts count] > index)?[expectedlineCounts objectAtIndex:index]:nil;
         //   Run the 2nd command in the remote shell, which will be
         //   to "ls" the directory.
         success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"%@\n",command] charset: @"ansi"];
         if (success != YES) {
+            *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
             NSLog(@"%@",ssh.LastErrorText);
             return;
         }
-        
-        //  Retrieve and display the output.
-        success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
-        if (success != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
-            return;
+        if (numberLines && [numberLines integerValue] > 1) {
+            NSMutableString * mOutput = [NSMutableString string];
+            while (1) {
+                NSNumber * poll = [ssh ChannelReadAndPoll: @(channelNum) pollTimeoutMs:@(3000)];
+                if ([poll integerValue] == -1) {
+                    *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+                    NSLog(@"%@",ssh.LastErrorText);
+                    return;
+                } else if ([poll integerValue] > 0) {
+                    [mOutput appendString:[ssh GetReceivedText: @(channelNum) charset: @"ansi"]];
+                    NSUInteger numberOfLines, index, stringLength = [mOutput length];
+                    
+                    for (index = 0, numberOfLines = 0; index < stringLength; numberOfLines++)
+                        index = NSMaxRange([mOutput lineRangeForRange:NSMakeRange(index, 0)]);
+                    clb(command,numberOfLines / [numberLines floatValue]);
+                }
+                if ([[mOutput stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] hasSuffix:myPrompt]) {
+                    clb(command,1.0);
+                    [rDict setObject:[mOutput copy] forKey:command];
+                    break;
+                }
+            }
+        } else {
+            //  Retrieve and display the output.
+            success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+            if (success != YES) {
+                *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+                NSLog(@"%@",ssh.LastErrorText);
+                return;
+            }
+            clb(command,1.0);
+            cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+            if (ssh.LastMethodSuccess != YES) {
+                *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+                NSLog(@"%@",ssh.LastErrorText);
+                return;
+            }
+            [rDict setObject:cmdOutput forKey:command];
         }
-        
-        cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
-        if (ssh.LastMethodSuccess != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
-            return;
-        }
-        [rDict setObject:cmdOutput forKey:command];
     }
     
     //  Send an EOF.  This tells the server that no more data will
@@ -219,6 +251,7 @@
     //  the SSH client may still receive output on this channel.
     success = [ssh ChannelSendEof: @(channelNum)];
     if (success != YES) {
+        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
@@ -226,6 +259,7 @@
     //  Close the channel:
     success = [ssh ChannelSendClose: @(channelNum)];
     if (success != YES) {
+        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
@@ -376,56 +410,83 @@
 
 #pragma mark - Set Up
 
-- (void)setUpMasternodeDashd:(NSManagedObject*)masternode
+- (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb
 {
-    CkoSsh * ssh = [self sshIn:[masternode valueForKey:@"publicIP"]] ;
-    if (!ssh) return;
-    //  Send some commands and get the output.
-    NSString *strOutput = [ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"];
-    if (ssh.LastMethodSuccess != YES) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return;
-    }
-    BOOL justCloned = FALSE;
-    if (![strOutput isEqualToString:@"dash"]) {
-        justCloned = TRUE;
-        [ssh QuickCommand: @"git clone https://github.com/QuantumExplorer/dash.git ~/src/dash" charset: @"ansi"];
-        if (ssh.LastMethodSuccess != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
+    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+    __block NSString * repositoryPath = [masternode valueForKeyPath:@"branch.repository.url"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        CkoSsh * ssh = [self sshIn:publicIP] ;
+        if (!ssh){
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,@"Could not SSH in");
+            });
             return;
         }
-    }
-    
-    //now let's get git info
-    NSDictionary * gitValues = nil;
-    if (!justCloned) {
-        gitValues = [self sendGitCommands:@[@"pull",@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
-    } else {
-        gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
-    }
-    NSString * remote = nil;
-    NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
-    
-    if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
-        remote = remoteInfoLine[1];
-    }
-    if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
-        [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
-    }
-    if (remote) {
-        NSManagedObject * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
-        if (branch) {
-            [masternode setValue:branch forKey:@"branch"];
+        //  Send some commands and get the output.
+        NSString *strOutput = [ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"];
+        if (ssh.LastMethodSuccess != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,ssh.LastErrorText);
+            });
+            return;
         }
-    }
-    [masternode setValue:gitValues[@"rev-parse HEAD"] forKey:@"gitCommit"];
+        if ([strOutput hasPrefix:@"ls: cannot access src: No such file or directory"]) {
+            [ssh QuickCommand: @"mkdir src" charset: @"ansi"];
+            if (ssh.LastMethodSuccess != YES) {
+                NSLog(@"%@",ssh.LastErrorText);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,ssh.LastErrorText);
+                });
+                return;
+            }
+        }
+        BOOL justCloned = FALSE;
+        if (![strOutput isEqualToString:@"dash"]) {
+            justCloned = TRUE;
+            strOutput = [ssh QuickCommand: [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath] charset: @"ansi"];
+            if (ssh.LastMethodSuccess != YES) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,ssh.LastErrorText);
+                });
+                
+                return;
+            }
+        }
+        
+        //now let's get git info
+        __block NSDictionary * gitValues = nil;
+        if (!justCloned) {
+            gitValues = [self sendGitCommands:@[@"pull",@"rev-parse --short HEAD"] onSSH:ssh];
+        } else {
+            gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD"] onSSH:ssh];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+        });
+        
+        NSError * error = nil;
+        
+        //now let's make all this shit
+        [self sendDashCommandList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh commandExpectedLineCounts:@[@(52),@(481),@(301),@(1),@(1),@(1),@(1),@(1)] error:&error percentageClb:^(NSString *call, float percentage) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"%@ %.2f",call,percentage);
+                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+            });
+        }];
+        
+        [ssh Disconnect];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
+                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+            }
+            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+        });
+    });
     
-    //now let's make all this shit
-    [self sendDashCommandList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh];
     
-    [ssh Disconnect];
-    
-    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
 }
 
 - (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb {
@@ -513,6 +574,157 @@
 }
 
 
+#pragma mark - Start Remote
+
+- (void)startDashd:(NSManagedObject*)masternode clb:(dashInfoClb)clb {
+    
+    if ([[masternode valueForKey:@"syncStatus"] integerValue] == MasternodeSync_Finished) {
+        [self startRemoteMasternode:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
+            if (!success || !value) {
+                clb(FALSE,nil,errorMessage);
+            } else {
+                [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
+                [[DPDataStore sharedInstance] saveContext];
+                clb(TRUE,nil,nil);
+            }
+        }];
+    } else if ([[masternode valueForKey:@"syncStatus"] integerValue] == MasternodeSync_Initial) {
+        __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+        __block NSString * rpcPassword = [masternode valueForKey:@"rpcPassword"];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+            CkoSsh * ssh = [self sshIn:publicIP] ;
+            if (!ssh){
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,nil,@"Could not SSH in");
+                });
+                return;
+            }
+            //  Send some commands and get the output.
+            NSString * mnoutput = [ssh QuickCommand: @"export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.8/lib && dashd" charset: @"ansi"];
+            if (ssh.LastMethodSuccess != YES) {
+                NSLog(@"%@",ssh.LastErrorText);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,nil,ssh.LastErrorText);
+                });
+                return;
+            }
+            sleep(20);
+            NSString * previousSyncStatus = @"MASTERNODE_SYNC_INITIAL";
+            while (1) {
+                NSError * error = nil;
+                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error];
+                
+                if (error) {
+                    clb(NO,dictionary,nil);
+                    break;
+                } else {
+                    if (dictionary) {
+                        if (![previousSyncStatus isEqualToString:dictionary[@"AssetName"]]) {
+                            if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_FINISHED"]) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+                                    [[DPDataStore sharedInstance] saveContext];
+                                    [self startRemoteMasternode:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
+                                        if (!success) {
+                                            clb(NO,dictionary,errorMessage);
+                                        } else  if (value) {
+                                            clb(YES,dictionary,nil);
+                                        }
+                                    }];
+                                });
+                                break;
+                            }else if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_FAILED"]) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+                                    clb(NO,dictionary,nil);
+                                    [[DPDataStore sharedInstance] saveContext];
+                                });
+                                break;
+                            }else {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+                                    [[DPDataStore sharedInstance] saveContext];
+                                });
+                            }
+                        }
+                    }
+                }
+                sleep(5);
+            }
+            [ssh Disconnect];
+        });
+    } else {
+        __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+        __block NSString * rpcPassword = [masternode valueForKey:@"rpcPassword"];
+        __block NSString * previousSyncStatus = [MasternodeSyncStatusTransformer typeNameForType:[[masternode valueForKey:@"syncStatus"] unsignedIntegerValue]];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+            CkoSsh * ssh = [self sshIn:publicIP] ;
+            if (!ssh){
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,nil,@"Could not SSH in");
+                });
+                return;
+            }
+            //  Send some commands and get the output.
+            
+            while (1) {
+                NSError * error = nil;
+                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error];
+                
+                if (error) {
+                    clb(NO,dictionary,nil);
+                    break;
+                } else {
+                    if (dictionary) {
+                        if (![previousSyncStatus isEqualToString:dictionary[@"AssetName"]]) {
+                            if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_FINISHED"]) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+                                    [[DPDataStore sharedInstance] saveContext];
+                                    [self startRemoteMasternode:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
+                                        if (!success) {
+                                            clb(NO,dictionary,errorMessage);
+                                        } else  if (value) {
+                                            clb(YES,dictionary,nil);
+                                        }
+                                    }];
+                                });
+                                break;
+                            }else if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_FAILED"]) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+                                    clb(NO,dictionary,nil);
+                                    [[DPDataStore sharedInstance] saveContext];
+                                });
+                                break;
+                            }else {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+                                    [[DPDataStore sharedInstance] saveContext];
+                                });
+                            }
+                        }
+                    }
+                }
+                sleep(5);
+            }
+            [ssh Disconnect];
+        });
+    }
+}
+
+- (void)startRemoteMasternode:(NSManagedObject*)masternode clb:(dashBoolClb)clb {
+    NSString * string = [NSString stringWithFormat:@"-testnet masternode start-alias %@",[masternode valueForKey:@"instanceId"]];
+    NSData * data = [[DPLocalNodeController sharedInstance] runDashRPCCommand:string];
+    NSError * error = nil;
+    NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+    if (error) return clb(NO,NO,[error localizedDescription]);
+    if (dictionary && [dictionary[@"result"] isEqualToString:@"successful"]) clb(YES,YES,nil);
+    else {
+        clb(NO,NO,dictionary[@"result"]);
+    }
+}
+
 #pragma mark - RPC Query Remote
 
 -(NSData *)sendRPCCommand:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword {
@@ -526,6 +738,7 @@
 
 -(NSDictionary *)sendRPCCommandJSONDictionary:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword error:(NSError**)error {
     NSData * data = [self sendRPCCommand:command toPublicIP:publicIP rpcPassword:rpcPassword];
+    if (!data || data.length == 0) return @{};
     return [NSJSONSerialization JSONObjectWithData:data options:0 error:error];
 }
 
@@ -777,7 +990,8 @@
     CkoSsh * ssh = [self sshIn:[masternode valueForKey:@"publicIP"]];
     if (!ssh) return FALSE;
     //now let's make all this shit
-    [self sendCommandList:@[@"rm -rf {banlist,fee_estimates,budget,governance,mncache,mnpayments,netfulfilled,peers}.dat"] toPath:@"~/.dashcore/" onSSH:ssh];
+    NSError * error = nil;
+    [self sendCommandList:@[@"rm -rf {banlist,fee_estimates,budget,governance,mncache,mnpayments,netfulfilled,peers}.dat"] toPath:@"~/.dashcore/" onSSH:ssh error:&error];
     
     [ssh Disconnect];
     
@@ -826,6 +1040,57 @@
 }
 
 #pragma mark - Instances
+
+-(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-a70092c7 --count %ld --instance-type t2.micro --key-name SSH_KEY_DASH_PLAYGROUND --security-group-ids sg-8a11f5f1 --instance-initiated-shutdown-behavior terminate --subnet-id subnet-b764acd2",(long)count]];
+        
+        __block NSMutableDictionary * instances = [NSMutableDictionary dictionary];
+        //NSLog(@"%@",reservation[@"Instances"]);
+        for (NSDictionary * dictionary in output[@"Instances"]) {
+            NSDictionary * rDict = [NSMutableDictionary dictionary];
+            [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+            [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+            [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+            [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
+        }
+        NSMutableArray * instanceIdsLeft = [[instances allKeys] mutableCopy];
+        while ([instanceIdsLeft count]) {
+            NSDictionary *output2 = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --instance-ids %@ --filter Name=key-name,Values=SSH_KEY_DASH_PLAYGROUND",[instanceIdsLeft componentsJoinedByString:@" "]]];
+            NSArray * reservations = output2[@"Reservations"];
+            for (NSDictionary * reservation in reservations) {
+                //NSLog(@"%@",reservation[@"Instances"]);
+                for (NSDictionary * dictionary in reservation[@"Instances"]) {
+                    if ([dictionary valueForKey:@"PublicIpAddress"] && ![[dictionary valueForKeyPath:@"State.Name"] isEqualToString:@"pending"]) {
+                        CkoSsh * ssh = [self sshIn:[dictionary valueForKey:@"PublicIpAddress"]];
+                        if (ssh) {
+                            [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
+                            [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                            [instanceIdsLeft removeObject:[dictionary valueForKey:@"InstanceId"]];
+                            [ssh Disconnect];
+                        }
+                    }
+                }
+            }
+            if (instanceIdsLeft) sleep(5);
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSArray * masternodes = [self saveInstances:[instances allValues]];
+            for (NSManagedObject * masternode in masternodes) {
+                [masternode setValue:branch forKey:@"branch"];
+                [[DPDataStore sharedInstance] saveContext];
+                [self setUpMasternodeDashd:masternode clb:^(BOOL success, NSString *message) {
+                    if (!success) {
+                        clb(NO,nil,message);
+                        NSLog(@"");
+                    }
+                }];
+            }
+        });
+    });
+    
+    
+}
 
 - (void)runInstances:(NSInteger)count {
     NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-a70092c7 --count %ld --instance-type t2.micro --key-name SSH_KEY_DASH_PLAYGROUND --security-group-ids sg-8a11f5f1 --instance-initiated-shutdown-behavior terminate --subnet-id subnet-b764acd2",(long)count]];
@@ -899,12 +1164,15 @@
     return InstanceState_Stopped;
 }
 
--(void)saveInstances:(NSMutableArray*)instances {
+-(NSArray*)saveInstances:(NSArray*)instances {
+    return [self saveInstances:instances removeOthers:FALSE];
+}
+
+-(NSArray*)saveInstances:(NSArray*)instances removeOthers:(BOOL)removeOthers {
     NSDictionary * knownInstances = [[[DPDataStore sharedInstance] allMasternodes] dictionaryReferencedByKeyPath:@"instanceId"];
-    
     NSDictionary * referencedInstances = [instances dictionaryReferencedByKeyPath:@"instanceId"];
     BOOL needsSave = FALSE;
-    NSMutableArray * masternodesNeedingChecks = [NSMutableArray array];
+    NSMutableArray * newMasternodes = [NSMutableArray array];
     for (NSString* reference in referencedInstances) {
         if ([knownInstances objectForKey:reference]) {
             if (![[[knownInstances objectForKey:reference] valueForKey:@"instanceState"] isEqualToNumber:[referencedInstances[reference] valueForKey:@"instanceState"]]) {
@@ -913,23 +1181,22 @@
             }
         } else {
             needsSave = TRUE;
-            [referencedInstances[reference] setValue:@(MasternodeState_Checking) forKey:@"masternodeState"];
             NSManagedObject * masternode = [[DPDataStore sharedInstance] addMasternode:referencedInstances[reference] saveContext:FALSE];
-            [masternodesNeedingChecks addObject:masternode];
+            [newMasternodes addObject:masternode];
         }
     }
-    for (NSString* knownInstance in knownInstances) {
-        if (!referencedInstances[knownInstance]) {
-            needsSave = TRUE;
-            [[[DPDataStore sharedInstance] mainContext] deleteObject:knownInstances[knownInstance]];
+    if (removeOthers) {
+        for (NSString* knownInstance in knownInstances) {
+            if (!referencedInstances[knownInstance]) {
+                needsSave = TRUE;
+                [[[DPDataStore sharedInstance] mainContext] deleteObject:knownInstances[knownInstance]];
+            }
         }
     }
     if (needsSave) {
         [[DPDataStore sharedInstance] saveContext];
     }
-    for (NSManagedObject * masternode in masternodesNeedingChecks) {
-        [self checkMasternode:masternode];
-    }
+    return newMasternodes;
 }
 
 -(void)getInstances {
@@ -946,7 +1213,10 @@
             [instances addObject:rDict];
         }
     }
-    [self saveInstances:instances];
+    NSArray * newMasternodes = [self saveInstances:instances removeOthers:TRUE];
+    for (NSManagedObject * masternode in newMasternodes) {
+        [self checkMasternode:masternode];
+    }
 }
 
 #pragma mark - Util

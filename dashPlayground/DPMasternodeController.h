@@ -17,16 +17,19 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
 +(DPMasternodeController*)sharedInstance;
 
+-(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb;
 - (void)runInstances:(NSInteger)count;
 - (void)startInstance:(NSString*)instanceId;
 - (void)stopInstance:(NSString*)instanceId;
 - (void)terminateInstance:(NSString*)instanceId;
 - (void)getInstances;
 
-- (void)setUpMasternodeDashd:(NSManagedObject*)masternode;
+- (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)setUpMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)configureRemoteMasternode:(NSManagedObject*)masternode;
+
+- (void)startDashd:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
 
 -(void)checkMasternode:(NSManagedObject*)masternode;
 

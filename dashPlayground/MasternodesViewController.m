@@ -48,7 +48,14 @@
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] setUpMasternodeDashd:object];
+    [[DPMasternodeController sharedInstance] setUpMasternodeDashd:object clb:^(BOOL success, NSString *message) {
+        if (!success) {
+            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+            dict[NSLocalizedDescriptionKey] = message;
+            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+            [[NSApplication sharedApplication] presentError:error];
+        }
+    }];
 }
 
 - (IBAction)configure:(id)sender {
@@ -82,9 +89,18 @@
         NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
         [[NSApplication sharedApplication] presentError:error];
         return;
+    } else {
+        [[DPMasternodeController sharedInstance] startDashd:object clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+            if (!success) {
+                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                dict[NSLocalizedDescriptionKey] = errorMessage;
+                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                [[NSApplication sharedApplication] presentError:error];
+            }
+        }];
     }
 
-        [[DPLocalNodeController sharedInstance] startRemote:object];
+    
     
 }
 

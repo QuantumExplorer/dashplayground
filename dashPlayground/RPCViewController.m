@@ -13,7 +13,6 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    [self checkServer:self];
 }
 
 - (IBAction)runCommand:(id)sender {

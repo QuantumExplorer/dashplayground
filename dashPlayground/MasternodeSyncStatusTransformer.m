@@ -20,23 +20,52 @@
     return NO;
 }
 
--(NSUInteger)typeForTypeName:(NSString*)string {
-    if ([string isEqualToString:@"initial"]) {
++(NSUInteger)typeForTypeName:(NSString*)string {
+    if ([string isEqualToString:@"MASTERNODE_SYNC_INITIAL"]) {
         return MasternodeSync_Initial;
-    } else if ([string isEqualToString:@"sporks"]) {
+    } else if ([string isEqualToString:@"MASTERNODE_SYNC_SPORKS"]) {
         return MasternodeSync_Sporks;
-    } else if ([string isEqualToString:@"list"]) {
+    } else if ([string isEqualToString:@"MASTERNODE_SYNC_LIST"]) {
         return MasternodeSync_List;
-    } else if ([string isEqualToString:@"mnw"]) {
+    } else if ([string isEqualToString:@"MASTERNODE_SYNC_MNW"]) {
         return MasternodeSync_MNW;
-    } else if ([string isEqualToString:@"governance"]) {
+    } else if ([string isEqualToString:@"MASTERNODE_SYNC_GOVERNANCE"]) {
         return MasternodeSync_Governance;
-    } else if ([string isEqualToString:@"failes"]) {
+    } else if ([string isEqualToString:@"MASTERNODE_SYNC_FAILED"]) {
         return MasternodeSync_Failed;
-    } else if ([string isEqualToString:@"finished"]) {
+    } else if ([string isEqualToString:@"MASTERNODE_SYNC_FINISHED"]) {
         return MasternodeSync_Finished;
     }
     return MasternodeSync_Initial;
+}
+
++(NSString*)typeNameForType:(NSUInteger)type {
+    switch (type) {
+        case MasternodeSync_Initial:
+            return @"MASTERNODE_SYNC_INITIAL";
+            break;
+        case MasternodeSync_Sporks:
+            return @"MASTERNODE_SYNC_SPORKS";
+            break;
+        case MasternodeSync_List:
+            return @"MASTERNODE_SYNC_LIST";
+            break;
+        case MasternodeSync_MNW:
+            return @"MASTERNODE_SYNC_MNW";
+            break;
+        case MasternodeSync_Governance:
+            return @"MASTERNODE_SYNC_GOVERNANCE";
+            break;
+        case MasternodeSync_Failed:
+            return @"MASTERNODE_SYNC_FAILED";
+            break;
+        case MasternodeSync_Finished:
+            return @"MASTERNODE_SYNC_FINISHED";
+            break;
+        default:
+            return @"MASTERNODE_SYNC_INITIAL";
+            break;
+    }
 }
 
 

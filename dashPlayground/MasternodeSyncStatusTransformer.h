@@ -21,4 +21,7 @@ typedef NS_ENUM(NSUInteger,MasternodeSync) {
 
 @interface MasternodeSyncStatusTransformer : NSValueTransformer
 
++(NSUInteger)typeForTypeName:(NSString*)string;
++(NSString*)typeNameForType:(NSUInteger)type;
+
 @end

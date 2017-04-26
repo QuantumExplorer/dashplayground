@@ -59,7 +59,8 @@
         [[NSApplication sharedApplication] presentError:error];
         return;
     }
-    [[DPMasternodeController sharedInstance] runInstances:[self.startCountField integerValue]];
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil];
 }
 
 - (IBAction)addRepository:(id)sender {
