@@ -9,7 +9,15 @@
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
 
-@interface MasternodesViewController : NSViewController
+@interface ConsoleEventInfo : NSObject
+
+@property (nonatomic,strong) NSDate * startDate;
+@property (nonatomic,strong) NSDate * lastInfoDate;
+@property (nonatomic,strong) NSString * text;
+
+@end
+
+@interface MasternodesViewController : NSViewController <NSTabViewDelegate>
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
@@ -19,5 +27,7 @@
 - (IBAction)setUp:(id)sender;
 - (IBAction)configure:(id)sender;
 - (IBAction)startRemote:(id)sender;
+
+- (IBAction)selectedConsoleTab:(id)sender;
 
 @end

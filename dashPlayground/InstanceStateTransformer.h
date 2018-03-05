@@ -8,7 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+#define InstanceState_Transitional(x) (x == InstanceState_Pending || x == InstanceState_Stopping || x == InstanceState_Rebooting || x == InstanceState_Shutting_Down)
+
 typedef enum InstanceState {
+    InstanceState_Unknown = -1,
     InstanceState_Stopped = 0,
     InstanceState_Running = 1,
     InstanceState_Terminated = 2,
@@ -17,6 +20,8 @@ typedef enum InstanceState {
     InstanceState_Rebooting = 5,
     InstanceState_Shutting_Down = 6,
 } InstanceState;
+
+typedef void (^dashStateClb)(BOOL success,InstanceState state,NSString * message);
 
 @interface InstanceStateTransformer : NSValueTransformer
 

@@ -141,6 +141,10 @@
     [self sendCommandList:commands toPath:@"~/src/dash" onSSH:ssh commandExpectedLineCounts:expectedlineCounts error:error percentageClb:clb];
 }
 
+-(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(CkoSsh *)ssh error:(NSError**)error percentageClb:(dashPercentageClb)clb {
+    
+}
+
 -(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh error:(NSError**)error {
     [self sendCommandList:commands toPath:path onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
 }
@@ -444,6 +448,13 @@
         BOOL justCloned = FALSE;
         if (![strOutput isEqualToString:@"dash"]) {
             justCloned = TRUE;
+            NSError * error = nil;
+            [self sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:&error percentageClb:^(NSString *call, float percentage) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSLog(@"%@ %.2f",call,percentage);
+                    [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+                });
+            }];
             strOutput = [ssh QuickCommand: [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath] charset: @"ansi"];
             if (ssh.LastMethodSuccess != YES) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -1092,57 +1103,121 @@
     
 }
 
-- (void)runInstances:(NSInteger)count {
-    NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-a70092c7 --count %ld --instance-type t2.micro --key-name SSH_KEY_DASH_PLAYGROUND --security-group-ids sg-8a11f5f1 --instance-initiated-shutdown-behavior terminate --subnet-id subnet-b764acd2",(long)count]];
-    
-    NSMutableArray * instances = [NSMutableArray array];
-    //NSLog(@"%@",reservation[@"Instances"]);
-    for (NSDictionary * dictionary in output[@"Instances"]) {
-        NSDictionary * rDict = [NSMutableDictionary dictionary];
-        [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-        [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
-        [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
-        [instances addObject:rDict];
-    }
-    [self saveInstances:instances];
-    NSLog(@"%@",output);
+-(void)keepTabsOnInstance:(NSString*)instanceId clb:(dashStateClb)clb  {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        [NSTimer scheduledTimerWithTimeInterval:10 repeats:TRUE block:^(NSTimer * _Nonnull timer) {
+            [self checkInstance:instanceId clb:^(BOOL success, InstanceState state, NSString *message) {
+                if (!InstanceState_Transitional(state)) {
+                    
+                }
+            }];
+        }];
+        
+    });
 }
 
-- (void)startInstance:(NSString*)instanceId {
-    NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 start-instances --instance-ids %@",instanceId]];
-    if (output[@"StartingInstances"]) {
-        for (NSDictionary * instance in output[@"StartingInstances"]) {
-            if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
-                [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+- (void)runInstances:(NSInteger)count clb:(dashStateClb)clb  {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-a70092c7 --count %ld --instance-type t2.micro --key-name SSH_KEY_DASH_PLAYGROUND --security-group-ids sg-8a11f5f1 --instance-initiated-shutdown-behavior terminate --subnet-id subnet-b764acd2",(long)count]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (output[@"Instances"]) {
+                NSMutableArray * instances = [NSMutableArray array];
+                //NSLog(@"%@",reservation[@"Instances"]);
+                for (NSDictionary * dictionary in output[@"Instances"]) {
+                    NSDictionary * rDict = [NSMutableDictionary dictionary];
+                    [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                    [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
+                    [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                    [instances addObject:rDict];
+                }
+                [self saveInstances:instances];
+            } else {
+                clb(FALSE,InstanceState_Unknown,FS(@"Unable to process the creation of %ld instance%@",count,count>1?@"s":@""));
             }
-        }
-    }
-    NSLog(@"%@",output);
+        });
+    });
 }
 
-- (void)stopInstance:(NSString*)instanceId {
-    NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 stop-instances --instance-ids %@",instanceId]];
-    if (output[@"StoppingInstances"]) {
-        for (NSDictionary * instance in output[@"StoppingInstances"]) {
-            if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
-                [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+- (void)startInstance:(NSString*)instanceId clb:(dashStateClb)clb  {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 start-instances --instance-ids %@",instanceId]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (output[@"StartingInstances"]) {
+                for (NSDictionary * instance in output[@"StartingInstances"]) {
+                    if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
+                        [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+                        clb(TRUE,[self stateForStateName:instance[@"CurrentState"][@"Name"]],instance[@"InstanceId"]);
+                    }
+                }
+            } else {
+                clb(FALSE,InstanceState_Unknown,@"Unable to process the start of instance(s)");
             }
-        }
-    }
-    NSLog(@"%@",output);
+        });
+    });
 }
 
-- (void)terminateInstance:(NSString*)instanceId {
-    NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 terminate-instances --instance-ids %@",instanceId]];
-    if (output[@"TerminatingInstances"]) {
-        for (NSDictionary * instance in output[@"TerminatingInstances"]) {
-            if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
-                [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+- (void)stopInstance:(NSString*)instanceId clb:(dashStateClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 stop-instances --instance-ids %@",instanceId]];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (output[@"StoppingInstances"]) {
+                for (NSDictionary * instance in output[@"StoppingInstances"]) {
+                    if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
+                        [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+                        clb(TRUE,[self stateForStateName:instance[@"CurrentState"][@"Name"]],instance[@"InstanceId"]);
+                    }
+                }
+            } else {
+                clb(FALSE,InstanceState_Unknown,@"Unable to process the stop of instance(s)");
             }
-        }
-    }
-    NSLog(@"%@",output);
+        });
+    });
 }
+
+- (void)terminateInstance:(NSString*)instanceId clb:(dashStateClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 terminate-instances --instance-ids %@",instanceId]];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (output[@"TerminatingInstances"]) {
+                for (NSDictionary * instance in output[@"TerminatingInstances"]) {
+                    if (instance[@"InstanceId"] && instance[@"CurrentState"] && instance[@"CurrentState"][@"Name"]) {
+                        [[DPDataStore sharedInstance] updateMasternode:instance[@"InstanceId"] withState:[self stateForStateName:instance[@"CurrentState"][@"Name"]]];
+                        clb(TRUE,[self stateForStateName:instance[@"CurrentState"][@"Name"]],instance[@"InstanceId"]);
+                    }
+                }
+            } else {
+                clb(FALSE,InstanceState_Unknown,@"Unable to process the terminatation instance(s)");
+            }
+        });
+    });
+}
+                   
+                   - (void)checkInstance:(NSString*)instanceId clb:(dashStateClb)clb {
+                       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+                           NSDictionary *output = [self runAWSCommandJSON:@"ec2 describe-instances --filter Name=key-name,Values=SSH_KEY_DASH_PLAYGROUND"];
+                           NSArray * reservations = output[@"Reservations"];
+                           NSMutableArray * instances = [NSMutableArray array];
+                           for (NSDictionary * reservation in reservations) {
+                               //NSLog(@"%@",reservation[@"Instances"]);
+                               for (NSDictionary * dictionary in reservation[@"Instances"]) {
+                                   NSDictionary * rDict = [NSMutableDictionary dictionary];
+                                   [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                                   [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
+                                   [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                                   [instances addObject:rDict];
+                               }
+                           }
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               NSArray * newMasternodes = [self saveInstances:instances removeOthers:TRUE];
+                               for (NSManagedObject * masternode in newMasternodes) {
+                                   [self checkMasternode:masternode];
+                               }
+                               clb(output?TRUE:FALSE,InstanceState_Unknown,@"Successfully refreshed");
+                           });
+                       });
+                   }
 
 -(InstanceState)stateForStateName:(NSString*)string {
     if ([string isEqualToString:@"running"]) {
@@ -1178,6 +1253,11 @@
             if (![[[knownInstances objectForKey:reference] valueForKey:@"instanceState"] isEqualToNumber:[referencedInstances[reference] valueForKey:@"instanceState"]]) {
                 needsSave = TRUE;
                 [[knownInstances objectForKey:reference] setValue:[referencedInstances[reference] valueForKey:@"instanceState"] forKey:@"instanceState"];
+                
+            }
+            if (![[[knownInstances objectForKey:reference] valueForKey:@"publicIP"] isEqualToString:[referencedInstances[reference] valueForKey:@"publicIP"]]) {
+                needsSave = TRUE;
+                [[knownInstances objectForKey:reference] setValue:[referencedInstances[reference] valueForKey:@"publicIP"] forKey:@"publicIP"];
             }
         } else {
             needsSave = TRUE;
@@ -1198,25 +1278,32 @@
     }
     return newMasternodes;
 }
+                   
 
--(void)getInstances {
-    NSDictionary *output = [self runAWSCommandJSON:@"ec2 describe-instances --filter Name=key-name,Values=SSH_KEY_DASH_PLAYGROUND"];
-    NSArray * reservations = output[@"Reservations"];
-    NSMutableArray * instances = [NSMutableArray array];
-    for (NSDictionary * reservation in reservations) {
-        //NSLog(@"%@",reservation[@"Instances"]);
-        for (NSDictionary * dictionary in reservation[@"Instances"]) {
-            NSDictionary * rDict = [NSMutableDictionary dictionary];
-            [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-            [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
-            [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
-            [instances addObject:rDict];
+
+- (void)getInstancesClb:(dashClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSDictionary *output = [self runAWSCommandJSON:@"ec2 describe-instances --filter Name=key-name,Values=SSH_KEY_DASH_PLAYGROUND"];
+        NSArray * reservations = output[@"Reservations"];
+        NSMutableArray * instances = [NSMutableArray array];
+        for (NSDictionary * reservation in reservations) {
+            //NSLog(@"%@",reservation[@"Instances"]);
+            for (NSDictionary * dictionary in reservation[@"Instances"]) {
+                NSDictionary * rDict = [NSMutableDictionary dictionary];
+                [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
+                [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                [instances addObject:rDict];
+            }
         }
-    }
-    NSArray * newMasternodes = [self saveInstances:instances removeOthers:TRUE];
-    for (NSManagedObject * masternode in newMasternodes) {
-        [self checkMasternode:masternode];
-    }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSArray * newMasternodes = [self saveInstances:instances removeOthers:TRUE];
+            for (NSManagedObject * masternode in newMasternodes) {
+                [self checkMasternode:masternode];
+            }
+            clb(output?TRUE:FALSE,@"Successfully refreshed");
+        });
+    });
 }
 
 #pragma mark - Util

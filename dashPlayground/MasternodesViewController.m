@@ -11,23 +11,37 @@
 #import "DPLocalNodeController.h"
 #import "DPDataStore.h"
 #import "NSArray+SWAdditions.h"
+#import "ConsoleEventArray.h"
+#import "Defines.h"
 
 @interface MasternodesViewController ()
 @property (strong) IBOutlet NSArrayController *arrayController;
 @property (strong) IBOutlet NSTableView *tableView;
+@property (strong) IBOutlet NSSegmentedControl * consoleTabSegmentedControl;
+@property (strong) ConsoleEventArray * consoleEvents;
+@property (strong) IBOutlet NSTextView *consoleTextView;
 
 @end
 
 @implementation MasternodesViewController
 
+-(void)setUpConsole {
+    self.consoleEvents = [[ConsoleEventArray alloc] init];
+    [self.consoleTabSegmentedControl setTrackingMode:NSSegmentSwitchTrackingSelectOne];
+//    [self.consoleTabSegmentedControl setSegmentCount:self.arrayController];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do view setup here.
+    [self setUpConsole];
 }
 
 - (IBAction)retreiveInstances:(id)sender {
-    [[DPMasternodeController sharedInstance] getInstances];
-    
+    [self addStringEvent:@"Refreshing instances."];
+    [[DPMasternodeController sharedInstance] getInstancesClb:^(BOOL success, NSString *message) {
+        [self addStringEvent:@"Refreshed instances."];
+    }];
+
 }
 
 - (IBAction)getKey:(id)sender {
@@ -108,7 +122,10 @@
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] startInstance:[object valueForKey:@"instanceId"]];
+    [self addStringEvent:FS(@"Starting instance %@",[object valueForKey:@"instanceId"])];
+    [[DPMasternodeController sharedInstance] startInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
+        [self addStringEvent:FS(@"Instance in boot up process : %@",[object valueForKey:@"instanceId"])];
+    }];
 }
 
 
@@ -116,18 +133,60 @@
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] stopInstance:[object valueForKey:@"instanceId"]];
+    [self addStringEvent:FS(@"Trying to stop instance %@",[object valueForKey:@"instanceId"])];
+    [[DPMasternodeController sharedInstance] stopInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
+        [self addStringEvent:FS(@"Stopping instance %@",[object valueForKey:@"instanceId"])];
+    }];
 }
 
 - (IBAction)terminateInstance:(id)sender {
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] terminateInstance:[object valueForKey:@"instanceId"]];
+    [self addStringEvent:FS(@"Trying to terminate %@",[object valueForKey:@"instanceId"])];
+    [[DPMasternodeController sharedInstance] terminateInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
+        [self addStringEvent:FS(@"Terminating instance %@",[object valueForKey:@"instanceId"])];
+    }];
 }
 
 -(AppDelegate*)appDelegate {
     return [NSApplication sharedApplication].delegate;
+}
+
+#pragma mark Console
+
+-(void)addStringEvent:(NSString*)string {
+    ConsoleEvent * consoleEvent = [ConsoleEvent consoleEventWithString:string];
+    [self.consoleEvents addConsoleEvent:consoleEvent];
+    [self updateConsole];
+}
+
+
+-(void)addEvent:(ConsoleEvent*)consoleEvent {
+    [self.consoleEvents addConsoleEvent:consoleEvent];
+    [self updateConsole];
+}
+
+-(void)updateConsole {
+    if (!self.consoleTabSegmentedControl.selectedSegment) {
+        NSString * consoleEventString = [self.consoleEvents printOut];
+        self.consoleTextView.string = consoleEventString;
+    } else {
+        NSInteger row = self.tableView.selectedRow;
+        if (row == -1) return;
+        NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+        self.consoleTextView.string = @"Select a running masternode";
+    }
+    
+
+}
+
+#pragma mark Console tab view delegate
+
+- (IBAction)selectedConsoleTab:(id)sender {
+    [self updateConsole];
+    
+    
 }
 
 @end

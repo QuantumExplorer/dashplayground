@@ -42,6 +42,8 @@
 		FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */; };
 		FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */; };
 		FB5A31CA1E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */; };
+		FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96BFB71F0B90D900220B4B /* ConsoleEventArray.m */; };
+		FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */; };
 		FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
 		FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
 		FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
@@ -226,6 +228,10 @@
 		FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPRepositoryController.h; sourceTree = "<group>"; };
 		FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPRepositoryController.m; sourceTree = "<group>"; };
 		FB5A31CB1E9EAD21003D4DD8 /* DashCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashCallbacks.h; sourceTree = "<group>"; };
+		FB96BFB61F0B90D900220B4B /* ConsoleEventArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConsoleEventArray.h; sourceTree = "<group>"; };
+		FB96BFB71F0B90D900220B4B /* ConsoleEventArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConsoleEventArray.m; sourceTree = "<group>"; };
+		FB96BFB91F0B90F200220B4B /* ConsoleEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConsoleEvent.h; sourceTree = "<group>"; };
+		FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConsoleEvent.m; sourceTree = "<group>"; };
 		FB9EBCEB1E96F22200AE8AC3 /* InstanceTypeTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstanceTypeTransformer.h; sourceTree = "<group>"; };
 		FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceTypeTransformer.m; sourceTree = "<group>"; };
 		FB9EBCEF1E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeSyncStatusTransformer.h; sourceTree = "<group>"; };
@@ -494,6 +500,10 @@
 				FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */,
 				FB45054A1EA441C50066C6B9 /* DPTableView.h */,
 				FB45054B1EA441C50066C6B9 /* DPTableView.m */,
+				FB96BFB61F0B90D900220B4B /* ConsoleEventArray.h */,
+				FB96BFB71F0B90D900220B4B /* ConsoleEventArray.m */,
+				FB96BFB91F0B90F200220B4B /* ConsoleEvent.h */,
+				FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -746,6 +756,7 @@
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
+				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
@@ -758,6 +769,7 @@
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
 				FBBAF9A31EAF687500D6F568 /* ContainerViewController.m in Sources */,
+				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
