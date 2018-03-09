@@ -1,10 +1,12 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Dkim
 // Wrapped Chilkat C++ class name =  CkDkim
 
+@class CkoBinData;
 @class CkoTask;
+@class CkoPrivateKey;
 
 
 @class CkoBaseProgress;
@@ -53,6 +55,16 @@
 - (NSData *)AddDkimSignature: (NSData *)mimeIn;
 // method: AddDomainKeySignature
 - (NSData *)AddDomainKeySignature: (NSData *)mimeIn;
+// method: DkimSign
+- (BOOL)DkimSign: (CkoBinData *)mimeData;
+// method: DkimVerify
+- (BOOL)DkimVerify: (NSNumber *)sigIndex 
+	mimeData: (CkoBinData *)mimeData;
+// method: DomainKeySign
+- (BOOL)DomainKeySign: (CkoBinData *)mimeData;
+// method: DomainKeyVerify
+- (BOOL)DomainKeyVerify: (NSNumber *)sigIndex 
+	mimeData: (CkoBinData *)mimeData;
 // method: LoadDkimPk
 - (BOOL)LoadDkimPk: (NSString *)privateKey 
 	optionalPassword: (NSString *)optionalPassword;
@@ -91,6 +103,10 @@
 	domain: (NSString *)domain;
 // method: SaveLastError
 - (BOOL)SaveLastError: (NSString *)path;
+// method: SetDkimPrivateKey
+- (BOOL)SetDkimPrivateKey: (CkoPrivateKey *)privateKey;
+// method: SetDomainKeyPrivateKey
+- (BOOL)SetDomainKeyPrivateKey: (CkoPrivateKey *)privateKey;
 // method: UnlockComponent
 - (BOOL)UnlockComponent: (NSString *)unlockCode;
 // method: VerifyDkimSignature

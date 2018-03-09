@@ -1,12 +1,12 @@
 // Chilkat Objective-C header.
 // This is a generated header file for Chilkat version 9.5.0.72
 
-// Generic/internal class name =  DtObj
-// Wrapped Chilkat C++ class name =  CkDtObj
+// Generic/internal class name =  AuthUtil
+// Wrapped Chilkat C++ class name =  CkAuthUtil
 
 
 
-@interface CkoDtObj : NSObject {
+@interface CkoAuthUtil : NSObject {
 
 	@private
 		void *m_obj;
@@ -22,27 +22,19 @@
 
 - (void)clearCppImplObj;
 
-@property (nonatomic, copy) NSNumber *Day;
 @property (nonatomic, copy) NSString *DebugLogFilePath;
-@property (nonatomic, copy) NSNumber *Hour;
 @property (nonatomic, readonly, copy) NSString *LastErrorHtml;
 @property (nonatomic, readonly, copy) NSString *LastErrorText;
 @property (nonatomic, readonly, copy) NSString *LastErrorXml;
 @property (nonatomic) BOOL LastMethodSuccess;
-@property (nonatomic, copy) NSNumber *Minute;
-@property (nonatomic, copy) NSNumber *Month;
-@property (nonatomic, copy) NSNumber *Second;
-@property (nonatomic, copy) NSNumber *StructTmMonth;
-@property (nonatomic, copy) NSNumber *StructTmYear;
-@property (nonatomic) BOOL Utc;
 @property (nonatomic) BOOL VerboseLogging;
 @property (nonatomic, readonly, copy) NSString *Version;
-@property (nonatomic, copy) NSNumber *Year;
-// method: DeSerialize
-- (void)DeSerialize: (NSString *)serializedDtObj;
 // method: SaveLastError
 - (BOOL)SaveLastError: (NSString *)path;
-// method: Serialize
-- (NSString *)Serialize;
+// method: WalmartSignature
+- (NSString *)WalmartSignature: (NSString *)requestUrl 
+	consumerId: (NSString *)consumerId 
+	privateKey: (NSString *)privateKey 
+	requestMethod: (NSString *)requestMethod;
 
 @end

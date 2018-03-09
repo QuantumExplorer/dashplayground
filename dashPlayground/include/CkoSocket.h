@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Socket
 // Wrapped Chilkat C++ class name =  CkSocket
@@ -67,6 +67,7 @@
 @property (nonatomic, copy) NSNumber *HeartbeatMs;
 @property (nonatomic, copy) NSString *HttpProxyAuthMethod;
 @property (nonatomic, copy) NSString *HttpProxyDomain;
+@property (nonatomic) BOOL HttpProxyForHttp;
 @property (nonatomic, copy) NSString *HttpProxyHostname;
 @property (nonatomic, copy) NSString *HttpProxyPassword;
 @property (nonatomic, copy) NSNumber *HttpProxyPort;
@@ -175,6 +176,14 @@
 // method: BindAndListenAsync
 - (CkoTask *)BindAndListenAsync: (NSNumber *)port 
 	backlog: (NSNumber *)backlog;
+// method: BindAndListenPortRange
+- (NSNumber *)BindAndListenPortRange: (NSNumber *)beginPort 
+	endPort: (NSNumber *)endPort 
+	backLog: (NSNumber *)backLog;
+// method: BindAndListenPortRangeAsync
+- (CkoTask *)BindAndListenPortRangeAsync: (NSNumber *)beginPort 
+	endPort: (NSNumber *)endPort 
+	backLog: (NSNumber *)backLog;
 // method: BuildHttpGetRequest
 - (NSString *)BuildHttpGetRequest: (NSString *)url;
 // method: CheckWriteable
@@ -367,6 +376,10 @@
 - (BOOL)SendString: (NSString *)str;
 // method: SendStringAsync
 - (CkoTask *)SendStringAsync: (NSString *)str;
+// method: SendWakeOnLan
+- (BOOL)SendWakeOnLan: (NSString *)macAddress 
+	port: (NSNumber *)port 
+	ipBroadcastAddr: (NSString *)ipBroadcastAddr;
 // method: SetSslClientCert
 - (BOOL)SetSslClientCert: (CkoCert *)cert;
 // method: SetSslClientCertPem

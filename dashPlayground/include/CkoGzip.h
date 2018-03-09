@@ -1,9 +1,10 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Gzip
 // Wrapped Chilkat C++ class name =  CkGzip
 
+@class CkoBinData;
 @class CkoTask;
 @class CkoDateTime;
 
@@ -46,6 +47,10 @@
 @property (nonatomic) BOOL UseCurrentDate;
 @property (nonatomic) BOOL VerboseLogging;
 @property (nonatomic, readonly, copy) NSString *Version;
+// method: CompressBd
+- (BOOL)CompressBd: (CkoBinData *)binDat;
+// method: CompressBdAsync
+- (CkoTask *)CompressBdAsync: (CkoBinData *)binDat;
 // method: CompressFile
 - (BOOL)CompressFile: (NSString *)srcPath 
 	destPath: (NSString *)destPath;
@@ -120,6 +125,10 @@
 - (BOOL)SaveLastError: (NSString *)path;
 // method: SetDt
 - (BOOL)SetDt: (CkoDateTime *)dt;
+// method: UncompressBd
+- (BOOL)UncompressBd: (CkoBinData *)binDat;
+// method: UncompressBdAsync
+- (CkoTask *)UncompressBdAsync: (CkoBinData *)binDat;
 // method: UncompressFile
 - (BOOL)UncompressFile: (NSString *)srcPath 
 	destPath: (NSString *)destPath;

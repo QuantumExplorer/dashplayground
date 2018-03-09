@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  PublicKey
 // Wrapped Chilkat C++ class name =  CkPublicKey
@@ -23,6 +23,7 @@
 - (void)clearCppImplObj;
 
 @property (nonatomic, copy) NSString *DebugLogFilePath;
+@property (nonatomic, readonly, copy) NSNumber *KeySize;
 @property (nonatomic, readonly, copy) NSString *KeyType;
 @property (nonatomic, readonly, copy) NSString *LastErrorHtml;
 @property (nonatomic, readonly, copy) NSString *LastErrorText;

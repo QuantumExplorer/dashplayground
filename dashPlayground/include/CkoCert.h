@@ -1,9 +1,10 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Cert
 // Wrapped Chilkat C++ class name =  CkCert
 
+@class CkoBinData;
 @class CkoPrivateKey;
 @class CkoPublicKey;
 @class CkoCertChain;
@@ -78,6 +79,8 @@
 - (NSNumber *)CheckRevoked;
 // method: ExportCertDer
 - (NSData *)ExportCertDer;
+// method: ExportCertDerBd
+- (BOOL)ExportCertDerBd: (CkoBinData *)cerData;
 // method: ExportCertDerFile
 - (BOOL)ExportCertDerFile: (NSString *)path;
 // method: ExportCertPem
@@ -90,6 +93,10 @@
 - (CkoPrivateKey *)ExportPrivateKey;
 // method: ExportPublicKey
 - (CkoPublicKey *)ExportPublicKey;
+// method: ExportToPfxBd
+- (BOOL)ExportToPfxBd: (NSString *)password 
+	includeCertChain: (BOOL)includeCertChain 
+	pfxData: (CkoBinData *)pfxData;
 // method: ExportToPfxData
 - (NSData *)ExportToPfxData: (NSString *)password 
 	includeCertChain: (BOOL)includeCertChain;
@@ -114,6 +121,8 @@
 - (BOOL)HasPrivateKey;
 // method: LoadFromBase64
 - (BOOL)LoadFromBase64: (NSString *)encodedCert;
+// method: LoadFromBd
+- (BOOL)LoadFromBd: (CkoBinData *)certBytes;
 // method: LoadFromBinary
 - (BOOL)LoadFromBinary: (NSData *)data;
 // method: LoadFromBinary2
@@ -123,6 +132,9 @@
 - (BOOL)LoadFromFile: (NSString *)path;
 // method: LoadPem
 - (BOOL)LoadPem: (NSString *)strPem;
+// method: LoadPfxBd
+- (BOOL)LoadPfxBd: (CkoBinData *)pfxData 
+	password: (NSString *)password;
 // method: LoadPfxData
 - (BOOL)LoadPfxData: (NSData *)pfxData 
 	password: (NSString *)password;

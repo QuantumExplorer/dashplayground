@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Rsa
 // Wrapped Chilkat C++ class name =  CkRsa
@@ -35,6 +35,7 @@
 @property (nonatomic) BOOL NoUnpad;
 @property (nonatomic, readonly, copy) NSNumber *NumBits;
 @property (nonatomic, copy) NSString *OaepHash;
+@property (nonatomic, copy) NSString *OaepMgfHash;
 @property (nonatomic) BOOL OaepPadding;
 @property (nonatomic) BOOL VerboseLogging;
 @property (nonatomic, readonly, copy) NSString *Version;

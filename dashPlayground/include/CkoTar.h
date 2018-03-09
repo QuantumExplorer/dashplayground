@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Tar
 // Wrapped Chilkat C++ class name =  CkTar
@@ -69,6 +69,9 @@
 	rootPath: (NSString *)rootPath;
 // method: AddFile
 - (BOOL)AddFile: (NSString *)path;
+// method: AddFile2
+- (BOOL)AddFile2: (NSString *)filePath 
+	pathWithinTar: (NSString *)pathWithinTar;
 // method: CreateDeb
 - (BOOL)CreateDeb: (NSString *)controlPath 
 	dataPath: (NSString *)dataPath 

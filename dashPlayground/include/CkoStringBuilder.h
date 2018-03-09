@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  StringBuilder
 // Wrapped Chilkat C++ class name =  CkStringBuilder
@@ -50,6 +50,9 @@
 // method: Contains
 - (BOOL)Contains: (NSString *)str 
 	caseSensitive: (BOOL)caseSensitive;
+// method: ContainsWord
+- (BOOL)ContainsWord: (NSString *)word 
+	caseSensitive: (BOOL)caseSensitive;
 // method: ContentsEqual
 - (BOOL)ContentsEqual: (NSString *)str 
 	caseSensitive: (BOOL)caseSensitive;
@@ -94,6 +97,10 @@
 	charset: (NSString *)charset;
 // method: Prepend
 - (BOOL)Prepend: (NSString *)value;
+// method: PunyDecode
+- (BOOL)PunyDecode;
+// method: PunyEncode
+- (BOOL)PunyEncode;
 // method: Replace
 - (NSNumber *)Replace: (NSString *)value 
 	replacement: (NSString *)replacement;
@@ -107,9 +114,14 @@
 	endMark: (NSString *)endMark 
 	value: (NSString *)value 
 	replacement: (NSString *)replacement;
+// method: ReplaceI
+- (NSNumber *)ReplaceI: (NSString *)value 
+	replacement: (NSNumber *)replacement;
 // method: ReplaceWord
 - (NSNumber *)ReplaceWord: (NSString *)value 
 	replacement: (NSString *)replacement;
+// method: SecureClear
+- (void)SecureClear;
 // method: SetNth
 - (BOOL)SetNth: (NSNumber *)index 
 	value: (NSString *)value 

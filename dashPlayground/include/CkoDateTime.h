@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  CkDateTime
 // Wrapped Chilkat C++ class name =  CkDateTime
@@ -41,6 +41,9 @@
 - (void)DeSerialize: (NSString *)serializedDateTime;
 // method: DiffSeconds
 - (NSNumber *)DiffSeconds: (CkoDateTime *)dateTimeArg;
+// method: ExpiresWithin
+- (BOOL)ExpiresWithin: (NSNumber *)n 
+	units: (NSString *)units;
 // method: GetAsDateTime
 - (NSDate *)GetAsDateTime: (BOOL)bLocal;
 // method: GetAsDateTimeTicks
@@ -68,6 +71,9 @@
 - (CkoDtObj *)GetDtObj: (BOOL)bLocal;
 // method: LoadTaskResult
 - (BOOL)LoadTaskResult: (CkoTask *)task;
+// method: OlderThan
+- (BOOL)OlderThan: (NSNumber *)n 
+	units: (NSString *)units;
 // method: SaveLastError
 - (BOOL)SaveLastError: (NSString *)path;
 // method: Serialize

@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  FileAccess
 // Wrapped Chilkat C++ class name =  CkFileAccess
@@ -45,13 +45,13 @@
 // method: AppendUtf8BOM
 - (BOOL)AppendUtf8BOM;
 // method: DirAutoCreate
-- (BOOL)DirAutoCreate: (NSString *)path;
+- (BOOL)DirAutoCreate: (NSString *)filePath;
 // method: DirCreate
 - (BOOL)DirCreate: (NSString *)path;
 // method: DirDelete
 - (BOOL)DirDelete: (NSString *)path;
 // method: DirEnsureExists
-- (BOOL)DirEnsureExists: (NSString *)filePath;
+- (BOOL)DirEnsureExists: (NSString *)dirPath;
 // method: FileClose
 - (void)FileClose;
 // method: FileContentsEqual
@@ -104,6 +104,9 @@
 - (NSString *)GetFileName: (NSString *)path;
 // method: GetFileNameWithoutExtension
 - (NSString *)GetFileNameWithoutExtension: (NSString *)path;
+// method: GetFileTime
+- (CkoDateTime *)GetFileTime: (NSString *)path 
+	which: (NSNumber *)which;
 // method: GetLastModified
 - (CkoDateTime *)GetLastModified: (NSString *)path;
 // method: GetNumBlocks

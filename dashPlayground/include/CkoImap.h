@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Imap
 // Wrapped Chilkat C++ class name =  CkImap
@@ -13,6 +13,7 @@
 @class CkoStringArray;
 @class CkoCert;
 @class CkoMailboxes;
+@class CkoSecureString;
 @class CkoPrivateKey;
 @class CkoSshKey;
 @class CkoXmlCertVault;
@@ -415,6 +416,12 @@
 // method: LoginAsync
 - (CkoTask *)LoginAsync: (NSString *)login 
 	password: (NSString *)password;
+// method: LoginSecure
+- (BOOL)LoginSecure: (CkoSecureString *)loginName 
+	password: (CkoSecureString *)password;
+// method: LoginSecureAsync
+- (CkoTask *)LoginSecureAsync: (CkoSecureString *)loginName 
+	password: (CkoSecureString *)password;
 // method: Logout
 - (BOOL)Logout;
 // method: LogoutAsync

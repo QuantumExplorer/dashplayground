@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Mime
 // Wrapped Chilkat C++ class name =  CkMime
@@ -10,6 +10,7 @@
 @class CkoBinData;
 @class CkoStringBuilder;
 @class CkoCertChain;
+@class CkoJsonObject;
 @class CkoXmlCertVault;
 
 
@@ -47,9 +48,13 @@
 @property (nonatomic, readonly, copy) NSNumber *NumHeaderFields;
 @property (nonatomic, readonly, copy) NSNumber *NumParts;
 @property (nonatomic, readonly, copy) NSNumber *NumSignerCerts;
+@property (nonatomic, copy) NSString *OaepHash;
+@property (nonatomic, copy) NSString *OaepMgfHash;
+@property (nonatomic) BOOL OaepPadding;
 @property (nonatomic, copy) NSString *Pkcs7CryptAlg;
 @property (nonatomic, copy) NSNumber *Pkcs7KeyLength;
 @property (nonatomic, copy) NSString *Protocol;
+@property (nonatomic, copy) NSString *SigningAlg;
 @property (nonatomic, copy) NSString *SigningHashAlg;
 @property (nonatomic) BOOL UnwrapExtras;
 @property (nonatomic) BOOL UseMmDescription;
@@ -127,6 +132,8 @@
 - (CkoStringArray *)ExtractPartsToFiles: (NSString *)dirPath;
 // method: FindIssuer
 - (CkoCert *)FindIssuer: (CkoCert *)cert;
+// method: GetBodyBd
+- (BOOL)GetBodyBd: (CkoBinData *)binDat;
 // method: GetBodyBinary
 - (NSData *)GetBodyBinary;
 // method: GetBodyDecoded
@@ -204,6 +211,8 @@
 - (BOOL)IsVideo;
 // method: IsXml
 - (BOOL)IsXml;
+// method: LastJsonData
+- (CkoJsonObject *)LastJsonData;
 // method: LoadMime
 - (BOOL)LoadMime: (NSString *)mimeText;
 // method: LoadMimeBd

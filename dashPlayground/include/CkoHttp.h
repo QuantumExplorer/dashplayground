@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Http
 // Wrapped Chilkat C++ class name =  CkHttp
@@ -10,10 +10,12 @@
 @class CkoStringBuilder;
 @class CkoCert;
 @class CkoHashtable;
+@class CkoJsonObject;
 @class CkoHttpRequest;
 @class CkoStringArray;
 @class CkoDateTime;
 @class CkoPrivateKey;
+@class CkoSecureString;
 
 
 @class CkoHttpProgress;
@@ -44,6 +46,7 @@
 @property (nonatomic, copy) NSString *AcceptLanguage;
 @property (nonatomic) BOOL AllowGzip;
 @property (nonatomic) BOOL AllowHeaderFolding;
+@property (nonatomic, copy) NSString *AuthToken;
 @property (nonatomic) BOOL AutoAddHostHeader;
 @property (nonatomic, copy) NSString *AwsAccessKey;
 @property (nonatomic, copy) NSString *AwsEndpoint;
@@ -90,6 +93,7 @@
 @property (nonatomic, readonly, copy) NSString *LastResponseBody;
 @property (nonatomic, readonly, copy) NSString *LastResponseHeader;
 @property (nonatomic, readonly, copy) NSNumber *LastStatus;
+@property (nonatomic, readonly, copy) NSString *LastStatusText;
 @property (nonatomic, copy) NSNumber *LMFactor;
 @property (nonatomic, copy) NSString *Login;
 @property (nonatomic, copy) NSString *LoginDomain;
@@ -165,6 +169,8 @@
 - (void)ClearBgEventLog;
 // method: ClearInMemoryCookies
 - (void)ClearInMemoryCookies;
+// method: ClearUrlVars
+- (void)ClearUrlVars;
 // method: CloseAllConnections
 - (BOOL)CloseAllConnections;
 // method: CloseAllConnectionsAsync
@@ -271,6 +277,20 @@
 	contentType: (NSString *)contentType 
 	md5: (BOOL)md5 
 	gzip: (BOOL)gzip;
+// method: PBinaryBd
+- (CkoHttpResponse *)PBinaryBd: (NSString *)verb 
+	url: (NSString *)url 
+	data: (CkoBinData *)data 
+	contentType: (NSString *)contentType 
+	md5: (BOOL)md5 
+	gzip: (BOOL)gzip;
+// method: PBinaryBdAsync
+- (CkoTask *)PBinaryBdAsync: (NSString *)verb 
+	url: (NSString *)url 
+	data: (CkoBinData *)data 
+	contentType: (NSString *)contentType 
+	md5: (BOOL)md5 
+	gzip: (BOOL)gzip;
 // method: PostBinary
 - (NSString *)PostBinary: (NSString *)url 
 	byteData: (NSData *)byteData 
@@ -297,6 +317,14 @@
 - (CkoTask *)PostJson2Async: (NSString *)url 
 	contentType: (NSString *)contentType 
 	jsonText: (NSString *)jsonText;
+// method: PostJson3
+- (CkoHttpResponse *)PostJson3: (NSString *)url 
+	contentType: (NSString *)contentType 
+	json: (CkoJsonObject *)json;
+// method: PostJson3Async
+- (CkoTask *)PostJson3Async: (NSString *)url 
+	contentType: (NSString *)contentType 
+	json: (CkoJsonObject *)json;
 // method: PostUrlEncoded
 - (CkoHttpResponse *)PostUrlEncoded: (NSString *)url 
 	req: (CkoHttpRequest *)req;
@@ -323,6 +351,22 @@
 - (CkoTask *)PTextAsync: (NSString *)verb 
 	url: (NSString *)url 
 	textData: (NSString *)textData 
+	charset: (NSString *)charset 
+	contentType: (NSString *)contentType 
+	md5: (BOOL)md5 
+	gzip: (BOOL)gzip;
+// method: PTextSb
+- (CkoHttpResponse *)PTextSb: (NSString *)verb 
+	url: (NSString *)url 
+	textData: (CkoStringBuilder *)textData 
+	charset: (NSString *)charset 
+	contentType: (NSString *)contentType 
+	md5: (BOOL)md5 
+	gzip: (BOOL)gzip;
+// method: PTextSbAsync
+- (CkoTask *)PTextSbAsync: (NSString *)verb 
+	url: (NSString *)url 
+	textData: (CkoStringBuilder *)textData 
 	charset: (NSString *)charset 
 	contentType: (NSString *)contentType 
 	md5: (BOOL)md5 
@@ -502,6 +546,8 @@
 	cookieXml: (NSString *)cookieXml;
 // method: SetOAuthRsaKey
 - (BOOL)SetOAuthRsaKey: (CkoPrivateKey *)privKey;
+// method: SetPassword
+- (BOOL)SetPassword: (CkoSecureString *)password;
 // method: SetRequestHeader
 - (void)SetRequestHeader: (NSString *)name 
 	value: (NSString *)value;
@@ -513,6 +559,9 @@
 // method: SetSslClientCertPfx
 - (BOOL)SetSslClientCertPfx: (NSString *)pfxPath 
 	pfxPassword: (NSString *)pfxPassword;
+// method: SetUrlVar
+- (BOOL)SetUrlVar: (NSString *)name 
+	value: (NSString *)value;
 // method: SleepMs
 - (void)SleepMs: (NSNumber *)millisec;
 // method: SynchronousRequest

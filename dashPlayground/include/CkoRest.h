@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Rest
 // Wrapped Chilkat C++ class name =  CkRest
@@ -13,6 +13,7 @@
 @class CkoAuthAzureAD;
 @class CkoAuthAzureSAS;
 @class CkoAuthAzureStorage;
+@class CkoSecureString;
 @class CkoAuthGoogle;
 @class CkoOAuth1;
 @class CkoOAuth2;
@@ -45,6 +46,7 @@
 @property (nonatomic) BOOL AllowHeaderQB;
 @property (nonatomic, copy) NSString *Authorization;
 @property (nonatomic, readonly, copy) NSNumber *ConnectFailReason;
+@property (nonatomic, copy) NSNumber *ConnectTimeoutMs;
 @property (nonatomic, copy) NSString *DebugLogFilePath;
 @property (nonatomic, copy) NSNumber *HeartbeatMs;
 @property (nonatomic, copy) NSString *Host;
@@ -72,6 +74,9 @@
 	uriPath: (NSString *)uriPath 
 	domain: (NSString *)domain 
 	mwsSecretKey: (NSString *)mwsSecretKey;
+// method: AddPathParam
+- (BOOL)AddPathParam: (NSString *)name 
+	value: (NSString *)value;
 // method: AddQueryParam
 - (BOOL)AddQueryParam: (NSString *)name 
 	value: (NSString *)value;
@@ -84,8 +89,12 @@
 - (BOOL)ClearAllHeaders;
 // method: ClearAllParts
 - (BOOL)ClearAllParts;
+// method: ClearAllPathParams
+- (BOOL)ClearAllPathParams;
 // method: ClearAllQueryParams
 - (BOOL)ClearAllQueryParams;
+// method: ClearAuth
+- (BOOL)ClearAuth;
 // method: ClearResponseBodyStream
 - (void)ClearResponseBodyStream;
 // method: Connect
@@ -289,6 +298,9 @@
 // method: SetAuthBasic
 - (BOOL)SetAuthBasic: (NSString *)username 
 	password: (NSString *)password;
+// method: SetAuthBasicSecure
+- (BOOL)SetAuthBasicSecure: (CkoSecureString *)username 
+	password: (CkoSecureString *)password;
 // method: SetAuthGoogle
 - (BOOL)SetAuthGoogle: (CkoAuthGoogle *)authProvider;
 // method: SetAuthOAuth1

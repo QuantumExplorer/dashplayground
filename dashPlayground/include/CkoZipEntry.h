@@ -1,11 +1,14 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  ZipEntry
 // Wrapped Chilkat C++ class name =  CkZipEntry
 
 @class CkoTask;
 @class CkoDateTime;
+@class CkoBinData;
+@class CkoStringBuilder;
+@class CkoStream;
 
 
 @class CkoBaseProgress;
@@ -37,6 +40,7 @@
 @property (nonatomic, copy) NSNumber *CompressionMethod;
 @property (nonatomic, readonly, copy) NSNumber *Crc;
 @property (nonatomic, copy) NSString *DebugLogFilePath;
+@property (nonatomic, readonly, copy) NSNumber *EncryptionKeyLen;
 @property (nonatomic, readonly, copy) NSNumber *EntryID;
 @property (nonatomic, readonly, copy) NSNumber *EntryType;
 @property (nonatomic, copy) NSDate *FileDateTime;
@@ -44,6 +48,7 @@
 @property (nonatomic, copy) NSString *FileName;
 @property (nonatomic, readonly, copy) NSString *FileNameHex;
 @property (nonatomic, copy) NSNumber *HeartbeatMs;
+@property (nonatomic, readonly) BOOL IsAesEncrypted;
 @property (nonatomic, readonly) BOOL IsDirectory;
 @property (nonatomic, readonly, copy) NSString *LastErrorHtml;
 @property (nonatomic, readonly, copy) NSString *LastErrorText;
@@ -97,6 +102,22 @@
 - (BOOL)SaveLastError: (NSString *)path;
 // method: SetDt
 - (void)SetDt: (CkoDateTime *)dt;
+// method: UnzipToBd
+- (BOOL)UnzipToBd: (CkoBinData *)binData;
+// method: UnzipToBdAsync
+- (CkoTask *)UnzipToBdAsync: (CkoBinData *)binData;
+// method: UnzipToSb
+- (BOOL)UnzipToSb: (NSNumber *)lineEndingBehavior 
+	srcCharset: (NSString *)srcCharset 
+	sb: (CkoStringBuilder *)sb;
+// method: UnzipToSbAsync
+- (CkoTask *)UnzipToSbAsync: (NSNumber *)lineEndingBehavior 
+	srcCharset: (NSString *)srcCharset 
+	sb: (CkoStringBuilder *)sb;
+// method: UnzipToStream
+- (BOOL)UnzipToStream: (CkoStream *)toStream;
+// method: UnzipToStreamAsync
+- (CkoTask *)UnzipToStreamAsync: (CkoStream *)toStream;
 // method: UnzipToString
 - (NSString *)UnzipToString: (NSNumber *)lineEndingBehavior 
 	srcCharset: (NSString *)srcCharset;

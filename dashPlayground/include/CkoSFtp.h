@@ -1,11 +1,12 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  SFtp
 // Wrapped Chilkat C++ class name =  CkSFtp
 
 @class CkoTask;
 @class CkoSshKey;
+@class CkoSecureString;
 @class CkoSsh;
 @class CkoBinData;
 @class CkoStringBuilder;
@@ -78,6 +79,7 @@
 @property (nonatomic, readonly, copy) NSNumber *ProtocolVersion;
 @property (nonatomic, copy) NSString *ReadDirMustMatch;
 @property (nonatomic, copy) NSString *ReadDirMustNotMatch;
+@property (nonatomic, readonly, copy) NSString *ServerIdentifier;
 @property (nonatomic, readonly, copy) NSString *SessionLog;
 @property (nonatomic, copy) NSString *SocksHostname;
 @property (nonatomic, copy) NSString *SocksPassword;
@@ -95,6 +97,8 @@
 @property (nonatomic) BOOL UtcMode;
 @property (nonatomic) BOOL VerboseLogging;
 @property (nonatomic, readonly, copy) NSString *Version;
+@property (nonatomic, readonly, copy) NSNumber *XferByteCount;
+@property (nonatomic, readonly, copy) NSNumber *XferByteCount64;
 // method: AccumulateBytes
 - (NSNumber *)AccumulateBytes: (NSString *)sftpHandle 
 	maxBytes: (NSNumber *)maxBytes;
@@ -123,6 +127,20 @@
 // method: AuthenticatePwPkAsync
 - (CkoTask *)AuthenticatePwPkAsync: (NSString *)username 
 	password: (NSString *)password 
+	privateKey: (CkoSshKey *)privateKey;
+// method: AuthenticateSecPw
+- (BOOL)AuthenticateSecPw: (CkoSecureString *)login 
+	password: (CkoSecureString *)password;
+// method: AuthenticateSecPwAsync
+- (CkoTask *)AuthenticateSecPwAsync: (CkoSecureString *)login 
+	password: (CkoSecureString *)password;
+// method: AuthenticateSecPwPk
+- (BOOL)AuthenticateSecPwPk: (CkoSecureString *)username 
+	password: (CkoSecureString *)password 
+	privateKey: (CkoSshKey *)privateKey;
+// method: AuthenticateSecPwPkAsync
+- (CkoTask *)AuthenticateSecPwPkAsync: (CkoSecureString *)username 
+	password: (CkoSecureString *)password 
 	privateKey: (CkoSshKey *)privateKey;
 // method: ClearAccumulateBuffer
 - (void)ClearAccumulateBuffer;
@@ -190,6 +208,16 @@
 	sb: (CkoStringBuilder *)sb;
 // method: Eof
 - (BOOL)Eof: (NSString *)sftpHandle;
+// method: FileExists
+- (NSNumber *)FileExists: (NSString *)remotePath 
+	followLinks: (BOOL)followLinks;
+// method: FileExistsAsync
+- (CkoTask *)FileExistsAsync: (NSString *)remotePath 
+	followLinks: (BOOL)followLinks;
+// method: Fsync
+- (BOOL)Fsync: (NSString *)handle;
+// method: FsyncAsync
+- (CkoTask *)FsyncAsync: (NSString *)handle;
 // method: GetFileCreateDt
 - (CkoDateTime *)GetFileCreateDt: (NSString *)filePathOrHandle 
 	bFollowLinks: (BOOL)bFollowLinks 
@@ -278,6 +306,12 @@
 - (NSNumber *)GetFileSize64: (NSString *)filePathOrHandle 
 	bFollowLinks: (BOOL)bFollowLinks 
 	bIsHandle: (BOOL)bIsHandle;
+// method: HardLink
+- (BOOL)HardLink: (NSString *)oldPath 
+	newPath: (NSString *)newPath;
+// method: HardLinkAsync
+- (CkoTask *)HardLinkAsync: (NSString *)oldPath 
+	newPath: (NSString *)newPath;
 // method: InitializeSftp
 - (BOOL)InitializeSftp;
 // method: InitializeSftpAsync
@@ -325,6 +359,10 @@
 	offset64: (NSNumber *)offset64 
 	numBytes: (NSNumber *)numBytes 
 	charset: (NSString *)charset;
+// method: ReadLink
+- (NSString *)ReadLink: (NSString *)path;
+// method: ReadLinkAsync
+- (CkoTask *)ReadLinkAsync: (NSString *)path;
 // method: RealPath
 - (NSString *)RealPath: (NSString *)originalPath 
 	composePath: (NSString *)composePath;
@@ -441,6 +479,12 @@
 - (CkoTask *)SetPermissionsAsync: (NSString *)pathOrHandle 
 	bIsHandle: (BOOL)bIsHandle 
 	perm: (NSNumber *)perm;
+// method: SymLink
+- (BOOL)SymLink: (NSString *)oldPath 
+	newPath: (NSString *)newPath;
+// method: SymLinkAsync
+- (CkoTask *)SymLinkAsync: (NSString *)oldPath 
+	newPath: (NSString *)newPath;
 // method: SyncTreeDownload
 - (BOOL)SyncTreeDownload: (NSString *)remoteRoot 
 	localRoot: (NSString *)localRoot 

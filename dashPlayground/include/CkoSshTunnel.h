@@ -1,11 +1,12 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  SshTunnel
 // Wrapped Chilkat C++ class name =  CkSshTunnel
 
 @class CkoSshKey;
 @class CkoTask;
+@class CkoSecureString;
 @class CkoSsh;
 
 
@@ -60,6 +61,7 @@
 @property (nonatomic, readonly, copy) NSNumber *ListenPort;
 @property (nonatomic, copy) NSString *OutboundBindIpAddress;
 @property (nonatomic, copy) NSNumber *OutboundBindPort;
+@property (nonatomic) BOOL PreferIpv6;
 @property (nonatomic, copy) NSString *SocksHostname;
 @property (nonatomic, copy) NSString *SocksPassword;
 @property (nonatomic, copy) NSNumber *SocksPort;
@@ -91,6 +93,20 @@
 // method: AuthenticatePwPkAsync
 - (CkoTask *)AuthenticatePwPkAsync: (NSString *)username 
 	password: (NSString *)password 
+	privateKey: (CkoSshKey *)privateKey;
+// method: AuthenticateSecPw
+- (BOOL)AuthenticateSecPw: (CkoSecureString *)login 
+	password: (CkoSecureString *)password;
+// method: AuthenticateSecPwAsync
+- (CkoTask *)AuthenticateSecPwAsync: (CkoSecureString *)login 
+	password: (CkoSecureString *)password;
+// method: AuthenticateSecPwPk
+- (BOOL)AuthenticateSecPwPk: (CkoSecureString *)username 
+	password: (CkoSecureString *)password 
+	privateKey: (CkoSshKey *)privateKey;
+// method: AuthenticateSecPwPkAsync
+- (CkoTask *)AuthenticateSecPwPkAsync: (CkoSecureString *)username 
+	password: (CkoSecureString *)password 
 	privateKey: (CkoSshKey *)privateKey;
 // method: BeginAccepting
 - (BOOL)BeginAccepting: (NSNumber *)listenPort;

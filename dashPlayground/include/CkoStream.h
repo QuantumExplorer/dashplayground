@@ -1,10 +1,12 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Stream
 // Wrapped Chilkat C++ class name =  CkStream
 
+@class CkoBinData;
 @class CkoTask;
+@class CkoStringBuilder;
 
 
 @class CkoBaseProgress;
@@ -57,6 +59,10 @@
 @property (nonatomic, readonly, copy) NSString *Version;
 @property (nonatomic, readonly, copy) NSNumber *WriteFailReason;
 @property (nonatomic, copy) NSNumber *WriteTimeoutMs;
+// method: ReadBd
+- (BOOL)ReadBd: (CkoBinData *)binData;
+// method: ReadBdAsync
+- (CkoTask *)ReadBdAsync: (CkoBinData *)binData;
 // method: ReadBytes
 - (NSData *)ReadBytes;
 // method: ReadBytesAsync
@@ -75,6 +81,10 @@
 // method: ReadNBytesENCAsync
 - (CkoTask *)ReadNBytesENCAsync: (NSNumber *)numBytes 
 	encoding: (NSString *)encoding;
+// method: ReadSb
+- (BOOL)ReadSb: (CkoStringBuilder *)sb;
+// method: ReadSbAsync
+- (CkoTask *)ReadSbAsync: (CkoStringBuilder *)sb;
 // method: ReadString
 - (NSString *)ReadString;
 // method: ReadStringAsync
@@ -104,6 +114,10 @@
 // method: SetSourceString
 - (BOOL)SetSourceString: (NSString *)srcStr 
 	charset: (NSString *)charset;
+// method: WriteBd
+- (BOOL)WriteBd: (CkoBinData *)binData;
+// method: WriteBdAsync
+- (CkoTask *)WriteBdAsync: (CkoBinData *)binData;
 // method: WriteByte
 - (BOOL)WriteByte: (NSNumber *)byteVal;
 // method: WriteByteAsync
@@ -120,6 +134,10 @@
 	encoding: (NSString *)encoding;
 // method: WriteClose
 - (BOOL)WriteClose;
+// method: WriteSb
+- (BOOL)WriteSb: (CkoStringBuilder *)sb;
+// method: WriteSbAsync
+- (CkoTask *)WriteSbAsync: (CkoStringBuilder *)sb;
 // method: WriteString
 - (BOOL)WriteString: (NSString *)str;
 // method: WriteStringAsync

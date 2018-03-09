@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  OAuth2
 // Wrapped Chilkat C++ class name =  CkOAuth2
@@ -45,10 +45,12 @@
 @property (nonatomic, readonly, copy) NSString *LastErrorXml;
 @property (nonatomic) BOOL LastMethodSuccess;
 @property (nonatomic, copy) NSNumber *ListenPort;
+@property (nonatomic, copy) NSNumber *ListenPortRangeEnd;
 @property (nonatomic, copy) NSString *LocalHost;
 @property (nonatomic, copy) NSString *RedirectAllowHtml;
 @property (nonatomic, copy) NSString *RedirectDenyHtml;
 @property (nonatomic, copy) NSString *RefreshToken;
+@property (nonatomic, copy) NSString *Resource;
 @property (nonatomic, copy) NSString *Scope;
 @property (nonatomic, copy) NSString *TokenEndpoint;
 @property (nonatomic, copy) NSString *TokenType;
@@ -56,6 +58,8 @@
 @property (nonatomic, readonly, copy) NSString *Version;
 // method: Cancel
 - (BOOL)Cancel;
+// method: GetRedirectRequestParam
+- (NSString *)GetRedirectRequestParam: (NSString *)paramName;
 // method: Monitor
 - (BOOL)Monitor;
 // method: MonitorAsync

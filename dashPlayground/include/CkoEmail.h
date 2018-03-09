@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  Email
 // Wrapped Chilkat C++ class name =  CkEmail
@@ -64,6 +64,9 @@
 @property (nonatomic, readonly, copy) NSNumber *NumReplacePatterns;
 @property (nonatomic, readonly, copy) NSNumber *NumReports;
 @property (nonatomic, readonly, copy) NSNumber *NumTo;
+@property (nonatomic, copy) NSString *OaepHash;
+@property (nonatomic, copy) NSString *OaepMgfHash;
+@property (nonatomic) BOOL OaepPadding;
 @property (nonatomic) BOOL OverwriteExisting;
 @property (nonatomic, copy) NSString *Pkcs7CryptAlg;
 @property (nonatomic, copy) NSNumber *Pkcs7KeyLength;
@@ -78,6 +81,7 @@
 @property (nonatomic) BOOL SendSigned;
 @property (nonatomic, readonly) BOOL SignaturesValid;
 @property (nonatomic, readonly, copy) NSString *SignedBy;
+@property (nonatomic, copy) NSString *SigningAlg;
 @property (nonatomic, copy) NSString *SigningHashAlg;
 @property (nonatomic, readonly, copy) NSNumber *Size;
 @property (nonatomic, copy) NSString *Subject;
@@ -191,6 +195,8 @@
 - (BOOL)AesEncrypt: (NSString *)password;
 // method: AppendToBody
 - (void)AppendToBody: (NSString *)str;
+// method: ApplyFixups
+- (BOOL)ApplyFixups: (NSString *)fixups;
 // method: AspUnpack
 - (BOOL)AspUnpack: (NSString *)prefix 
 	saveDir: (NSString *)saveDir 
@@ -253,6 +259,9 @@
 - (NSString *)GenerateFilename;
 // method: GetAlternativeBody
 - (NSString *)GetAlternativeBody: (NSNumber *)index;
+// method: GetAlternativeBodyBd
+- (BOOL)GetAlternativeBodyBd: (NSNumber *)index 
+	binData: (CkoBinData *)binData;
 // method: GetAlternativeBodyByContentType
 - (NSString *)GetAlternativeBodyByContentType: (NSString *)contentType;
 // method: GetAlternativeContentType
@@ -272,6 +281,9 @@
 - (NSString *)GetAttachmentAttr: (NSNumber *)index 
 	fieldName: (NSString *)fieldName 
 	attrName: (NSString *)attrName;
+// method: GetAttachmentBd
+- (BOOL)GetAttachmentBd: (NSNumber *)index 
+	binData: (CkoBinData *)binData;
 // method: GetAttachmentContentID
 - (NSString *)GetAttachmentContentID: (NSNumber *)index;
 // method: GetAttachmentContentType

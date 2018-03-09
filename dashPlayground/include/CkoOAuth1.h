@@ -1,5 +1,5 @@
 // Chilkat Objective-C header.
-// This is a generated header file for Chilkat version 9.5.0.66
+// This is a generated header file for Chilkat version 9.5.0.72
 
 // Generic/internal class name =  OAuth1
 // Wrapped Chilkat C++ class name =  CkOAuth1
@@ -40,6 +40,7 @@
 @property (nonatomic, copy) NSString *OauthUrl;
 @property (nonatomic, copy) NSString *OauthVersion;
 @property (nonatomic, readonly, copy) NSString *QueryString;
+@property (nonatomic, copy) NSString *Realm;
 @property (nonatomic, readonly, copy) NSString *Signature;
 @property (nonatomic, copy) NSString *SignatureMethod;
 @property (nonatomic, copy) NSString *Timestamp;
