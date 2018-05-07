@@ -58,6 +58,10 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(dispatch_queue_t)queryCacheDispatchQueue;
 
+-(NSArray*)allRepositories;
 
+-(NSManagedObject*)branchNamed:(NSString*)branchName inRepository:(NSManagedObject*)repository;
+
+-(void)deleteRepository:(NSManagedObject*)object;
 
 @end

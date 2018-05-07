@@ -17,7 +17,6 @@
 @property (nonatomic,strong) IBOutlet NSTextField * startCountField;
 
 - (IBAction)pressStartIntances:(id)sender;
-- (IBAction)addRepository:(id)sender;
 - (IBAction)refreshBranch:(id)sender;
 
 @end

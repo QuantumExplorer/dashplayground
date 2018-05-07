@@ -16,5 +16,4 @@
 - (IBAction)checkServer:(id)sender;
 - (IBAction)startServer:(id)sender;
 @property (strong) IBOutlet NSButton *startStopButton;
-
 @end

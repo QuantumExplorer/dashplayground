@@ -1,0 +1,27 @@
+PODS:
+  - AFNetworking (3.2.1):
+    - AFNetworking/NSURLSession (= 3.2.1)
+    - AFNetworking/Reachability (= 3.2.1)
+    - AFNetworking/Security (= 3.2.1)
+    - AFNetworking/Serialization (= 3.2.1)
+    - AFNetworking/UIKit (= 3.2.1)
+  - AFNetworking/NSURLSession (3.2.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (3.2.1)
+  - AFNetworking/Security (3.2.1)
+  - AFNetworking/Serialization (3.2.1)
+  - NMSSH (2.2.8)
+
+DEPENDENCIES:
+  - AFNetworking
+  - NMSSH
+
+SPEC CHECKSUMS:
+  AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
+  NMSSH: b722885a07485a2c03ffa3ea56a7b0308dbdc37c
+
+PODFILE CHECKSUM: 3451c4e2cc6dd2d167094f7a24cb0755d0261f2b
+
+COCOAPODS: 1.4.0

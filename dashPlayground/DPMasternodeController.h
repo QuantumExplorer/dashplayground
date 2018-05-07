@@ -23,7 +23,9 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 - (void)stopInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)terminateInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)getInstancesClb:(dashClb)clb;
+- (void)createInstanceWithInitialAMI:(dashStateClb)clb;
 
+- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)setUpMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
@@ -34,5 +36,16 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 -(void)checkMasternode:(NSManagedObject*)masternode;
 
 -(NSDictionary*)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode;
+
+- (NSDictionary *)runAWSCommandJSON:(NSString *)commandToRun;
+- (NSData *)runAWSCommand:(NSString *)commandToRun;
+- (NSString *)runAWSCommandString:(NSString *)commandToRun;
+
+-(void)setSshPath:(NSString*)sshPath;
+-(NSString*)sshPath;
+
+- (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
+
+- (NSDictionary *)runTerminalCommandJSON:(NSString *)commandToRun;
 
 @end

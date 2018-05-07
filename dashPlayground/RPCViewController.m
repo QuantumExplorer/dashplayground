@@ -8,6 +8,7 @@
 
 #import "RPCViewController.h"
 #import "DPLocalNodeController.h"
+#import "DialogAlert.h"
 
 @implementation RPCViewController
 
@@ -20,32 +21,68 @@
     
 }
 - (IBAction)checkServer:(id)sender {
-    [[DPLocalNodeController sharedInstance] checkDash:^(BOOL active) {
-        if (active) {
-            self.serverStatusLabel.stringValue = @"Dashd running successfully";
-            self.startStopButton.title = @"Stop";
-        } else {
-            self.serverStatusLabel.stringValue = @"Dashd isn't running";
-            self.startStopButton.title = @"Start";
+    if (![[DPLocalNodeController sharedInstance] dashDPath]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"dashd" exPath:@"~/Documents/src/dash/src"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSString *pathString = [dialog getLaunchPath];
+            [[DPLocalNodeController sharedInstance] setDashDPath:pathString];
+            [self checkServer:sender];
         }
-    }];
-}
-
-- (IBAction)startServer:(id)sender {
-    if ([self.startStopButton.title isEqualToString:@"Stop"]) {
-        [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
-            self.serverStatusLabel.stringValue = message;
-            if (success) {
+    }
+    else{
+        [[DPLocalNodeController sharedInstance] checkDash:^(BOOL active) {
+            if (active) {
+                self.serverStatusLabel.stringValue = @"Dashd running successfully";
+                self.startStopButton.title = @"Stop";
+            } else {
+                self.serverStatusLabel.stringValue = @"Dashd isn't running";
                 self.startStopButton.title = @"Start";
             }
         }];
-    } else {
-    [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
-        self.serverStatusLabel.stringValue = message;
-        if (success) {
-            self.startStopButton.title = @"Stop";
+    }
+}
+
+- (IBAction)startServer:(id)sender {
+    if (![[DPLocalNodeController sharedInstance] dashCliPath]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"dash-cli" exPath:@"~/Documents/src/dash/src"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSString *pathString = [dialog getLaunchPath];
+            [[DPLocalNodeController sharedInstance] setDashCliPath:pathString];
+            [self startServer:sender];
         }
-    }];
+    }
+    else {
+        if ([self.startStopButton.title isEqualToString:@"Stop"]) {
+            [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
+                self.serverStatusLabel.stringValue = message;
+                if (success) {
+                    self.startStopButton.title = @"Start";
+                }
+            }];
+        } else if (![[DPLocalNodeController sharedInstance] dashDPath]) {
+            DialogAlert *dialog=[[DialogAlert alloc]init];
+            NSAlert *findPathAlert = [dialog getFindPathAlert:@"dashd" exPath:@"~/Documents/src/dash/src"];
+            
+            if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+                //Find clicked
+                NSString *pathString = [dialog getLaunchPath];
+                [[DPLocalNodeController sharedInstance] setDashDPath:pathString];
+                [self startServer:sender];
+            }
+        } else {
+        [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
+            self.serverStatusLabel.stringValue = message;
+            if (success) {
+                self.startStopButton.title = @"Stop";
+            }
+        }];
+        }
     }
 }
 @end

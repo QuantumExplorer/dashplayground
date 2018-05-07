@@ -19,6 +19,8 @@
 
 @interface MasternodesViewController : NSViewController <NSTabViewDelegate>
 
++(MasternodesViewController*)sharedInstance;
+
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
 - (IBAction)retreiveInstances:(id)sender;
@@ -29,5 +31,9 @@
 - (IBAction)startRemote:(id)sender;
 
 - (IBAction)selectedConsoleTab:(id)sender;
+
+-(void)addStringEvent:(NSString*)string;
+-(void)addStringEventToTerminalConsole:(NSString*)string;
+-(void)setTerminalString:(NSString*)string;
 
 @end

@@ -17,8 +17,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dashdStopped:) name:nDASHD_STOPPED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dashdStarted:) name:nDASHD_STARTED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dashdStarting:) name:nDASHD_STARTING object:nil];
-    
-        [[DPLocalNodeController sharedInstance] checkDash:^(BOOL active) {}];
 }
 
 -(void)dealloc {

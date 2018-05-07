@@ -11,6 +11,13 @@
 #import "DPDataStore.h"
 #import "MasternodeStateTransformer.h"
 #import "SentinelStateTransformer.h"
+#import "DialogAlert.h"
+#import "DPMasternodeController.h"
+#import "PreferenceViewController.h"
+#import "VolumeViewController.h"
+#import "RepositoriesModalViewController.h"
+#import "RepositoriesViewController.h"
+#import <NMSSH/NMSSH.h>
 
 @interface AppDelegate ()
 
@@ -20,6 +27,49 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    
+//    Toey, adding some code here to test somethong more easier.
+    
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"securityGroupId"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"subnetID"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"keyName"];
+    
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sshPath"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"SSH_NAME"];
+    
+//    VolumeViewController *volController = [[VolumeViewController alloc] init];
+//    [volController showAMIWindow:@"test"];
+    
+    NMSSHSession *session = [NMSSHSession connectToHost:@"54.255.245.103"
+                                           withUsername:@"ubuntu"];
+    
+    if (session.isConnected) {
+        [session authenticateByPublicKey:nil privateKey:[[DPMasternodeController sharedInstance] sshPath] andPassword:nil];
+        
+        if (session.isAuthorized) {
+            NSLog(@"Authentication succeeded");
+            
+            session.channel.requestPty = YES;
+            session.channel.ptyTerminalType = NMSSHChannelPtyTerminalAnsi;
+            
+            
+            NSError *error;
+            NSString *response = [[session channel] execute:@"\n cd sre" error:&error];
+            if(!error)
+            {
+                NSLog(@"Response: %@", response);
+            }
+            else{
+                NSLog(@"Error: %@", error);
+            }
+        }
+    }
+    
+    [session disconnect];
+
+    //end
+    
+    
     NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"masternodeState == %@ || ((masternodseState == %@ || masternodseState == %@) && sentinelState == %@)",@(MasternodeState_Checking),@(MasternodeState_Installed),@(MasternodeState_Configured),@(SentinelState_Checking)]];
     for (NSManagedObject * masternode in checkingMasternodes) {
         if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
@@ -283,6 +333,13 @@
     }
     
     return NSTerminateNow;
+}
+
+- (IBAction)openPreference:(id)sender {
+    
+    PreferenceViewController *prefController = [[PreferenceViewController alloc] init];
+    [prefController showConfiguringWindow];
+    
 }
 
 @end
