@@ -10,6 +10,7 @@
 #import "DPMasternodeController.h"
 #import "DPRepositoryController.h"
 #import "DPDataStore.h"
+#import "DialogAlert.h"
 
 @interface RepositoriesViewController ()
 
@@ -32,15 +33,17 @@
         NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
         [[NSApplication sharedApplication] presentError:error];
     } else {
-        [[DPDataStore sharedInstance] deleteObject:object];
-        [[DPDataStore sharedInstance] saveContext];
+        
+        [[DPDataStore sharedInstance] deleteRepository:object]; //Toey, delete in main context
+//        [[DPDataStore sharedInstance] deleteObject:object];
+//        [[DPDataStore sharedInstance] saveContext];
     }
     return YES;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     // Do any additional setup after loading the view.
 }
 
@@ -59,11 +62,21 @@
         [[NSApplication sharedApplication] presentError:error];
         return;
     }
-    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil];
+    
+    if([self.startCountField integerValue] <= 100 && [self.startCountField integerValue] >= 1)
+    {
+        NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+        [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil];
+    }
+    else
+    {
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Warning!" message:@"The number of instances exceeds the limitation (1-100)."];
+    }
+    
+    
 }
 
-- (IBAction)addRepository:(id)sender {
+- (IBAction)pressAddRepository:(id)sender {
     NSString * branch = [self.branchAddField stringValue];
     if (!branch || [branch isEqualToString:@""]) branch = @"master";
     if ([self.repositoryAddField stringValue]) {
@@ -125,4 +138,6 @@
         }
     }];
 }
+
+
 @end

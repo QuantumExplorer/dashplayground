@@ -21,10 +21,18 @@
 //#import "DFSSHServer.h"
 //#import "DFSSHConnector.h"
 //#import "DFSSHOperator.h"
+#import "DialogAlert.h"
+#import "PreferenceViewController.h"
+#import "PreferenceData.h"
+#import "MasternodesViewController.h"
+#import <NMSSH/NMSSH.h>
 
 #define MASTERNODE_PRIVATE_KEY_STRING @"[MASTERNODE_PRIVATE_KEY]"
 #define RPC_PASSWORD_STRING @"[RPC_PASSWORD]"
 #define EXTERNAL_IP_STRING @"[EXTERNAL_IP]"
+
+#define SSHPATH @"sshPath"
+#define SSH_NAME_STRING @"SSH_NAME"
 
 @interface DPMasternodeController ()
 
@@ -32,6 +40,26 @@
 @end
 
 @implementation DPMasternodeController
+
+-(NSString*)sshPath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    return [standardUserDefaults stringForKey:SSHPATH];
+}
+
+-(void)setSshPath:(NSString*)sshPath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    [standardUserDefaults setObject:sshPath forKey:SSHPATH];
+}
+
+-(NSString*)getSshName {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    return [standardUserDefaults stringForKey:SSH_NAME_STRING];
+}
+
+-(void)setSshName:(NSString*)sshName {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    [standardUserDefaults setObject:sshName forKey:SSH_NAME_STRING];
+}
 
 #pragma mark - Connectivity
 
@@ -269,6 +297,25 @@
     }
 }
 
+-(NMSSHSession*)connectInstanceWithSsh:(NSString*)keyPath masternodeIp:(NSString*)masternodeIp {
+    NMSSHSession *session = [NMSSHSession connectToHost:masternodeIp withUsername:@"ubuntu"];
+    
+    if (session.isConnected) {
+        [session authenticateByPublicKey:nil privateKey:keyPath andPassword:nil];
+        
+        if (session.isAuthorized) {
+            NSLog(@"Authentication succeeded");
+            
+            session.channel.requestPty = YES;
+            
+            NSError *error;
+            [session.channel startShell:&error];
+        }
+    }
+    
+    return session;
+}
+
 -(CkoSshKey *)loginPrivateKeyAtPath:(NSString*)path {
     CkoSshKey *key = [[CkoSshKey alloc] init];
     
@@ -298,7 +345,22 @@
 }
 
 -(CkoSFtp*)sftpIn:(NSString*)masternodeIP {
-    return [self sftpIn:masternodeIP privateKeyPath:@"/Users/samuelw/Documents/SSH_KEY_DASH_PLAYGROUND.pem"];
+    if (![self sshPath]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSString *pathString = [dialog getLaunchPath];
+            [self setSshPath:pathString];
+            return [self sftpIn:masternodeIP privateKeyPath:pathString];
+        }
+    }
+    else{
+        return [self sftpIn:masternodeIP privateKeyPath:[self sshPath]];
+    }
+    
+    return nil;
 }
 
 -(CkoSFtp*)sftpIn:(NSString*)masternodeIP privateKeyPath:(NSString*)privateKeyPath {
@@ -355,7 +417,21 @@
 }
 
 -(CkoSsh*)sshIn:(NSString*)masternodeIP channelNum:(NSInteger *)channelNum {
-    return [self sshIn:masternodeIP privateKeyPath:@"/Users/samuelw/Documents/SSH_KEY_DASH_PLAYGROUND.pem" channelNum:channelNum];
+    if (![self sshPath]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSString *pathString = [dialog getLaunchPath];
+            [self setSshPath:pathString];
+            return [self sshIn:masternodeIP privateKeyPath:pathString channelNum:channelNum];
+        }
+    }
+    else{
+        return [self sshIn:masternodeIP privateKeyPath:[self sshPath] channelNum:channelNum];
+    }
+    return nil;
 }
 
 -(CkoSsh*)sshIn:(NSString*)masternodeIP privateKeyPath:(NSString*)privateKeyPath channelNum:(NSInteger *)channelNum {
@@ -413,6 +489,114 @@
 }
 
 #pragma mark - Set Up
+
+- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb
+{
+    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+    __block NSString * repositoryPath = [repository valueForKey:@"repository.url"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        NMSSHSession *sshSession = [self connectInstanceWithSsh:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP];
+        
+        if (!sshSession.isAuthorized) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,@"Could not SSH in");
+            });
+            return;
+        }
+        
+        NSError *error = nil;
+        NSString *response = [sshSession.channel execute:@"ls src" error:&error];
+        NSLog(@"List of my sites: %@", response);
+        
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [[sshSession channel] write:@"ls" error:nil timeout:@10];
+//        });
+        
+        [sshSession disconnect];
+        
+        //---------
+        
+//        CkoSsh * ssh = [self sshIn:publicIP] ;
+//        if (!ssh){
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,@"Could not SSH in");
+//            });
+//            return;
+//        }
+//        //  Send some commands and get the output.
+//        NSString *strOutput = [ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"];
+//        if (ssh.LastMethodSuccess != YES) {
+//            NSLog(@"%@",ssh.LastErrorText);
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,ssh.LastErrorText);
+//            });
+//            return;
+//        }
+//        if ([strOutput hasPrefix:@"ls: cannot access src: No such file or directory"]) {
+//            [ssh QuickCommand: @"mkdir src" charset: @"ansi"];
+//            if (ssh.LastMethodSuccess != YES) {
+//                NSLog(@"%@",ssh.LastErrorText);
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    clb(NO,ssh.LastErrorText);
+//                });
+//                return;
+//            }
+//        }
+//        BOOL justCloned = FALSE;
+//        if (![strOutput isEqualToString:@"dash"]) {
+//            justCloned = TRUE;
+//            NSError * error = nil;
+//            [self sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:&error percentageClb:^(NSString *call, float percentage) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    NSLog(@"%@ %.2f",call,percentage);
+//                    [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+//                });
+//            }];
+//            strOutput = [ssh QuickCommand: [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath] charset: @"ansi"];
+//            if (ssh.LastMethodSuccess != YES) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    clb(NO,ssh.LastErrorText);
+//                });
+//
+//                return;
+//            }
+//        }
+//
+//        //now let's get git info
+//        __block NSDictionary * gitValues = nil;
+//        if (!justCloned) {
+//            gitValues = [self sendGitCommands:@[@"pull",@"rev-parse --short HEAD"] onSSH:ssh];
+//        } else {
+//            gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD"] onSSH:ssh];
+//        }
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+//            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//        });
+//
+//        NSError * error = nil;
+//
+//        //now let's make all this shit
+//        [self sendDashCommandList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh commandExpectedLineCounts:@[@(52),@(481),@(301),@(1),@(1),@(1),@(1),@(1)] error:&error percentageClb:^(NSString *call, float percentage) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                NSLog(@"%@ %.2f",call,percentage);
+//                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+//            });
+//        }];
+//
+//        [ssh Disconnect];
+//
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
+//                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+//            }
+//            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//        });
+    });
+    
+    
+}
 
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb
 {
@@ -1036,71 +1220,238 @@
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:@"/usr/local/bin/aws"];
     
+//    if([task isRunning])
+//    {
+//        NSLog(@"Aws is running!!");
+//    }
+//    else
+//    {
+//        NSLog(@"Aws not found!!");
+//        return nil;
+//    }
+    
+    
     NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
+    
+    //TOEY, add newArguments variable to handle a case that has sentence like "We are developer".
+    NSMutableArray *newArguments = [self getArgumentsWithSentence:arguments terminalType:false];
+    
     NSLog(@"run command:%@", commandToRun);
-    [task setArguments:arguments];
+    [task setArguments:newArguments];
     
     NSPipe *pipe = [NSPipe pipe];
     [task setStandardOutput:pipe];
     
     NSFileHandle *file = [pipe fileHandleForReading];
     
+    NSPipe *errorPipe = [NSPipe pipe];
+    [task setStandardError:errorPipe];
+    
+    NSFileHandle *error = [errorPipe fileHandleForReading];
+    
     [task launch];
+    [task waitUntilExit]; //Toey, wait until finish launching task to show error.
+    
+    //Toey, add this stuff to show error alert.
+    NSData * dataError = [error readDataToEndOfFile];
+    NSString * strError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if([strError length] != 0){
+            [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:[NSString stringWithFormat:@"%@", strError]];
+            NSLog(@"%@", strError);
+        }
+    });
     
     return [file readDataToEndOfFile];
+}
+
+- (NSDictionary *)runTerminalCommandJSON:(NSString *)commandToRun
+{
+    NSData * data = [self runTerminalCommand:commandToRun];
+    NSError * error = nil;
+    NSDictionary *output = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error: &error];
+    return output;
+}
+
+- (NSData *)runTerminalCommand:(NSString *)commandToRun
+{
+    NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
+    
+    NSTask *task = [[NSTask alloc] init];
+    
+    NSString *launchPath = [NSString stringWithFormat:@"/usr/bin/%@", arguments[0]];
+    
+    [task setLaunchPath:launchPath];
+    
+    //TOEY, add newArguments variable to handle a case that has sentence like "We are developer".
+    NSMutableArray *newArguments = [self getArgumentsWithSentence:arguments terminalType:true];
+    
+    NSLog(@"run command:%@", commandToRun);
+    [task setArguments:newArguments];
+    
+    NSPipe *pipe = [NSPipe pipe];
+    [task setStandardOutput:pipe];
+    
+    NSFileHandle *file = [pipe fileHandleForReading];
+    
+    NSPipe *errorPipe = [NSPipe pipe];
+    [task setStandardError:errorPipe];
+    
+    NSFileHandle *error = [errorPipe fileHandleForReading];
+    
+    [task launch];
+    [task waitUntilExit]; //Toey, wait until finish launching task to show error.
+    
+    //Toey, add this stuff to show error alert.
+    NSData * dataError = [error readDataToEndOfFile];
+    NSString * strError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
+    
+    if([strError length] != 0){
+        NSLog(@"%@", strError);
+        [[MasternodesViewController sharedInstance] setTerminalString:strError];
+    }
+    
+    return [file readDataToEndOfFile];
+}
+
+
+-(NSMutableArray*)getArgumentsWithSentence:(NSArray*)arguments terminalType:(BOOL)terminalType {
+    
+    NSMutableArray *newArguments = [[NSMutableArray alloc] init];
+    NSString *str = @"";
+    BOOL isConcating = false;
+    
+    for (NSString *string in arguments)
+    {
+        if(terminalType) {
+            if(arguments[0])
+            {
+                terminalType = false;
+                continue;
+            }
+        }
+        if([string length] == 0) continue;
+        
+        NSString *firstChar = [string substringToIndex:1];
+        NSString *lastChar = [string substringFromIndex:[string length] - 1];
+        
+        if([firstChar isEqualToString:@"\""] && [lastChar isEqualToString:@"\""])
+        {
+            NSString *cutFirst = [string substringFromIndex:1];
+            NSString *cutLast = [cutFirst substringToIndex:[cutFirst length] - 1];
+            [newArguments addObject:cutLast];
+        }
+        else if([firstChar isEqualToString:@"\""]) {
+            str = [str stringByAppendingString:string];
+            isConcating = true;
+        }
+        else if([lastChar isEqualToString:@"\""])
+        {
+            str = [str stringByAppendingString:[NSString stringWithFormat:@" %@",string]];
+            NSString *cutFirst = [str substringFromIndex:1];
+            NSString *cutLast = [cutFirst substringToIndex:[cutFirst length] - 1];
+            //            NSLog(@"%@", cutLast);
+            [newArguments addObject:cutLast];
+            isConcating = false;
+            str = @"";
+        }
+        else{
+            if(isConcating)
+            {
+                str = [str stringByAppendingString:[NSString stringWithFormat:@" %@",string]];
+            }
+            else{
+                [newArguments addObject:string];
+                //                NSLog(@"%@", string);
+            }
+        }
+    }
+    return newArguments;
 }
 
 #pragma mark - Instances
 
 -(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-a70092c7 --count %ld --instance-type t2.micro --key-name SSH_KEY_DASH_PLAYGROUND --security-group-ids sg-8a11f5f1 --instance-initiated-shutdown-behavior terminate --subnet-id subnet-b764acd2",(long)count]];
+    
+    if (![self sshPath] || ![self getSshName]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
         
-        __block NSMutableDictionary * instances = [NSMutableDictionary dictionary];
-        //NSLog(@"%@",reservation[@"Instances"]);
-        for (NSDictionary * dictionary in output[@"Instances"]) {
-            NSDictionary * rDict = [NSMutableDictionary dictionary];
-            [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-            [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
-            [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
-            [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSArray *fileInfo = [dialog getSSHLaunchPathAndName];
+            [self setSshPath:fileInfo[1]];
+            
+            NSArray* nameArray = [fileInfo[0] componentsSeparatedByString: @"."];
+            NSString* nameString = [nameArray objectAtIndex: 0];
+            
+            [self setSshName:nameString];
         }
-        NSMutableArray * instanceIdsLeft = [[instances allKeys] mutableCopy];
-        while ([instanceIdsLeft count]) {
-            NSDictionary *output2 = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --instance-ids %@ --filter Name=key-name,Values=SSH_KEY_DASH_PLAYGROUND",[instanceIdsLeft componentsJoinedByString:@" "]]];
-            NSArray * reservations = output2[@"Reservations"];
-            for (NSDictionary * reservation in reservations) {
-                //NSLog(@"%@",reservation[@"Instances"]);
-                for (NSDictionary * dictionary in reservation[@"Instances"]) {
-                    if ([dictionary valueForKey:@"PublicIpAddress"] && ![[dictionary valueForKeyPath:@"State.Name"] isEqualToString:@"pending"]) {
-                        CkoSsh * ssh = [self sshIn:[dictionary valueForKey:@"PublicIpAddress"]];
-                        if (ssh) {
-                            [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
-                            [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
-                            [instanceIdsLeft removeObject:[dictionary valueForKey:@"InstanceId"]];
-                            [ssh Disconnect];
+    }
+    
+    if([[PreferenceData sharedInstance] getSecurityGroupId]
+       ||[[PreferenceData sharedInstance] getSubnetID]
+       ||[[PreferenceData sharedInstance] getKeyName])
+    {
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-38ad8444 --count %ld --instance-type t2.small --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+                                                            (long)count,
+                                                            [[PreferenceData sharedInstance] getKeyName],
+                                                            [[PreferenceData sharedInstance] getSecurityGroupId],
+                                                            [[PreferenceData sharedInstance] getSubnetID]] ];
+            
+            __block NSMutableDictionary * instances = [NSMutableDictionary dictionary];
+            //NSLog(@"%@",reservation[@"Instances"]);
+            for (NSDictionary * dictionary in output[@"Instances"]) {
+                NSDictionary * rDict = [NSMutableDictionary dictionary];
+                [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+                [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
+            }
+            NSMutableArray * instanceIdsLeft = [[instances allKeys] mutableCopy];
+            while ([instanceIdsLeft count]) {
+                NSDictionary *output2 = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --instance-ids %@ --filter Name=key-name,Values=%@",[instanceIdsLeft componentsJoinedByString:@" "], [[PreferenceData sharedInstance] getKeyName]] ];
+                NSArray * reservations = output2[@"Reservations"];
+                for (NSDictionary * reservation in reservations) {
+                    //NSLog(@"%@",reservation[@"Instances"]);
+                    for (NSDictionary * dictionary in reservation[@"Instances"]) {
+                        if ([dictionary valueForKey:@"PublicIpAddress"] && ![[dictionary valueForKeyPath:@"State.Name"] isEqualToString:@"pending"]) {
+                            CkoSsh * ssh = [self sshIn:[dictionary valueForKey:@"PublicIpAddress"]];
+                            if (ssh) {
+                                [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
+                                [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                                [instanceIdsLeft removeObject:[dictionary valueForKey:@"InstanceId"]];
+                                [ssh Disconnect];
+                            }
                         }
                     }
                 }
+                if (instanceIdsLeft) sleep(5);
             }
-            if (instanceIdsLeft) sleep(5);
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSArray * masternodes = [self saveInstances:[instances allValues]];
-            for (NSManagedObject * masternode in masternodes) {
-                [masternode setValue:branch forKey:@"branch"];
-                [[DPDataStore sharedInstance] saveContext];
-                [self setUpMasternodeDashd:masternode clb:^(BOOL success, NSString *message) {
-                    if (!success) {
-                        clb(NO,nil,message);
-                        NSLog(@"");
-                    }
-                }];
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSArray * masternodes = [self saveInstances:[instances allValues]];
+                for (NSManagedObject * masternode in masternodes) {
+                    [masternode setValue:branch forKey:@"branch"];
+                    [[DPDataStore sharedInstance] saveContext];
+                    [self setUpMasternodeDashd:masternode clb:^(BOOL success, NSString *message) {
+                        if (!success) {
+                            clb(NO,nil,message);
+                            NSLog(@"");
+                        }
+                    }];
+                }
+            });
         });
-    });
     
-    
+    }
+    else{
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create new instance!" message:@"Please configure your AWS account."];
+        
+        PreferenceViewController *prefController = [[PreferenceViewController alloc] init];
+        [prefController showConfiguringWindow];
+    }
 }
 
 -(void)keepTabsOnInstance:(NSString*)instanceId clb:(dashStateClb)clb  {
@@ -1118,7 +1469,12 @@
 
 - (void)runInstances:(NSInteger)count clb:(dashStateClb)clb  {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-a70092c7 --count %ld --instance-type t2.micro --key-name SSH_KEY_DASH_PLAYGROUND --security-group-ids sg-8a11f5f1 --instance-initiated-shutdown-behavior terminate --subnet-id subnet-b764acd2",(long)count]];
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-38ad8444 --count %ld --instance-type t2.small --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+                                                        (long)count,
+                                                        [[PreferenceData sharedInstance] getKeyName],
+                                                        [[PreferenceData sharedInstance] getSecurityGroupId],
+                                                        [[PreferenceData sharedInstance] getSubnetID]] ];
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             if (output[@"Instances"]) {
                 NSMutableArray * instances = [NSMutableArray array];
@@ -1193,31 +1549,102 @@
         });
     });
 }
-                   
-                   - (void)checkInstance:(NSString*)instanceId clb:(dashStateClb)clb {
-                       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-                           NSDictionary *output = [self runAWSCommandJSON:@"ec2 describe-instances --filter Name=key-name,Values=SSH_KEY_DASH_PLAYGROUND"];
-                           NSArray * reservations = output[@"Reservations"];
-                           NSMutableArray * instances = [NSMutableArray array];
-                           for (NSDictionary * reservation in reservations) {
-                               //NSLog(@"%@",reservation[@"Instances"]);
-                               for (NSDictionary * dictionary in reservation[@"Instances"]) {
-                                   NSDictionary * rDict = [NSMutableDictionary dictionary];
-                                   [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-                                   [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
-                                   [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
-                                   [instances addObject:rDict];
-                               }
-                           }
-                           dispatch_async(dispatch_get_main_queue(), ^{
-                               NSArray * newMasternodes = [self saveInstances:instances removeOthers:TRUE];
-                               for (NSManagedObject * masternode in newMasternodes) {
-                                   [self checkMasternode:masternode];
-                               }
-                               clb(output?TRUE:FALSE,InstanceState_Unknown,@"Successfully refreshed");
-                           });
-                       });
-                   }
+
+- (void)checkInstance:(NSString*)instanceId clb:(dashStateClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --filter Name=key-name,Values=%@",
+                                                        [[PreferenceData sharedInstance] getKeyName]]];
+        NSArray * reservations = output[@"Reservations"];
+        NSMutableArray * instances = [NSMutableArray array];
+        for (NSDictionary * reservation in reservations) {
+            //NSLog(@"%@",reservation[@"Instances"]);
+            for (NSDictionary * dictionary in reservation[@"Instances"]) {
+                NSDictionary * rDict = [NSMutableDictionary dictionary];
+                [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                [rDict setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
+                [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                [instances addObject:rDict];
+            }
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSArray * newMasternodes = [self saveInstances:instances removeOthers:TRUE];
+            for (NSManagedObject * masternode in newMasternodes) {
+                [self checkMasternode:masternode];
+            }
+            clb(output?TRUE:FALSE,InstanceState_Unknown,@"Successfully refreshed");
+        });
+    });
+}
+
+- (void)createInstanceWithInitialAMI:(dashStateClb)clb  {
+    
+    if (![self sshPath] || ![self getSshName]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSArray *fileInfo = [dialog getSSHLaunchPathAndName];
+            [self setSshPath:fileInfo[1]];
+            
+            NSArray* nameArray = [fileInfo[0] componentsSeparatedByString: @"."];
+            NSString* nameString = [nameArray objectAtIndex: 0];
+            
+            [self setSshName:nameString];
+        }
+    }
+    
+    if([[PreferenceData sharedInstance] getSecurityGroupId]
+       ||[[PreferenceData sharedInstance] getSubnetID]
+       ||[[PreferenceData sharedInstance] getKeyName])
+    {
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-38ad8444 --count 1 --instance-type t2.small --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+                                                            [[PreferenceData sharedInstance] getKeyName],
+                                                            [[PreferenceData sharedInstance] getSecurityGroupId],
+                                                            [[PreferenceData sharedInstance] getSubnetID]] ];
+            
+            __block NSMutableDictionary * instances = [NSMutableDictionary dictionary];
+            //NSLog(@"%@",reservation[@"Instances"]);
+            for (NSDictionary * dictionary in output[@"Instances"]) {
+                NSDictionary * rDict = [NSMutableDictionary dictionary];
+                [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+                [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
+            }
+            NSMutableArray * instanceIdsLeft = [[instances allKeys] mutableCopy];
+            while ([instanceIdsLeft count]) {
+                NSDictionary *output2 = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --instance-ids %@ --filter Name=key-name,Values=%@",[instanceIdsLeft componentsJoinedByString:@" "], [[PreferenceData sharedInstance] getKeyName]] ];
+                NSArray * reservations = output2[@"Reservations"];
+                for (NSDictionary * reservation in reservations) {
+                    //NSLog(@"%@",reservation[@"Instances"]);
+                    for (NSDictionary * dictionary in reservation[@"Instances"]) {
+                        if ([dictionary valueForKey:@"PublicIpAddress"] && ![[dictionary valueForKeyPath:@"State.Name"] isEqualToString:@"pending"]) {
+                            CkoSsh * ssh = [self sshIn:[dictionary valueForKey:@"PublicIpAddress"]];
+                            if (ssh) {
+                                [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
+                                [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                                [instanceIdsLeft removeObject:[dictionary valueForKey:@"InstanceId"]];
+                                [ssh Disconnect];
+                            }
+                        }
+                    }
+                }
+                if (instanceIdsLeft) sleep(5);
+            }
+        });
+        
+    }
+    else{
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create instance!" message:@"Please configure your AWS account."];
+        
+        PreferenceViewController *prefController = [[PreferenceViewController alloc] init];
+        [prefController showConfiguringWindow];
+    }
+    
+}
 
 -(InstanceState)stateForStateName:(NSString*)string {
     if ([string isEqualToString:@"running"]) {
@@ -1283,7 +1710,9 @@
 
 - (void)getInstancesClb:(dashClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [self runAWSCommandJSON:@"ec2 describe-instances --filter Name=key-name,Values=SSH_KEY_DASH_PLAYGROUND"];
+        
+        NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --filter Name=key-name,Values=%@",
+                                                        [[PreferenceData sharedInstance] getKeyName]]];
         NSArray * reservations = output[@"Reservations"];
         NSMutableArray * instances = [NSMutableArray array];
         for (NSDictionary * reservation in reservations) {

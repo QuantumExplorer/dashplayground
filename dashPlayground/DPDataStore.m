@@ -16,6 +16,45 @@
 
 #pragma mark - Repositories
 
+-(NSArray*)allRepositories {
+    return [self allRepositoriesInContext:self.mainContext];
+}
+-(NSArray*)allRepositoriesInContext:(NSManagedObjectContext*)context {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repository"
+                                              inManagedObjectContext:context];
+    [fetchRequest setEntity:entity];
+    
+    NSError *error = nil;
+    
+    NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
+    if (!repositories) {
+        return @[];
+    } else  {
+        return repositories;
+    }
+}
+
+-(void)deleteRepository:(NSManagedObject*)object {
+    
+    NSArray *repoData = [self allRepositories];
+    
+    for (NSUInteger i = 0; i < repoData.count; i++) {
+        NSManagedObject *repository = (NSManagedObject *)[repoData objectAtIndex:i];
+        
+        NSManagedObject *repositorySelected = (NSManagedObject *)[object valueForKey:@"repository"];
+        
+        if([[repositorySelected valueForKey:@"url"] isEqualToString:[repository valueForKey:@"url"]])
+        {
+            [self.mainContext deleteObject:repository];
+            break;
+        }
+    }
+    
+    [self.mainContext deleteObject:object];
+    [self saveMainContext];
+}
+
 -(NSManagedObject*)branchNamed:(NSString*)string onRepositoryURLPath:(NSString*)repositoryURLPath {
     return [self branchNamed:string onRepositoryURLPath:repositoryURLPath inContext:self.mainContext];
 }
@@ -349,6 +388,7 @@ __strong static NSMutableDictionary * mDict = nil;
         }else {
 #if LOG_DATASTORE_SAVE_CONTEXT_STACKTRACE
             NSLog(@"Context saved successfully");
+            NSLog(@"Toey");
 #endif
         }
     }

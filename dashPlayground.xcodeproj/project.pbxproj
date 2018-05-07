@@ -8,6 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */; };
+		A516B45720908324009A59C0 /* DialogAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45620908324009A59C0 /* DialogAlert.m */; };
+		A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45A20908514009A59C0 /* PreferenceViewController.m */; };
+		A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */; };
+		A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */; };
+		A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */; };
+		A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0D22099BA22004B23FE /* VolumeViewController.m */; };
+		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
+		A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A597E24420934C590001C98A /* PreferenceWindow.xib */; };
+		A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */; };
 		EC76ED00E89649FE175F52D1 /* libPods-dashPlayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */; };
 		FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
@@ -50,7 +59,6 @@
 		FB9EBCF21E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
 		FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */; };
 		FB9EBCF61E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */; };
-		FBBAF9A31EAF687500D6F568 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBAF9A21EAF687500D6F568 /* ContainerViewController.m */; };
 		FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */; };
 		FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
 		FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
@@ -84,6 +92,21 @@
 /* Begin PBXFileReference section */
 		0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
+		A516B45620908324009A59C0 /* DialogAlert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DialogAlert.m; sourceTree = "<group>"; };
+		A516B45820908333009A59C0 /* DialogAlert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DialogAlert.h; sourceTree = "<group>"; };
+		A516B45920908509009A59C0 /* PreferenceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceViewController.h; sourceTree = "<group>"; };
+		A516B45A20908514009A59C0 /* PreferenceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceViewController.m; sourceTree = "<group>"; };
+		A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RepositoryWindow.xib; sourceTree = "<group>"; };
+		A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RepositoriesModalViewController.h; sourceTree = "<group>"; };
+		A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesModalViewController.m; sourceTree = "<group>"; };
+		A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPPreferenceController.h; sourceTree = "<group>"; };
+		A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPPreferenceController.m; sourceTree = "<group>"; };
+		A55FC0D12099BA17004B23FE /* VolumeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VolumeViewController.h; sourceTree = "<group>"; };
+		A55FC0D22099BA22004B23FE /* VolumeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VolumeViewController.m; sourceTree = "<group>"; };
+		A5782D1F2095E99A00CA603A /* PreferenceData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceData.h; sourceTree = "<group>"; };
+		A5782D202095E9A400CA603A /* PreferenceData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceData.m; sourceTree = "<group>"; };
+		A597E24420934C590001C98A /* PreferenceWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceWindow.xib; sourceTree = "<group>"; };
+		A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VolumeWindow.xib; sourceTree = "<group>"; };
 		F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
 		F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlayground.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.debug.xcconfig"; sourceTree = "<group>"; };
@@ -238,8 +261,6 @@
 		FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodeSyncStatusTransformer.m; sourceTree = "<group>"; };
 		FB9EBCF31E98752500AE8AC3 /* MasternodeStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeStateTransformer.h; sourceTree = "<group>"; };
 		FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodeStateTransformer.m; sourceTree = "<group>"; };
-		FBBAF9A11EAF687500D6F568 /* ContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerViewController.h; sourceTree = "<group>"; };
-		FBBAF9A21EAF687500D6F568 /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerViewController.m; sourceTree = "<group>"; };
 		FBBAF9A41EB0562400D6F568 /* Notification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Notification.h; sourceTree = "<group>"; };
 		FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlaygroundModel.xcdatamodel; sourceTree = "<group>"; };
 		FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodesViewController.h; sourceTree = "<group>"; };
@@ -459,7 +480,10 @@
 				FB2906651E85799F00A31092 /* AppDelegate.h */,
 				FB2906661E85799F00A31092 /* AppDelegate.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
+				A597E24420934C590001C98A /* PreferenceWindow.xib */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
+				A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */,
+				A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */,
 				FB2906731E85799F00A31092 /* Info.plist */,
 				FB2906681E85799F00A31092 /* Supporting Files */,
 				FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */,
@@ -504,6 +528,8 @@
 				FB96BFB71F0B90D900220B4B /* ConsoleEventArray.m */,
 				FB96BFB91F0B90F200220B4B /* ConsoleEvent.h */,
 				FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */,
+				A516B45820908333009A59C0 /* DialogAlert.h */,
+				A516B45620908324009A59C0 /* DialogAlert.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -517,8 +543,12 @@
 				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
 				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
 				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
-				FBBAF9A11EAF687500D6F568 /* ContainerViewController.h */,
-				FBBAF9A21EAF687500D6F568 /* ContainerViewController.m */,
+				A516B45920908509009A59C0 /* PreferenceViewController.h */,
+				A516B45A20908514009A59C0 /* PreferenceViewController.m */,
+				A55FC0D12099BA17004B23FE /* VolumeViewController.h */,
+				A55FC0D22099BA22004B23FE /* VolumeViewController.m */,
+				A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */,
+				A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -532,6 +562,8 @@
 				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
 				FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */,
 				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
+				A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */,
+				A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */,
 			);
 			name = "Server Controllers";
 			sourceTree = "<group>";
@@ -541,6 +573,8 @@
 			children = (
 				FB0683421E8731AD00F1AFB4 /* DPDataStore.h */,
 				FB0683431E8731AD00F1AFB4 /* DPDataStore.m */,
+				A5782D1F2095E99A00CA603A /* PreferenceData.h */,
+				A5782D202095E9A400CA603A /* PreferenceData.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -601,13 +635,13 @@
 				TargetAttributes = {
 					FB2906611E85799F00A31092 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 44RJ69WHFF;
+						DevelopmentTeam = 9P659Y78B6;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					FB2906771E85799F00A31092 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 44RJ69WHFF;
+						DevelopmentTeam = 9P659Y78B6;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 						TestTargetID = FB2906611E85799F00A31092;
@@ -638,10 +672,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */,
 				FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */,
 				FB1D2B561EAF552B00F7BE2D /* Images.xcassets in Resources */,
+				A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */,
 				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
+				A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -762,7 +799,9 @@
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
+				A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */,
 				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
+				A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
@@ -771,14 +810,17 @@
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
+				A516B45720908324009A59C0 /* DialogAlert.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
-				FBBAF9A31EAF687500D6F568 /* ContainerViewController.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
+				A5782D212095E9A400CA603A /* PreferenceData.m in Sources */,
+				A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */,
+				A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */,
 				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
 			);
@@ -920,7 +962,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				DEVELOPMENT_TEAM = 9P659Y78B6;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/dashPlayground",
@@ -949,7 +991,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				DEVELOPMENT_TEAM = 9P659Y78B6;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/dashPlayground",
@@ -977,7 +1019,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				DEVELOPMENT_TEAM = 9P659Y78B6;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/dashPlayground",
@@ -1005,7 +1047,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 44RJ69WHFF;
+				DEVELOPMENT_TEAM = 9P659Y78B6;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/dashPlayground",

@@ -17,6 +17,8 @@
 @interface DPLocalNodeController : NSObject
 
 @property (atomic,assign) MasternodeSync syncStatus;
+@property (nonatomic,copy) NSString * dashCliPath;
+@property (nonatomic,copy) NSString * dashDPath;
 
 - (void)startDash:(dashClb)clb;
 

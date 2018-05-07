@@ -9,13 +9,50 @@
 #import "DPLocalNodeController.h"
 #import "DPMasternodeController.h"
 #import "Notification.h"
+#import "DialogAlert.h"
+
+#define DASHCLIPATH @"dashCliPath"
+#define DASHDPATH @"dashDPath"
+#define MASTERNODEPATH @"masterNodePath"
 
 @implementation DPLocalNodeController
 
+-(NSString*)dashCliPath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    return [standardUserDefaults stringForKey:DASHCLIPATH];
+}
+
+-(void)setDashCliPath:(NSString*)dashCliPath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    [standardUserDefaults setObject:dashCliPath forKey:DASHCLIPATH];
+}
+
+-(NSString*)dashDPath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    return [standardUserDefaults stringForKey:DASHDPATH];
+}
+
+-(void)setDashDPath:(NSString*)dashDPath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    [standardUserDefaults setObject:dashDPath forKey:DASHDPATH];
+}
+
+-(NSString*)masterNodePath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    return [standardUserDefaults stringForKey:MASTERNODEPATH];
+}
+
+-(void)setMasterNodePath:(NSString*)masterNodePath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    [standardUserDefaults setObject:masterNodePath forKey:MASTERNODEPATH];
+}
+
 - (NSData *)runDashRPCCommand:(NSString *)commandToRun
 {
+    if (![self dashCliPath]) return nil;
     NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:@"/Users/samuelw/Documents/src/dash/src/dash-cli"];
+    NSLog(@"%@",[self dashCliPath]);
+    [task setLaunchPath:[self dashCliPath]];
     
     NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
     NSLog(@"run command:%@", commandToRun);
@@ -112,13 +149,15 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 
 - (void)startDash:(dashClb)clb
 {
+    if (![self dashDPath]) return;
     [self checkDash:^(BOOL active) {
         if (!active) {
             [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STARTING object:nil];
             NSString * commandToRun = @"-testnet";
             
             NSTask *task = [[NSTask alloc] init];
-            [task setLaunchPath:@"/Users/samuelw/Documents/src/dash/src/dashd"];
+            NSLog(@"%@",[self dashDPath]);
+            [task setLaunchPath:[self dashDPath]];
             
             NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
             NSLog(@"run command:%@", commandToRun);
@@ -146,11 +185,11 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 
 - (void)stopDash:(dashClb)clb
 {
-    
+    if (![self dashCliPath]) return;
     NSString * commandToRun = @"-testnet stop";
     
     NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:@"/Users/samuelw/Documents/src/dash/src/dash-cli"];
+    [task setLaunchPath:[self dashCliPath]];
     
     NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
     NSLog(@"run command:%@", commandToRun);
@@ -213,7 +252,17 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 }
 
 -(NSDictionary*)masternodeInfoInMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode {
-    NSString *fullpath = @"/Users/samuelw/Library/Application Support/Dashcore/testnet3/masternode.conf";
+    if (![self masterNodePath]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"masternode.conf" exPath:@"~Library/Application Support/Dashcore/testnet3"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSString *pathString = [dialog getLaunchPath];
+            [self setMasterNodePath:pathString];
+        }
+    }
+    NSString *fullpath = [self masterNodePath];
     NSError * error = nil;
     NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
     NSArray * lines = [contents componentsSeparatedByString:@"\n"];
@@ -235,11 +284,21 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 }
 
 -(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashClb)clb {
+    if (![self masterNodePath]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"masternode.conf" exPath:@"~Library/Application Support/Dashcore/testnet3"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSString *pathString = [dialog getLaunchPath];
+            [self setMasterNodePath:pathString];
+        }
+    }
     __block NSManagedObject * object = masternode;
     [self checkDash:^(BOOL active) {
     [self stopDash:^(BOOL success, NSString *message) {
         if (success) {
-            NSString *fullpath = @"/Users/samuelw/Library/Application Support/Dashcore/testnet3/masternode.conf";
+            NSString *fullpath = [self masterNodePath];
             NSError * error = nil;
             NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
             NSMutableArray * lines = [[contents componentsSeparatedByString:@"\n"] mutableCopy];
