@@ -10,6 +10,8 @@
 #import "VolumeViewController.h"
 #import "DPMasternodeController.h"
 #import "DialogAlert.h"
+#import "DPDataStore.h"
+#import "DPRepoModalController.h"
 
 @interface VolumeViewController ()
 
@@ -26,6 +28,7 @@
 
 VolumeViewController* _volumeController;
 NSString *instanceId;
+NSManagedObject *mainObject;
 
 - (void)awakeFromNib {
     
@@ -35,9 +38,11 @@ NSString *instanceId;
     [self getAMI:instanceId];
 }
 
--(void)showAMIWindow:(NSString*)instanceID {
+-(void)showAMIWindow:(NSManagedObject*)object {
     
-    instanceId = instanceID;
+    mainObject = object;
+    
+    instanceId = [object valueForKey:@"instanceId"];
     
     _volumeController = [[VolumeViewController alloc] initWithWindowNibName:@"VolumeWindow"];
     [_volumeController.window makeKeyAndOrderFront:self];
@@ -75,7 +80,7 @@ NSString *instanceId;
         });
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [_volumeArrayCon setContent:nil];
+            [self.volumeArrayCon setContent:nil];
             for (NSDictionary* reference in volume) {
                 [self showContentToTable:reference];
             }
@@ -86,9 +91,9 @@ NSString *instanceId;
 
 -(void)showContentToTable:(NSDictionary*)dictionary
 {
-    [_volumeArrayCon addObject:dictionary];
+    [self.volumeArrayCon addObject:dictionary];
 
-    [_volumeArrayCon rearrangeObjects];
+    [self.volumeArrayCon rearrangeObjects];
 
     NSArray *array = [_volumeArrayCon arrangedObjects];
     NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
@@ -136,10 +141,28 @@ NSString *instanceId;
                 {
                     [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:@"The image is created succesfully."];
                     [_volumeController.window close];
+                    [self setAmiIdToRepositoryView:output[@"ImageId"] repoPath:[mainObject valueForKey:@"repositoryUrl"]];
                 }
             });
         });
         
+    }
+}
+
+-(void)setAmiIdToRepositoryView:(NSString*)amiId repoPath:(NSString*)repoPath {
+    NSArray *repoData = [[DPDataStore sharedInstance] allRepositories];
+    
+    NSUInteger count = [repoData count];
+    for (NSUInteger i = 0; i < count; i++) {
+        //repository entity
+        NSManagedObject *repository = (NSManagedObject *)[repoData objectAtIndex:i];
+        //branch entity
+        NSManagedObject *branch = (NSManagedObject *)[repository valueForKey:@"branches"];
+        if([[repository valueForKey:@"url"] isEqualToString:repoPath]) {
+            [branch setValue:amiId forKey:@"amiId"];
+            [[DPDataStore sharedInstance] saveContext];
+            break;
+        }
     }
 }
 

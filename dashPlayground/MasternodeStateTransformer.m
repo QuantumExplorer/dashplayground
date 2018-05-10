@@ -41,6 +41,9 @@
         case MasternodeState_Error:
             return @"Error";
             break;
+        case MasternodeState_SettingUp:
+            return @"Setting up";
+            break;
         default:
             return @"Unknown";
             break;

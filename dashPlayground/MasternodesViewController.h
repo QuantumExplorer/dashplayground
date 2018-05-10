@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
+#import "DPMasternodeController.h"
+#import "NewConsoleEventArray.h"
 
 @interface ConsoleEventInfo : NSObject
 
@@ -23,17 +25,22 @@
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
+@property (strong) NSString *testString;
+
 - (IBAction)retreiveInstances:(id)sender;
 - (IBAction)getKey:(id)sender;
 
+@property (strong) IBOutlet NSButtonCell *setupButton;
 - (IBAction)setUp:(id)sender;
 - (IBAction)configure:(id)sender;
 - (IBAction)startRemote:(id)sender;
 
 - (IBAction)selectedConsoleTab:(id)sender;
 
--(void)addStringEvent:(NSString*)string;
--(void)addStringEventToTerminalConsole:(NSString*)string;
 -(void)setTerminalString:(NSString*)string;
+
+-(void)addStringEventToMasternodeConsole:(NSString*)string;
+
+@property (strong) IBOutlet NSSegmentedControl * consoleTabSegmentedControl;
 
 @end

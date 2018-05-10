@@ -40,33 +40,40 @@
 //    VolumeViewController *volController = [[VolumeViewController alloc] init];
 //    [volController showAMIWindow:@"test"];
     
-    NMSSHSession *session = [NMSSHSession connectToHost:@"54.255.245.103"
-                                           withUsername:@"ubuntu"];
     
-    if (session.isConnected) {
-        [session authenticateByPublicKey:nil privateKey:[[DPMasternodeController sharedInstance] sshPath] andPassword:nil];
-        
-        if (session.isAuthorized) {
-            NSLog(@"Authentication succeeded");
-            
-            session.channel.requestPty = YES;
-            session.channel.ptyTerminalType = NMSSHChannelPtyTerminalAnsi;
-            
-            
-            NSError *error;
-            NSString *response = [[session channel] execute:@"\n cd sre" error:&error];
-            if(!error)
-            {
-                NSLog(@"Response: %@", response);
-            }
-            else{
-                NSLog(@"Error: %@", error);
-            }
-        }
-    }
     
-    [session disconnect];
-
+//    NMSSHSession *ssh = [NMSSHSession connectToHost:@"54.255.245.103"
+//                                       withUsername:@"ubuntu"];
+//    
+//    if (ssh.isConnected) {
+//        
+//        [ssh authenticateByPublicKey:nil privateKey:[[DPMasternodeController sharedInstance] sshPath] andPassword:nil];
+//        
+//        if (ssh.isAuthorized) {
+//            NSLog(@"[+] Authentication succeeded");
+//        } else {
+//            NSLog(@"Error authenticating with server.");
+//        }
+//    } else {
+//        NSLog(@"Error connecting to server. Sometimes cause by poor to no signal.");
+//    }
+//    
+//    ssh.channel.requestPty = YES;
+//    
+//    NSError *error = nil;
+//    
+//    NSString *response = [ssh.channel execute:@"cd src" error:&error];
+//    if (error) {
+//        error = nil;
+//        [ssh.channel execute:@"mkdir src" error:&error];
+//        if(error)
+//        {
+//            NSLog(@"Error: %@", error.localizedDescription);
+//        }
+//    }
+//    
+//    [ssh disconnect];
+    
     //end
     
     

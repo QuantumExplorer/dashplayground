@@ -24,7 +24,6 @@
 #import "DialogAlert.h"
 #import "PreferenceViewController.h"
 #import "PreferenceData.h"
-#import "MasternodesViewController.h"
 #import <NMSSH/NMSSH.h>
 
 #define MASTERNODE_PRIVATE_KEY_STRING @"[MASTERNODE_PRIVATE_KEY]"
@@ -35,7 +34,6 @@
 #define SSH_NAME_STRING @"SSH_NAME"
 
 @interface DPMasternodeController ()
-
 
 @end
 
@@ -63,102 +61,218 @@
 
 #pragma mark - Connectivity
 
--(NSString*)sendGitCommand:(NSString*)command onSSH:(CkoSsh *)ssh {
-    return [[self sendGitCommands:@[command] onSSH:ssh] valueForKey:command];
+//Toey
+
+-(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh error:(NSError*)error percentageClb:(dashPercentageClb)clb {
+    
+    NSString *command = [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath];
+    [self sendExecuteCommand:command onSSH:ssh error:error];
+    
 }
 
--(NSDictionary*)sendGitCommands:(NSArray*)commands onSSH:(CkoSsh *)ssh {
+-(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error percentageClb:(dashPercentageClb)clb {
     
-    NSInteger channelNum = [[ssh QuickShell] integerValue];
-    if (channelNum < 0) {
-        NSLog(@"%@",ssh.LastErrorText);
+    for (NSUInteger index = 0;index<[commands count];index++) {
+        NSString * command = [commands objectAtIndex:index];
+        
+//        NSLog(@"Executing command %@", command);
+        
+        [self sendExecuteCommand:[NSString stringWithFormat:@"%@ %@",path, command] onSSH:ssh error:error];
+        
+        int currentCommand = (int)index;
+        currentCommand = currentCommand+1;
+        
+        clb(command,(currentCommand*100)/[commands count]);
+    }
+}
+
+-(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error {
+    error = nil;
+    [ssh.channel execute:command error:&error];
+    if (error) {
+        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
+        return;
+    }
+}
+
+-(NMSSHSession*)sshInWithKeyPath:(NSString*)masternodeIP {
+    if (![self sshPath]) {
+        DialogAlert *dialog=[[DialogAlert alloc]init];
+        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
+        
+        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+            //Find clicked
+            NSString *pathString = [dialog getLaunchPath];
+            [self setSshPath:pathString];
+            return [self sshInWithKeyPath:pathString masternodeIp:masternodeIP];
+        }
+    }
+    else{
+        return [self sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:masternodeIP];
+    }
+    return nil;
+}
+
+-(NMSSHSession*)sshInWithKeyPath:(NSString*)keyPath masternodeIp:(NSString*)masternodeIp {
+    NMSSHSession *session = [NMSSHSession connectToHost:masternodeIp withUsername:@"ubuntu"];
+    
+    if (session.isConnected) {
+        [session authenticateByPublicKey:nil privateKey:keyPath andPassword:nil];
+        
+        if (session.isAuthorized) {
+            NSLog(@"Authentication succeeded");
+        }
+    }
+    
+    return session;
+}
+
+//-(NSString*)sendGitCommand:(NSString*)command onSSH:(CkoSsh *)ssh {
+//    return [[self sendGitCommands:@[command] onSSH:ssh] valueForKey:command];
+//}
+
+-(NSDictionary*)sendGitCommands:(NSArray*)commands onSSH:(NMSSHSession *)ssh {
+    
+    NSError *error = nil;
+    [ssh.channel execute:@"cd src/dash\n" error:&error];
+    if (error) {
+        NSLog(@"location not found! %@",error.localizedDescription);
         return nil;
     }
     
-    //  This is the prompt we'll be expecting to find in
-    //  the output of the remote shell.
-    NSString *myPrompt = @":~/src/dash$";
-    //   Run the 1st command in the remote shell, which will be to
-    //   "cd" to a subdirectory.
-    BOOL success = [ssh ChannelSendString: @(channelNum) strData: @"cd src/dash/\n" charset: @"ansi"];
-    if (success != YES) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return nil;
-    }
-    
-    //    NSNumber * v = [ssh ChannelReadAndPoll:@(channelNum) pollTimeoutMs:@(5000)];
-    //
-    //    NSString *cmdOutpu2t = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
-    //    if (ssh.LastMethodSuccess != YES) {
-    //        NSLog(@"%@",ssh.LastErrorText);
-    //        return nil;
-    //    };
-    //  Retrieve the output.
-    success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
-    if (success != YES) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return nil;
-    }
-    
-    //   Display what we've received so far.  This clears
-    //   the internal receive buffer, which is important.
-    //   After we send the command, we'll be reading until
-    //   the next command prompt.  If the command prompt
-    //   is already in the internal receive buffer, it'll think it's
-    //   already finished...
-    NSString *cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
-    if (ssh.LastMethodSuccess != YES) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return nil;
-    };
     NSMutableDictionary * rDict = [NSMutableDictionary dictionaryWithCapacity:commands.count];
     for (NSString * gitCommand in commands) {
         //   Run the 2nd command in the remote shell, which will be
         //   to "ls" the directory.
-        success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"git %@\n",gitCommand] charset: @"ansi"];
-        if (success != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
+        error = nil;
+        NSString *cmdOutput = [ssh.channel execute:[NSString stringWithFormat:@"cd src/dash; git %@", gitCommand] error:&error];
+        if (error) {
+            NSLog(@"error trying to send git command! %@",error.localizedDescription);
             return nil;
         }
-        
-        //  Retrieve and display the output.
-        success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
-        if (success != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
-            return nil;
-        }
-        
-        cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
-        if (ssh.LastMethodSuccess != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
-            return nil;
-        }
-        NSArray * components = [cmdOutput componentsSeparatedByString:@"\r\n"];
-        if ([components count] > 2) {
-            if ([[NSString stringWithFormat:@"git %@",gitCommand] isEqualToString:components[0]]) {
-                [rDict setObject:components[1] forKey:gitCommand];
+        else{
+            NSArray * components = [cmdOutput componentsSeparatedByString:@"\r\n"];
+            if ([components count] >= 2) {
+                //                if ([[NSString stringWithFormat:@"git %@",gitCommand] isEqualToString:components[0]]) {
+                //                    [rDict setObject:components[1] forKey:gitCommand];
+                //                }
+                for (id eachComponent in components) {
+                    if(![eachComponent isEqualToString:@""])
+                    {
+                        if([gitCommand isEqualToString:@"remote -v"]) {
+                            [rDict setObject:components[0] forKey:gitCommand];//set only (fetch) branch
+                            break;
+                        }
+                        [rDict setObject:eachComponent forKey:gitCommand];
+                    }
+                }
             }
         }
     }
     
-    //  Send an EOF.  This tells the server that no more data will
-    //  be sent on this channel.  The channel remains open, and
-    //  the SSH client may still receive output on this channel.
-    success = [ssh ChannelSendEof: @(channelNum)];
-    if (success != YES) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return nil;
-    }
-    
-    //  Close the channel:
-    success = [ssh ChannelSendClose: @(channelNum)];
-    if (success != YES) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return nil;
-    }
-    
     return rDict;
 }
+
+
+//End Toey
+
+
+//-(NSString*)sendGitCommand:(NSString*)command onSSH:(CkoSsh *)ssh {
+//    return [[self sendGitCommands:@[command] onSSH:ssh] valueForKey:command];
+//}
+//
+//-(NSDictionary*)sendGitCommands:(NSArray*)commands onSSH:(CkoSsh *)ssh {
+//
+//    NSInteger channelNum = [[ssh QuickShell] integerValue];
+//    if (channelNum < 0) {
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return nil;
+//    }
+//
+//    //  This is the prompt we'll be expecting to find in
+//    //  the output of the remote shell.
+//    NSString *myPrompt = @":~/src/dash$";
+//    //   Run the 1st command in the remote shell, which will be to
+//    //   "cd" to a subdirectory.
+//    BOOL success = [ssh ChannelSendString: @(channelNum) strData: @"cd src/dash/\n" charset: @"ansi"];
+//    if (success != YES) {
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return nil;
+//    }
+//
+//    //    NSNumber * v = [ssh ChannelReadAndPoll:@(channelNum) pollTimeoutMs:@(5000)];
+//    //
+//    //    NSString *cmdOutpu2t = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+//    //    if (ssh.LastMethodSuccess != YES) {
+//    //        NSLog(@"%@",ssh.LastErrorText);
+//    //        return nil;
+//    //    };
+//    //  Retrieve the output.
+//    success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+//    if (success != YES) {
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return nil;
+//    }
+//
+//    //   Display what we've received so far.  This clears
+//    //   the internal receive buffer, which is important.
+//    //   After we send the command, we'll be reading until
+//    //   the next command prompt.  If the command prompt
+//    //   is already in the internal receive buffer, it'll think it's
+//    //   already finished...
+//    NSString *cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+//    if (ssh.LastMethodSuccess != YES) {
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return nil;
+//    };
+//    NSMutableDictionary * rDict = [NSMutableDictionary dictionaryWithCapacity:commands.count];
+//    for (NSString * gitCommand in commands) {
+//        //   Run the 2nd command in the remote shell, which will be
+//        //   to "ls" the directory.
+//        success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"git %@\n",gitCommand] charset: @"ansi"];
+//        if (success != YES) {
+//            NSLog(@"%@",ssh.LastErrorText);
+//            return nil;
+//        }
+//
+//        //  Retrieve and display the output.
+//        success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+//        if (success != YES) {
+//            NSLog(@"%@",ssh.LastErrorText);
+//            return nil;
+//        }
+//
+//        cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+//        if (ssh.LastMethodSuccess != YES) {
+//            NSLog(@"%@",ssh.LastErrorText);
+//            return nil;
+//        }
+//        NSArray * components = [cmdOutput componentsSeparatedByString:@"\r\n"];
+//        if ([components count] > 2) {
+//            if ([[NSString stringWithFormat:@"git %@",gitCommand] isEqualToString:components[0]]) {
+//                [rDict setObject:components[1] forKey:gitCommand];
+//            }
+//        }
+//    }
+//
+//    //  Send an EOF.  This tells the server that no more data will
+//    //  be sent on this channel.  The channel remains open, and
+//    //  the SSH client may still receive output on this channel.
+//    success = [ssh ChannelSendEof: @(channelNum)];
+//    if (success != YES) {
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return nil;
+//    }
+//
+//    //  Close the channel:
+//    success = [ssh ChannelSendClose: @(channelNum)];
+//    if (success != YES) {
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return nil;
+//    }
+//
+//    return rDict;
+//}
 
 -(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh error:(NSError**)error {
     [self sendDashCommandList:commands onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
@@ -167,10 +281,6 @@
 
 -(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts error:(NSError**)error percentageClb:(dashPercentageClb)clb {
     [self sendCommandList:commands toPath:@"~/src/dash" onSSH:ssh commandExpectedLineCounts:expectedlineCounts error:error percentageClb:clb];
-}
-
--(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(CkoSsh *)ssh error:(NSError**)error percentageClb:(dashPercentageClb)clb {
-    
 }
 
 -(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh error:(NSError**)error {
@@ -295,25 +405,6 @@
         NSLog(@"%@",ssh.LastErrorText);
         return;
     }
-}
-
--(NMSSHSession*)connectInstanceWithSsh:(NSString*)keyPath masternodeIp:(NSString*)masternodeIp {
-    NMSSHSession *session = [NMSSHSession connectToHost:masternodeIp withUsername:@"ubuntu"];
-    
-    if (session.isConnected) {
-        [session authenticateByPublicKey:nil privateKey:keyPath andPassword:nil];
-        
-        if (session.isAuthorized) {
-            NSLog(@"Authentication succeeded");
-            
-            session.channel.requestPty = YES;
-            
-            NSError *error;
-            [session.channel startShell:&error];
-        }
-    }
-    
-    return session;
 }
 
 -(CkoSshKey *)loginPrivateKeyAtPath:(NSString*)path {
@@ -488,32 +579,21 @@
     return ssh;
 }
 
-#pragma mark - Set Up
+//#pragma mark - Set Up
 
-- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb
-{
-    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
-    __block NSString * repositoryPath = [repository valueForKey:@"repository.url"];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        
-        NMSSHSession *sshSession = [self connectInstanceWithSsh:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP];
-        
-        if (!sshSession.isAuthorized) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,@"Could not SSH in");
-            });
-            return;
-        }
-        
-        NSError *error = nil;
-        NSString *response = [sshSession.channel execute:@"ls src" error:&error];
-        NSLog(@"List of my sites: %@", response);
-        
+//- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb
+//{
+//    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+//    __block NSString * repositoryPath = [repository valueForKey:@"repository.url"];
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+
 //        dispatch_async(dispatch_get_main_queue(), ^{
-//            [[sshSession channel] write:@"ls" error:nil timeout:@10];
+//            if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
+//                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+//            }
+//            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//            [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];
 //        });
-        
-        [sshSession disconnect];
         
         //---------
         
@@ -593,93 +673,93 @@
 //            }
 //            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
 //        });
-    });
-    
-    
-}
+//    });
+//
+//
+//}
 
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb
 {
-    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
-    __block NSString * repositoryPath = [masternode valueForKeyPath:@"branch.repository.url"];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        CkoSsh * ssh = [self sshIn:publicIP] ;
-        if (!ssh){
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,@"Could not SSH in");
-            });
-            return;
-        }
-        //  Send some commands and get the output.
-        NSString *strOutput = [ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"];
-        if (ssh.LastMethodSuccess != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,ssh.LastErrorText);
-            });
-            return;
-        }
-        if ([strOutput hasPrefix:@"ls: cannot access src: No such file or directory"]) {
-            [ssh QuickCommand: @"mkdir src" charset: @"ansi"];
-            if (ssh.LastMethodSuccess != YES) {
-                NSLog(@"%@",ssh.LastErrorText);
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    clb(NO,ssh.LastErrorText);
-                });
-                return;
-            }
-        }
-        BOOL justCloned = FALSE;
-        if (![strOutput isEqualToString:@"dash"]) {
-            justCloned = TRUE;
-            NSError * error = nil;
-            [self sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:&error percentageClb:^(NSString *call, float percentage) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSLog(@"%@ %.2f",call,percentage);
-                    [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-                });
-            }];
-            strOutput = [ssh QuickCommand: [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath] charset: @"ansi"];
-            if (ssh.LastMethodSuccess != YES) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    clb(NO,ssh.LastErrorText);
-                });
-                
-                return;
-            }
-        }
-        
-        //now let's get git info
-        __block NSDictionary * gitValues = nil;
-        if (!justCloned) {
-            gitValues = [self sendGitCommands:@[@"pull",@"rev-parse --short HEAD"] onSSH:ssh];
-        } else {
-            gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD"] onSSH:ssh];
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
-            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-        });
-        
-        NSError * error = nil;
-        
-        //now let's make all this shit
-        [self sendDashCommandList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh commandExpectedLineCounts:@[@(52),@(481),@(301),@(1),@(1),@(1),@(1),@(1)] error:&error percentageClb:^(NSString *call, float percentage) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSLog(@"%@ %.2f",call,percentage);
-                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-            });
-        }];
-        
-        [ssh Disconnect];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
-                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
-            }
-            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-        });
-    });
+//    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+//    __block NSString * repositoryPath = [masternode valueForKeyPath:@"branch.repository.url"];
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+//        CkoSsh * ssh = [self sshIn:publicIP] ;
+//        if (!ssh){
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,@"Could not SSH in");
+//            });
+//            return;
+//        }
+//        //  Send some commands and get the output.
+//        NSString *strOutput = [ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"];
+//        if (ssh.LastMethodSuccess != YES) {
+//            NSLog(@"%@",ssh.LastErrorText);
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,ssh.LastErrorText);
+//            });
+//            return;
+//        }
+//        if ([strOutput hasPrefix:@"ls: cannot access src: No such file or directory"]) {
+//            [ssh QuickCommand: @"mkdir src" charset: @"ansi"];
+//            if (ssh.LastMethodSuccess != YES) {
+//                NSLog(@"%@",ssh.LastErrorText);
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    clb(NO,ssh.LastErrorText);
+//                });
+//                return;
+//            }
+//        }
+//        BOOL justCloned = FALSE;
+//        if (![strOutput isEqualToString:@"dash"]) {
+//            justCloned = TRUE;
+//            NSError * error = nil;
+//            [self sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:&error percentageClb:^(NSString *call, float percentage) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    NSLog(@"%@ %.2f",call,percentage);
+//                    [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+//                });
+//            }];
+//            strOutput = [ssh QuickCommand: [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath] charset: @"ansi"];
+//            if (ssh.LastMethodSuccess != YES) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    clb(NO,ssh.LastErrorText);
+//                });
+//
+//                return;
+//            }
+//        }
+//
+//        //now let's get git info
+//        __block NSDictionary * gitValues = nil;
+//        if (!justCloned) {
+//            gitValues = [self sendGitCommands:@[@"pull",@"rev-parse --short HEAD"] onSSH:ssh];
+//        } else {
+//            gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD"] onSSH:ssh];
+//        }
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+//            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//        });
+//
+//        NSError * error = nil;
+//
+//        //now let's make all this shit
+//        [self sendDashCommandList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh commandExpectedLineCounts:@[@(52),@(481),@(301),@(1),@(1),@(1),@(1),@(1)] error:&error percentageClb:^(NSString *call, float percentage) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                NSLog(@"%@ %.2f",call,percentage);
+//                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+//            });
+//        }];
+//
+//        [ssh Disconnect];
+//
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
+//                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+//            }
+//            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//        });
+//    });
     
     
 }
@@ -795,7 +875,7 @@
                 return;
             }
             //  Send some commands and get the output.
-            NSString * mnoutput = [ssh QuickCommand: @"export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.8/lib && dashd" charset: @"ansi"];
+            NSString * output = [ssh QuickCommand: @"export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.8/lib && dashd" charset: @"ansi"];
             if (ssh.LastMethodSuccess != YES) {
                 NSLog(@"%@",ssh.LastErrorText);
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -969,16 +1049,20 @@
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     __block NSString * branchName = [masternode valueForKeyPath:@"branch.name"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        CkoSsh * ssh = [self sshIn:publicIP];
-        if (!ssh) {
+        
+        NMSSHSession *ssh = [self sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP];
+        
+        if (!ssh.isAuthorized) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"Could not ssh in");
+                clb(NO,nil,@"SSH: error authenticating with server.");
             });
             return;
         }
         
+        ssh.channel.requestPty = YES;
+        
         NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
-        [ssh Disconnect];
+        [ssh disconnect];
         __block NSString * remote = nil;
         NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
         
@@ -998,6 +1082,36 @@
                 return clb(YES,@{@"hasChanges":@(TRUE)},nil);
             }
         });
+
+//        CkoSsh * ssh = [self sshIn:publicIP];
+//        if (!ssh) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,nil,@"Could not ssh in");
+//            });
+//            return;
+//        }
+//
+//        NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
+//        [ssh Disconnect];
+//        __block NSString * remote = nil;
+//        NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
+//
+//        if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
+//            remote = remoteInfoLine[1];
+//        }
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            if (remote) {
+//                NSManagedObject * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
+//                if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
+//                    [masternode setValue:branch forKey:@"branch"];
+//                    return clb(YES,@{@"hasChanges":@(TRUE)},nil);
+//                }
+//            }
+//            if (![[masternode valueForKey:@"gitCommit"] isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
+//                [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+//                return clb(YES,@{@"hasChanges":@(TRUE)},nil);
+//            }
+//        });
         
     });
 }
@@ -1011,7 +1125,7 @@
         CkoSsh * ssh = [self sshIn:publicIP channelNum:&channelNum];
         if (!ssh) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"Cound not ssh in");
+                clb(NO,nil,@"Could not ssh in");
             });
             return;
         }
@@ -1020,7 +1134,7 @@
         if (ssh.LastMethodSuccess != YES) {
             NSLog(@"%@",ssh.LastErrorText);
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"Cound retieve configuration file");
+                clb(NO,nil,@"Could retieve configuration file");
             });
             return;
         }
@@ -1044,32 +1158,55 @@
 - (void)checkMasternodeIsInstalled:(NSManagedObject*)masternode clb:(dashBoolClb)clb {
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        CkoSsh * ssh = [self sshIn:publicIP];
-        if (!ssh) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,NO,@"Could not ssh in");
-            });
-            return;
-        }
-        //  Send some commands and get the output.
-        NSString *strOutput = [[ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        if (ssh.LastMethodSuccess != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
-            [ssh Disconnect];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,NO,@"ssh failure");
-            });
-            return;
-        }
-        [ssh Disconnect];
+        NMSSHSession *ssh = [self sshInWithKeyPath:[self sshPath] masternodeIp:publicIP];
         
+        if (!ssh.isAuthorized) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,NO,@"SSH: error authenticating with server.");
+            });
+            return;
+        }
+        
+        ssh.channel.requestPty = YES;
+        
+        NSError *error = nil;
+        [ssh.channel execute:@"cd src/dash" error:&error];
+        [ssh disconnect];
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([strOutput isEqualToString:@"dash"]) {
-                return clb(YES,YES,nil);
-            }else {
+            if (error) {
                 return clb(YES,NO,nil);
             }
+            else {
+                return clb(YES,YES,nil);
+            }
         });
+        
+//        CkoSsh * ssh = [self sshIn:publicIP];
+//        if (!ssh) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,NO,@"Could not ssh in");
+//            });
+//            return;
+//        }
+//        //  Send some commands and get the output.
+//        NSString *strOutput = [[ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+//        if (ssh.LastMethodSuccess != YES) {
+//            NSLog(@"%@",ssh.LastErrorText);
+//            [ssh Disconnect];
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,NO,@"ssh failure");
+//            });
+//            return;
+//        }
+//        [ssh Disconnect];
+//
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            if ([strOutput isEqualToString:@"dash"]) {
+//                return clb(YES,YES,nil);
+//            }else {
+//                return clb(YES,NO,nil);
+//            }
+//        });
     });
 }
 
@@ -1308,7 +1445,7 @@
     
     if([strError length] != 0){
         NSLog(@"%@", strError);
-        [[MasternodesViewController sharedInstance] setTerminalString:strError];
+//        [[MasternodesViewController sharedInstance] setTerminalString:strError];
     }
     
     return [file readDataToEndOfFile];
@@ -1395,7 +1532,20 @@
     {
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-38ad8444 --count %ld --instance-type t2.small --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+            
+            //check repository's AMI
+            NSString *imageId = @"";
+            if([[branch valueForKey:@"amiId"] isEqualToString:@""] || [branch valueForKey:@"amiId"] == nil)
+            {
+                imageId = @"ami-38ad8444"; //this is initial dash image id
+            }
+            else{
+                imageId = [branch valueForKey:@"amiId"];
+            }
+            
+            
+            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id %@ --count %ld --instance-type t2.small --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+                                                            imageId,
                                                             (long)count,
                                                             [[PreferenceData sharedInstance] getKeyName],
                                                             [[PreferenceData sharedInstance] getSecurityGroupId],
@@ -1418,12 +1568,13 @@
                     //NSLog(@"%@",reservation[@"Instances"]);
                     for (NSDictionary * dictionary in reservation[@"Instances"]) {
                         if ([dictionary valueForKey:@"PublicIpAddress"] && ![[dictionary valueForKeyPath:@"State.Name"] isEqualToString:@"pending"]) {
-                            CkoSsh * ssh = [self sshIn:[dictionary valueForKey:@"PublicIpAddress"]];
-                            if (ssh) {
+                            
+                            NMSSHSession *ssh = [self sshInWithKeyPath:[dictionary valueForKey:@"PublicIpAddress"]];
+                            if (ssh.isAuthorized) {
                                 [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
                                 [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
                                 [instanceIdsLeft removeObject:[dictionary valueForKey:@"InstanceId"]];
-                                [ssh Disconnect];
+                                [ssh disconnect];
                             }
                         }
                     }
@@ -1622,12 +1773,14 @@
                     //NSLog(@"%@",reservation[@"Instances"]);
                     for (NSDictionary * dictionary in reservation[@"Instances"]) {
                         if ([dictionary valueForKey:@"PublicIpAddress"] && ![[dictionary valueForKeyPath:@"State.Name"] isEqualToString:@"pending"]) {
-                            CkoSsh * ssh = [self sshIn:[dictionary valueForKey:@"PublicIpAddress"]];
-                            if (ssh) {
+                            
+                            NMSSHSession *ssh = [self sshInWithKeyPath:[dictionary valueForKey:@"PublicIpAddress"]];
+                            
+                            if (ssh.isAuthorized) {
                                 [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:[dictionary valueForKey:@"PublicIpAddress"] forKey:@"publicIP"];
                                 [[instances objectForKey:[dictionary valueForKey:@"InstanceId"]] setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
                                 [instanceIdsLeft removeObject:[dictionary valueForKey:@"InstanceId"]];
-                                [ssh Disconnect];
+                                [ssh disconnect];
                             }
                         }
                     }
@@ -1661,6 +1814,8 @@
         return InstanceState_Rebooting;
     } else if ([string isEqualToString:@"shutting-down"]) {
         return InstanceState_Shutting_Down;
+    } else if ([string isEqualToString:@"setting up"]) {
+        return InstanceState_Setting_Up;
     }
     
     return InstanceState_Stopped;

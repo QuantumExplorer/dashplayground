@@ -19,6 +19,7 @@ typedef enum InstanceState {
     InstanceState_Stopping = 4,
     InstanceState_Rebooting = 5,
     InstanceState_Shutting_Down = 6,
+    InstanceState_Setting_Up = 7,
 } InstanceState;
 
 typedef void (^dashStateClb)(BOOL success,InstanceState state,NSString * message);

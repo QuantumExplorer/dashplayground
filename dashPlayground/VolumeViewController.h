@@ -16,6 +16,7 @@
 
 @interface VolumeViewController : NSWindowController <NSTableViewDataSource,NSApplicationDelegate> {}
 
--(void)showAMIWindow:(NSString*)instanceID;
+-(void)showAMIWindow:(NSManagedObject*)object;
+-(void)setAmiIdToRepositoryView:(NSString*)amiId repoPath:(NSString*)repoPath;
 
 @end

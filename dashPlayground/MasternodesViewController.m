@@ -17,16 +17,18 @@
 #import "VolumeViewController.h"
 #import "RepositoriesModalViewController.h"
 #import "MasternodeStateTransformer.h"
+#import "DPMasternodeController.h"
+#import "NewConsoleEventArray.h"
 
 @interface MasternodesViewController ()
+
 @property (strong) IBOutlet NSArrayController *arrayController;
 @property (strong) IBOutlet NSTableView *tableView;
-@property (strong) IBOutlet NSSegmentedControl * consoleTabSegmentedControl;
 @property (strong) ConsoleEventArray * consoleEvents;
 @property (strong) IBOutlet NSTextView *consoleTextView;
 
 //Masternode control
-@property (strong) IBOutlet NSButton *setupButton;
+@property (strong) IBOutlet NSButtonCell *createAmiButton;
 @property (strong) ConsoleEventArray * masternodeConsoleEvents;
 
 //Instance control
@@ -34,10 +36,15 @@
 
 //Terminal
 @property (strong) ConsoleEventArray * terminalConsoleEvents;
+@property (strong) IBOutlet NSButton *sendTerminalButton;
+@property (strong) IBOutlet NSTextField *commandTextField;
 
 @end
 
 @implementation MasternodesViewController
+
+MasternodesViewController *masternodeController;
+@synthesize testString;
 
 NSString *terminalString = @"";
 
@@ -54,6 +61,7 @@ NSString *terminalString = @"";
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setUpConsole];
+    masternodeController = self;
 }
 
 - (IBAction)retreiveInstances:(id)sender {
@@ -82,9 +90,8 @@ NSString *terminalString = @"";
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    
     RepositoriesModalViewController *repoController = [[RepositoriesModalViewController alloc] init];
-    [repoController showRepoWindow:object];
+    [repoController showRepoWindow:object controller:masternodeController];
     
 //    [[DPMasternodeController sharedInstance] setUpMasternodeDashd:object clb:^(BOOL success, NSString *message) {
 //        if (!success) {
@@ -111,6 +118,7 @@ NSString *terminalString = @"";
 }
 
 - (IBAction)startRemote:(id)sender {
+    
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
@@ -137,9 +145,6 @@ NSString *terminalString = @"";
             }
         }];
     }
-
-    
-    
 }
 
 - (IBAction)startInstance:(id)sender {
@@ -216,10 +221,6 @@ NSString *terminalString = @"";
             }
         }];
     }
-    else
-    {
-        return;
-    }
     
 }
 
@@ -233,7 +234,7 @@ NSString *terminalString = @"";
     
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     VolumeViewController *volumeController = [[VolumeViewController alloc]init];
-    [volumeController showAMIWindow:[object valueForKey:@"instanceId"]];
+    [volumeController showAMIWindow:object];
 }
 
 -(AppDelegate*)appDelegate {
@@ -269,6 +270,7 @@ NSString *terminalString = @"";
     if (!self.consoleTabSegmentedControl.selectedSegment) {
         NSString * consoleEventString = [self.consoleEvents printOut];
         self.consoleTextView.string = consoleEventString;
+        [self setTerminalCommandState:[NSNumber numberWithInt:0]];
     } else {
         
         if(self.consoleTabSegmentedControl.selectedSegment == 1)
@@ -277,17 +279,31 @@ NSString *terminalString = @"";
 //            if (row == -1) return;
 //            NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
 //            self.consoleTextView.string = @"Select a running masternode";
+            
+            [self setTerminalCommandState:[NSNumber numberWithInt:0]];
+            
             NSString * consoleEventString = [self.masternodeConsoleEvents printOut];
             self.consoleTextView.string = consoleEventString;
         }
         else if(self.consoleTabSegmentedControl.selectedSegment == 2)
         {
+            [self setTerminalCommandState:[NSNumber numberWithInt:1]];
             NSString * consoleEventString = [self.terminalConsoleEvents printOut];
             self.consoleTextView.string = consoleEventString;
         }
     }
-    
+}
 
+-(void)setTerminalCommandState:(NSNumber*)state {
+    if([state isEqual:@(0)])//hide
+    {
+        self.sendTerminalButton.hidden = true;
+        self.commandTextField.hidden = true;
+    }
+    else {//show
+        self.sendTerminalButton.hidden = false;
+        self.commandTextField.hidden = false;
+    }
 }
 
 #pragma mark Console tab view delegate
@@ -318,14 +334,25 @@ NSString *terminalString = @"";
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
     NSInteger row = self.tableView.selectedRow;
-    if(row == -1) {self.setupButton.enabled = false; return;}
+    if(row == -1) {
+        //clear all button state
+        self.setupButton.enabled = false;
+        self.createAmiButton.enabled = false;
+        return;
+    }
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
-    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed) {
+    //Set up button
+    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
         self.setupButton.enabled = false;
     }
     else{
         self.setupButton.enabled = true;
+    }
+    
+    //Create AMI button
+    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed) {
+        self.createAmiButton.enabled = true;
     }
 }
 

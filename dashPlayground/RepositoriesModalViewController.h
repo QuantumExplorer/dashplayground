@@ -8,9 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
+#import "MasternodesViewController.h"
 
 @interface RepositoriesModalViewController : NSWindowController
 
--(void)showRepoWindow:(NSManagedObject*)object;
+-(void)showRepoWindow:(NSManagedObject*)object controller:(MasternodesViewController*)controller;
 
 @end

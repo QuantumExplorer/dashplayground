@@ -56,7 +56,7 @@ PreferenceViewController* _windowController;
             //NSLog(@"%@",reservation[@"Instances"]);
             if(output[@"SecurityGroups"])
             {
-                [_securityArrayController setContent:nil];//clear the table content
+                [self.securityArrayController setContent:nil];//clear the table content
             }
             for (NSDictionary * dictionary in output[@"SecurityGroups"]) {
                 
@@ -65,7 +65,7 @@ PreferenceViewController* _windowController;
                                         ,@"vpcID":[dictionary valueForKey:@"VpcId"]
                                         };
                 
-                [self addRowToArrayController:_securityArrayController tableView:_securityTable dict:dict];
+                [self addRowToArrayController:self.securityArrayController tableView:self.securityTable dict:dict];
             }
         });
     });
@@ -80,14 +80,14 @@ PreferenceViewController* _windowController;
             //NSLog(@"%@",reservation[@"Instances"]);
             if(output[@"Subnets"])
             {
-                [_subnetArrayController setContent:nil];//clear the table content
+                [self.subnetArrayController setContent:nil];//clear the table content
             }
             for (NSDictionary * dictionary in output[@"Subnets"]) {
                 NSDictionary *dict = @{@"subnetID":[dictionary valueForKey:@"SubnetId"]
                                         ,@"availZone":[dictionary valueForKey:@"AvailabilityZone"]
                                         ,@"state":[dictionary valueForKey:@"State"]
                                         };
-                [self addRowToArrayController:_subnetArrayController tableView:_subnetTable dict:dict];
+                [self addRowToArrayController:self.subnetArrayController tableView:self.subnetTable dict:dict];
             }
         });
     });
@@ -102,13 +102,13 @@ PreferenceViewController* _windowController;
             //NSLog(@"%@",reservation[@"Instances"]);
             if(output[@"KeyPairs"])
             {
-                [_keyPairArrayController setContent:nil];//clear the table content
+                [self.keyPairArrayController setContent:nil];//clear the table content
             }
             for (NSDictionary * dictionary in output[@"KeyPairs"]) {
                 NSDictionary *dict = @{@"keyName":[dictionary valueForKey:@"KeyName"]
                                         ,@"fingerprint":[dictionary valueForKey:@"KeyFingerprint"]
                                         };
-                [self addRowToArrayController:_keyPairArrayController tableView:_keyPairTable dict:dict];
+                [self addRowToArrayController:self.keyPairArrayController tableView:self.keyPairTable dict:dict];
             }
         });
     });

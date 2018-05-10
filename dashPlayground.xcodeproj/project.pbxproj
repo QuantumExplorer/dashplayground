@@ -8,10 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */; };
+		A50FB29B20A2241F008EFD32 /* NewConsoleEventArray.m in Sources */ = {isa = PBXBuildFile; fileRef = A50FB29A20A2241F008EFD32 /* NewConsoleEventArray.m */; };
+		A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */ = {isa = PBXBuildFile; fileRef = A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */; };
 		A516B45720908324009A59C0 /* DialogAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45620908324009A59C0 /* DialogAlert.m */; };
 		A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45A20908514009A59C0 /* PreferenceViewController.m */; };
 		A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */; };
 		A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */; };
+		A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A532618320A42413004678E8 /* UnspentOutputViewController.m */; };
+		A532618720A42CC8004678E8 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A532618520A42CC8004678E8 /* ContainerViewController.m */; };
 		A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */; };
 		A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0D22099BA22004B23FE /* VolumeViewController.m */; };
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
@@ -92,6 +96,10 @@
 /* Begin PBXFileReference section */
 		0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
+		A50FB29920A2241F008EFD32 /* NewConsoleEventArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NewConsoleEventArray.h; sourceTree = "<group>"; };
+		A50FB29A20A2241F008EFD32 /* NewConsoleEventArray.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NewConsoleEventArray.m; sourceTree = "<group>"; };
+		A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPRepoModalController.h; sourceTree = "<group>"; };
+		A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPRepoModalController.m; sourceTree = "<group>"; };
 		A516B45620908324009A59C0 /* DialogAlert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DialogAlert.m; sourceTree = "<group>"; };
 		A516B45820908333009A59C0 /* DialogAlert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DialogAlert.h; sourceTree = "<group>"; };
 		A516B45920908509009A59C0 /* PreferenceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceViewController.h; sourceTree = "<group>"; };
@@ -99,6 +107,10 @@
 		A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RepositoryWindow.xib; sourceTree = "<group>"; };
 		A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RepositoriesModalViewController.h; sourceTree = "<group>"; };
 		A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesModalViewController.m; sourceTree = "<group>"; };
+		A532618220A42413004678E8 /* UnspentOutputViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnspentOutputViewController.h; sourceTree = "<group>"; };
+		A532618320A42413004678E8 /* UnspentOutputViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnspentOutputViewController.m; sourceTree = "<group>"; };
+		A532618520A42CC8004678E8 /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ContainerViewController.m; path = "../../../Documents/src/dashplayground-old/dashPlayground/ContainerViewController.m"; sourceTree = "<group>"; };
+		A532618620A42CC8004678E8 /* ContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ContainerViewController.h; path = "../../../Documents/src/dashplayground-old/dashPlayground/ContainerViewController.h"; sourceTree = "<group>"; };
 		A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPPreferenceController.h; sourceTree = "<group>"; };
 		A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPPreferenceController.m; sourceTree = "<group>"; };
 		A55FC0D12099BA17004B23FE /* VolumeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VolumeViewController.h; sourceTree = "<group>"; };
@@ -530,6 +542,8 @@
 				FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */,
 				A516B45820908333009A59C0 /* DialogAlert.h */,
 				A516B45620908324009A59C0 /* DialogAlert.m */,
+				A50FB29920A2241F008EFD32 /* NewConsoleEventArray.h */,
+				A50FB29A20A2241F008EFD32 /* NewConsoleEventArray.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -549,6 +563,10 @@
 				A55FC0D22099BA22004B23FE /* VolumeViewController.m */,
 				A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */,
 				A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */,
+				A532618220A42413004678E8 /* UnspentOutputViewController.h */,
+				A532618320A42413004678E8 /* UnspentOutputViewController.m */,
+				A532618620A42CC8004678E8 /* ContainerViewController.h */,
+				A532618520A42CC8004678E8 /* ContainerViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -564,6 +582,8 @@
 				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
 				A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */,
 				A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */,
+				A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */,
+				A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */,
 			);
 			name = "Server Controllers";
 			sourceTree = "<group>";
@@ -630,7 +650,7 @@
 		FB29065A1E85799F00A31092 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = dashfoundation;
 				TargetAttributes = {
 					FB2906611E85799F00A31092 = {
@@ -796,9 +816,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */,
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
+				A50FB29B20A2241F008EFD32 /* NewConsoleEventArray.m in Sources */,
 				A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */,
 				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
 				A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */,
@@ -812,11 +834,13 @@
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				A516B45720908324009A59C0 /* DialogAlert.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
+				A532618720A42CC8004678E8 /* ContainerViewController.m in Sources */,
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
+				A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				A5782D212095E9A400CA603A /* PreferenceData.m in Sources */,
 				A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */,
@@ -877,15 +901,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -924,15 +956,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

@@ -126,7 +126,7 @@
                         </buttonCell>
                     </button>
                     <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="xDF-fv-lmb">
-                        <rect key="frame" x="0.0" y="187" width="851" height="71"/>
+                        <rect key="frame" x="0.0" y="187" width="851" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
                     <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="42" horizontalPageScroll="10" verticalLineScroll="42" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0se-Oz-8aq">
@@ -364,7 +364,7 @@
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <prototypeCellViews>
                                                 <tableCellView id="gk6-5v-wOm">
-                                                    <rect key="frame" x="669" y="1" width="138" height="40"/>
+                                                    <rect key="frame" x="669" y="1" width="139" height="40"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dnd-k5-Ilo">
