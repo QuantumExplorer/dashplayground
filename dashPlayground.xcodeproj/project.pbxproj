@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */; };
-		A50FB29B20A2241F008EFD32 /* NewConsoleEventArray.m in Sources */ = {isa = PBXBuildFile; fileRef = A50FB29A20A2241F008EFD32 /* NewConsoleEventArray.m */; };
 		A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */ = {isa = PBXBuildFile; fileRef = A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */; };
 		A516B45720908324009A59C0 /* DialogAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45620908324009A59C0 /* DialogAlert.m */; };
 		A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45A20908514009A59C0 /* PreferenceViewController.m */; };
@@ -96,8 +95,6 @@
 /* Begin PBXFileReference section */
 		0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
-		A50FB29920A2241F008EFD32 /* NewConsoleEventArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NewConsoleEventArray.h; sourceTree = "<group>"; };
-		A50FB29A20A2241F008EFD32 /* NewConsoleEventArray.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NewConsoleEventArray.m; sourceTree = "<group>"; };
 		A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPRepoModalController.h; sourceTree = "<group>"; };
 		A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPRepoModalController.m; sourceTree = "<group>"; };
 		A516B45620908324009A59C0 /* DialogAlert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DialogAlert.m; sourceTree = "<group>"; };
@@ -542,8 +539,6 @@
 				FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */,
 				A516B45820908333009A59C0 /* DialogAlert.h */,
 				A516B45620908324009A59C0 /* DialogAlert.m */,
-				A50FB29920A2241F008EFD32 /* NewConsoleEventArray.h */,
-				A50FB29A20A2241F008EFD32 /* NewConsoleEventArray.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -820,7 +815,6 @@
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
-				A50FB29B20A2241F008EFD32 /* NewConsoleEventArray.m in Sources */,
 				A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */,
 				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
 				A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */,

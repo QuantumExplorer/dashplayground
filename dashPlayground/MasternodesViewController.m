@@ -18,7 +18,6 @@
 #import "RepositoriesModalViewController.h"
 #import "MasternodeStateTransformer.h"
 #import "DPMasternodeController.h"
-#import "NewConsoleEventArray.h"
 
 @interface MasternodesViewController ()
 
@@ -353,6 +352,9 @@ NSString *terminalString = @"";
     //Create AMI button
     if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed) {
         self.createAmiButton.enabled = true;
+    }
+    else{
+        self.createAmiButton.enabled = false;
     }
 }
 

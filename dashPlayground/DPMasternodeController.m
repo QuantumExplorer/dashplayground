@@ -1074,12 +1074,14 @@
                 NSManagedObject * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
                 if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
                     [masternode setValue:branch forKey:@"branch"];
-                    return clb(YES,@{@"hasChanges":@(TRUE)},nil);
+                    if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
+                    return;
                 }
             }
             if (![[masternode valueForKey:@"gitCommit"] isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
                 [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
-                return clb(YES,@{@"hasChanges":@(TRUE)},nil);
+                if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
+                return;
             }
         });
 

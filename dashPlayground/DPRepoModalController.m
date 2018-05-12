@@ -75,7 +75,7 @@ MasternodesViewController *masternodeCon;
             dispatch_async(dispatch_get_main_queue(), ^{
 //                NSLog(@"%@ %.2f",call,percentage);
 //                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-                NSString *string = [NSString stringWithFormat:@"Done %.2f % %",percentage];
+                NSString *string = [NSString stringWithFormat:@"Done %.2f %%%%",percentage];
                 [masternodeCon addStringEventToMasternodeConsole:string];
             });
         }];

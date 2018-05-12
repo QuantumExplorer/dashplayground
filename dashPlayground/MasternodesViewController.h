@@ -9,7 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
 #import "DPMasternodeController.h"
-#import "NewConsoleEventArray.h"
 
 @interface ConsoleEventInfo : NSObject
 
