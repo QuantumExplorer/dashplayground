@@ -8,7 +8,6 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
             <connections>
-                <outlet property="branchField" destination="305-qN-jAq" id="Sqz-GV-TOK"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="kRi-Qj-2LB"/>
             </connections>
         </customObject>
@@ -140,7 +139,7 @@
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <prototypeCellViews>
                                                 <tableCellView id="PIv-Ii-HrI">
-                                                    <rect key="frame" x="322" y="1" width="295" height="17"/>
+                                                    <rect key="frame" x="321.5" y="1" width="295" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dqc-r7-xIv">

@@ -11,6 +11,7 @@
 #import "DPRepositoryController.h"
 #import "DPDataStore.h"
 #import "DialogAlert.h"
+#import "AvailabilityViewController.h"
 
 @interface RepositoriesViewController ()
 
@@ -65,8 +66,9 @@
     
     if([self.startCountField integerValue] <= 100 && [self.startCountField integerValue] >= 1)
     {
+        AvailabilityViewController *availCon = [[AvailabilityViewController alloc] init];
         NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-        [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil];
+        [availCon showAvailWindow:[self.startCountField integerValue] onBranch:object clb:nil];
     }
     else
     {

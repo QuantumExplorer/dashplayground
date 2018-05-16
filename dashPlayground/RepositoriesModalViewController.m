@@ -76,6 +76,8 @@ MasternodesViewController *masternodeCon2;
 
 -(void)showRepoWindow:(NSManagedObject*)object controller:(MasternodesViewController*)controller {
     
+    if([_repoWindowController.window isVisible]) return;
+    
     _repoWindowController = [[RepositoriesModalViewController alloc] initWithWindowNibName:@"RepositoryWindow"];
     [_repoWindowController.window makeKeyAndOrderFront:self];
     masternodeObject = object;

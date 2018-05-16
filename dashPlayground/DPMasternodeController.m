@@ -1123,24 +1123,25 @@
 -(void)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode clb:(dashInfoClb)clb {
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSInteger channelNum = 0;
-        CkoSsh * ssh = [self sshIn:publicIP channelNum:&channelNum];
-        if (!ssh) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"Could not ssh in");
-            });
-            return;
-        }
-        //  Send some commands and get the output.
-        NSString *strOutput = [ssh QuickCommand: @"cat .dashcore/dash.conf" charset: @"ansi"];
-        if (ssh.LastMethodSuccess != YES) {
-            NSLog(@"%@",ssh.LastErrorText);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"Could retieve configuration file");
-            });
-            return;
-        }
-        [ssh Disconnect];
+//        NSInteger channelNum = 0;
+//        CkoSsh * ssh = [self sshIn:publicIP channelNum:&channelNum];
+//        if (!ssh) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,nil,@"Could not ssh in");
+//            });
+//            return;
+//        }
+//        //  Send some commands and get the output.
+//        NSString *strOutput = [ssh QuickCommand: @"cat .dashcore/dash.conf" charset: @"ansi"];
+//        if (ssh.LastMethodSuccess != YES) {
+//            NSLog(@"%@",ssh.LastErrorText);
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,nil,@"Could retieve configuration file");
+//            });
+//            return;
+//        }
+//        [ssh Disconnect];
+        NSString *strOutput;
         NSArray * lines = [strOutput componentsSeparatedByString:@"\n"];
         __block NSMutableDictionary * rDict = [NSMutableDictionary dictionary];
         for (NSString * line in lines) {
@@ -1510,7 +1511,7 @@
 
 #pragma mark - Instances
 
--(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb {
+-(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb onRegion:(NSMutableArray*)regionArray {
     
     if (![self sshPath] || ![self getSshName]) {
         DialogAlert *dialog=[[DialogAlert alloc]init];
@@ -1545,23 +1546,37 @@
                 imageId = [branch valueForKey:@"amiId"];
             }
             
-            
-            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id %@ --count %ld --instance-type t2.small --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
-                                                            imageId,
-                                                            (long)count,
-                                                            [[PreferenceData sharedInstance] getKeyName],
-                                                            [[PreferenceData sharedInstance] getSecurityGroupId],
-                                                            [[PreferenceData sharedInstance] getSubnetID]] ];
-            
             __block NSMutableDictionary * instances = [NSMutableDictionary dictionary];
-            //NSLog(@"%@",reservation[@"Instances"]);
-            for (NSDictionary * dictionary in output[@"Instances"]) {
-                NSDictionary * rDict = [NSMutableDictionary dictionary];
-                [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-                [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
-                [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
-                [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
+            
+            //loop for creating new instance
+            for (int i = 1; i <= count; i++)
+            {
+                NSInteger arrayIndex;
+                if([regionArray count] == 1){
+                    arrayIndex = 0;
+                }
+                else {
+                    arrayIndex = i-1;
+                }
+                
+                NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id %@ --instance-type t2.small --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@ --placement AvailabilityZone=%@a",
+                                                                   imageId,
+                                                                   [[PreferenceData sharedInstance] getKeyName],
+                                                                   [[PreferenceData sharedInstance] getSecurityGroupId],
+                                                                   [[PreferenceData sharedInstance] getSubnetID],
+                                                                   [regionArray objectAtIndex:arrayIndex]]];
+                
+                //NSLog(@"%@",reservation[@"Instances"]);
+                for (NSDictionary * dictionary in output[@"Instances"]) {
+                    NSDictionary * rDict = [NSMutableDictionary dictionary];
+                    [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                    [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+                    [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                    [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
+                }
             }
+            
+        
             NSMutableArray * instanceIdsLeft = [[instances allKeys] mutableCopy];
             while ([instanceIdsLeft count]) {
                 NSDictionary *output2 = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --instance-ids %@ --filter Name=key-name,Values=%@",[instanceIdsLeft componentsJoinedByString:@" "], [[PreferenceData sharedInstance] getKeyName]] ];
@@ -1595,6 +1610,7 @@
                         }
                     }];
                 }
+                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Instance" message:@"Instance created successfully."];
             });
         });
     

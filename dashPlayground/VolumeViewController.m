@@ -40,6 +40,8 @@ NSManagedObject *mainObject;
 
 -(void)showAMIWindow:(NSManagedObject*)object {
     
+    if([_volumeController.window isVisible]) return;
+    
     mainObject = object;
     
     instanceId = [object valueForKey:@"instanceId"];

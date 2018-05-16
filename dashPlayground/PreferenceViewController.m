@@ -166,9 +166,8 @@ PreferenceViewController* _windowController;
 }
 
 -(void)showConfiguringWindow {
-    
+    if([_windowController.window isVisible]) return;
     _windowController = [[PreferenceViewController alloc] initWithWindowNibName:@"PreferenceWindow"];
-//    [_windowController showWindow:self];
     [_windowController.window makeKeyAndOrderFront:self];
 }
 

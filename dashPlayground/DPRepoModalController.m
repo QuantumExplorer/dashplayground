@@ -22,6 +22,7 @@ MasternodesViewController *masternodeCon;
 
 -(void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb
 {
+    
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     __block NSString * repositoryPath = [repository valueForKey:@"repository.url"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
@@ -35,8 +36,7 @@ MasternodesViewController *masternodeCon;
             return;
         }
         
-        ssh.channel.requestPty = YES;
-        
+//        ssh.channel.requestPty = YES;
         NSError *error = nil;
         [ssh.channel execute:@"cd src" error:&error];
         if (error) {
@@ -51,31 +51,23 @@ MasternodesViewController *masternodeCon;
             }
         }
         
-        //check if dash does exist then clone
-        
-        BOOL justCloned = FALSE;
+        //clone repository
         error = nil;
-        [ssh.channel execute:@"cd src/dash" error:&error];
-        if (error) {
-            justCloned = TRUE;
-            error = nil;
-            
-            [self sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error percentageClb:^(NSString *call, float percentage) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSLog(@"%@ %.2f",call,percentage);
-                    [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-                });
-            }];
-        }
+        [self sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error percentageClb:^(NSString *call, float percentage) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"%@ %.2f",call,percentage);
+                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+            });
+        }];
         
         
         //now let's make all this shit
         error = nil;
         [self sendDashCommandsList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh onPath:@"cd src/dash;" error:error percentageClb:^(NSString *call, float percentage) {
             dispatch_async(dispatch_get_main_queue(), ^{
-//                NSLog(@"%@ %.2f",call,percentage);
-//                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-                NSString *string = [NSString stringWithFormat:@"Done %.2f %%%%",percentage];
+                //                NSLog(@"%@ %.2f",call,percentage);
+                //                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+                NSString *string = [NSString stringWithFormat:@"Done %.2f%%%%",percentage];
                 [masternodeCon addStringEventToMasternodeConsole:string];
             });
         }];
@@ -84,6 +76,7 @@ MasternodesViewController *masternodeCon;
         dispatch_async(dispatch_get_main_queue(), ^{
             [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
         });
+        
         
         dispatch_async(dispatch_get_main_queue(), ^{
             
@@ -110,7 +103,7 @@ MasternodesViewController *masternodeCon;
     dispatch_async(dispatch_get_main_queue(), ^{
         [masternodeCon addStringEventToMasternodeConsole:command];
     });
-    [self sendExecuteCommand:command onSSH:ssh error:error];
+    [self sendWriteCommand:command onSSH:ssh error:error];
     
 }
 
@@ -119,12 +112,32 @@ MasternodesViewController *masternodeCon;
     for (NSUInteger index = 0;index<[commands count];index++) {
         NSString * command = [commands objectAtIndex:index];
         
-        [self sendExecuteCommand:[NSString stringWithFormat:@"%@ %@",path, command] onSSH:ssh error:error];
+        [self sendWriteCommand:[NSString stringWithFormat:@"%@ %@",path, command] onSSH:ssh error:error];
         
         int currentCommand = (int)index;
         currentCommand = currentCommand+1;
         
         clb(command,(currentCommand*100)/[commands count]);
+    }
+}
+
+-(void)sendWriteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error {
+    
+    NSString *string = [NSString stringWithFormat:@"executing command %@", command];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [masternodeCon addStringEventToMasternodeConsole:string];
+    });
+    error = nil;
+    [ssh.channel startShell:&error];
+    if (error) {
+        [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: error %@", error.localizedDescription]];
+    }
+    
+    error = nil;
+    [ssh.channel write:command error:&error timeout:@5];
+    if (error) {
+        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
+        return;
     }
 }
 
@@ -172,6 +185,12 @@ MasternodesViewController *masternodeCon;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [masternodeCon addStringEventToMasternodeConsole:@"SSH: authentication succeeded!"];
             });
+            
+            NSError *error = nil;
+            [session.channel startShell:&error];
+            if (error) {
+                [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: error %@", error.localizedDescription]];
+            }
         }
     }
     

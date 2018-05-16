@@ -341,13 +341,14 @@ NSString *terminalString = @"";
     }
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
-    //Set up button
-    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
-        self.setupButton.enabled = false;
-    }
-    else{
-        self.setupButton.enabled = true;
-    }
+//    //Set up button
+//    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+//        self.setupButton.enabled = false;
+//    }
+//    else{
+//        self.setupButton.enabled = true;
+//    }
+    self.setupButton.enabled = true;
     
     //Create AMI button
     if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed) {

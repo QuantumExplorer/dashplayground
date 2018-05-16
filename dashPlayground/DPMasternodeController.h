@@ -17,7 +17,7 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
 +(DPMasternodeController*)sharedInstance;
 
--(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb;
+-(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb onRegion:(NSMutableArray*)regionArray;
 - (void)runInstances:(NSInteger)count clb:(dashStateClb)clb;
 - (void)startInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)stopInstance:(NSString*)instanceId clb:(dashStateClb)clb;
