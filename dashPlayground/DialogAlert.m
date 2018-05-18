@@ -8,6 +8,7 @@
 
 #import "DialogAlert.h"
 
+static NSString *const selectInfoWarning = @"Please make sure you already select an instance.";
 
 @implementation DialogAlert
 

@@ -165,7 +165,7 @@ MasternodesViewController *masternodeCon2;
             }
         });        
         
-        [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set selected to masternode segment.
+        [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
         
         NSManagedObject * object = [self.repositoryArrayCon.arrangedObjects objectAtIndex:row];
         

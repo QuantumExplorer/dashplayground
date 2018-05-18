@@ -18,6 +18,7 @@
 #import "RepositoriesModalViewController.h"
 #import "MasternodeStateTransformer.h"
 #import "DPMasternodeController.h"
+#import <NMSSH/NMSSH.h>
 
 @interface MasternodesViewController ()
 
@@ -29,25 +30,27 @@
 //Masternode control
 @property (strong) IBOutlet NSButtonCell *createAmiButton;
 @property (strong) ConsoleEventArray * masternodeConsoleEvents;
+@property (strong) IBOutlet NSButton *connectButton;
 
 //Instance control
 @property (strong) IBOutlet NSButton *startInstanceButton;
 
 //Terminal
 @property (strong) ConsoleEventArray * terminalConsoleEvents;
-@property (strong) IBOutlet NSButton *sendTerminalButton;
 @property (strong) IBOutlet NSTextField *commandTextField;
 
+@property (strong) NMSSHSession *ssh;
 @end
 
 @implementation MasternodesViewController
 
 MasternodesViewController *masternodeController;
-@synthesize testString;
 
 NSString *terminalString = @"";
+NSString *terminalHeadString = @"";
 
 @synthesize consoleTabSegmentedControl;
+@synthesize ssh;
 
 -(void)setUpConsole {
     self.consoleEvents = [[ConsoleEventArray alloc] init];
@@ -70,6 +73,42 @@ NSString *terminalString = @"";
     }];
 
 }
+
+- (IBAction)connectInstance:(id)sender {
+    
+    if ([self.connectButton.title isEqualToString:@"Disconnect"]) {
+        [self.ssh disconnect];
+        self.connectButton.title = @"Connect";
+        [self addStringEventToTerminalConsole:@"instance disconnected"];
+        return;
+    }
+    
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) {
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to start instance!" message:@"Please make sure you already select an instance."];
+        return;
+    }
+    
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    if([[object valueForKey:@"publicIP"] length] == 0)
+    {
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to connect instance!" message:@"This instance is currently offline. Please start it first!"];
+        return;
+    }
+    self.ssh = [[DPMasternodeController sharedInstance] connectInstance:object];
+    if (!self.ssh.isAuthorized) {
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to connect instance!" message:@"SSH: error authenticating with server."];
+        return;
+    }
+    
+    //connect instance successfully
+    self.connectButton.title = @"Disconnect";
+    [self.consoleTabSegmentedControl setSelectedSegment:2];//set console tab to terminal segment.
+    terminalHeadString = [NSString stringWithFormat:@"ubuntu@ip-%@:", [object valueForKey:@"publicIP"]];
+    NSString *string = [NSString stringWithFormat:@"%@ connected successfully", terminalHeadString];
+    [self addStringEventToTerminalConsole:string];
+}
+
 
 - (IBAction)getKey:(id)sender {
     NSInteger row = self.tableView.selectedRow;
@@ -296,11 +335,9 @@ NSString *terminalString = @"";
 -(void)setTerminalCommandState:(NSNumber*)state {
     if([state isEqual:@(0)])//hide
     {
-        self.sendTerminalButton.hidden = true;
         self.commandTextField.hidden = true;
     }
     else {//show
-        self.sendTerminalButton.hidden = false;
         self.commandTextField.hidden = false;
     }
 }
@@ -312,17 +349,38 @@ NSString *terminalString = @"";
 }
 
 - (IBAction)pressCommandField:(NSTextField*)string {
-    NSDictionary *output = [[DPMasternodeController sharedInstance] runTerminalCommandJSON:[NSString stringWithFormat:@"%@", string.stringValue]];
     
-    if([terminalString isEqualToString:@""])
+    if(string.stringValue.length == 0) return;
+    
+    if([self.connectButton.title isEqualToString:@"Connect"])
     {
-        [self addStringEventToTerminalConsole:[NSString stringWithFormat:@"%@", output]];
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to send command!" message:@"Please make sure you connect instance."];
+        return;
     }
-    else
-    {
-        [self addStringEventToTerminalConsole:[NSString stringWithFormat:@"%@", terminalString]];
-        terminalString = @"";
+    
+    NSString *terminalString = [NSString stringWithFormat:@"%@ %@", terminalHeadString, string.stringValue];
+    [self addStringEventToTerminalConsole:terminalString];
+    
+    NSError *error;
+    NSString *response = [[DPMasternodeController sharedInstance] getResponseExecuteCommand:string.stringValue onSSH:self.ssh error:error];
+    if(![response isEqualToString:@""] || [response length] != 0) {
+        terminalString = [NSString stringWithFormat:@"%@ %@", terminalHeadString, response];
+        [self addStringEventToTerminalConsole:terminalString];
     }
+    
+    self.commandTextField.stringValue = @"";
+    
+//    NSDictionary *output = [[DPMasternodeController sharedInstance] runTerminalCommandJSON:[NSString stringWithFormat:@"%@", string.stringValue]];
+//
+//    if([terminalString isEqualToString:@""])
+//    {
+//        [self addStringEventToTerminalConsole:[NSString stringWithFormat:@"%@", output]];
+//    }
+//    else
+//    {
+//        [self addStringEventToTerminalConsole:[NSString stringWithFormat:@"%@", terminalString]];
+//        terminalString = @"";
+//    }
 }
 
 -(void)setTerminalString:(NSString*)string {
@@ -342,13 +400,12 @@ NSString *terminalString = @"";
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
 //    //Set up button
-//    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
-//        self.setupButton.enabled = false;
-//    }
-//    else{
-//        self.setupButton.enabled = true;
-//    }
-    self.setupButton.enabled = true;
+    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+        self.setupButton.enabled = false;
+    }
+    else{
+        self.setupButton.enabled = true;
+    }
     
     //Create AMI button
     if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed) {

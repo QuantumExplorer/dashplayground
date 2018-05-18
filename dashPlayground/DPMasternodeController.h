@@ -10,6 +10,7 @@
 #import <CoreData/CoreData.h>
 #import "InstanceStateTransformer.h"
 #import "DPLocalNodeController.h"
+#import <NMSSH/NMSSH.h>
 
 typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
@@ -49,5 +50,8 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
 - (void)checkMasternodeIsInstalled:(NSManagedObject*)masternode clb:(dashBoolClb)clb;
 -(void)updateGitInfoForMasternode:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
+
+-(NMSSHSession*)connectInstance:(NSManagedObject*)masternode;
+-(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;
 
 @end

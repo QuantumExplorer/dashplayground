@@ -95,6 +95,16 @@
     }
 }
 
+-(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error {
+    error = nil;
+    NSString *response = [ssh.channel execute:command error:&error];
+    if (error) {
+        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
+        return [NSString stringWithFormat:@"%@", [error localizedDescription]];
+    }
+    return response;
+}
+
 -(NMSSHSession*)sshInWithKeyPath:(NSString*)masternodeIP {
     if (![self sshPath]) {
         DialogAlert *dialog=[[DialogAlert alloc]init];
@@ -173,6 +183,10 @@
     return rDict;
 }
 
+-(NMSSHSession*)connectInstance:(NSManagedObject*)masternode {
+    NMSSHSession *ssh = [self sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"]];
+    return ssh;
+}
 
 //End Toey
 
@@ -1123,25 +1137,24 @@
 -(void)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode clb:(dashInfoClb)clb {
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-//        NSInteger channelNum = 0;
-//        CkoSsh * ssh = [self sshIn:publicIP channelNum:&channelNum];
-//        if (!ssh) {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                clb(NO,nil,@"Could not ssh in");
-//            });
-//            return;
-//        }
-//        //  Send some commands and get the output.
-//        NSString *strOutput = [ssh QuickCommand: @"cat .dashcore/dash.conf" charset: @"ansi"];
-//        if (ssh.LastMethodSuccess != YES) {
-//            NSLog(@"%@",ssh.LastErrorText);
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                clb(NO,nil,@"Could retieve configuration file");
-//            });
-//            return;
-//        }
-//        [ssh Disconnect];
-        NSString *strOutput;
+        NSInteger channelNum = 0;
+        CkoSsh * ssh = [self sshIn:publicIP channelNum:&channelNum];
+        if (!ssh) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,nil,@"Could not ssh in");
+            });
+            return;
+        }
+        //  Send some commands and get the output.
+        NSString *strOutput = [ssh QuickCommand: @"cat .dashcore/dash.conf" charset: @"ansi"];
+        if (ssh.LastMethodSuccess != YES) {
+            NSLog(@"%@",ssh.LastErrorText);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,nil,@"Could retieve configuration file");
+            });
+            return;
+        }
+        [ssh Disconnect];
         NSArray * lines = [strOutput componentsSeparatedByString:@"\n"];
         __block NSMutableDictionary * rDict = [NSMutableDictionary dictionary];
         for (NSString * line in lines) {

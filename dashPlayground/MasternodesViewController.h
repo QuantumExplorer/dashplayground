@@ -24,8 +24,6 @@
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
-@property (strong) NSString *testString;
-
 - (IBAction)retreiveInstances:(id)sender;
 - (IBAction)getKey:(id)sender;
 
