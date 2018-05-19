@@ -38,6 +38,12 @@
 
 -(NSString *)runDashRPCCommandString:(NSString *)commandToRun;
 
+-(NSDictionary *)runDashRPCCommandArray:(NSString *)commandToRun;
+
+-(NSDictionary *)runDashRPCCommandArrayWithArray:(NSArray *)commandToRun;
+
+- (NSString *)runDashRPCCommandStringWithArray:(NSArray *)commandToRun;
+
 -(NSDictionary*)masternodeInfoInMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode;
 
 -(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashClb)clb;

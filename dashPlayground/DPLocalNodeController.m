@@ -57,13 +57,72 @@
     NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
     NSLog(@"run command:%@", commandToRun);
     [task setArguments:arguments];
+
+    NSPipe *pipe = [NSPipe pipe];
+    [task setStandardOutput:pipe];
+
+    NSFileHandle *file = [pipe fileHandleForReading];
+
+    [task launch];
+    
+    return [file readDataToEndOfFile];
+}
+
+- (NSDictionary *)runDashRPCCommandArrayWithArray:(NSArray *)commandToRun
+{
+    NSData *output = [self runDashRPCCommandFromArray:commandToRun];
+    if(output == nil) return nil;
+    NSError * error = nil;
+    NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:output options:0 error:&error];
+    if (error) return nil;
+    return dictionary;
+}
+
+- (NSString *)runDashRPCCommandStringWithArray:(NSArray *)commandToRun
+{
+    NSData *data = [self runDashRPCCommandFromArray:commandToRun];
+    if(data == nil) return nil;
+    NSString *output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    return output;
+}
+
+- (NSData *)runDashRPCCommandFromArray:(NSArray *)commandToRun
+{
+    if (![[DPLocalNodeController sharedInstance] dashCliPath]) return nil;
+    NSTask *task = [[NSTask alloc] init];
+    NSLog(@"%@",[[DPLocalNodeController sharedInstance] dashCliPath]);
+    [task setLaunchPath:[[DPLocalNodeController sharedInstance] dashCliPath]];
+    
+    //    NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
+    NSLog(@"run command:%@", commandToRun);
+    [task setArguments:commandToRun];
     
     NSPipe *pipe = [NSPipe pipe];
     [task setStandardOutput:pipe];
     
     NSFileHandle *file = [pipe fileHandleForReading];
     
+    NSPipe *errorPipe = [NSPipe pipe];
+    [task setStandardError:errorPipe];
+    
+    NSFileHandle *error = [errorPipe fileHandleForReading];
+    
     [task launch];
+    [task waitUntilExit]; //Toey, wait until finish launching task to show error.
+    
+    //Toey, add this stuff to show error alert.
+    NSData * dataError = [error readDataToEndOfFile];
+    NSString * strError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if([strError length] != 0){
+            [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:[NSString stringWithFormat:@"%@", strError]];
+            NSLog(@"%@", strError);
+        }
+    });
+    
+    if([strError length] != 0){
+        return nil;
+    }
     
     return [file readDataToEndOfFile];
 }
@@ -236,6 +295,15 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 {
     NSString *output = [[NSString alloc] initWithData:[self runDashRPCCommand:commandToRun] encoding:NSUTF8StringEncoding];
     return output;
+}
+
+- (NSDictionary *)runDashRPCCommandArray:(NSString *)commandToRun
+{
+    NSError* error;
+    NSDictionary* outputs = [NSJSONSerialization JSONObjectWithData:[self runDashRPCCommand:commandToRun]
+                                                         options:kNilOptions
+                                                           error:&error];
+    return outputs;
 }
 
 -(NSArray*)outputs {

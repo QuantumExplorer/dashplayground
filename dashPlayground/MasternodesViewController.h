@@ -34,8 +34,6 @@
 
 - (IBAction)selectedConsoleTab:(id)sender;
 
--(void)setTerminalString:(NSString*)string;
-
 -(void)addStringEventToMasternodeConsole:(NSString*)string;
 
 @property (strong) IBOutlet NSSegmentedControl * consoleTabSegmentedControl;

@@ -46,8 +46,6 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
 //- (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
 
-- (NSDictionary *)runTerminalCommandJSON:(NSString *)commandToRun;
-
 - (void)checkMasternodeIsInstalled:(NSManagedObject*)masternode clb:(dashBoolClb)clb;
 -(void)updateGitInfoForMasternode:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
 

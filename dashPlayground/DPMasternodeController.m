@@ -1387,7 +1387,7 @@
     NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
     
     //TOEY, add newArguments variable to handle a case that has sentence like "We are developer".
-    NSMutableArray *newArguments = [self getArgumentsWithSentence:arguments terminalType:false];
+    NSMutableArray *newArguments = [self getArgumentsWithSentence:arguments];
     
     NSLog(@"run command:%@", commandToRun);
     [task setArguments:newArguments];
@@ -1418,57 +1418,7 @@
     return [file readDataToEndOfFile];
 }
 
-- (NSDictionary *)runTerminalCommandJSON:(NSString *)commandToRun
-{
-    NSData * data = [self runTerminalCommand:commandToRun];
-    NSError * error = nil;
-    NSDictionary *output = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error: &error];
-    return output;
-}
-
-- (NSData *)runTerminalCommand:(NSString *)commandToRun
-{
-    NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
-    
-    NSTask *task = [[NSTask alloc] init];
-    
-    NSString *launchPath = [NSString stringWithFormat:@"/usr/bin/%@", arguments[0]];
-    
-    [task setLaunchPath:launchPath];
-    
-    //TOEY, add newArguments variable to handle a case that has sentence like "We are developer".
-    NSMutableArray *newArguments = [self getArgumentsWithSentence:arguments terminalType:true];
-    
-    NSLog(@"run command:%@", commandToRun);
-    [task setArguments:newArguments];
-    
-    NSPipe *pipe = [NSPipe pipe];
-    [task setStandardOutput:pipe];
-    
-    NSFileHandle *file = [pipe fileHandleForReading];
-    
-    NSPipe *errorPipe = [NSPipe pipe];
-    [task setStandardError:errorPipe];
-    
-    NSFileHandle *error = [errorPipe fileHandleForReading];
-    
-    [task launch];
-    [task waitUntilExit]; //Toey, wait until finish launching task to show error.
-    
-    //Toey, add this stuff to show error alert.
-    NSData * dataError = [error readDataToEndOfFile];
-    NSString * strError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
-    
-    if([strError length] != 0){
-        NSLog(@"%@", strError);
-//        [[MasternodesViewController sharedInstance] setTerminalString:strError];
-    }
-    
-    return [file readDataToEndOfFile];
-}
-
-
--(NSMutableArray*)getArgumentsWithSentence:(NSArray*)arguments terminalType:(BOOL)terminalType {
+-(NSMutableArray*)getArgumentsWithSentence:(NSArray*)arguments {
     
     NSMutableArray *newArguments = [[NSMutableArray alloc] init];
     NSString *str = @"";
@@ -1476,13 +1426,13 @@
     
     for (NSString *string in arguments)
     {
-        if(terminalType) {
-            if(arguments[0])
-            {
-                terminalType = false;
-                continue;
-            }
-        }
+//        if(terminalType) {
+//            if(arguments[0])
+//            {
+//                terminalType = false;
+//                continue;
+//            }
+//        }
         if([string length] == 0) continue;
         
         NSString *firstChar = [string substringToIndex:1];

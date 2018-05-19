@@ -46,7 +46,6 @@
 
 MasternodesViewController *masternodeController;
 
-NSString *terminalString = @"";
 NSString *terminalHeadString = @"";
 
 @synthesize consoleTabSegmentedControl;
@@ -369,22 +368,6 @@ NSString *terminalHeadString = @"";
     }
     
     self.commandTextField.stringValue = @"";
-    
-//    NSDictionary *output = [[DPMasternodeController sharedInstance] runTerminalCommandJSON:[NSString stringWithFormat:@"%@", string.stringValue]];
-//
-//    if([terminalString isEqualToString:@""])
-//    {
-//        [self addStringEventToTerminalConsole:[NSString stringWithFormat:@"%@", output]];
-//    }
-//    else
-//    {
-//        [self addStringEventToTerminalConsole:[NSString stringWithFormat:@"%@", terminalString]];
-//        terminalString = @"";
-//    }
-}
-
--(void)setTerminalString:(NSString*)string {
-    terminalString = string;
 }
 
 #pragma mark - Table View

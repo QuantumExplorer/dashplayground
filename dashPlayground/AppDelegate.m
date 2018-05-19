@@ -74,7 +74,9 @@
 //    
 //    [ssh disconnect];
     
+//    -testnet createrawtransaction \”[{\”txid\":\"2ec193d9308aaf86722e06ceb5e7771d32739fd9c787fc84be7553768c917954\",\"vout\”:1}]\” \”{\”yfxMotksHE9rrJtbpYUCBeiEeY6phgeViv\":0.01}\”
     
+
     
     //end
     
