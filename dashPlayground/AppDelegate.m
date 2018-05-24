@@ -18,6 +18,7 @@
 #import "RepositoriesModalViewController.h"
 #import "RepositoriesViewController.h"
 #import <NMSSH/NMSSH.h>
+#import "SshConnection.h"
 
 @interface AppDelegate ()
 
@@ -76,7 +77,18 @@
     
 //    -testnet createrawtransaction \”[{\”txid\":\"2ec193d9308aaf86722e06ceb5e7771d32739fd9c787fc84be7553768c917954\",\"vout\”:1}]\” \”{\”yfxMotksHE9rrJtbpYUCBeiEeY6phgeViv\":0.01}\”
     
-
+//    [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:@"54.169.124.99" openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+//        if(success){
+//            NSError *error;
+//            
+//            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash; ./autogen.sh; ./configure; make" onSSH:sshSession error:error percentageClb:^(NSString *call, float percentage) {
+//                NSLog(@"%@", call);
+//            }];
+//            
+//            NSLog(@"Last response: %@", [sshSession.channel lastResponse]);
+//            [sshSession disconnect];
+//        }
+//    }];
     
     //end
     

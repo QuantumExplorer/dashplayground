@@ -64,6 +64,7 @@
     NSFileHandle *file = [pipe fileHandleForReading];
 
     [task launch];
+    [task waitUntilExit]; 
     
     return [file readDataToEndOfFile];
 }
@@ -310,6 +311,11 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     NSCharacterSet * bracketCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"{} "] ;
     NSCharacterSet * quotesCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\n\r "] ;
     NSString * linesString = [[[self runDashRPCCommandString:@"-testnet masternode outputs"] stringByTrimmingCharactersInSet:bracketCharacterSet] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    
+    if([linesString isEqualToString:@"}"]) {
+        return nil;
+    }
+    
     NSArray * split = [linesString componentsSeparatedByString:@","];
     NSMutableArray * rArray = [NSMutableArray array];
     for (NSString * line in split) {

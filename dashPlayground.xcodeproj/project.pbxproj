@@ -18,6 +18,7 @@
 		A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */; };
 		A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */; };
 		A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A532618320A42413004678E8 /* UnspentOutputViewController.m */; };
+		A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A558E0C520B54E3C00E853DB /* SshConnection.m */; };
 		A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */; };
 		A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0D22099BA22004B23FE /* VolumeViewController.m */; };
 		A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5724D4B20A70D4A004BED71 /* ContainerViewController.m */; };
@@ -117,6 +118,8 @@
 		A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesModalViewController.m; sourceTree = "<group>"; };
 		A532618220A42413004678E8 /* UnspentOutputViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnspentOutputViewController.h; sourceTree = "<group>"; };
 		A532618320A42413004678E8 /* UnspentOutputViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnspentOutputViewController.m; sourceTree = "<group>"; };
+		A558E0C420B54E3C00E853DB /* SshConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SshConnection.h; sourceTree = "<group>"; };
+		A558E0C520B54E3C00E853DB /* SshConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SshConnection.m; sourceTree = "<group>"; };
 		A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPPreferenceController.h; sourceTree = "<group>"; };
 		A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPPreferenceController.m; sourceTree = "<group>"; };
 		A55FC0D12099BA17004B23FE /* VolumeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VolumeViewController.h; sourceTree = "<group>"; };
@@ -551,6 +554,8 @@
 				FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */,
 				A516B45820908333009A59C0 /* DialogAlert.h */,
 				A516B45620908324009A59C0 /* DialogAlert.m */,
+				A558E0C420B54E3C00E853DB /* SshConnection.h */,
+				A558E0C520B54E3C00E853DB /* SshConnection.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -848,6 +853,7 @@
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
+				A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */,
 				A516B45720908324009A59C0 /* DialogAlert.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,

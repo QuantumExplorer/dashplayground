@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
 
-@interface UnspentOutputViewController : NSViewController
+@interface UnspentOutputViewController : NSViewController <NSTabViewDelegate>
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 

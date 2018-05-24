@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MasternodesViewController.h"
+#import "DPLocalNodeController.h"
 
 @interface DPRepoModalController : NSObject
 

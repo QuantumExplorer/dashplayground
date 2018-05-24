@@ -21,6 +21,6 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 -(void)retreiveUnspentOutput:(dashInfoClb)clb;
 -(NSDictionary*)getUnspentList;
 -(NSMutableArray*)processOutput:(NSDictionary*)unspentOutputs;
--(void)createTransaction:(NSUInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects;
+-(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb;
 
 @end

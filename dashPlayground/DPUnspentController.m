@@ -27,6 +27,7 @@
         [rDict setValue:[unspent valueForKey:@"txid"] forKey:@"txid"];
         [rDict setValue:[unspent valueForKey:@"confirmations"] forKey:@"confirmations"];
         [rDict setValue:[unspent valueForKey:@"amount"] forKey:@"amount"];
+        [rDict setValue:[unspent valueForKey:@"address"] forKey:@"address"];
         [rDict setValue:dateTime forKey:@"time"];
         [unspentArray addObject:rDict];
     }
@@ -90,14 +91,19 @@
     return outputs;
 }
 
--(void)createTransaction:(NSUInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects {
+-(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb {
     //get local address
-    NSString *address = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"-testnet getaccountaddress \"\""];
-    address = [address stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];//remove /n
+    NSMutableArray *addressArray = [[NSMutableArray alloc]init];
+    for(int i = 1; i <= count; i++) {
+        NSString *address = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"-testnet getnewaddress \"\""];
+        [addressArray addObject:[address stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]]];//remove /n];
+    }
     
     //set label to address
-    NSString *labelCommand = [NSString stringWithFormat:@"-testnet setaccount %@ %@", address, label];
-    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:labelCommand];
+    for(NSArray *address in addressArray) {
+        NSString *labelCommand = [NSString stringWithFormat:@"-testnet setaccount %@ %@", address, label];
+        [[DPLocalNodeController sharedInstance] runDashRPCCommandString:labelCommand];
+    }
     
     NSMutableArray *inputsWithScriptPubKey = [NSMutableArray array];
     
@@ -131,7 +137,7 @@
     }
     
     if([inputsWithScriptPubKey count] == 0) {
-        [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"Input list is empty."];
+        [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"None of unspent output is selected."];
         return;
     }
     
@@ -148,27 +154,39 @@
     }
     
     //let's create this shit
-    for(int i=0; i<count; i++)
-    {
-        NSString *processResult = [self processRawTransaction:amount toAddress:address inputString:inputStringWithPubKey];
-        if(processResult != nil) {
-            NSString *successStr = [NSString stringWithFormat:@"#%d Create unspent %ld dash outputs sucessfully.",i , amount];
-            [[DialogAlert sharedInstance] showAlertWithOkButton:@"Success" message:successStr];
-            
-            
-        }
-        else {
-            NSString *failedStr = [NSString stringWithFormat:@"#%d Create unspent output failed.", i];
-            [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:failedStr];
-        }
+    NSString *processResult = [self processRawTransaction:amount toAddress:addressArray inputString:inputStringWithPubKey count:count];
+    if(processResult != nil) {
+        NSString *successStr = [NSString stringWithFormat:@"Create %d unspent outputs for %lu sucessfully. Please wait for a while the transaction is being processed...",(int)count , amount];
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Success" message:successStr];
+        clb(YES,[self createTransactionToTable:addressArray]);
+    }
+    else {
+        NSString *failedStr = [NSString stringWithFormat:@"Create unspent output failed."];
+        [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:failedStr];
+        clb(NO,nil);
     }
 }
 
--(NSString*)processRawTransaction:(NSUInteger)amount toAddress:(NSString*)address inputString:(NSMutableString*)inputStringWithPubKey
+-(NSString*)processRawTransaction:(NSUInteger)amount toAddress:(NSMutableArray*)address inputString:(NSMutableString*)inputStringWithPubKey
+                            count:(NSInteger)count
 {
     //create raw transaction
     //    createrawtransaction \”[{\”txid\":\"input-txid\",\"vout\”:1}]\” \”{\”destination-address\":amount}\”
-    NSString *addressParam = [NSString stringWithFormat:@"{\"%@\":%ld}", address, amount];
+    NSMutableString *destinationAddress = [NSMutableString string];
+    for(NSInteger i = 1; i <= count; i++) {
+        if(i == count) {
+            [destinationAddress appendFormat:@"\"%@\":%ld", [address objectAtIndex:i-1], amount];
+            break;
+        }
+        if(count > 1){
+            [destinationAddress appendFormat:@"\"%@\":%ld,", [address objectAtIndex:i-1], amount];
+        }
+        else{
+            [destinationAddress appendFormat:@"\"%@\":%ld,", [address objectAtIndex:i-1], amount];
+        }
+    }
+//    NSString *addressParam = [NSString stringWithFormat:@"{\"%@\":%ld}", address, amount];
+    NSString *addressParam = [NSString stringWithFormat:@"{%@}", destinationAddress];
     //    NSString *inputParam = [NSString stringWithFormat:@"[%@]", inputString];
     NSString *inputPubKeyParam = [NSString stringWithFormat:@"[%@]", inputStringWithPubKey];
     
@@ -212,6 +230,24 @@
     NSString *sendResult = [[DPLocalNodeController sharedInstance] runDashRPCCommandStringWithArray:sendCommand];
     NSLog(@"Result: %@", sendResult);
     return sendResult;
+}
+
+-(NSMutableArray*)createTransactionToTable:(NSMutableArray*)addressArray {
+    
+    NSMutableArray *newData = [NSMutableArray array];
+    
+    for(NSArray *address in addressArray) {
+        NSDictionary *tranDicts = [NSMutableDictionary dictionary];
+        [tranDicts setValue:@"processing" forKey:@"name"];
+        [tranDicts setValue:@"processing" forKey:@"time"];
+        [tranDicts setValue:@"processing" forKey:@"txid"];
+        [tranDicts setValue:@"processing" forKey:@"amount"];
+        [tranDicts setValue:@"processing" forKey:@"confirmations"];
+        [tranDicts setValue:address forKey:@"address"];
+        [newData addObject:tranDicts];
+    }
+    
+    return newData;
 }
 
 #pragma mark - Singleton methods

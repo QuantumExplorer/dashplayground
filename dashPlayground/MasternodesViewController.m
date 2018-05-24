@@ -143,8 +143,9 @@ NSString *terminalHeadString = @"";
 - (IBAction)configure:(id)sender {
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:object clb:^(BOOL success, NSString *message) {
+    [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:object onViewCon:masternodeController clb:^(BOOL success, NSString *message) {
         if (!success) {
             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
             dict[NSLocalizedDescriptionKey] = message;
@@ -172,15 +173,40 @@ NSString *terminalHeadString = @"";
         NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
         [[NSApplication sharedApplication] presentError:error];
         return;
-    } else {
-        [[DPMasternodeController sharedInstance] startDashd:object clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
-            if (!success) {
-                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                dict[NSLocalizedDescriptionKey] = errorMessage;
-                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                [[NSApplication sharedApplication] presentError:error];
+    }
+    if(![object valueForKey:@"rpcPassword"]) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        dict[NSLocalizedDescriptionKey] = @"You must first have a rpc password for the masternode before you can start it.";
+        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+        [[NSApplication sharedApplication] presentError:error];
+        return;
+    }
+    else {
+        [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
+        [self addStringEventToMasternodeConsole:eventMsg];
+        
+        if (![[DPLocalNodeController sharedInstance] dashDPath]) {
+            DialogAlert *dialog=[[DialogAlert alloc]init];
+            NSAlert *findPathAlert = [dialog getFindPathAlert:@"dashd" exPath:@"~/Documents/src/dash/src"];
+            
+            if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+                //Find clicked
+                NSString *pathString = [dialog getLaunchPath];
+                [[DPLocalNodeController sharedInstance] setDashDPath:pathString];
+                [[DialogAlert sharedInstance] showAlertWithOkButton:@"dashd" message:@"Set up dashd path successfully."];
             }
-        }];
+        }
+        else{
+            [[DPMasternodeController sharedInstance] startDashd:object onViewCon:masternodeController clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                if (!success) {
+                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                    dict[NSLocalizedDescriptionKey] = errorMessage;
+                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                    [[NSApplication sharedApplication] presentError:error];
+                }
+            }];
+        }
     }
 }
 
@@ -383,18 +409,19 @@ NSString *terminalHeadString = @"";
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
 //    //Set up button
-    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
-        self.setupButton.enabled = false;
-    }
-    else{
-        self.setupButton.enabled = true;
-    }
+//    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
+//        self.setupButton.enabled = true;
+//    }
+//    else{
+//        self.setupButton.enabled = false;
+//    }
+    self.setupButton.enabled = true;
     
     //Create AMI button
-    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed) {
+    if ([[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
         self.createAmiButton.enabled = true;
     }
-    else{
+    else if ([[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_Checking){
         self.createAmiButton.enabled = false;
     }
 }

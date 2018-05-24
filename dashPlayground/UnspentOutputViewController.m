@@ -24,6 +24,13 @@
 
 @implementation UnspentOutputViewController
 
+-(id)init
+{
+    [self.unspentTable setDelegate: (id)self];
+    [self.unspentTable setDataSource: (id)self];
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -48,7 +55,10 @@
 
 -(void)processUnspentOutput:(NSMutableArray*)unspentArray {
     
-    [self.arrayController setContent:nil];
+    if([unspentArray count] == 0) {
+        [self.arrayController setContent:nil];
+        return;
+    }
     for (NSDictionary* unspent in unspentArray) {
         [self showTableContent:unspent];
     }
@@ -56,6 +66,16 @@
 
 -(void)showTableContent:(NSDictionary*)dictionary
 {
+    NSMutableArray *allObjectsClone = [NSMutableArray array];
+    
+    for(NSArray *object in [self.arrayController.arrangedObjects allObjects]) {
+        if([[object valueForKey:@"address"] isEqualToString:[dictionary valueForKey:@"address"]]){
+            [allObjectsClone addObject:object];
+        }
+    }
+    
+    [self.arrayController removeObjects:allObjectsClone];
+    
     [self.arrayController addObject:dictionary];
     
     [self.arrayController rearrangeObjects];
@@ -88,25 +108,20 @@
         return;
     }
     
-    NSString *msgAlert = [NSString stringWithFormat:@"Are you sure you want to create %@ of 1000 dash unspent output", self.countField.stringValue];
+    NSString *msgAlert = [NSString stringWithFormat:@"Are you sure you want to create %@ unspent outputs with 1000 dash?", self.countField.stringValue];
     
     NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warning!" message:msgAlert];
     
     if ([alert runModal] == NSAlertFirstButtonReturn) {
-        [[DPUnspentController sharedInstance] createTransaction:self.countField.integerValue label:self.labelField.stringValue amount:1000 allObjects:[self.arrayController.arrangedObjects allObjects]];
         
-        //refresh unspentlist
-        [[DPUnspentController sharedInstance] retreiveUnspentOutput:^(BOOL success,NSDictionary *dict, NSString *message){
-            if(success)
-            {
-                self.windowLog.stringValue = @"Dash server started";
-                NSMutableArray * unspentArray = [[DPUnspentController sharedInstance] processOutput:dict];
-                [self processUnspentOutput:unspentArray];
-            }
-            else{
-                self.windowLog.stringValue = @"Dash server didn't start up";
+        [[DPUnspentController sharedInstance] createTransaction:self.countField.integerValue label:self.labelField.stringValue amount:1000 allObjects:[self.arrayController.arrangedObjects allObjects] clb:^(BOOL success, NSMutableArray *newObjects) {
+            
+            if(success) {
+                [self processUnspentOutput:newObjects];
             }
         }];
+        
+        [self deSelectAll];
         [self clearInputFields];
     }
     
@@ -133,7 +148,15 @@
     
     for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
     {
-        [object setValue:stateValue forKey:@"selected"];
+        if([[object valueForKey:@"amount"] integerValue] != 1000) [object setValue:stateValue forKey:@"selected"];
+    }
+}
+
+-(void)deSelectAll {
+    self.selectAllButton.state = 0;
+    for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+    {
+        [object setValue:@"0" forKey:@"selected"];
     }
 }
 

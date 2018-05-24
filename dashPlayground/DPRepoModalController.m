@@ -13,6 +13,9 @@
 #import "MasternodeStateTransformer.h"
 #import "MasternodeSyncStatusTransformer.h"
 #import "DPDataStore.h"
+#import "DPLocalNodeController.h"
+#import "DPMasternodeController.h"
+#import "SshConnection.h"
 
 @implementation DPRepoModalController
 
@@ -27,177 +30,81 @@ MasternodesViewController *masternodeCon;
     __block NSString * repositoryPath = [repository valueForKey:@"repository.url"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
-        NMSSHSession *ssh = [self sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP];
+        __block NMSSHSession *ssh;
+        [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:YES clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            ssh = sshSession;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [masternodeCon addStringEventToMasternodeConsole:message];
+            });
+        }];
         
         if (!ssh.isAuthorized) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,@"SSH: error authenticating with server.");
+                [masternodeCon addStringEventToMasternodeConsole:@"SSH: error authenticating with server."];
             });
             return;
         }
         
-//        ssh.channel.requestPty = YES;
         NSError *error = nil;
-        [ssh.channel execute:@"cd src" error:&error];
+        [ssh.channel write:@"cd src" error:&error];
         if (error) {
             error = nil;
-            [ssh.channel execute:@"mkdir src" error:&error];
+            [ssh.channel write:@"mkdir src" error:&error];
             if(error)
             {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    clb(NO,[NSString stringWithFormat:@"SSH: error making src directory. %@", error.localizedDescription]);
+                    NSString *erroStr = [NSString stringWithFormat:@"SSH: error making src directory. %@", error.localizedDescription];
+                    [masternodeCon addStringEventToMasternodeConsole:erroStr];
+                    clb(NO,erroStr);
                 });
                 return;
             }
         }
         
         //clone repository
+        [ssh.channel startShell:&error];
         error = nil;
-        [self sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error percentageClb:^(NSString *call, float percentage) {
+        [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error percentageClb:^(NSString *call, float percentage) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSLog(@"%@ %.2f",call,percentage);
                 [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+                [masternodeCon addStringEventToMasternodeConsole:call];
             });
         }];
-        
         
         //now let's make all this shit
+//        [ssh.channel startShell:&error];
         error = nil;
-        [self sendDashCommandsList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh onPath:@"cd src/dash;" error:error percentageClb:^(NSString *call, float percentage) {
+        [[SshConnection sharedInstance] sendDashCommandsList:@[@"./autogen.sh",@"./configure",@"make"] onSSH:ssh onPath:@"cd ~/src/dash;" error:error percentageClb:^(NSString *call, float percentage) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                //                NSLog(@"%@ %.2f",call,percentage);
-                //                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-                NSString *string = [NSString stringWithFormat:@"Done %.2f%%%%",percentage];
-                [masternodeCon addStringEventToMasternodeConsole:string];
+                [masternodeCon addStringEventToMasternodeConsole:call];
             });
         }];
+//        [self sendDashCommandsList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh onPath:@"cd src/dash;" error:error percentageClb:^(NSString *call, float percentage) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                //                NSLog(@"%@ %.2f",call,percentage);
+//                //                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+//                NSString *string = [NSString stringWithFormat:@"Done %.2f%%%%",percentage];
+//                [masternodeCon addStringEventToMasternodeConsole:string];
+//            });
+//        }];
         
-        [ssh disconnect];
         dispatch_async(dispatch_get_main_queue(), ^{
+            [ssh disconnect];
             [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
-        });
-        
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
             [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
             
             [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];
         });
+        
 
         //---------
     });
     
     
 }
-
-#pragma mark - Connectivity
-
-//Toey
-
--(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh error:(NSError*)error percentageClb:(dashPercentageClb)clb {
-    
-    NSString *command = [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [masternodeCon addStringEventToMasternodeConsole:command];
-    });
-    [self sendWriteCommand:command onSSH:ssh error:error];
-    
-}
-
--(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error percentageClb:(dashPercentageClb)clb {
-    
-    for (NSUInteger index = 0;index<[commands count];index++) {
-        NSString * command = [commands objectAtIndex:index];
-        
-        [self sendWriteCommand:[NSString stringWithFormat:@"%@ %@",path, command] onSSH:ssh error:error];
-        
-        int currentCommand = (int)index;
-        currentCommand = currentCommand+1;
-        
-        clb(command,(currentCommand*100)/[commands count]);
-    }
-}
-
--(void)sendWriteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error {
-    
-    NSString *string = [NSString stringWithFormat:@"executing command %@", command];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [masternodeCon addStringEventToMasternodeConsole:string];
-    });
-    error = nil;
-    [ssh.channel startShell:&error];
-    if (error) {
-        [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: error %@", error.localizedDescription]];
-    }
-    
-    error = nil;
-    [ssh.channel write:command error:&error timeout:@5];
-    if (error) {
-        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
-        return;
-    }
-}
-
--(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error {
-    
-    NSString *string = [NSString stringWithFormat:@"executing command %@", command];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [masternodeCon addStringEventToMasternodeConsole:string];
-    });
-    
-    error = nil;
-    [ssh.channel execute:command error:&error];
-    if (error) {
-        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
-        return;
-    }
-}
-
--(NMSSHSession*)sshInWithKeyPath:(NSString*)masternodeIP {
-    if (![[DPMasternodeController sharedInstance] sshPath]) {
-        DialogAlert *dialog=[[DialogAlert alloc]init];
-        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
-        
-        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
-            //Find clicked
-            NSString *pathString = [dialog getLaunchPath];
-            [[DPMasternodeController sharedInstance] setSshPath:pathString];
-            return [self sshInWithKeyPath:pathString masternodeIp:masternodeIP];
-        }
-    }
-    else{
-        return [self sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:masternodeIP];
-    }
-    return nil;
-}
-
--(NMSSHSession*)sshInWithKeyPath:(NSString*)keyPath masternodeIp:(NSString*)masternodeIp {
-    NMSSHSession *session = [NMSSHSession connectToHost:masternodeIp withUsername:@"ubuntu"];
-    
-    if (session.isConnected) {
-        [session authenticateByPublicKey:nil privateKey:keyPath andPassword:nil];
-        
-        if (session.isAuthorized) {
-            NSLog(@"Authentication succeeded");
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [masternodeCon addStringEventToMasternodeConsole:@"SSH: authentication succeeded!"];
-            });
-            
-            NSError *error = nil;
-            [session.channel startShell:&error];
-            if (error) {
-                [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: error %@", error.localizedDescription]];
-            }
-        }
-    }
-    
-    return session;
-}
-
-//End Toey
 
 -(void)setViewController:(MasternodesViewController*)controller {
     masternodeCon = controller;
