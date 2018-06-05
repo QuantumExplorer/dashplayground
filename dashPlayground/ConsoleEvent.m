@@ -25,6 +25,8 @@
     consoleEvent.identifier = [[NSUUID UUID] UUIDString];
     consoleEvent.string = string;
     consoleEvent.creationDate = [NSDate date];
+    consoleEvent.componentNames = [NSArray array];
+    consoleEvent.values = [NSMutableDictionary dictionary];
     return consoleEvent;
 }
 
@@ -40,11 +42,15 @@
 }
 
 -(NSString*)printOut {
-    NSArray * keys = [self.values objectsForKeys:self.componentNames notFoundMarker:[NSNull null]];
-    NSRange range = NSMakeRange(0, [keys count]);
-    NSMutableData *data = [NSMutableData dataWithLength:sizeof(id) * [keys count]];
-    [keys getObjects:(__unsafe_unretained id *)data.mutableBytes range:range];
-    return [NSString stringWithFormat:@"[%@]: %@",[self.dateFormatter stringFromDate:self.creationDate],[[NSString alloc] initWithFormat:self.string arguments:data.mutableBytes]];
+    if ([self.componentNames count]) {
+        NSArray * keys = [self.values objectsForKeys:self.componentNames notFoundMarker:[NSNull null]];
+        NSRange range = NSMakeRange(0, [keys count]);
+        NSMutableData *data = [NSMutableData dataWithLength:sizeof(id) * [keys count]];
+        [keys getObjects:(__unsafe_unretained id *)data.mutableBytes range:range];
+        return [NSString stringWithFormat:@"[%@]: %@",[self.dateFormatter stringFromDate:self.creationDate],[[NSString alloc] initWithFormat:self.string arguments:data.mutableBytes]];
+    } else {
+        return [NSString stringWithFormat:@"[%@]: %@",[self.dateFormatter stringFromDate:self.creationDate],self.string];
+    }
 }
 
 @end

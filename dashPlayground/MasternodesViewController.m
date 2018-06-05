@@ -26,11 +26,15 @@
 @property (strong) IBOutlet NSTableView *tableView;
 @property (strong) ConsoleEventArray * consoleEvents;
 @property (strong) IBOutlet NSTextView *consoleTextView;
+@property (strong) IBOutlet NSScrollView *consoleScrollView;
+
 
 //Masternode control
 @property (strong) IBOutlet NSButtonCell *createAmiButton;
 @property (strong) ConsoleEventArray * masternodeConsoleEvents;
 @property (strong) IBOutlet NSButton *connectButton;
+@property (strong) IBOutlet NSButton *configureButton;
+@property (strong) IBOutlet NSButton *startButton;
 
 //Instance control
 @property (strong) IBOutlet NSButton *startInstanceButton;
@@ -63,6 +67,12 @@ NSString *terminalHeadString = @"";
     [super viewDidLoad];
     [self setUpConsole];
     masternodeController = self;
+}
+
+#pragma sentinel
+
+- (IBAction)setupSentinel:(id)sender {
+    
 }
 
 - (IBAction)retreiveInstances:(id)sender {
@@ -127,6 +137,7 @@ NSString *terminalHeadString = @"";
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    self.setupButton.enabled = false;
     RepositoriesModalViewController *repoController = [[RepositoriesModalViewController alloc] init];
     [repoController showRepoWindow:object controller:masternodeController];
     
@@ -182,8 +193,9 @@ NSString *terminalHeadString = @"";
         return;
     }
     else {
+        
         [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
+        __block NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start dashd server.", [object valueForKey:@"instanceId"]];
         [self addStringEventToMasternodeConsole:eventMsg];
         
         if (![[DPLocalNodeController sharedInstance] dashDPath]) {
@@ -198,12 +210,37 @@ NSString *terminalHeadString = @"";
             }
         }
         else{
-            [[DPMasternodeController sharedInstance] startDashd:object onViewCon:masternodeController clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
-                if (!success) {
-                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                    dict[NSLocalizedDescriptionKey] = errorMessage;
-                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                    [[NSApplication sharedApplication] presentError:error];
+            [[DPLocalNodeController sharedInstance] checkDash:^(BOOL active) {
+                if (active) {
+                    eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
+                    [self addStringEventToMasternodeConsole:eventMsg];
+                    [[DPMasternodeController sharedInstance] startDashd:object onViewCon:masternodeController clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                        if (!success) {
+                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                            dict[NSLocalizedDescriptionKey] = errorMessage;
+                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                            [[NSApplication sharedApplication] presentError:error];
+                        }
+                    }];
+                } else {
+                    [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
+                        if (success) {
+                            eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
+                            [self addStringEventToMasternodeConsole:eventMsg];
+                            [[DPMasternodeController sharedInstance] startDashd:object onViewCon:masternodeController clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                                if (!success) {
+                                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                                    dict[NSLocalizedDescriptionKey] = errorMessage;
+                                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                                    [[NSApplication sharedApplication] presentError:error];
+                                }
+                            }];
+                        }
+                        else{
+                            eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Unable to connect dashd server.", [object valueForKey:@"instanceId"]];
+                            [self addStringEventToMasternodeConsole:eventMsg];
+                        }
+                    }];
                 }
             }];
         }
@@ -355,6 +392,7 @@ NSString *terminalHeadString = @"";
             self.consoleTextView.string = consoleEventString;
         }
     }
+    [self.consoleScrollView scrollRectToVisible:CGRectMake(self.consoleScrollView.contentSize.width - 1, self.consoleScrollView.contentSize.height -1 , 1, 1) ];
 }
 
 -(void)setTerminalCommandState:(NSNumber*)state {
@@ -388,8 +426,13 @@ NSString *terminalHeadString = @"";
     
     NSError *error;
     NSString *response = [[DPMasternodeController sharedInstance] getResponseExecuteCommand:string.stringValue onSSH:self.ssh error:error];
+    
     if(![response isEqualToString:@""] || [response length] != 0) {
         terminalString = [NSString stringWithFormat:@"%@ %@", terminalHeadString, response];
+        [self addStringEventToTerminalConsole:terminalString];
+    }
+    else if(error){
+        terminalString = [NSString stringWithFormat:@"%@ %@", terminalHeadString, [error localizedDescription]];
         [self addStringEventToTerminalConsole:terminalString];
     }
     
@@ -408,20 +451,25 @@ NSString *terminalHeadString = @"";
     }
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
-//    //Set up button
-//    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
-//        self.setupButton.enabled = true;
-//    }
-//    else{
-//        self.setupButton.enabled = false;
-//    }
-    self.setupButton.enabled = true;
+    //Set up button
+    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed
+        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running
+        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+        self.setupButton.enabled = false;
+    }
+    else{
+        self.setupButton.enabled = true;
+    }
     
     //Create AMI button
-    if ([[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
+    //Start button
+    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running
+        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Configured) {
+        self.startButton.enabled = true;
         self.createAmiButton.enabled = true;
     }
-    else if ([[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_Checking){
+    else{
+        self.startButton.enabled = false;
         self.createAmiButton.enabled = false;
     }
 }

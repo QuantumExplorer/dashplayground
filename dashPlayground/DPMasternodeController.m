@@ -92,7 +92,7 @@
     error = nil;
     [ssh.channel execute:command error:&error];
     if (error) {
-        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
+        NSLog(@"SSH: error executing command %@ - %@", command, error);
         return;
     }
 }
@@ -101,7 +101,7 @@
     error = nil;
     NSString *response = [ssh.channel execute:command error:&error];
     if (error) {
-        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
+        NSLog(@"SSH: error executing command %@ - %@", command, error);
         return [NSString stringWithFormat:@"%@", [error localizedDescription]];
     }
     return response;
@@ -779,11 +779,15 @@
         [viewCon addStringEventToMasternodeConsole:eventMsg];
         [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
             if (success) {
-                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully.", [masternode valueForKey:@"instanceId"]];
-                [viewCon addStringEventToMasternodeConsole:eventMsg];
-                [self configureRemoteMasternode:object];
-                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
-                [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                [self configureRemoteMasternode:object clb:^(BOOL success, NSString *message) {
+                    if(success != YES) {
+                        return clb(success,message);
+                    }
+                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully.", [masternode valueForKey:@"instanceId"]];
+                    [viewCon addStringEventToMasternodeConsole:eventMsg];
+                    [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                    [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                }];
             }
             return clb(success,message);
         }];
@@ -812,11 +816,15 @@
                     [[DPDataStore sharedInstance] saveContext];
                     [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
                         if (success) {
-                            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully.", [masternode valueForKey:@"instanceId"]];
-                            [viewCon addStringEventToMasternodeConsole:eventMsg];
-                            [self configureRemoteMasternode:object];
-                            [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
-                            [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                            [self configureRemoteMasternode:object clb:^(BOOL success, NSString *message) {
+                                if(success != YES) {
+                                    return clb(success,message);
+                                }
+                                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully.", [masternode valueForKey:@"instanceId"]];
+                                [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                                [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                            }];
                         }
                         return clb(success,message);
                     }];
@@ -834,25 +842,40 @@
     
 }
 
-- (void)configureRemoteMasternode:(NSManagedObject*)masternode {
+- (void)configureRemoteMasternode:(NSManagedObject*)masternode clb:(dashClb)clb {
     
-    NSString *localFilePath = [self createConfigDashFileForMasternode:masternode];
+    [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        if(success == YES) {
+            NSString *localFilePath = [self createConfigDashFileForMasternode:masternode];
+            NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
+            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+            if (uploadSuccess != YES) {
+                NSLog(@"%@",[sshSession lastError]);
+                clb(NO, [[sshSession lastError] localizedDescription]);
+            }
+            else {
+                clb(YES, nil);
+            }
+        }
+    }];
     
-    CkoSFtp * sftp = [self sftpIn:[masternode valueForKey:@"publicIP"]];
-    if (!sftp) return;
-    
-    //  Upload from the local file to the SSH server.
-    //  Important -- the remote filepath is the 1st argument,
-    //  the local filepath is the 2nd argument;
-    NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
-    
-    BOOL success = [sftp UploadFileByName: remoteFilePath localFilePath: localFilePath];
-    if (success != YES) {
-        NSLog(@"%@",sftp.LastErrorText);
-        return;
-    }
-    
-    NSLog(@"%@",@"Success.");
+//    NSString *localFilePath = [self createConfigDashFileForMasternode:masternode];
+//
+//    CkoSFtp * sftp = [self sftpIn:[masternode valueForKey:@"publicIP"]];
+//    if (!sftp) return;
+//
+//    //  Upload from the local file to the SSH server.
+//    //  Important -- the remote filepath is the 1st argument,
+//    //  the local filepath is the 2nd argument;
+//    NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
+//
+//    BOOL success = [sftp UploadFileByName: remoteFilePath localFilePath: localFilePath];
+//    if (success != YES) {
+//        NSLog(@"%@",sftp.LastErrorText);
+//        return;
+//    }
+//
+//    NSLog(@"%@",@"Success.");
 }
 
 
@@ -891,21 +914,32 @@
                 return;
             }
             //  Send some commands and get the output.
-            NSString *exportCommand = @"export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.8/lib && dashd";
+//            NSString *exportCommand = @"export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.8/lib && dashd";
             NSError *error = nil;
-            NSString *output = [ssh.channel execute:exportCommand error:&error];
+//            NSString *output = [ssh.channel execute:exportCommand error:&error];
+            
+            //start dashd
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd...", [masternode valueForKey:@"instanceId"]];
+                [viewCon addStringEventToMasternodeConsole:eventMsg];
+            });
+            [ssh.channel execute:@"cd ~/src; ./dashd" error:&error];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd successfully.", [masternode valueForKey:@"instanceId"]];
+                [viewCon addStringEventToMasternodeConsole:eventMsg];
+            });
+            
             if(error != nil) {
                 NSLog(@"%@",[error localizedDescription]);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], [error localizedDescription]];
                     [viewCon addStringEventToMasternodeConsole:eventMsg];
-                    clb(NO,nil,[error localizedDescription]);
                 });
-                return;
             }
             
             sleep(20);
             NSString * previousSyncStatus = @"MASTERNODE_SYNC_INITIAL";
+            int countConnect = 0;
             while (1) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -testnet -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ mnsync status", [masternode valueForKey:@"instanceId"], publicIP, rpcPassword];
@@ -913,6 +947,7 @@
                 });
                 NSError * error = nil;
                 NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error];
+                countConnect = countConnect+1;
                 
                 if (error) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -957,7 +992,21 @@
                                 });
                             }
                         }
+                        else if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_INITIAL"]) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Error: this masternode synchronization status is initial. Please wait until synchronization is finished.", [masternode valueForKey:@"instanceId"]];
+                                [viewCon addStringEventToMasternodeConsole:eventMsg];
+                            });
+                            break;
+                        }
                     }
+                }
+                if(countConnect >= 10) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Error: could not retrieve server information! Make sure you already configure it.", [masternode valueForKey:@"instanceId"]];
+                        [viewCon addStringEventToMasternodeConsole:eventMsg];
+                    });
+                    break;
                 }
                 sleep(5);
             }
@@ -1274,6 +1323,75 @@
     return TRUE;
 }
 
+-(void)checkMasternodeIsProperlyInstalled:(NSManagedObject*)masternode onSSH:(NMSSHSession*)ssh {
+    [self IsMasternodeIsProperlyInstalled:[masternode valueForKey:@"publicIP"] onSSH:ssh dashClb:^(BOOL success, NSString *message) {
+        if(success == YES) {
+            [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+        }
+        else {
+            [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+        }
+    }];
+}
+
+-(void)IsMasternodeIsProperlyInstalled:(NSString*)publicIP onSSH:(NMSSHSession*)ssh dashClb:(dashClb)clb {
+//    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        NSError *error;
+        
+        //does this masternode execute .autogen.sh?
+        NSString *response = [ssh.channel execute:@"ls ~/src/dash/configure" error:&error];
+        if(error || [response length] == 0) {//no
+            
+            [[SshConnection sharedInstance] sendDashCommandsList:@[@"autogen.sh",@"configure"] onSSH:ssh onPath:@"~/src/dash/" error:error dashClb:^(BOOL success, NSString *call) {
+                NSLog(@"SSH-%@: %@", publicIP, call);
+                clb(success,call);
+            }];
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                NSLog(@"SSH-%@: %@", publicIP, message);
+                clb(success,message);
+            }];
+        }
+        else {//yes
+            //does this masternode execute ./configure?
+            NSString *response = [ssh.channel execute:@"ls ~/src/dash/Makefile" error:&error];
+            if(error || [response length] == 0) {//no
+                
+                [[SshConnection sharedInstance] sendDashCommandsList:@[@"configure"] onSSH:ssh onPath:@"~/src/dash/" error:error dashClb:^(BOOL success, NSString *call) {
+                    NSLog(@"SSH-%@: %@", publicIP, call);
+                    clb(success,call);
+                }];
+                
+                [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                    NSLog(@"SSH-%@: %@", publicIP, message);
+                    clb(success,message);
+                }];
+            }
+            else {//yes
+                //does this masternode execute ./make?
+                NSString *response = [ssh.channel execute:@"ls ~/src/dash/src/dashd" error:&error];
+                if(error || [response length] == 0) {//no
+                    
+                    [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                        NSLog(@"SSH-%@: %@", publicIP, message);
+                        clb(success,message);
+                    }];
+                    
+                }
+                else {
+                    clb(YES,nil);
+                }
+            }
+        }
+        
+        
+    });
+}
+
 -(void)checkMasternode:(NSManagedObject*)masternode {
     [self checkMasternode:masternode saveContext:TRUE clb:nil];
 }
@@ -1389,7 +1507,7 @@
     }
     
     NSError * error = nil;
-    [[SshConnection sharedInstance] sendDashCommandsList:@[@"rm -rf {banlist,fee_estimates,budget,governance,mncache,mnpayments,netfulfilled,peers}.dat"] onSSH:ssh onPath:@"cd ~/.dashcore" error:error percentageClb:^(NSString *call, float percentage) {
+    [[SshConnection sharedInstance] sendDashCommandsList:@[@"rm -rf {banlist,fee_estimates,budget,governance,mncache,mnpayments,netfulfilled,peers}.dat"] onSSH:ssh onPath:@"cd ~/.dashcore" error:error dashClb:^(BOOL success, NSString *call) {
         
     }];
     [ssh disconnect];

@@ -31,7 +31,7 @@ MasternodesViewController *masternodeCon;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
         __block NMSSHSession *ssh;
-        [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:YES clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
             ssh = sshSession;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [masternodeCon addStringEventToMasternodeConsole:message];
@@ -62,38 +62,47 @@ MasternodesViewController *masternodeCon;
         }
         
         //clone repository
-        [ssh.channel startShell:&error];
-        error = nil;
-        [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error percentageClb:^(NSString *call, float percentage) {
+        [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSLog(@"%@ %.2f",call,percentage);
-                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
+//                NSLog(@"%@ %.2f",call,percentage);
+//                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
                 [masternodeCon addStringEventToMasternodeConsole:call];
+                [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             });
         }];
         
         //now let's make all this shit
-//        [ssh.channel startShell:&error];
-        error = nil;
-        [[SshConnection sharedInstance] sendDashCommandsList:@[@"./autogen.sh",@"./configure",@"make"] onSSH:ssh onPath:@"cd ~/src/dash;" error:error percentageClb:^(NSString *call, float percentage) {
+        __block BOOL isSuccess = YES;
+        [[SshConnection sharedInstance] sendDashCommandsList:@[@"autogen.sh",@"configure"] onSSH:ssh onPath:@"~/src/dash/" error:error dashClb:^(BOOL success, NSString *call) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [masternodeCon addStringEventToMasternodeConsole:call];
+                if(success == NO) {
+                    isSuccess = NO;
+                    return;
+                }
             });
         }];
-//        [self sendDashCommandsList:@[@"./autogen.sh",@"./configure CPPFLAGS='-I/usr/local/BerkeleyDB.4.8/include -O2' LDFLAGS='-L/usr/local/BerkeleyDB.4.8/lib'",@"make",@"mkdir ~/.dashcore/",@"cp src/dashd ~/.dashcore/",@"cp src/dash-cli ~/.dashcore/",@"sudo cp src/dashd /usr/bin/dashd",@"sudo cp src/dash-cli /usr/bin/dash-cli"] onSSH:ssh onPath:@"cd src/dash;" error:error percentageClb:^(NSString *call, float percentage) {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                //                NSLog(@"%@ %.2f",call,percentage);
-//                //                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-//                NSString *string = [NSString stringWithFormat:@"Done %.2f%%%%",percentage];
-//                [masternodeCon addStringEventToMasternodeConsole:string];
-//            });
-//        }];
+        
+        [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [masternodeCon addStringEventToMasternodeConsole:message];
+                if(success == NO) {
+                    isSuccess = NO;
+                    return;
+                }
+            });
+        }];
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            if(isSuccess == NO) {
+                [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                [[DialogAlert sharedInstance] showWarningAlert:@"Set up" message:@"Set up failed!"];
+                return;
+            }
             [ssh disconnect];
             [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
-            [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
-            
             [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];

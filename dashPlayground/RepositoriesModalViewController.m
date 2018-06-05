@@ -159,10 +159,8 @@ MasternodesViewController *masternodeCon2;
         //Change masternode state
         masternodeCon2.setupButton.enabled = false;
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([[masternodeObject valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
-                [masternodeObject setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
-                [[DPDataStore sharedInstance] saveContext:masternodeObject.managedObjectContext];
-            }
+            [masternodeObject setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+            [[DPDataStore sharedInstance] saveContext:masternodeObject.managedObjectContext];
         });        
         
         [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.

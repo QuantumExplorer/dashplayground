@@ -48,7 +48,7 @@
                 NSError *error = nil;
                 [session.channel startShell:&error];
                 if (error) {
-                    clb(YES, [NSString stringWithFormat:@"SSH: error %@", [error localizedDescription]], session);
+                    clb(NO, [NSString stringWithFormat:@"SSH: error %@", [error localizedDescription]], session);
                 }
                 else {
                     clb(YES, @"SSH: authentication succeeded!", session);
@@ -65,74 +65,77 @@
 
 //Toey
 
--(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh error:(NSError*)error percentageClb:(dashPercentageClb)clb {
+-(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh error:(NSError*)error dashClb:(dashClb)clb {
     
     NSString *command = [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath];
-    [self sendWriteCommand:command onSSH:ssh error:error percentageClb:^(NSString *call, float percentage) {
-        clb(call,0);
+    clb(YES,command);
+    [self sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
+        clb(success,call);
     }];
 }
 
--(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error percentageClb:(dashPercentageClb)clb {
+-(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error dashClb:(dashClb)clb {
     
-    NSMutableString *commandStr = [NSMutableString string];
-    [commandStr appendString:path];
     
     for (NSUInteger index = 0;index<[commands count];index++) {
         NSString * command = [commands objectAtIndex:index];
         
-        if((index+1) != [commands count]) {
-            [commandStr appendString:[NSString stringWithFormat:@" %@;",command]];
-        }
-        else {
-            [commandStr appendString:[NSString stringWithFormat:@" %@",command]];
-        }
+        NSMutableString *commandStr = [NSMutableString string];
+        [commandStr appendString:path];
+        [commandStr appendString:command];
+        
+//        NSString *string = [NSString stringWithFormat:@"executing command %@...", command];
+//        clb(YES,string);
+        
+        __block BOOL isSucceed = YES;
+        [self sendExecuteCommand:commandStr onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+            clb(success,message);
+            isSucceed = success;
+        }];
+        if(!isSucceed) break;
         
         //        int currentCommand = (int)index;
         //        currentCommand = currentCommand+1;
         //        clb(command,(currentCommand*100)/[commands count]);
     }
-    
-    error = nil;
-    
-    [self sendWriteCommand:commandStr onSSH:ssh error:error percentageClb:^(NSString *call, float percentage) {
-        clb(call,0);
-    }];
+
 }
 
 -(void)sendWriteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error percentageClb:(dashPercentageClb)clb {
     
-    NSString *string = [NSString stringWithFormat:@"executing command %@", command];
+    NSString *executeStr = [NSString stringWithFormat:@"executing command %@", command];
     
     error = nil;
-    [ssh.channel write:command error:&error timeout:@100];
+    [ssh.channel write:command error:&error];
     if (error) {
-        NSLog(@"SSH: error executing command %@ with reason %@", command, error);
-        NSString *errorStr = [NSString stringWithFormat:@"SSH: error executing command %@ with reason %@", command, error];
+        NSLog(@"SSH: error executing command %@ - %@", command, error);
+        NSString *errorStr = [NSString stringWithFormat:@"SSH: error executing command %@ - %@", command, error];
         clb(errorStr,0);
         return;
     }
     else {
-        clb(string,0);
+        clb(executeStr,0);
     }
 }
 
--(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error percentageClb:(dashPercentageClb)clb {
+-(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error dashClb:(dashClb)clb {
     
-    NSString *string = [NSString stringWithFormat:@"executing command %@", command];
-    
+    NSString *executeStr = [NSString stringWithFormat:@"executing command %@", command];
+    clb(YES, executeStr);
+//    [ssh.channel startShell:&error];
     error = nil;
-    [ssh.channel execute:command error:&error];
+    NSString *response = [ssh.channel execute:command error:&error];
     if (error) {
-        NSLog(@"SSH: error executing command %@ with reason %@", command, [error localizedDescription]);
-        NSString *errorStr = [NSString stringWithFormat:@"SSH: error executing command %@ with reason %@", command, [error localizedDescription]];
-        clb(errorStr,0);
+        NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
+        NSString *errorStr = [NSString stringWithFormat:@"SSH: error executing command %@ - %@", command, [error localizedDescription]];
+        clb(NO, errorStr);
         return;
     }
     else {
-        clb(string,0);
+        NSLog(@"SSH: %@", response);
+        clb(YES, response);
     }
-}
+} 
 
 //End Toey
 

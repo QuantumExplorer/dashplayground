@@ -49,8 +49,9 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 //- (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
 
-- (void)checkMasternodeIsInstalled:(NSManagedObject*)masternode clb:(dashBoolClb)clb;
+-(void)checkMasternodeIsInstalled:(NSManagedObject*)masternode clb:(dashBoolClb)clb;
 -(void)updateGitInfoForMasternode:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
+-(void)checkMasternodeIsProperlyInstalled:(NSManagedObject*)masternode onSSH:(NMSSHSession*)ssh;
 
 -(NMSSHSession*)connectInstance:(NSManagedObject*)masternode;
 -(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;

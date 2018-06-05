@@ -962,7 +962,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="do3-4g-tdD">
-                                                            <rect key="frame" x="198" y="1" width="199" height="17"/>
+                                                            <rect key="frame" x="197.5" y="1" width="199" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cYd-Oe-egg">
@@ -1034,7 +1034,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="4oB-tx-dY6">
-                                                            <rect key="frame" x="534" y="1" width="239" height="17"/>
+                                                            <rect key="frame" x="533.5" y="1" width="239" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cWy-zV-17y">
@@ -1718,7 +1718,7 @@
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vDA-Fh-ysu">
                                             <rect key="frame" x="13" y="37" width="120" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JlJ-wX-pc3">
+                                            <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JlJ-wX-pc3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -1729,13 +1729,10 @@
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CrD-Jq-WXM">
                                             <rect key="frame" x="13" y="63" width="120" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Check" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vaI-0K-Ipd">
+                                            <buttonCell key="cell" type="push" title="Check" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vaI-0K-Ipd">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
-                                            <connections>
-                                                <action selector="startRemote:" target="Inw-N2-PBT" id="7nz-Ha-Eqe"/>
-                                            </connections>
                                         </button>
                                     </subviews>
                                 </view>
@@ -1818,10 +1815,10 @@
                                             <buttonCell key="cell" type="push" title="Set Up/Update" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kHc-e0-1ki">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
+                                                <connections>
+                                                    <action selector="setupSentinel:" target="Inw-N2-PBT" id="gks-5E-h8z"/>
+                                                </connections>
                                             </buttonCell>
-                                            <connections>
-                                                <action selector="setUp:" target="Inw-N2-PBT" id="xUb-O1-ctE"/>
-                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cqs-XI-SNq">
                                             <rect key="frame" x="13" y="88" width="120" height="32"/>
@@ -1838,9 +1835,6 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
-                                            <connections>
-                                                <action selector="startRemote:" target="Inw-N2-PBT" id="7lh-jj-1Mm"/>
-                                            </connections>
                                         </button>
                                     </subviews>
                                 </view>
@@ -1926,11 +1920,14 @@
                     <connections>
                         <outlet property="arrayController" destination="hRl-KI-0Yo" id="YSO-AT-ffj"/>
                         <outlet property="commandTextField" destination="GRs-Hq-axs" id="HFF-Qg-teB"/>
+                        <outlet property="configureButton" destination="uJC-Ji-4Vr" id="BG4-sw-7O5"/>
                         <outlet property="connectButton" destination="qjE-rg-RjO" id="bCC-dO-gTc"/>
+                        <outlet property="consoleScrollView" destination="8Xb-Tt-uZF" id="R6f-Ww-8zK"/>
                         <outlet property="consoleTabSegmentedControl" destination="7yz-li-jg8" id="fiK-6P-uyu"/>
                         <outlet property="consoleTextView" destination="k66-ZE-8e4" id="Zae-IX-p4A"/>
                         <outlet property="createAmiButton" destination="Pje-IL-Cbp" id="dzI-ui-xDV"/>
                         <outlet property="setupButton" destination="ck6-t0-kyP" id="n2O-NH-feR"/>
+                        <outlet property="startButton" destination="vDA-Fh-ysu" id="LSk-Jg-piH"/>
                         <outlet property="startInstanceButton" destination="lBj-kM-swQ" id="VpN-uE-0u4"/>
                         <outlet property="tableView" destination="fON-g0-YwV" id="2uB-SR-7xN"/>
                     </connections>
