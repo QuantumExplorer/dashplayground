@@ -93,7 +93,7 @@ NSMutableArray * availabilityRegions;
         [selectRegionArray addObject:[availabilityRegions objectAtIndex:selectRegion]];
     }
     
-    [[DPMasternodeController sharedInstance] setUpInstances:startCountField onBranch:branchObject clb:nil onRegion:selectRegionArray];
+    [[DPMasternodeController sharedInstance] setUpInstances:startCountField onBranch:branchObject clb:nil onRegion:selectRegionArray serverType:@"t2.small"];
     [_availWindowController.window close];
 }
 

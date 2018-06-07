@@ -21,13 +21,13 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 -(void)setViewController:(MasternodesViewController*)controller;
 
--(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb onRegion:(NSMutableArray*)regionArray;
-- (void)runInstances:(NSInteger)count clb:(dashStateClb)clb;
+- (void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb onRegion:(NSMutableArray*)regionArray serverType:(NSString*)serverType;
+- (void)runInstances:(NSInteger)count clb:(dashStateClb)clb serverType:(NSString*)serverType;
 - (void)startInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)stopInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)terminateInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)getInstancesClb:(dashClb)clb;
-- (void)createInstanceWithInitialAMI:(dashStateClb)clb;
+- (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType;
 - (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onViewCon:(MasternodesViewController*)viewCon clb:(dashClb)clb;
@@ -52,7 +52,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)checkMasternodeIsInstalled:(NSManagedObject*)masternode clb:(dashBoolClb)clb;
 -(void)updateGitInfoForMasternode:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
 -(void)checkMasternodeIsProperlyInstalled:(NSManagedObject*)masternode onSSH:(NMSSHSession*)ssh;
-
+- (void)checkMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
 -(NMSSHSession*)connectInstance:(NSManagedObject*)masternode;
 -(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;
 

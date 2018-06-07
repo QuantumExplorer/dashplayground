@@ -64,9 +64,12 @@ MasternodesViewController *masternodeCon;
         //clone repository
         [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
             dispatch_async(dispatch_get_main_queue(), ^{
-//                NSLog(@"%@ %.2f",call,percentage);
-//                [masternode setValue:@(percentage) forKey:@"operationPercentageDone"];
-                [masternodeCon addStringEventToMasternodeConsole:call];
+                if(success == YES) {
+                    [masternodeCon addStringEventToMasternodeConsole:@"git clone successfully."];
+                }
+                else {
+                    [masternodeCon addStringEventToMasternodeConsole:call];
+                }
                 [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             });

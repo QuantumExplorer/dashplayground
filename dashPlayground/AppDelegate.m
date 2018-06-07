@@ -104,11 +104,11 @@
         if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
         }
-        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
-            [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-                [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
-            }];
-        }
+//        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+//            [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+//                [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
+//            }];
+//        }
         else {
             //[[DPMasternodeController sharedInstance] checkSentinel:masternode];
         }

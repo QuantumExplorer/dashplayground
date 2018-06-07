@@ -69,10 +69,30 @@ NSString *terminalHeadString = @"";
     masternodeController = self;
 }
 
-#pragma sentinel
-
 - (IBAction)setupSentinel:(id)sender {
-    
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) {
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to start instance!" message:@"Please make sure you already select an instance."];
+        return;
+    }
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] setUpMasternodeSentinel:object clb:^(BOOL success, NSString *message) {
+        [self addStringEventToMasternodeConsole:message];
+    }];
+}
+
+- (IBAction)checkSentinel:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) {
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to start instance!" message:@"Please make sure you already select an instance."];
+        return;
+    }
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [[DPMasternodeController sharedInstance] checkMasternodeSentinel:object clb:^(BOOL success, NSString *message) {
+        [self addStringEventToMasternodeConsole:message];
+    }];
 }
 
 - (IBAction)retreiveInstances:(id)sender {
@@ -311,7 +331,7 @@ NSString *terminalHeadString = @"";
     if ([alert runModal] == NSAlertFirstButtonReturn) {
         [self addStringEvent:FS(@"Trying to create a new instance.")];
         
-        [[DPMasternodeController sharedInstance] createInstanceWithInitialAMI:^(BOOL success,InstanceState state, NSString *message) {
+        [[DPMasternodeController sharedInstance] createInstanceWithInitialAMI:^(BOOL success, InstanceState state, NSString *message) {
             if(success)
             {
                 [self addStringEvent:FS(@"new instance is created succesfully.")];
@@ -319,7 +339,7 @@ NSString *terminalHeadString = @"";
             else{
                 [self addStringEvent:FS(@"creating new instance failure.")];
             }
-        }];
+        } serverType:@"t2.small"];
     }
     
 }
@@ -460,6 +480,7 @@ NSString *terminalHeadString = @"";
     else{
         self.setupButton.enabled = true;
     }
+//    self.setupButton.enabled = true;
     
     //Create AMI button
     //Start button

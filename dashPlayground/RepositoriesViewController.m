@@ -15,7 +15,6 @@
 
 @interface RepositoriesViewController ()
 
-@property (strong) IBOutlet NSArrayController *arrayController;
 @property (strong) IBOutlet NSTableView *tableView;
 @property (strong) IBOutlet NSTextField *repositoryAddField;
 @property (strong) IBOutlet NSTextField *branchAddField;
