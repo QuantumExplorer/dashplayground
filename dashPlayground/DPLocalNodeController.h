@@ -20,23 +20,23 @@
 @property (nonatomic,copy) NSString * dashCliPath;
 @property (nonatomic,copy) NSString * dashDPath;
 
-- (void)startDash:(dashClb)clb;
+- (void)startDash:(dashClb)clb forChain:(NSString*)chainNetwork;
 
-- (void)stopDash:(dashClb)clb;
+- (void)stopDash:(dashClb)clb forChain:(NSString*)chainNetwork;
 
-- (void)checkDash:(dashActiveClb)clb;
+- (void)checkDash:(dashActiveClb)clb forChain:(NSString*)chainNetwork;
 
 - (void)checkDashStopped:(dashActiveClb)clb;
 
--(void)checkSyncStatus:(dashSyncClb)clb;
+-(void)checkSyncStatus:(dashSyncClb)clb forChain:(NSString*)chainNetwork;
 
 -(NSDictionary*)getSyncStatus;
 
--(NSArray*)outputs;
+-(NSArray*)outputs:(NSString*)chainNetwork;
 
 - (NSData *)runDashRPCCommand:(NSString *)commandToRun;
 
--(NSString *)runDashRPCCommandString:(NSString *)commandToRun;
+-(NSString *)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork;
 
 -(NSDictionary *)runDashRPCCommandArray:(NSString *)commandToRun;
 

@@ -12,7 +12,11 @@
 
 typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
-@interface DPDataStore : NSObject
+@interface DPDataStore : NSObject {
+    NSString *_chainNetwork;
+}
+
+@property(strong, nonatomic, readwrite) NSString *chainNetwork;
 
 +(DPDataStore*)sharedInstance;
 

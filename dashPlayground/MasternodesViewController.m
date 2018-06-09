@@ -19,6 +19,8 @@
 #import "MasternodeStateTransformer.h"
 #import "DPMasternodeController.h"
 #import <NMSSH/NMSSH.h>
+#import "SentinelStateTransformer.h"
+#import "ChainSelectionViewController.h"
 
 @interface MasternodesViewController ()
 
@@ -91,7 +93,19 @@ NSString *terminalHeadString = @"";
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     [[DPMasternodeController sharedInstance] checkMasternodeSentinel:object clb:^(BOOL success, NSString *message) {
-        [self addStringEventToMasternodeConsole:message];
+        if([message length] == 0) {
+            [self addStringEventToMasternodeConsole:@"sentinel is now working."];
+            [object setValue:@(SentinelState_Running) forKey:@"sentinelState"];
+            [[DPDataStore sharedInstance] saveContext];
+        }
+        else if (success != YES){
+            [object setValue:@(SentinelState_Error) forKey:@"sentinelState"];
+            [[DPDataStore sharedInstance] saveContext];
+            [self addStringEventToMasternodeConsole:message];
+        }
+        else {
+            [self addStringEventToMasternodeConsole:message];
+        }
     }];
 }
 
@@ -144,7 +158,7 @@ NSString *terminalHeadString = @"";
     if (row == -1) return;
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     if (![object valueForKey:@"key"]) {
-        NSString * key = [[[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"-testnet masternode genkey"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString * key = [[[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"masternode genkey" forChain:[object valueForKey:@"chainNetwork"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         if ([key length] == 51) {
             [object setValue:key forKey:@"key"];
         }
@@ -176,14 +190,19 @@ NSString *terminalHeadString = @"";
     if (row == -1) return;
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:object onViewCon:masternodeController clb:^(BOOL success, NSString *message) {
-        if (!success) {
-            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-            dict[NSLocalizedDescriptionKey] = message;
-            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-            [[NSApplication sharedApplication] presentError:error];
-        }
-    }];
+    
+    ChainSelectionViewController *chainView = [[ChainSelectionViewController alloc] init];
+    [chainView showChainSelectionWindow:object];
+    
+//    [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:object clb:^(BOOL success, NSString *message) {
+//        if (!success) {
+//            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//            dict[NSLocalizedDescriptionKey] = message;
+//            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+//            [[NSApplication sharedApplication] presentError:error];
+//        }
+//        [self addStringEventToMasternodeConsole:message];
+//    }];
 }
 
 - (IBAction)startRemote:(id)sender {
@@ -234,35 +253,37 @@ NSString *terminalHeadString = @"";
                 if (active) {
                     eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
                     [self addStringEventToMasternodeConsole:eventMsg];
-                    [[DPMasternodeController sharedInstance] startDashd:object onViewCon:masternodeController clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                    [[DPMasternodeController sharedInstance] startDashd:object clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
                         if (!success) {
                             NSMutableDictionary *dict = [NSMutableDictionary dictionary];
                             dict[NSLocalizedDescriptionKey] = errorMessage;
                             NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
                             [[NSApplication sharedApplication] presentError:error];
                         }
+                        [self addStringEventToMasternodeConsole:errorMessage];
                     }];
                 } else {
                     [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
                         if (success) {
                             eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
                             [self addStringEventToMasternodeConsole:eventMsg];
-                            [[DPMasternodeController sharedInstance] startDashd:object onViewCon:masternodeController clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                            [[DPMasternodeController sharedInstance] startDashd:object clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
                                 if (!success) {
                                     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
                                     dict[NSLocalizedDescriptionKey] = errorMessage;
                                     NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
                                     [[NSApplication sharedApplication] presentError:error];
                                 }
+                                [self addStringEventToMasternodeConsole:errorMessage];
                             }];
                         }
                         else{
                             eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Unable to connect dashd server.", [object valueForKey:@"instanceId"]];
                             [self addStringEventToMasternodeConsole:eventMsg];
                         }
-                    }];
+                    } forChain:[object valueForKey:@"chainNetwork"]];
                 }
-            }];
+            } forChain:[[DPDataStore sharedInstance] chainNetwork]];
         }
     }
 }
@@ -381,6 +402,7 @@ NSString *terminalHeadString = @"";
 }
 
 -(void)addStringEventToMasternodeConsole:(NSString*)string {
+    if([string length] == 0) return;
     ConsoleEvent * consoleEvent = [ConsoleEvent consoleEventWithString:string];
     [self.masternodeConsoleEvents addConsoleEvent:consoleEvent];
     [self updateConsole];
@@ -472,15 +494,15 @@ NSString *terminalHeadString = @"";
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
     //Set up button
-    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed
-        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running
-        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
-        self.setupButton.enabled = false;
-    }
-    else{
-        self.setupButton.enabled = true;
-    }
-//    self.setupButton.enabled = true;
+//    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed
+//        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running
+//        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+//        self.setupButton.enabled = false;
+//    }
+//    else{
+//        self.setupButton.enabled = true;
+//    }
+    self.setupButton.enabled = true;
     
     //Create AMI button
     //Start button

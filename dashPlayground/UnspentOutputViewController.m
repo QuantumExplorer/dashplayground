@@ -9,6 +9,7 @@
 #import "UnspentOutputViewController.h"
 #import "DPUnspentController.h"
 #import "DialogAlert.h"
+#import "DPDataStore.h"
 
 @interface UnspentOutputViewController ()
 
@@ -36,17 +37,19 @@
     
     // Do any additional setup after loading the view.
     
+    NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
+    
     [[DPUnspentController sharedInstance] retreiveUnspentOutput:^(BOOL success,NSDictionary *dict, NSString *message){
         if(success)
         {
             self.windowLog.stringValue = @"Dash server started";
-            NSMutableArray * unspentArray = [[DPUnspentController sharedInstance] processOutput:dict];
+            NSMutableArray * unspentArray = [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork];
             [self processUnspentOutput:unspentArray];
         }
         else{
             self.windowLog.stringValue = @"Dash server didn't start up";
         }
-    }];
+    } forChain:chainNetwork];
 }
 
 -(AppDelegate*)appDelegate {
@@ -88,17 +91,19 @@
 
 - (IBAction)pressRefresh:(id)sender {
     
+    NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
+    
     [[DPUnspentController sharedInstance] retreiveUnspentOutput:^(BOOL success,NSDictionary *dict, NSString *message){
         if(success)
         {
             self.windowLog.stringValue = @"Dash server started";
-            NSMutableArray * unspentArray = [[DPUnspentController sharedInstance] processOutput:dict];
+            NSMutableArray * unspentArray = [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork];
             [self processUnspentOutput:unspentArray];
         }
         else{
             self.windowLog.stringValue = @"Dash server didn't start up";
         }
-    }];
+    } forChain:chainNetwork];
 }
 
 - (IBAction)pressCreate:(id)sender {
@@ -114,12 +119,14 @@
     
     if ([alert runModal] == NSAlertFirstButtonReturn) {
         
+        NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
+        
         [[DPUnspentController sharedInstance] createTransaction:self.countField.integerValue label:self.labelField.stringValue amount:1000 allObjects:[self.arrayController.arrangedObjects allObjects] clb:^(BOOL success, NSMutableArray *newObjects) {
             
             if(success) {
                 [self processUnspentOutput:newObjects];
             }
-        }];
+        } forChain:chainNetwork];
         
         [self deSelectAll];
         [self clearInputFields];

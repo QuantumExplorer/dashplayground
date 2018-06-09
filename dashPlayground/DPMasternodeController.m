@@ -25,7 +25,6 @@
 #import "PreferenceViewController.h"
 #import "PreferenceData.h"
 #import <NMSSH/NMSSH.h>
-#import "MasternodesViewController.h"
 #import "SshConnection.h"
 #import "SentinelStateTransformer.h"
 
@@ -579,31 +578,31 @@
     
 }
 
-- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onViewCon:(MasternodesViewController*)viewCon clb:(dashClb)clb {
+- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb {
     __block NSManagedObject * object = masternode;
     if (![masternode valueForKey:@"key"]) {
         [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
             if (!success) return clb(success,message);
             
-            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -testnet masternode genkey", [masternode valueForKey:@"instanceId"]];
-            [viewCon addStringEventToMasternodeConsole:eventMsg];
+            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -%@ masternode genkey", [masternode valueForKey:@"chainNetwork"], [masternode valueForKey:@"instanceId"]];
+            clb(YES,eventMsg);
             
-            NSString * key = [[[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"-testnet masternode genkey"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString * key = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[NSString stringWithFormat:@"-%@ masternode genkey", [masternode valueForKey:@"chainNetwork"]] forChain:[masternode valueForKey:@"chainNetwork"]];
             if ([key length] == 51) {
                 [object setValue:key forKey:@"key"];
                 [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-                [self setUpMasternodeConfiguration:object onViewCon:viewCon clb:clb];
+                [self setUpMasternodeConfiguration:object clb:clb];
             } else {
                 if (!success) return clb(FALSE,@"Error generating masternode key");
             }
-        }];
+        } forChain:[masternode valueForKey:@"chainNetwork"]];
         return;
     }
     
     
     if ([masternode valueForKey:@"transactionId"] && [masternode valueForKey:@"transactionOutputIndex"]) {
         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configuring masternode configuration file...", [masternode valueForKey:@"instanceId"]];
-        [viewCon addStringEventToMasternodeConsole:eventMsg];
+        clb(YES,eventMsg);
         [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
             if (success) {
                 [self configureRemoteMasternode:object clb:^(BOOL success, NSString *message) {
@@ -611,7 +610,7 @@
                         return clb(success,message);
                     }
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully.", [masternode valueForKey:@"instanceId"]];
-                    [viewCon addStringEventToMasternodeConsole:eventMsg];
+                    clb(YES,eventMsg);
                     [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
                     [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                 }];
@@ -623,9 +622,9 @@
             if (success) {
                 
                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configuring masternode configuration file...", [masternode valueForKey:@"instanceId"]];
-                [viewCon addStringEventToMasternodeConsole:eventMsg];
+                clb(YES,eventMsg);
                 
-                NSMutableArray * outputs = [[[DPLocalNodeController sharedInstance] outputs] mutableCopy];
+                NSMutableArray * outputs = [[[DPLocalNodeController sharedInstance] outputs:[masternode valueForKey:@"chainNetwork"]] mutableCopy];
                 
                 if(outputs == nil) {
                     return clb(FALSE,@"No valid outputs (empty) please set up this instance first.");
@@ -648,7 +647,7 @@
                                     return clb(success,message);
                                 }
                                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully.", [masternode valueForKey:@"instanceId"]];
-                                [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                clb(YES,eventMsg);
                                 [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
                                 [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                             }];
@@ -661,7 +660,7 @@
             } else {
                 return clb(FALSE,@"Dash server had a problem starting.");
             }
-        }];
+        } forChain:[masternode valueForKey:@"chainNetwork"]];
     }
 }
 
@@ -669,6 +668,8 @@
     
     [masternode setValue:@(SentinelState_Checking) forKey:@"sentinelState"];
     [[DPDataStore sharedInstance] saveContext];
+    
+    __block NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
@@ -759,7 +760,7 @@
                 if(isContinue == NO) return;
                 
                 error = nil;
-                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:[masternode valueForKey:@"publicIP"] rpcPassword:[masternode valueForKey:@"rpcPassword"] error:&error];
+                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:[masternode valueForKey:@"publicIP"] rpcPassword:[masternode valueForKey:@"rpcPassword"] error:&error forChain:chainNetwork];
                 
                 if (error) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -791,7 +792,6 @@
                     }
                 }
                 
-                //Warning this will rewrite the crontab
                 command = @"echo \"$(echo '* * * * * cd /home/ubuntu/.dashcore/sentinel && ./venv/bin/python bin/sentinel.py 2>&1 >> sentinel-cron.log' ; crontab -l)\" | crontab -";
                 
                 [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
@@ -842,7 +842,7 @@
             NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
             BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
             if (uploadSuccess != YES) {
-                NSLog(@"%@",[sshSession lastError]);
+                NSLog(@"%@",[[sshSession lastError] localizedDescription]);
                 clb(NO, [[sshSession lastError] localizedDescription]);
             }
             else {
@@ -855,25 +855,24 @@
 
 #pragma mark - Start Remote
 
-- (void)startDashd:(NSManagedObject*)masternode onViewCon:(MasternodesViewController *)viewCon clb:(dashInfoClb)clb {
+- (void)startDashd:(NSManagedObject*)masternode clb:(dashInfoClb)clb {
     
     if ([[masternode valueForKey:@"syncStatus"] integerValue] == MasternodeSync_Finished) {
         [self startRemoteMasternode:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
             if (!success || !value) {
                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
-                [viewCon addStringEventToMasternodeConsole:eventMsg];
-                clb(FALSE,nil,errorMessage);
+                clb(FALSE,nil,eventMsg);
             } else {
                 [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
                 [[DPDataStore sharedInstance] saveContext];
                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: masternode started", [masternode valueForKey:@"instanceId"]];
-                [viewCon addStringEventToMasternodeConsole:eventMsg];
-                clb(TRUE,nil,nil);
+                clb(TRUE,nil,eventMsg);
             }
         }];
     } else if ([[masternode valueForKey:@"syncStatus"] integerValue] == MasternodeSync_Initial) {
         __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
         __block NSString * rpcPassword = [masternode valueForKey:@"rpcPassword"];
+        __block NSString * chainNetwork = [masternode valueForKey:@"chainNetwork"];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
             
             __block NMSSHSession *ssh;
@@ -895,19 +894,19 @@
             //start dashd
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd...", [masternode valueForKey:@"instanceId"]];
-                [viewCon addStringEventToMasternodeConsole:eventMsg];
+                clb(TRUE, nil, eventMsg);
             });
             [ssh.channel execute:@"cd ~/src; ./dashd" error:&error];
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd successfully.", [masternode valueForKey:@"instanceId"]];
-                [viewCon addStringEventToMasternodeConsole:eventMsg];
+                clb(TRUE, nil, eventMsg);
             });
             
             if(error != nil) {
                 NSLog(@"%@",[error localizedDescription]);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], [error localizedDescription]];
-                    [viewCon addStringEventToMasternodeConsole:eventMsg];
+                    clb(FALSE, nil, eventMsg);
                 });
             }
             
@@ -916,17 +915,17 @@
             int countConnect = 0;
             while (1) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -testnet -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ mnsync status", [masternode valueForKey:@"instanceId"], publicIP, rpcPassword];
-                    [viewCon addStringEventToMasternodeConsole:eventMsg];
+                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ mnsync status", chainNetwork, [masternode valueForKey:@"instanceId"], publicIP, rpcPassword];
+                    clb(TRUE, nil, eventMsg);
                 });
                 NSError * error = nil;
-                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error];
+                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error forChain:chainNetwork];
                 countConnect = countConnect+1;
                 
                 if (error) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
-                        [viewCon addStringEventToMasternodeConsole:eventMsg];
+                        clb(FALSE, dictionary, eventMsg);
                     });
                     clb(NO,dictionary,nil);
                     break;
@@ -940,11 +939,11 @@
                                     [self startRemoteMasternode:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                                         if (!success) {
                                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
-                                            [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                            clb(FALSE, dictionary, eventMsg);
                                             clb(NO,dictionary,errorMessage);
                                         } else  if (value) {
                                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
-                                            [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                            clb(TRUE, dictionary, eventMsg);
                                             clb(YES,dictionary,nil);
                                         }
                                     }];
@@ -954,7 +953,7 @@
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
                                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
-                                    [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                    clb(FALSE, dictionary, eventMsg);
                                     clb(NO,dictionary,nil);
                                     [[DPDataStore sharedInstance] saveContext];
                                 });
@@ -969,7 +968,7 @@
                         else if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_INITIAL"]) {
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Error: Sync in progress. Must wait until sync is complete to start Masternode.", [masternode valueForKey:@"instanceId"]];
-                                [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                clb(FALSE, nil, eventMsg);
                             });
                             break;
                         }
@@ -978,7 +977,7 @@
                 if(countConnect >= 10) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Error: could not retrieve server information! Make sure you already configure it.", [masternode valueForKey:@"instanceId"]];
-                        [viewCon addStringEventToMasternodeConsole:eventMsg];
+                        clb(FALSE, nil, eventMsg);
                     });
                     break;
                 }
@@ -989,6 +988,7 @@
     } else {
         __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
         __block NSString * rpcPassword = [masternode valueForKey:@"rpcPassword"];
+        __block NSString * chainNetwork = [masternode valueForKey:@"chainNetwork"];
         __block NSString * previousSyncStatus = [MasternodeSyncStatusTransformer typeNameForType:[[masternode valueForKey:@"syncStatus"] unsignedIntegerValue]];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
 //            CkoSsh * ssh = [self sshIn:publicIP] ;
@@ -1002,11 +1002,11 @@
             
             while (1) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -testnet -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ mnsync status", [masternode valueForKey:@"instanceId"], publicIP, rpcPassword];
-                    [viewCon addStringEventToMasternodeConsole:eventMsg];
+                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ mnsync status", chainNetwork, [masternode valueForKey:@"instanceId"], publicIP, rpcPassword];
+                    clb(TRUE, nil, eventMsg);
                 });
                 NSError * error = nil;
-                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error];
+                NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error forChain:chainNetwork];
                 
                 if (error) {
                     clb(NO,dictionary,nil);
@@ -1021,11 +1021,11 @@
                                     [self startRemoteMasternode:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                                         if (!success) {
                                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
-                                            [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                            clb(FALSE, dictionary, eventMsg);
                                             clb(NO,dictionary,errorMessage);
                                         } else  if (value) {
                                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
-                                            [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                            clb(TRUE, dictionary, eventMsg);
                                             clb(YES,dictionary,nil);
                                         }
                                     }];
@@ -1035,7 +1035,7 @@
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
                                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
-                                    [viewCon addStringEventToMasternodeConsole:eventMsg];
+                                    clb(FALSE, dictionary, eventMsg);
                                     clb(NO,dictionary,nil);
                                     [[DPDataStore sharedInstance] saveContext];
                                 });
@@ -1057,7 +1057,7 @@
 }
 
 - (void)startRemoteMasternode:(NSManagedObject*)masternode clb:(dashBoolClb)clb {
-    NSString * string = [NSString stringWithFormat:@"-testnet masternode start-alias %@",[masternode valueForKey:@"instanceId"]];
+    NSString * string = [NSString stringWithFormat:@"-%@ masternode start-alias %@", [masternode valueForKey:@"chainNetwork"], [masternode valueForKey:@"instanceId"]];
     NSData * data = [[DPLocalNodeController sharedInstance] runDashRPCCommand:string];
     NSError * error = nil;
     NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -1070,17 +1070,18 @@
 
 #pragma mark - RPC Query Remote
 
--(NSData *)sendRPCCommand:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword {
-    NSString * fullCommand = [NSString stringWithFormat:@"-testnet -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@",publicIP,rpcPassword, command];
+-(NSData *)sendRPCCommand:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword forChain:(NSString*)chainNetwork {
+    NSString * fullCommand = [NSString stringWithFormat:@"-%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@",chainNetwork,publicIP,rpcPassword, command];
     return [[DPLocalNodeController sharedInstance] runDashRPCCommand:fullCommand];
 }
 
 -(NSData *)sendRPCCommand:(NSString*)command toMasternode:(NSManagedObject*)masternode {
-    return [self sendRPCCommand:command toPublicIP:[masternode valueForKey:@"publicIP"] rpcPassword:[masternode valueForKey:@"rpcPassword"]];
+    return [self sendRPCCommand:command toPublicIP:[masternode valueForKey:@"publicIP"] rpcPassword:[masternode valueForKey:@"rpcPassword"] forChain:[masternode valueForKey:@"chainNetwork"]];
 }
 
--(NSDictionary *)sendRPCCommandJSONDictionary:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword error:(NSError**)error {
-    NSData * data = [self sendRPCCommand:command toPublicIP:publicIP rpcPassword:rpcPassword];
+-(NSDictionary *)sendRPCCommandJSONDictionary:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword error:(NSError**)error
+                                     forChain:(NSString*)chainNetwork {
+    NSData * data = [self sendRPCCommand:command toPublicIP:publicIP rpcPassword:rpcPassword forChain:chainNetwork];
     if (!data || data.length == 0) return @{};
     return [NSJSONSerialization JSONObjectWithData:data options:0 error:error];
 }
@@ -1091,16 +1092,17 @@
 }
 
 -(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode {
-    NSString * fullCommand = [NSString stringWithFormat:@"-testnet -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@",[masternode valueForKey:@"publicIP"],[masternode valueForKey:@"rpcPassword"], command];
-    return [[DPLocalNodeController sharedInstance] runDashRPCCommandString:fullCommand];
+    NSString * fullCommand = [NSString stringWithFormat:@"-%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@", [masternode valueForKey:@"chainNetwork"],[masternode valueForKey:@"publicIP"],[masternode valueForKey:@"rpcPassword"], command];
+    return [[DPLocalNodeController sharedInstance] runDashRPCCommandString:fullCommand forChain:nil];
 }
 
 -(void)getInfo:(NSManagedObject*)masternode clb:(dashInfoClb)clb {
     __block NSString * publicIp = [masternode valueForKey:@"publicIP"];
     __block NSString * rpcPassword = [masternode valueForKey:@"rpcPassword"];
+    __block NSString * chainNetwork = [masternode valueForKey:@"chainNetwork"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         NSError * error = nil;
-        NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"getinfo" toPublicIP:publicIp rpcPassword:rpcPassword error:&error];
+        NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"getinfo" toPublicIP:publicIp rpcPassword:rpcPassword error:&error forChain:chainNetwork];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (error) {
                 clb(NO,nil,[error localizedDescription]);
@@ -1211,7 +1213,7 @@
         if(error) {
             NSLog(@"%@",[error localizedDescription]);
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"Could retieve configuration file");
+                clb(NO,nil,@"Could not retieve configuration file");
             });
             return;
         }
@@ -1295,6 +1297,70 @@
 
 -(BOOL)checkMasternodeIsProperlyConfigured:(NSManagedObject *)masternode {
     return TRUE;
+}
+
+-(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode {
+    
+    if([masternode valueForKey:@"publicIP"] == nil) return;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            
+            if(success != YES) return;
+            
+            __block BOOL isSuccess = YES;
+            NSError *error = nil;
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                isSuccess = success;
+            }];
+            if(isSuccess != YES) return;
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore && cat dash.conf" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                isSuccess = success;
+                if(success == YES && message != nil){
+                    NSArray *dashConf = [message componentsSeparatedByString:@"\n"];
+                    NSString *chainString = @"";
+                    
+                    for(NSString *line in dashConf) {
+                        if ([line rangeOfString:@"mainnet"].location != NSNotFound)
+                        {
+                            chainString = @"mainnet";
+                            break;
+                        }
+                        else if ([line rangeOfString:@"testnet"].location != NSNotFound)
+                        {
+                            chainString = @"testnet";
+                            break;
+                        }
+                        else if ([line rangeOfString:@"devnet"].location != NSNotFound)
+                        {
+                            NSArray *netArray = [line componentsSeparatedByString:@"="];
+                            if([netArray count] == 2) {
+                                chainString = [NSString stringWithFormat:@"devnet-'%@'",[netArray objectAtIndex:1]];
+                            }
+                            else {
+                                chainString = @"devnet-none";
+                            }
+                            break;
+                        }
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [masternode setValue:chainString forKey:@"chainNetwork"];
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    });
+                }
+                else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [masternode setValue:@"none" forKey:@"chainNetwork"];
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    });
+                }
+            }];
+            if(isSuccess != YES) return;
+        }];
+    });
 }
 
 -(void)checkMasternodeIsProperlyInstalled:(NSManagedObject*)masternode onSSH:(NMSSHSession*)ssh {
@@ -1663,32 +1729,43 @@
             __block NSMutableDictionary * instances = [NSMutableDictionary dictionary];
             
             //loop for creating new instance
-            for (int i = 1; i <= count; i++)
-            {
-                NSInteger arrayIndex;
-                if([regionArray count] == 1){
-                    arrayIndex = 0;
-                }
-                else {
-                    arrayIndex = i-1;
-                }
-                
-                NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id %@ --instance-type %@ --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@ --placement AvailabilityZone=%@a",
-                                                                   imageId,
-                                                                serverType,
-                                                                   [[PreferenceData sharedInstance] getKeyName],
-                                                                   [[PreferenceData sharedInstance] getSecurityGroupId],
-                                                                   [[PreferenceData sharedInstance] getSubnetID],
-                                                                   [regionArray objectAtIndex:arrayIndex]]];
-                
-                //NSLog(@"%@",reservation[@"Instances"]);
-                for (NSDictionary * dictionary in output[@"Instances"]) {
-                    NSDictionary * rDict = [NSMutableDictionary dictionary];
-                    [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-                    [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
-                    [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
-                    [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
-                }
+//            for (int i = 1; i <= count; i++)
+//            {
+//                NSInteger arrayIndex;
+//                if([regionArray count] == 1){
+//                    arrayIndex = 0;
+//                }
+//                else {
+//                    arrayIndex = i-1;
+//                }
+//
+//                NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id %@ --instance-type %@ --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@ --placement AvailabilityZone=%@a",
+//                                                                   imageId,
+//                                                                serverType,
+//                                                                   [[PreferenceData sharedInstance] getKeyName],
+//                                                                   [[PreferenceData sharedInstance] getSecurityGroupId],
+//                                                                   [[PreferenceData sharedInstance] getSubnetID],
+//                                                                   [regionArray objectAtIndex:arrayIndex]]];
+//
+//                //NSLog(@"%@",reservation[@"Instances"]);
+//                for (NSDictionary * dictionary in output[@"Instances"]) {
+//                    NSDictionary * rDict = [NSMutableDictionary dictionary];
+//                    [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+//                    [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+//                    [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+//                    [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
+//                }
+//            }
+            
+            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id %@ --count %ld --instance-type %@ --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@ ",imageId,count,serverType,[[PreferenceData sharedInstance] getKeyName],[[PreferenceData sharedInstance] getSecurityGroupId],[[PreferenceData sharedInstance] getSubnetID]]];
+            
+            //NSLog(@"%@",reservation[@"Instances"]);
+            for (NSDictionary * dictionary in output[@"Instances"]) {
+                NSDictionary * rDict = [NSMutableDictionary dictionary];
+                [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
+                [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+                [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
+                [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
             }
             
         
@@ -2059,6 +2136,26 @@
                           cachesDirectory];
     //create content - four lines of text
     NSString *content = configFileContents;
+    //save content to the documents directory
+    [content writeToFile:fileName
+              atomically:NO
+                encoding:NSStringEncodingConversionAllowLossy
+                   error:nil];
+    
+    return fileName;
+}
+
+-(NSString*)createSentinelConfFile {
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    //make a file name to write the data to using the documents directory:
+    NSString *fileName = [NSString stringWithFormat:@"%@/sentinel.conf",
+                          documentsDirectory];
+    //create content - four lines of text
+    NSString *content = @"# specify path to dash.conf or leave blankult=mainnet)\n# default is the same as DashCore\n#dash_conf=/home/evan82/.dashcore/dash.conf\n\n# valid options are mainnet, testnet (default=mainnet)\nnetwork=mainnet\n#network=testnet\n\n# database connection details\ndb_name=database/sentinel.db\ndb_driver=sqlite]";
     //save content to the documents directory
     [content writeToFile:fileName
               atomically:NO

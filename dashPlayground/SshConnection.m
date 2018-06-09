@@ -67,8 +67,8 @@
 
 -(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh error:(NSError*)error dashClb:(dashClb)clb {
     
-    NSString *command = [NSString stringWithFormat:@"git clone -b develop %@ ~/src/dash",repositoryPath];
-    clb(YES,command);
+    NSString *command = [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath];
+//    clb(YES,command);
     [self sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
         clb(success,call);
     }];
@@ -132,7 +132,7 @@
         return;
     }
     else {
-        NSLog(@"SSH: %@", response);
+//        NSLog(@"SSH: %@", response);
         clb(YES, response);
     }
 } 

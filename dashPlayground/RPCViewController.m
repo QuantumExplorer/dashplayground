@@ -9,6 +9,11 @@
 #import "RPCViewController.h"
 #import "DPLocalNodeController.h"
 #import "DialogAlert.h"
+#import "DPDataStore.h"
+
+@interface RPCViewController ()
+
+@end
 
 @implementation RPCViewController
 
@@ -17,7 +22,7 @@
 }
 
 - (IBAction)runCommand:(id)sender {
-    self.terminalOutput.string = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue]];
+    self.terminalOutput.string = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue] forChain:nil];
     
 }
 - (IBAction)checkServer:(id)sender {
@@ -41,7 +46,7 @@
                 self.serverStatusLabel.stringValue = @"Dashd isn't running";
                 self.startStopButton.title = @"Start";
             }
-        }];
+        } forChain:[[DPDataStore sharedInstance] chainNetwork]];
     }
 }
 
@@ -64,7 +69,7 @@
                 if (success) {
                     self.startStopButton.title = @"Start";
                 }
-            }];
+            } forChain:[[DPDataStore sharedInstance] chainNetwork]];
         } else if (![[DPLocalNodeController sharedInstance] dashDPath]) {
             DialogAlert *dialog=[[DialogAlert alloc]init];
             NSAlert *findPathAlert = [dialog getFindPathAlert:@"dashd" exPath:@"~/Documents/src/dash/src"];
@@ -81,7 +86,7 @@
             if (success) {
                 self.startStopButton.title = @"Stop";
             }
-        }];
+        } forChain:[[DPDataStore sharedInstance] chainNetwork]];
         }
     }
 }

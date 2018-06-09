@@ -9,16 +9,17 @@
 #import "DPUnspentController.h"
 #import "DPLocalNodeController.h"
 #import "DialogAlert.h"
+#import "DPDataStore.h"
 
 @implementation DPUnspentController
 
--(NSMutableArray*)processOutput:(NSDictionary*)unspentOutputs {
+-(NSMutableArray*)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork {
     
     NSMutableArray * unspentArray = [NSMutableArray array];
     
     for (NSDictionary* unspent in unspentOutputs) {
         
-        NSDictionary * unspentTran = [self getTransactionInfo:[unspent valueForKey:@"txid"]];
+        NSDictionary * unspentTran = [self getTransactionInfo:[unspent valueForKey:@"txid"] forChain:chainNetwork];
         NSString *dateTime = [self getDateTime:[unspentTran valueForKey:@"time"]];
         
         NSDictionary * rDict = [NSMutableDictionary dictionary];
@@ -35,7 +36,7 @@
     return unspentArray;
 }
 
--(void)retreiveUnspentOutput:(dashInfoClb)clb {
+-(void)retreiveUnspentOutput:(dashInfoClb)clb forChain:(NSString*)chainNetwork {
     
     __block NSDictionary * unspentArray = [NSDictionary dictionary];
     
@@ -53,20 +54,21 @@
     else{
         [[DPLocalNodeController sharedInstance] checkDash:^(BOOL active) {
             if (active) {
-                unspentArray = [self getUnspentList];
+                unspentArray = [self getUnspentList:chainNetwork];
                 clb(YES,unspentArray,nil);
             } else {
                 [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
                     if (success) {
-                        unspentArray = [self getUnspentList];
+                        unspentArray = [self getUnspentList:chainNetwork];
                         clb(YES,unspentArray,nil);
                     }
                     else{
                         [[DialogAlert sharedInstance] showWarningAlert:@"Error!" message:@"Unable to connect dashd server."];
+                        clb(NO,nil,nil);
                     }
-                }];
+                } forChain:chainNetwork];
             }
-        }];
+        } forChain:chainNetwork];
     }
 }
 
@@ -81,28 +83,30 @@
     return dateString;
 }
 
--(NSDictionary*)getUnspentList {
-    NSDictionary* outputs = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:@"-testnet listunspent"];
+-(NSDictionary*)getUnspentList:(NSString*)chainNetwork {
+    NSString *command = [NSString stringWithFormat:@"-%@ listunspent", chainNetwork];
+    NSDictionary* outputs = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:command];
     return outputs;
 }
 
--(NSDictionary*)getTransactionInfo:(NSString*)txid {
-    NSDictionary* outputs = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:[NSString stringWithFormat:@"-testnet gettransaction %@", txid]];
+-(NSDictionary*)getTransactionInfo:(NSString*)txid forChain:(NSString*)chainNetwork {
+    NSString *command = [NSString stringWithFormat:@"-%@ gettransaction %@", chainNetwork, txid];
+    NSDictionary* outputs = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:command];
     return outputs;
 }
 
--(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb {
+-(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb forChain:(NSString*)chainNetwork {
     //get local address
     NSMutableArray *addressArray = [[NSMutableArray alloc]init];
     for(int i = 1; i <= count; i++) {
-        NSString *address = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"-testnet getnewaddress \"\""];
+        NSString *address = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"getnewaddress \"\"" forChain:chainNetwork];
         [addressArray addObject:[address stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]]];//remove /n];
     }
     
     //set label to address
     for(NSArray *address in addressArray) {
-        NSString *labelCommand = [NSString stringWithFormat:@"-testnet setaccount %@ %@", address, label];
-        [[DPLocalNodeController sharedInstance] runDashRPCCommandString:labelCommand];
+        NSString *labelCommand = [NSString stringWithFormat:@"setaccount %@ %@", address, label];
+        [[DPLocalNodeController sharedInstance] runDashRPCCommandString:labelCommand forChain:chainNetwork];
     }
     
     NSMutableArray *inputsWithScriptPubKey = [NSMutableArray array];
@@ -114,7 +118,7 @@
         
         
         //get scriptPubKey
-        NSString *validateCommand = [NSString stringWithFormat:@"-testnet getrawtransaction %@ 1", [object valueForKey:@"txid"]];
+        NSString *validateCommand = [NSString stringWithFormat:@"-%@ getrawtransaction %@ 1", chainNetwork, [object valueForKey:@"txid"]];
         NSDictionary *rawTransaction = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:validateCommand];
         NSDictionary *voutListDict = [rawTransaction objectForKey:@"vout"];
         NSDictionary *scriptPubKeyDict;
@@ -154,7 +158,7 @@
     }
     
     //let's create this shit
-    NSString *processResult = [self processRawTransaction:amount toAddress:addressArray inputString:inputStringWithPubKey count:count];
+    NSString *processResult = [self processRawTransaction:amount toAddress:addressArray inputString:inputStringWithPubKey count:count forChain:chainNetwork];
     if(processResult != nil) {
         NSString *successStr = [NSString stringWithFormat:@"Create %d unspent outputs for %lu sucessfully. Please wait for a while the transaction is being processed...",(int)count , amount];
         [[DialogAlert sharedInstance] showAlertWithOkButton:@"Success" message:successStr];
@@ -168,7 +172,7 @@
 }
 
 -(NSString*)processRawTransaction:(NSUInteger)amount toAddress:(NSMutableArray*)address inputString:(NSMutableString*)inputStringWithPubKey
-                            count:(NSInteger)count
+                            count:(NSInteger)count forChain:(NSString*)chainNetwork
 {
     //create raw transaction
     //    createrawtransaction \”[{\”txid\":\"input-txid\",\"vout\”:1}]\” \”{\”destination-address\":amount}\”
@@ -190,7 +194,8 @@
     //    NSString *inputParam = [NSString stringWithFormat:@"[%@]", inputString];
     NSString *inputPubKeyParam = [NSString stringWithFormat:@"[%@]", inputStringWithPubKey];
     
-    NSArray *createCommand = [NSArray arrayWithObjects:@"-testnet",@"createrawtransaction",inputPubKeyParam, addressParam, nil];
+    NSString *chainNet = [NSString stringWithFormat:@"-%@", chainNetwork];
+    NSArray *createCommand = [NSArray arrayWithObjects:chainNet,@"createrawtransaction",inputPubKeyParam, addressParam, nil];
     NSString *createResult = [[DPLocalNodeController sharedInstance] runDashRPCCommandStringWithArray:createCommand];
     NSLog(@"Result: %@", createResult);
     if(createResult == nil) {
@@ -200,7 +205,7 @@
     //fundrawtransaction
     //    fundrawtransaction 2323ofkofjifjewifjri2jr2ir... -> from create result
     createResult = [createResult stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];//remove /n
-    NSArray *fundCommand = [NSArray arrayWithObjects:@"-testnet",@"fundrawtransaction",createResult, nil];
+    NSArray *fundCommand = [NSArray arrayWithObjects:chainNet,@"fundrawtransaction",createResult, nil];
     NSDictionary *fundResult = [[DPLocalNodeController sharedInstance] runDashRPCCommandArrayWithArray:fundCommand];
     NSLog(@"Result: %@", fundResult);
     if(fundResult == nil) {
@@ -211,7 +216,7 @@
     //    signrawtransaction 2323ofkofjifjewifjri2jr2ir... -> from fund output
     //    NSString *inputPubKeyParam = [NSString stringWithFormat:@"[%@]", inputStringWithPubKey];
     NSString *hexParam = [NSString stringWithFormat:@"%@", [fundResult valueForKey:@"hex"]];
-    NSArray *signCommand = [NSArray arrayWithObjects:@"-testnet",@"signrawtransaction", hexParam, inputPubKeyParam, nil];
+    NSArray *signCommand = [NSArray arrayWithObjects:chainNet,@"signrawtransaction", hexParam, inputPubKeyParam, nil];
     NSDictionary *signResult = [[DPLocalNodeController sharedInstance] runDashRPCCommandArrayWithArray:signCommand];
     NSLog(@"Result: %@", signResult);
     if(signResult == nil) {
@@ -226,7 +231,7 @@
     
     //sendrawtransaction
     //    sendrawtransaction 2323ofkofjifjewifjri2jr2ir... -> from sign output
-    NSArray *sendCommand = [NSArray arrayWithObjects:@"-testnet",@"sendrawtransaction",[signResult valueForKey:@"hex"], nil];
+    NSArray *sendCommand = [NSArray arrayWithObjects:chainNet,@"sendrawtransaction",[signResult valueForKey:@"hex"], nil];
     NSString *sendResult = [[DPLocalNodeController sharedInstance] runDashRPCCommandStringWithArray:sendCommand];
     NSLog(@"Result: %@", sendResult);
     return sendResult;

@@ -7,8 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */; };
+		9301D4C70E08DD5AB9ABFBF9 /* libPods-dashPlayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FB8E3A54BAC79C93C59105 /* libPods-dashPlayground.a */; };
 		A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */ = {isa = PBXBuildFile; fileRef = A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */; };
+		A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */; };
 		A515E7C020AA904E00CB5495 /* AvailabilityZoneWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */; };
 		A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */; };
 		A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */ = {isa = PBXBuildFile; fileRef = A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */; };
@@ -18,6 +19,8 @@
 		A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */; };
 		A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */; };
 		A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A532618320A42413004678E8 /* UnspentOutputViewController.m */; };
+		A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */; };
+		A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */; };
 		A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A558E0C520B54E3C00E853DB /* SshConnection.m */; };
 		A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */; };
 		A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0D22099BA22004B23FE /* VolumeViewController.m */; };
@@ -25,7 +28,7 @@
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
 		A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A597E24420934C590001C98A /* PreferenceWindow.xib */; };
 		A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */; };
-		EC76ED00E89649FE175F52D1 /* libPods-dashPlayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */; };
+		EB1383B3413C8C6236CB2B47 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */; };
 		FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683A91E875CDC00F1AFB4 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */; };
@@ -98,10 +101,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
+		04FB8E3A54BAC79C93C59105 /* libPods-dashPlayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlayground.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		21DCCC09DF21C9356075CD9A /* Pods-dashPlayground.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.debug.xcconfig"; sourceTree = "<group>"; };
+		39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		513EA1E735BFC6333CBD7A0A /* Pods-dashPlaygroundTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPRepoModalController.h; sourceTree = "<group>"; };
 		A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPRepoModalController.m; sourceTree = "<group>"; };
+		A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChainSelectionWindow.xib; sourceTree = "<group>"; };
 		A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AvailabilityZoneWindow.xib; sourceTree = "<group>"; };
 		A515E7CA20AA953400CB5495 /* AvailabilityViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailabilityViewController.h; sourceTree = "<group>"; };
 		A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvailabilityViewController.m; sourceTree = "<group>"; };
@@ -118,6 +124,10 @@
 		A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesModalViewController.m; sourceTree = "<group>"; };
 		A532618220A42413004678E8 /* UnspentOutputViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnspentOutputViewController.h; sourceTree = "<group>"; };
 		A532618320A42413004678E8 /* UnspentOutputViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnspentOutputViewController.m; sourceTree = "<group>"; };
+		A544ADDA20CA77FF0036AE29 /* ChainSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChainSelectionViewController.h; sourceTree = "<group>"; };
+		A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChainSelectionViewController.m; sourceTree = "<group>"; };
+		A544ADDD20CA78520036AE29 /* DPChainSelectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPChainSelectionController.h; sourceTree = "<group>"; };
+		A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPChainSelectionController.m; sourceTree = "<group>"; };
 		A558E0C420B54E3C00E853DB /* SshConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SshConnection.h; sourceTree = "<group>"; };
 		A558E0C520B54E3C00E853DB /* SshConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SshConnection.m; sourceTree = "<group>"; };
 		A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPPreferenceController.h; sourceTree = "<group>"; };
@@ -130,9 +140,8 @@
 		A5782D202095E9A400CA603A /* PreferenceData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceData.m; sourceTree = "<group>"; };
 		A597E24420934C590001C98A /* PreferenceWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceWindow.xib; sourceTree = "<group>"; };
 		A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VolumeWindow.xib; sourceTree = "<group>"; };
-		F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
-		F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlayground.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.debug.xcconfig"; sourceTree = "<group>"; };
+		AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
+		BDF339950FBADBE62826DC6C /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
 		FB0683421E8731AD00F1AFB4 /* DPDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPDataStore.h; sourceTree = "<group>"; };
 		FB0683431E8731AD00F1AFB4 /* DPDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPDataStore.m; sourceTree = "<group>"; };
 		FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = ../../../../../usr/lib/libz.1.dylib; sourceTree = "<group>"; };
@@ -291,7 +300,6 @@
 		FBBFEB281E86EED600BE41BE /* Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
 		FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SWAdditions.h"; sourceTree = "<group>"; };
 		FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SWAdditions.m"; sourceTree = "<group>"; };
-		FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -303,7 +311,7 @@
 				FB0683B31E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
 				FB0683B51E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
 				FB0683AF1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
-				EC76ED00E89649FE175F52D1 /* libPods-dashPlayground.a in Frameworks */,
+				9301D4C70E08DD5AB9ABFBF9 /* libPods-dashPlayground.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,20 +322,20 @@
 				FB0683B61E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
 				FB0683B41E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
 				FB0683B01E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
-				60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */,
+				EB1383B3413C8C6236CB2B47 /* libPods-dashPlaygroundTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		7DB87EC0D2F43AE3062A55F5 /* Pods */ = {
+		74BA64C381EE93DBB6F6E15B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */,
-				2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */,
-				FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */,
-				F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */,
+				21DCCC09DF21C9356075CD9A /* Pods-dashPlayground.debug.xcconfig */,
+				BDF339950FBADBE62826DC6C /* Pods-dashPlayground.release.xcconfig */,
+				513EA1E735BFC6333CBD7A0A /* Pods-dashPlaygroundTests.debug.xcconfig */,
+				AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -338,8 +346,8 @@
 				FB0683AC1E875D3A00F1AFB4 /* libcrypto.35.dylib */,
 				FB0683AA1E875D0100F1AFB4 /* libcrypto.0.9.8.dylib */,
 				FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */,
-				F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */,
-				0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */,
+				04FB8E3A54BAC79C93C59105 /* libPods-dashPlayground.a */,
+				39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -479,7 +487,7 @@
 				FB29067B1E85799F00A31092 /* dashPlaygroundTests */,
 				FB2906631E85799F00A31092 /* Products */,
 				FB0683A71E875CDC00F1AFB4 /* Frameworks */,
-				7DB87EC0D2F43AE3062A55F5 /* Pods */,
+				74BA64C381EE93DBB6F6E15B /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -504,6 +512,7 @@
 				FB2906661E85799F00A31092 /* AppDelegate.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
 				A597E24420934C590001C98A /* PreferenceWindow.xib */,
+				A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */,
 				A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
 				A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */,
@@ -581,6 +590,8 @@
 				A5724D4B20A70D4A004BED71 /* ContainerViewController.m */,
 				A515E7CA20AA953400CB5495 /* AvailabilityViewController.h */,
 				A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */,
+				A544ADDA20CA77FF0036AE29 /* ChainSelectionViewController.h */,
+				A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -602,6 +613,8 @@
 				A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */,
 				A517D29720AEBEF200BD567A /* DPUnspentController.h */,
 				A517D29820AEBEF200BD567A /* DPUnspentController.m */,
+				A544ADDD20CA78520036AE29 /* DPChainSelectionController.h */,
+				A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */,
 			);
 			name = "Server Controllers";
 			sourceTree = "<group>";
@@ -624,13 +637,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB2906811E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlayground" */;
 			buildPhases = (
-				94B2D357CF027FDAF151CEC9 /* [CP] Check Pods Manifest.lock */,
+				372C67C07B324016DE12C69A /* [CP] Check Pods Manifest.lock */,
 				FB29065E1E85799F00A31092 /* Sources */,
 				FB29065F1E85799F00A31092 /* Frameworks */,
 				FB2906601E85799F00A31092 /* Resources */,
 				FB2906FF1E857E4C00A31092 /* Embed Frameworks */,
-				71EA2F616C86A0EE853F561B /* [CP] Embed Pods Frameworks */,
-				9770C6F6B7C977D210559020 /* [CP] Copy Pods Resources */,
+				1CF4AE814A94455FDFE5B84B /* [CP] Embed Pods Frameworks */,
+				0D922A82FBEF373AEF43AE40 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -645,12 +658,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB2906841E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlaygroundTests" */;
 			buildPhases = (
-				8CFC32F0501D3061B0E72B31 /* [CP] Check Pods Manifest.lock */,
+				FEB69C38545E900C20B87E90 /* [CP] Check Pods Manifest.lock */,
 				FB2906741E85799F00A31092 /* Sources */,
 				FB2906751E85799F00A31092 /* Frameworks */,
 				FB2906761E85799F00A31092 /* Resources */,
-				2685535085359E818AA297FC /* [CP] Embed Pods Frameworks */,
-				C78F8BD6BA8F87F38BA600DE /* [CP] Copy Pods Resources */,
+				482F8E367480E7F3A238FC6F /* [CP] Embed Pods Frameworks */,
+				003D70B9A51A3227EFC92378 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -716,6 +729,7 @@
 				FB1D2B561EAF552B00F7BE2D /* Images.xcassets in Resources */,
 				A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */,
 				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
+				A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
 				A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */,
 			);
@@ -732,22 +746,37 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2685535085359E818AA297FC /* [CP] Embed Pods Frameworks */ = {
+		003D70B9A51A3227EFC92378 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		71EA2F616C86A0EE853F561B /* [CP] Embed Pods Frameworks */ = {
+		0D922A82FBEF373AEF43AE40 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1CF4AE814A94455FDFE5B84B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -762,25 +791,7 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8CFC32F0501D3061B0E72B31 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-dashPlaygroundTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		94B2D357CF027FDAF151CEC9 /* [CP] Check Pods Manifest.lock */ = {
+		372C67C07B324016DE12C69A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -798,34 +809,37 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9770C6F6B7C977D210559020 /* [CP] Copy Pods Resources */ = {
+		482F8E367480E7F3A238FC6F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C78F8BD6BA8F87F38BA600DE /* [CP] Copy Pods Resources */ = {
+		FEB69C38545E900C20B87E90 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-dashPlaygroundTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -836,6 +850,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */,
+				A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */,
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
@@ -846,6 +861,7 @@
 				A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
+				A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */,
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
@@ -1019,7 +1035,7 @@
 		};
 		FB2906821E85799F00A31092 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */;
+			baseConfigurationReference = 21DCCC09DF21C9356075CD9A /* Pods-dashPlayground.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1048,7 +1064,7 @@
 		};
 		FB2906831E85799F00A31092 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */;
+			baseConfigurationReference = BDF339950FBADBE62826DC6C /* Pods-dashPlayground.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1076,7 +1092,7 @@
 		};
 		FB2906851E85799F00A31092 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */;
+			baseConfigurationReference = 513EA1E735BFC6333CBD7A0A /* Pods-dashPlaygroundTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -1104,7 +1120,7 @@
 		};
 		FB2906861E85799F00A31092 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */;
+			baseConfigurationReference = AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;

@@ -64,12 +64,7 @@ MasternodesViewController *masternodeCon;
         //clone repository
         [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if(success == YES) {
-                    [masternodeCon addStringEventToMasternodeConsole:@"git clone successfully."];
-                }
-                else {
-                    [masternodeCon addStringEventToMasternodeConsole:call];
-                }
+                [masternodeCon addStringEventToMasternodeConsole:call];
                 [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             });
@@ -132,6 +127,8 @@ MasternodesViewController *masternodeCon;
         NSManagedObject *repository = (NSManagedObject *)[repoData objectAtIndex:i];
         //branch entity
         NSManagedObject *branch = (NSManagedObject *)[repository valueForKey:@"branches"];
+        
+        if([[branch valueForKey:@"name"] count] == 0) continue;
         
         NSDictionary * rDict = [NSMutableDictionary dictionary];
         

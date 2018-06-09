@@ -11,15 +11,12 @@
 #import "InstanceStateTransformer.h"
 #import "DPLocalNodeController.h"
 #import <NMSSH/NMSSH.h>
-#import "MasternodesViewController.h"
 
 typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 @interface DPMasternodeController : NSObject
 
 +(DPMasternodeController*)sharedInstance;
-
--(void)setViewController:(MasternodesViewController*)controller;
 
 - (void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb onRegion:(NSMutableArray*)regionArray serverType:(NSString*)serverType;
 - (void)runInstances:(NSInteger)count clb:(dashStateClb)clb serverType:(NSString*)serverType;
@@ -30,11 +27,10 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType;
 - (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb;
-- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onViewCon:(MasternodesViewController*)viewCon clb:(dashClb)clb;
+- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)setUpMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
-- (void)configureRemoteMasternode:(NSManagedObject*)masternode;
 
-- (void)startDashd:(NSManagedObject*)masternode onViewCon:(MasternodesViewController*)viewCon clb:(dashInfoClb)clb;
+- (void)startDashd:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
 
 -(void)checkMasternode:(NSManagedObject*)masternode;
 
@@ -55,5 +51,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)checkMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
 -(NMSSHSession*)connectInstance:(NSManagedObject*)masternode;
 -(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;
+-(NSString*)createSentinelConfFile;
+-(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
 
 @end

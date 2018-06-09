@@ -18,9 +18,9 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
 +(DPUnspentController*)sharedInstance;
 
--(void)retreiveUnspentOutput:(dashInfoClb)clb;
--(NSDictionary*)getUnspentList;
--(NSMutableArray*)processOutput:(NSDictionary*)unspentOutputs;
--(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb;
+-(void)retreiveUnspentOutput:(dashInfoClb)clb forChain:(NSString*)chainNetwork;
+-(NSDictionary*)getUnspentList:(NSString*)chainNetwork;
+-(NSMutableArray*)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork;
+-(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb forChain:(NSString*)chainNetwork;
 
 @end

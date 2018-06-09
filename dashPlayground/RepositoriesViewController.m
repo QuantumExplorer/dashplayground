@@ -65,9 +65,11 @@
     
     if([self.startCountField integerValue] <= 100 && [self.startCountField integerValue] >= 1)
     {
-        AvailabilityViewController *availCon = [[AvailabilityViewController alloc] init];
+//        AvailabilityViewController *availCon = [[AvailabilityViewController alloc] init];
+//        NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+//        [availCon showAvailWindow:[self.startCountField integerValue] onBranch:object clb:nil];
         NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-        [availCon showAvailWindow:[self.startCountField integerValue] onBranch:object clb:nil];
+        [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil onRegion:nil serverType:@"t2.small"];
     }
     else
     {

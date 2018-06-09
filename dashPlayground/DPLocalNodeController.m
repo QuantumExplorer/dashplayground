@@ -128,15 +128,15 @@
     return [file readDataToEndOfFile];
 }
 
--(NSString*)getInfo {
-    NSString *output = [self runDashRPCCommandString:@"-testnet getinfo"];
+-(NSString*)getInfo:(NSString*)chainNetwork {
+    NSString *output = [self runDashRPCCommandString:@"getinfo" forChain:chainNetwork];
     if ([output hasPrefix:@"error"] || [output isEqualToString:@""]) return nil;
     NSLog(@"o %@",output);
     return output;
 }
 
--(NSDictionary*)getSyncStatus {
-    NSData *output = [self runDashRPCCommand:@"-testnet mnsync status"];
+-(NSDictionary*)getSyncStatus:(NSString*)chainNetwork {
+    NSData *output = [self runDashRPCCommand:[NSString stringWithFormat:@"-%@ mnsync status", chainNetwork]];
     NSError * error = nil;
     NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:output options:0 error:&error];
     if (error) return nil;
@@ -161,14 +161,14 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     return queue;
 }
 
-- (void)checkDash:(dashActiveClb)clb {
-    [self checkDashTries:1 clb:clb];
+- (void)checkDash:(dashActiveClb)clb forChain:(NSString*)chainNetwork {
+    [self checkDashTries:1 clb:clb forChain:chainNetwork];
 }
 
-- (void)checkDashTries:(NSUInteger)timesToTry clb:(dashActiveClb)clb {
+- (void)checkDashTries:(NSUInteger)timesToTry clb:(dashActiveClb)clb forChain:(NSString*)chainNetwork {
     dispatch_async(dashCallbackBackgroundQueue(), ^{
         int tries = 0;
-        while (![self getInfo] && tries < timesToTry) {
+        while (![self getInfo:chainNetwork] && tries < timesToTry) {
             tries++;
             sleep(5);
         }
@@ -186,10 +186,10 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     });
 }
 
-- (void)checkDashStopped:(dashActiveClb)clb {
+- (void)checkDashStopped:(dashActiveClb)clb forChain:(NSString*)chainNetwork {
     dispatch_async(dashCallbackBackgroundQueue(), ^{
         int tries = 0;
-        while ([self getInfo] && tries < 5) {
+        while ([self getInfo:chainNetwork] && tries < 5) {
             tries++;
             sleep(5);
         }
@@ -207,13 +207,13 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     });
 }
 
-- (void)startDash:(dashClb)clb
+- (void)startDash:(dashClb)clb forChain:(NSString*)chainNetwork
 {
     if (![self dashDPath]) return;
     [self checkDash:^(BOOL active) {
         if (!active) {
             [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STARTING object:nil];
-            NSString * commandToRun = @"-testnet";
+            NSString * commandToRun = [NSString stringWithFormat:@"-%@", chainNetwork];
             
             NSTask *task = [[NSTask alloc] init];
             NSLog(@"%@",[self dashDPath]);
@@ -235,18 +235,18 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
                     clb(active,@"Dash server didn't start up");
                 }
                 
-            }];
+            } forChain:chainNetwork];
         } else {
             clb(active,@"Dash server active");
         }
-    }];
+    } forChain:chainNetwork];
     
 }
 
-- (void)stopDash:(dashClb)clb
+- (void)stopDash:(dashClb)clb forChain:(NSString*)chainNetwork
 {
     if (![self dashCliPath]) return;
-    NSString * commandToRun = @"-testnet stop";
+    NSString * commandToRun = [NSString stringWithFormat:@"-%@ stop", chainNetwork];
     
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath:[self dashCliPath]];
@@ -268,10 +268,10 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
             [[NSNotificationCenter defaultCenter] postNotificationName:nDASHD_STOPPED object:nil];
             clb(!active,@"Dash server stopped");
         }
-    }];
+    } forChain:chainNetwork];
 }
 
--(void)checkSyncStatus:(dashSyncClb)clb {
+-(void)checkSyncStatus:(dashSyncClb)clb forChain:(NSString*)chainNetwork {
     dispatch_async(dashCallbackBackgroundMNStatusQueue(), ^{
         int tries = 0;
         NSDictionary * dictionary = [self getSyncStatus];
@@ -292,9 +292,20 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     });
 }
 
-- (NSString *)runDashRPCCommandString:(NSString *)commandToRun
+- (NSString *)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork
 {
-    NSString *output = [[NSString alloc] initWithData:[self runDashRPCCommand:commandToRun] encoding:NSUTF8StringEncoding];
+    NSString * prefixCommand;
+    NSString *output;
+//    if ([chainNetwork isEqualToString:@"mainnet"] || [chainNetwork isEqualToString:@"testnet"]) prefixCommand = [NSString stringWithFormat:@"-%@",chainNetwork];
+//    else prefixCommand = [NSString stringWithFormat:@"-devnet='%@'",chainNetwork];
+    if(chainNetwork == nil) {
+        output = [[NSString alloc] initWithData:[self runDashRPCCommand:[NSString stringWithFormat:@"%@",commandToRun]] encoding:NSUTF8StringEncoding];
+    }
+    else {
+        prefixCommand = [NSString stringWithFormat:@"-%@",chainNetwork];
+        output = [[NSString alloc] initWithData:[self runDashRPCCommand:[NSString stringWithFormat:@"%@ %@",prefixCommand,commandToRun]] encoding:NSUTF8StringEncoding];
+    }
+    
     return output;
 }
 
@@ -307,10 +318,10 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     return outputs;
 }
 
--(NSArray*)outputs {
+-(NSArray*)outputs:(NSString*)chainNetwork {
     NSCharacterSet * bracketCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"{} "] ;
     NSCharacterSet * quotesCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\n\r "] ;
-    NSString * linesString = [[[self runDashRPCCommandString:@"-testnet masternode outputs"] stringByTrimmingCharactersInSet:bracketCharacterSet] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    NSString * linesString = [[[self runDashRPCCommandString:@"masternode outputs" forChain:chainNetwork] stringByTrimmingCharactersInSet:bracketCharacterSet] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
     
     if([linesString isEqualToString:@"}"]) {
         return nil;
@@ -399,7 +410,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
                 if (active) {
                     [self startDash:^(BOOL success, NSString *message) {
                         return clb(FALSE,@"Error writing to file");
-                    }];
+                    } forChain:[masternode valueForKey:@"chainNetwork"]];
                 } else {
                     return clb(FALSE,@"Error writing to file");
                 }
@@ -407,7 +418,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
                 if (active) {
                     [self startDash:^(BOOL success, NSString *message) {
                         return clb(success,message);
-                    }];
+                    } forChain:[masternode valueForKey:@"chainNetwork"]];
                 } else {
                     return clb(TRUE,nil);
                 }
@@ -415,8 +426,8 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
         } else {
             clb(FALSE,@"Error stoping dash server to place configuration file.");
         }
-    }];
-    }];
+    } forChain:[masternode valueForKey:@"chainNetwork"]];
+    } forChain:[masternode valueForKey:@"chainNetwork"]];
 }
 
 

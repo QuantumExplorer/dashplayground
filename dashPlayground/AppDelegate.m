@@ -19,6 +19,7 @@
 #import "RepositoriesViewController.h"
 #import <NMSSH/NMSSH.h>
 #import "SshConnection.h"
+#import "DPMasternodeController.h"
 
 @interface AppDelegate ()
 
@@ -75,14 +76,6 @@
 //    
 //    [ssh disconnect];
     
-//    -testnet createrawtransaction \”[{\”txid\":\"2ec193d9308aaf86722e06ceb5e7771d32739fd9c787fc84be7553768c917954\",\"vout\”:1}]\” \”{\”yfxMotksHE9rrJtbpYUCBeiEeY6phgeViv\":0.01}\”
-    
-//    [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:@"54.169.124.99" openShell:YES clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-//        NSError *error;
-//        NSString *response = [sshSession.channel execute:@"make ~/src/dash" error:&error];
-//        NSLog(@"response: %@, Error: %@", response, error);
-//    }];
-    
     //end
     
     
@@ -101,14 +94,21 @@
     
     NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in checkingMasternodes) {
+        
+        //check masternode chain network
+//        if ([[masternode valueForKey:@"chainNetwork"] stringValue] == nil || [[masternode valueForKey:@"chainNetwork"] count] == 0) {
+//            [[DPMasternodeController sharedInstance] checkMasternodeChainNetwork:masternode];
+//        }
+        [[DPMasternodeController sharedInstance] checkMasternodeChainNetwork:masternode];
+        
         if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
         }
-//        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
-//            [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-//                [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
-//            }];
-//        }
+        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+            [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
+            }];
+        }
         else {
             //[[DPMasternodeController sharedInstance] checkSentinel:masternode];
         }
