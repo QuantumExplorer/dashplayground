@@ -8,11 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import "AppDelegate.h"
+#import "DPLocalNodeController.h"
 
 @interface DPChainSelectionController : NSObject
 
 +(DPChainSelectionController*)sharedInstance;
 
--(void)configureConfigDashFileForMasternode:(NSManagedObject*)masternode onChain:(NSString*)chain onName:(NSString*)devName;
+-(void)configureConfigDashFileForMasternode:(NSManagedObject*)masternode onChain:(NSString*)chain onName:(NSString*)devName onClb:(dashClb)clb;
 
 @end

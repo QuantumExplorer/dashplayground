@@ -7,8 +7,36 @@
 //
 
 #import "NSArray+SWAdditions.h"
+#import "DPLocalNodeController.h"
+#import "DPDataStore.h"
 
 @implementation NSArray (SWAdditions)
+
+- (NSMutableString*)getMastetnodeFullPath {
+    NSMutableString *fullpath = [NSMutableString string];
+    if ([[[DPDataStore sharedInstance] chainNetwork] rangeOfString:@"mainnet"].location != NSNotFound) {
+        NSArray * paths = [[[DPLocalNodeController sharedInstance] masterNodePath] componentsSeparatedByString:@"\\"];
+        NSMutableArray *pathClone = [NSMutableArray arrayWithArray:paths];
+        [pathClone replaceObjectAtIndex:[pathClone count]-1 withObject:[[DPDataStore sharedInstance] chainNetwork]];
+        
+        for(int i = 0; i < [pathClone count]; i++) {
+            if(i != [pathClone count]-1) {
+                [fullpath appendString:[pathClone objectAtIndex:i]];
+            }
+        }
+    }
+    else {
+        NSArray * paths = [[[DPLocalNodeController sharedInstance] masterNodePath] componentsSeparatedByString:@"\\"];
+        NSMutableArray *pathClone = [NSMutableArray arrayWithArray:paths];
+        [pathClone replaceObjectAtIndex:[pathClone count]-1 withObject:[[DPDataStore sharedInstance] chainNetwork]];
+        
+        for(NSString *eachPath in pathClone) {
+            [fullpath appendString:eachPath];
+        }
+    }
+    
+    return fullpath;
+}
 
 - (NSDictionary *)dictionaryOfArraysReferencedByKeyPath:(NSString*)key {
     NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] init];
@@ -329,5 +357,18 @@
     return [NSString stringWithString:res];
 }
 
+#pragma mark - Singleton methods
+
++ (NSArray *)sharedInstance
+{
+    static NSArray *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[NSArray alloc] init];
+        
+        // Do any other initialisation stuff here
+    });
+    return sharedInstance;
+}
 
 @end

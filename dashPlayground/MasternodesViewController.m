@@ -69,6 +69,9 @@ NSString *terminalHeadString = @"";
     [super viewDidLoad];
     [self setUpConsole];
     masternodeController = self;
+    
+    DPMasternodeController *masternodeCon = [DPMasternodeController sharedInstance];
+    masternodeCon.masternodeViewController = self;
 }
 
 - (IBAction)setupSentinel:(id)sender {

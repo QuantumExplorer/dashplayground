@@ -11,10 +11,14 @@
 #import "InstanceStateTransformer.h"
 #import "DPLocalNodeController.h"
 #import <NMSSH/NMSSH.h>
+#import "MasternodesViewController.h"
 
 typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
-@interface DPMasternodeController : NSObject
+@interface DPMasternodeController : NSObject {
+    MasternodesViewController *_masternodeViewController;
+}
+@property(strong, nonatomic, readwrite) MasternodesViewController *masternodeViewController;
 
 +(DPMasternodeController*)sharedInstance;
 

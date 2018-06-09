@@ -37,10 +37,8 @@
         dataStore.chainNetwork = @"testnet";
     }
     else if([self.chainNetworkButton.objectValue integerValue] == 2){
-        dataStore.chainNetwork = @"devnet";
+        dataStore.chainNetwork = @"devnet=DRA";
     }
-    
-    NSLog(@"%@", [[DPDataStore sharedInstance] chainNetwork]);
 }
 
 

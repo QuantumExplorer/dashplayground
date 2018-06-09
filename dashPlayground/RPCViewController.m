@@ -22,7 +22,7 @@
 }
 
 - (IBAction)runCommand:(id)sender {
-    self.terminalOutput.string = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue] forChain:nil];
+    self.terminalOutput.string = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue] forChain:[[DPDataStore sharedInstance] chainNetwork]];
     
 }
 - (IBAction)checkServer:(id)sender {

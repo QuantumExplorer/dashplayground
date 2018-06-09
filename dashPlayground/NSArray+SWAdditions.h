@@ -11,6 +11,8 @@
 
 @interface NSArray (SWAdditions)
 
++(NSArray*)sharedInstance;
+
 - (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
 
 - (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key objectPath:(NSString*)object;
@@ -46,5 +48,7 @@
 - (NSString *)stringByJoiningOnProperty:(NSString *)property separator:(NSString *)separator;
 
 - (NSString *)stringByJoiningOnObject:(NSString *)objectString subProperty:(NSString*)subProperty separator:(NSString *)separator;
+
+- (NSMutableString*)getMastetnodeFullPath;
 
 @end

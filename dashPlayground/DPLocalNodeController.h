@@ -50,4 +50,6 @@
 
 +(DPLocalNodeController*)sharedInstance;
 
+-(NSString*)masterNodePath;
+
 @end
