@@ -75,7 +75,8 @@
     
     //Toey, add this stuff to show error alert.
     NSData * dataError = [error readDataToEndOfFile];
-    if(dataError != nil) {
+    NSString * strError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
+    if([strError length] != 0) {
         return dataError;
     }
     
