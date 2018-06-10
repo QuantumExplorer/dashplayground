@@ -176,7 +176,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 }
 
 - (void)checkDash:(dashActiveClb)clb forChain:(NSString*)chainNetwork {
-    [self checkDashTries:1 clb:clb forChain:chainNetwork];
+    [self checkDashTries:3 clb:clb forChain:chainNetwork];
 }
 
 - (void)checkDashTries:(NSUInteger)timesToTry clb:(dashActiveClb)clb forChain:(NSString*)chainNetwork {
@@ -230,7 +230,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
             
             NSString * commandToRun = @"";
             if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
-                commandToRun = [NSString stringWithFormat:@"-devnet=DRA -rpcport=12999 -port=12999"];
+                commandToRun = [NSString stringWithFormat:@"-%@ -rpcport=12998 -port=12999", chainNetwork];
             }
             else {
                 commandToRun = [NSString stringWithFormat:@"-%@", chainNetwork];
@@ -270,7 +270,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     
     NSString * commandToRun = [NSString stringWithFormat:@"-%@ stop", chainNetwork];
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
-        commandToRun = [NSString stringWithFormat:@"-devnet=DRA -rpcport=12999 -port=12999 stop"];
+        commandToRun = [NSString stringWithFormat:@"-%@ -rpcport=12998 -port=12999 stop", chainNetwork];
     }
     
     NSTask *task = [[NSTask alloc] init];
@@ -328,10 +328,11 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     }
     else {
         if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
-            chainNetwork = [NSString stringWithFormat:@"%@ -rpcport=12999 -port=12999", chainNetwork];
+            chainNetwork = [NSString stringWithFormat:@"%@ -rpcport=12998 -port=12999", chainNetwork];
         }
         prefixCommand = [NSString stringWithFormat:@"-%@",chainNetwork];
-        output = [[NSString alloc] initWithData:[self runDashRPCCommand:[NSString stringWithFormat:@"%@ %@",prefixCommand,commandToRun]] encoding:NSUTF8StringEncoding];
+        NSString * fullCommand = [NSString stringWithFormat:@"%@ %@",prefixCommand,commandToRun];
+        output = [[NSString alloc] initWithData:[self runDashRPCCommand:fullCommand] encoding:NSUTF8StringEncoding];
     }
     
     return output;
@@ -376,7 +377,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
         }
     }
     
-    NSMutableString *fullpath = [[NSArray sharedInstance] getMastetnodeFullPath];
+    NSMutableString *fullpath = [self getMastetnodeFullPath];
 
     NSError * error = nil;
     NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
@@ -411,57 +412,92 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     }
     __block NSManagedObject * object = masternode;
     [self checkDash:^(BOOL active) {
-        if(active != YES) return clb(NO, @"cannot connect to dash server.");
-        [self stopDash:^(BOOL success, NSString *message) {
-            if (success) {
-                NSString *fullpath = [[NSArray sharedInstance] getMastetnodeFullPath];
-                NSError * error = nil;
-                NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
-                NSMutableArray * lines = [[contents componentsSeparatedByString:@"\n"] mutableCopy];
-                NSMutableArray * specialLines = [NSMutableArray array];
-                for (int i = ((int)[lines count]) - 1;i> -1;i--) {
-                    if ([lines[i] hasPrefix:@"#"]) {
-                        [specialLines addObject:[lines objectAtIndex:i]];
-                        [lines removeObjectAtIndex:i];
-                    } else
-                        if ([lines[i] isEqualToString:@""]) {
+        int connectCount = 0;
+        if(active != YES) {
+            clb(NO, @"cannot connect to dash server. Please start it first.");
+            connectCount = connectCount+1;
+            if(connectCount == 3) return;
+        }
+        else {
+            [self stopDash:^(BOOL success, NSString *message) {
+                if (success) {
+                    NSString *fullpath = [self getMastetnodeFullPath];
+                    NSError * error = nil;
+                    NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
+                    NSMutableArray * lines = [[contents componentsSeparatedByString:@"\n"] mutableCopy];
+                    NSMutableArray * specialLines = [NSMutableArray array];
+                    for (int i = ((int)[lines count]) - 1;i> -1;i--) {
+                        if ([lines[i] hasPrefix:@"#"]) {
+                            [specialLines addObject:[lines objectAtIndex:i]];
                             [lines removeObjectAtIndex:i];
                         } else
-                            if ([lines[i] hasPrefix:[object valueForKey:@"instanceId"]]) {
+                            if ([lines[i] isEqualToString:@""]) {
                                 [lines removeObjectAtIndex:i];
-                            }
-                }
-                [lines addObject:[NSString stringWithFormat:@"%@ %@:19999 %@ %@ %@",[object valueForKey:@"instanceId"],[object valueForKey:@"publicIP"],[object valueForKey:@"key"],[object valueForKey:@"transactionId"],[object valueForKey:@"transactionOutputIndex"]]];
-                NSString * content = [[[specialLines componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"] stringByAppendingString:[lines componentsJoinedByString:@"\n"]];
-                [content writeToFile:fullpath
-                          atomically:NO
-                            encoding:NSStringEncodingConversionAllowLossy
-                               error:nil];
-                if (error) {
-                    if (active) {
-                        [self startDash:^(BOOL success, NSString *message) {
+                            } else
+                                if ([lines[i] hasPrefix:[object valueForKey:@"instanceId"]]) {
+                                    [lines removeObjectAtIndex:i];
+                                }
+                    }
+                    [lines addObject:[NSString stringWithFormat:@"%@ %@:19999 %@ %@ %@",[object valueForKey:@"instanceId"],[object valueForKey:@"publicIP"],[object valueForKey:@"key"],[object valueForKey:@"transactionId"],[object valueForKey:@"transactionOutputIndex"]]];
+                    NSString * content = [[[specialLines componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"] stringByAppendingString:[lines componentsJoinedByString:@"\n"]];
+                    [content writeToFile:fullpath
+                              atomically:NO
+                                encoding:NSStringEncodingConversionAllowLossy
+                                   error:nil];
+                    if (error) {
+                        if (active) {
+                            [self startDash:^(BOOL success, NSString *message) {
+                                return clb(FALSE,@"Error writing to file");
+                            } forChain:[masternode valueForKey:@"chainNetwork"]];
+                        } else {
                             return clb(FALSE,@"Error writing to file");
-                        } forChain:[masternode valueForKey:@"chainNetwork"]];
+                        }
                     } else {
-                        return clb(FALSE,@"Error writing to file");
+                        if (active) {
+                            [self startDash:^(BOOL success, NSString *message) {
+                                return clb(success,message);
+                            } forChain:[masternode valueForKey:@"chainNetwork"]];
+                        } else {
+                            return clb(TRUE,nil);
+                        }
                     }
                 } else {
-                    if (active) {
-                        [self startDash:^(BOOL success, NSString *message) {
-                            return clb(success,message);
-                        } forChain:[masternode valueForKey:@"chainNetwork"]];
-                    } else {
-                        return clb(TRUE,nil);
-                    }
+                    clb(FALSE,@"Error stopping dash server to place configuration file.");
                 }
-            } else {
-                clb(FALSE,@"Error stopping dash server to place configuration file.");
-            }
-        } forChain:[masternode valueForKey:@"chainNetwork"]];
+            } forChain:[masternode valueForKey:@"chainNetwork"]];
+        }
     } forChain:[masternode valueForKey:@"chainNetwork"]];
 }
 
-
+- (NSMutableString*)getMastetnodeFullPath {
+    
+    NSMutableString *fullpath = [NSMutableString string];
+    NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
+    
+    NSArray * paths = [[[DPLocalNodeController sharedInstance] masterNodePath] componentsSeparatedByString:@"/"];
+    NSMutableArray *pathClone = [NSMutableArray arrayWithArray:paths];
+    
+    if ([chainNetwork rangeOfString:@"testnet"].location != NSNotFound) {
+        chainNetwork = @"testnet3";
+        
+    }
+    else if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+        chainNetwork = @"devnet-DRA";
+    }
+    
+    if ([chainNetwork rangeOfString:@"mainnet"].location != NSNotFound) {
+        [fullpath setString:[[DPLocalNodeController sharedInstance] masterNodePath]];
+    }
+    else {
+        [pathClone replaceObjectAtIndex:[pathClone count]-2 withObject:chainNetwork];
+        
+        for(NSString *eachPath in pathClone) {
+            [fullpath appendString:[NSString stringWithFormat:@"/%@", eachPath]];
+        }
+    }
+    
+    return fullpath;
+}
 
 #pragma mark - Singleton methods
 

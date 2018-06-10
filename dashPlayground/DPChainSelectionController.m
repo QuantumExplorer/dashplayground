@@ -100,6 +100,22 @@
     return fileName;
 }
 
+-(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode {
+    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) chainNetwork = @"devnet";
+    [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:chainNetwork onName:chainNetworkName onClb:^(BOOL success, NSString *message) {
+        if(success != YES) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network failed."];
+            });
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network successfully."];
+            });
+        }
+    }];
+}
+
 #pragma mark - Singleton methods
 
 + (DPChainSelectionController *)sharedInstance

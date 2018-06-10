@@ -257,12 +257,14 @@ NSString *terminalHeadString = @"";
                     eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
                     [self addStringEventToMasternodeConsole:eventMsg];
                     [[DPMasternodeController sharedInstance] startDashd:object clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
-                        if (!success) {
-                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                            dict[NSLocalizedDescriptionKey] = errorMessage;
-                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                            [[NSApplication sharedApplication] presentError:error];
-                        }
+//                        if (!success) {
+//                            dispatch_async(dispatch_get_main_queue(), ^{
+//                                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//                                dict[NSLocalizedDescriptionKey] = errorMessage;
+//                                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+//                                [[NSApplication sharedApplication] presentError:error];
+//                            });
+//                        }
                         [self addStringEventToMasternodeConsole:errorMessage];
                     }];
                 } else {
@@ -271,12 +273,14 @@ NSString *terminalHeadString = @"";
                             eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start masternode.", [object valueForKey:@"instanceId"]];
                             [self addStringEventToMasternodeConsole:eventMsg];
                             [[DPMasternodeController sharedInstance] startDashd:object clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
-                                if (!success) {
-                                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                                    dict[NSLocalizedDescriptionKey] = errorMessage;
-                                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                                    [[NSApplication sharedApplication] presentError:error];
-                                }
+//                                if (!success) {
+//                                    dispatch_async(dispatch_get_main_queue(), ^{
+//                                        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//                                        dict[NSLocalizedDescriptionKey] = errorMessage;
+//                                        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+//                                        [[NSApplication sharedApplication] presentError:error];
+//                                    });
+//                                }
                                 [self addStringEventToMasternodeConsole:errorMessage];
                             }];
                         }
@@ -405,7 +409,7 @@ NSString *terminalHeadString = @"";
 }
 
 -(void)addStringEventToMasternodeConsole:(NSString*)string {
-    if([string length] == 0) return;
+    if([string length] == 0 || string == nil) return;
     ConsoleEvent * consoleEvent = [ConsoleEvent consoleEventWithString:string];
     [self.masternodeConsoleEvents addConsoleEvent:consoleEvent];
     [self updateConsole];

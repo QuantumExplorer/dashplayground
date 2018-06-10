@@ -15,5 +15,6 @@
 +(DPChainSelectionController*)sharedInstance;
 
 -(void)configureConfigDashFileForMasternode:(NSManagedObject*)masternode onChain:(NSString*)chain onName:(NSString*)devName onClb:(dashClb)clb;
+-(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode;
 
 @end

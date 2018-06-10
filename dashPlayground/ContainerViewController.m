@@ -37,6 +37,7 @@
         dataStore.chainNetwork = @"testnet";
     }
     else if([self.chainNetworkButton.objectValue integerValue] == 2){
+        //devnet=DRA
         dataStore.chainNetwork = @"devnet=DRA";
     }
 }

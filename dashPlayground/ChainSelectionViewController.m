@@ -49,6 +49,8 @@ NSManagedObject* _masternodeObject;
         chainNetwork = @"testnet";
     }
     else if([self.chainPopUp.objectValue integerValue] == 2) {
+        //devnet=DRA -> this is local devnet name
+        //TODO: find out a way to get local devnet name
         chainNetwork = @"devnet=DRA";
     }
     
@@ -57,45 +59,30 @@ NSManagedObject* _masternodeObject;
     
     [_chainSelectionWindow close];
     
-    __block BOOL isSuccess = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
-        [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:_masternodeObject clb:^(BOOL success, NSString *message) {
-            isSuccess = success;
-            if (!success) {
-                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                dict[NSLocalizedDescriptionKey] = message;
-                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                [[NSApplication sharedApplication] presentError:error];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
-                });
-                return;
-            }
-            else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
-                });
-            }
-        }];
-        
-        sleep(30);
-        if(isSuccess != YES) return;
-        if([chainNetwork isEqualToString:@"devnet=DRA"]) chainNetwork = @"devnet";
-        
-        [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:_masternodeObject onChain:chainNetwork onName:chainNetworkName onClb:^(BOOL success, NSString *message) {
-            if(success != YES) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network failed."];
-                });
-            }
-            else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network successfully."];
-                });
-            }
+        [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:_masternodeObject onChainName:chainNetworkName clb:^(BOOL success, NSString *message) {
+//            if (!success) {
+//                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//                dict[NSLocalizedDescriptionKey] = message;
+//                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+//                [[NSApplication sharedApplication] presentError:error];
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
+//                });
+//                return;
+//            }
+//            else {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
+//                });
+//            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
+            });
         }];
     });
+    
 }
 
 - (IBAction)selectChainNetwork:(id)sender {

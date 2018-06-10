@@ -49,6 +49,4 @@
 
 - (NSString *)stringByJoiningOnObject:(NSString *)objectString subProperty:(NSString*)subProperty separator:(NSString *)separator;
 
-- (NSMutableString*)getMastetnodeFullPath;
-
 @end

@@ -581,9 +581,9 @@
     
 }
 
-- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode clb:(dashClb)clb {
+- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onChainName:(NSString*)chainName clb:(dashClb)clb {
     __block NSManagedObject * object = masternode;
-    if (![masternode valueForKey:@"key"]) {
+    if (![masternode valueForKey:@"key"] || [masternode valueForKey:@"key"] == nil) {
         [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
             if (!success) return clb(success,message);
             
@@ -591,11 +591,13 @@
             clb(YES,eventMsg);
             
             NSString * key = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[NSString stringWithFormat:@"-%@ masternode genkey", [masternode valueForKey:@"chainNetwork"]] forChain:[masternode valueForKey:@"chainNetwork"]];
-            if ([key length] == 51) {
+            if ([key length] >= 51) {
+                if([key length] > 51) key = [key substringToIndex:[key length] - 1];
                 [object setValue:key forKey:@"key"];
                 [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-                [self setUpMasternodeConfiguration:object clb:clb];
-            } else {
+                [self setUpMasternodeConfiguration:object onChainName:chainName clb:clb];
+            }
+            else {
                 if (!success) return clb(FALSE,@"Error generating masternode key");
             }
         } forChain:[masternode valueForKey:@"chainNetwork"]];
@@ -616,6 +618,8 @@
                     clb(YES,eventMsg);
                     [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
                     [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                    
+                    [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode];
                 }];
             }
             return clb(success,message);
@@ -653,6 +657,8 @@
                                 clb(YES,eventMsg);
                                 [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
                                 [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                                
+                                [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode];
                             }];
                         }
                         return clb(success,message);
@@ -843,6 +849,7 @@
         if(success == YES) {
             NSString *localFilePath = [self createConfigDashFileForMasternode:masternode];
             NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
+            
             BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
             if (uploadSuccess != YES) {
                 NSLog(@"%@",[[sshSession lastError] localizedDescription]);
@@ -899,16 +906,32 @@
                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd...", [masternode valueForKey:@"instanceId"]];
                 clb(TRUE, nil, eventMsg);
             });
+            NSString *command;
+            __block BOOL isSuccess = YES;
             if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
-                [ssh.channel execute:@"cd ~/src; ./dashd -devnet='DRA' -rpcport='12999' -port='12999'" error:&error];
+                command = [NSString stringWithFormat:@"cd ~/src; ./dashd -%@ -rpcport=12998 -port=12999", chainNetwork];
             }
             else {
-                [ssh.channel execute:@"cd ~/src; ./dashd" error:&error];
+                command = [NSString stringWithFormat:@"cd ~/src; ./dashd"];
             }
+            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                isSuccess = success;
+                if(success != YES){
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        clb(FALSE, nil, message);
+                    });
+                    return;
+                }
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(TRUE, nil, message);
+                });
+            }];
+            if(isSuccess == NO) return;
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd successfully, trying to connect dashd server...", [masternode valueForKey:@"instanceId"]];
+                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: dashd is running up, trying to start remote server...", [masternode valueForKey:@"instanceId"]];
                 clb(TRUE, nil, eventMsg);
             });
+            sleep(20);
             
             if(error != nil) {
                 NSLog(@"%@",[error localizedDescription]);
@@ -918,7 +941,6 @@
                 });
             }
             
-            sleep(20);
             NSString * previousSyncStatus = @"MASTERNODE_SYNC_INITIAL";
             int countConnect = 0;
             while (1) {
@@ -932,11 +954,10 @@
                 
                 if (error) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
+                        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Error trying to start remote server. Dashd might not be started.", [masternode valueForKey:@"instanceId"]];
                         clb(FALSE, dictionary, eventMsg);
                     });
-                    clb(NO,dictionary,nil);
-                    break;
+//                    break;
                 } else {
                     if (dictionary) {
                         if (![previousSyncStatus isEqualToString:dictionary[@"AssetName"]]) {
@@ -984,7 +1005,7 @@
                 }
                 if(countConnect >= 10) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Error: could not retrieve server information! Make sure you already configure it.", [masternode valueForKey:@"instanceId"]];
+                        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Error: could not retrieve server information! Make sure dashd on remote is actually started.", [masternode valueForKey:@"instanceId"]];
                         clb(FALSE, nil, eventMsg);
                     });
                     break;
@@ -1079,8 +1100,16 @@
 #pragma mark - RPC Query Remote
 
 -(NSData *)sendRPCCommand:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword forChain:(NSString*)chainNetwork {
+    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+        chainNetwork = [NSString stringWithFormat:@"%@ -rpcport=12998 -port=12999", chainNetwork];
+    }
+    else {
+        chainNetwork = [NSString stringWithFormat:@"%@", chainNetwork];
+    }
     NSString * fullCommand = [NSString stringWithFormat:@"-%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@",chainNetwork,publicIP,rpcPassword, command];
-    return [[DPLocalNodeController sharedInstance] runDashRPCCommand:fullCommand];
+    NSData *dataReturn = [[DPLocalNodeController sharedInstance] runDashRPCCommand:fullCommand];
+    if(dataReturn != nil) return dataReturn;
+    else return nil;
 }
 
 -(NSData *)sendRPCCommand:(NSString*)command toMasternode:(NSManagedObject*)masternode {
@@ -1100,8 +1129,17 @@
 }
 
 -(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode {
-    NSString * fullCommand = [NSString stringWithFormat:@"-%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@", [masternode valueForKey:@"chainNetwork"],[masternode valueForKey:@"publicIP"],[masternode valueForKey:@"rpcPassword"], command];
-    return [[DPLocalNodeController sharedInstance] runDashRPCCommandString:fullCommand forChain:nil];
+    NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
+    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+        chainNetwork = [NSString stringWithFormat:@"%@ -rpcport=12998 -port=12999", chainNetwork];
+    }
+    else {
+        chainNetwork = [NSString stringWithFormat:@"%@", chainNetwork];
+    }
+    NSString * fullCommand = [NSString stringWithFormat:@"-%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@", chainNetwork,[masternode valueForKey:@"publicIP"],[masternode valueForKey:@"rpcPassword"], command];
+    NSString *dataReturn = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:fullCommand forChain:nil];
+    if(dataReturn != nil) return dataReturn;
+    else return nil;
 }
 
 -(void)getInfo:(NSManagedObject*)masternode clb:(dashInfoClb)clb {
@@ -1345,10 +1383,10 @@
                         {
                             NSArray *netArray = [line componentsSeparatedByString:@"="];
                             if([netArray count] == 2) {
-                                chainString = [NSString stringWithFormat:@"devnet-%@",[netArray objectAtIndex:1]];
+                                chainString = [NSString stringWithFormat:@"devnet=%@",[netArray objectAtIndex:1]];
                             }
                             else {
-                                chainString = @"devnet-none";
+                                chainString = @"devnet=none";
                             }
                             break;
                         }
