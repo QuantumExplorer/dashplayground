@@ -290,7 +290,7 @@ NSString *terminalHeadString = @"";
                         }
                     } forChain:[object valueForKey:@"chainNetwork"]];
                 }
-            } forChain:[[DPDataStore sharedInstance] chainNetwork]];
+            } forChain:[object valueForKey:@"chainNetwork"]];
         }
     }
 }

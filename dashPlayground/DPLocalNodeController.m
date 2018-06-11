@@ -482,7 +482,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
         
     }
     else if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
-        chainNetwork = @"devnet-DRA";
+        chainNetwork = [NSString stringWithFormat:@"devnet-%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
     }
     
     if ([chainNetwork rangeOfString:@"mainnet"].location != NSNotFound) {

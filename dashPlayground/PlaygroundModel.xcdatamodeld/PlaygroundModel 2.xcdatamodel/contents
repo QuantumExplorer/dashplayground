@@ -44,7 +44,7 @@
     </entity>
     <elements>
         <element name="Branch" positionX="-54" positionY="99" width="128" height="135"/>
-        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="450"/>
+        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="448"/>
         <element name="Repository" positionX="-63" positionY="90" width="128" height="90"/>
     </elements>
 </model>

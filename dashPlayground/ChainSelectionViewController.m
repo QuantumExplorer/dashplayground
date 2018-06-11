@@ -50,8 +50,8 @@ NSManagedObject* _masternodeObject;
     }
     else if([self.chainPopUp.objectValue integerValue] == 2) {
         //devnet=DRA -> this is local devnet name
-        //TODO: find out a way to get local devnet name
-        chainNetwork = @"devnet=DRA";
+        //TODO: find out a way to get local devnet name -> finished
+        chainNetwork = [NSString stringWithFormat:@"devnet=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
     }
     
     [_masternodeObject setValue:chainNetwork forKey:@"chainNetwork"];
@@ -95,6 +95,7 @@ NSManagedObject* _masternodeObject;
         self.chainNameField.hidden = true;
     }
 }
+
 
 
 @end

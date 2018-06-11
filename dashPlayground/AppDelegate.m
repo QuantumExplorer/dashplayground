@@ -20,6 +20,7 @@
 #import <NMSSH/NMSSH.h>
 #import "SshConnection.h"
 #import "DPMasternodeController.h"
+#import "InstanceStateTransformer.h"
 
 @interface AppDelegate ()
 
@@ -32,12 +33,15 @@
     
 //    Toey, adding some code here to test somethong more easier.
     
+//    NSLog(@"%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]);
+    
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"securityGroupId"];
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"subnetID"];
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"keyName"];
     
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sshPath"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"SSH_NAME"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"masterNodePath"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashDPath"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashCliPath"];
     
 //    VolumeViewController *volController = [[VolumeViewController alloc] init];
 //    [volController showAMIWindow:@"test"];
@@ -100,12 +104,12 @@
 //        if ([[masternode valueForKey:@"chainNetwork"] stringValue] == nil || [[masternode valueForKey:@"chainNetwork"] count] == 0) {
 //            [[DPMasternodeController sharedInstance] checkMasternodeChainNetwork:masternode];
 //        }
-        [[DPMasternodeController sharedInstance] checkMasternodeChainNetwork:masternode];
         
         if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
         }
         else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+            if([[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Terminated) return;
             [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                 [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
             }];

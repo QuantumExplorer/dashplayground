@@ -65,13 +65,31 @@
 
 //Toey
 
--(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh error:(NSError*)error dashClb:(dashClb)clb {
+-(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh  onBranch:(NSString*)branchName error:(NSError*)error dashClb:(dashClb)clb {
     
-    NSString *command = [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath];
+    __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@",repositoryPath, directory];
 //    clb(YES,command);
+    __block BOOL clonedSuccess = NO;
     [self sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
         clb(success,call);
+        clonedSuccess = success;
     }];
+    
+    if(clonedSuccess == YES) {
+        command = [NSString stringWithFormat:@"cd %@; git checkout %@", directory, branchName];
+        clb(YES,command);
+        clonedSuccess = NO;
+        [self sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+            clb(YES,command);
+            clonedSuccess = success;
+        }];
+        
+        if(clonedSuccess == YES) {
+            command = [NSString stringWithFormat:@"cd %@; git pull", directory];
+            clb(YES,command);
+            [self sendExecuteCommand:command onSSH:ssh error:error dashClb:clb];
+        }
+    }
 }
 
 -(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error dashClb:(dashClb)clb {

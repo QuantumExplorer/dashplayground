@@ -57,5 +57,6 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;
 -(NSString*)createSentinelConfFile;
 -(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
+-(void)updateMasternode:(NSManagedObject*)masternode;
 
 @end

@@ -70,7 +70,7 @@
     
     NSError *error = nil;
     
-    NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
+//    NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
     NSManagedObject * repo = nil;
     NSManagedObject * branch = nil;
     repo = [self createRepositoryForURLPath:repositoryURLPath inContext:context saveContext:FALSE];

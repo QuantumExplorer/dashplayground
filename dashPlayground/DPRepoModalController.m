@@ -28,6 +28,7 @@ MasternodesViewController *masternodeCon;
     
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     __block NSString * repositoryPath = [repository valueForKey:@"repository.url"];
+    __block NSString * branchName = [repository valueForKey:@"branchName"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
         __block NMSSHSession *ssh;
@@ -62,7 +63,7 @@ MasternodesViewController *masternodeCon;
         }
         
         //clone repository
-        [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
+        [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh onBranch:branchName error:error dashClb:^(BOOL success, NSString *call) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [masternodeCon addStringEventToMasternodeConsole:call];
                 [masternode setValue:repositoryPath forKey:@"repositoryUrl"];

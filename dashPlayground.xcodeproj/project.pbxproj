@@ -139,6 +139,7 @@
 		A5782D1F2095E99A00CA603A /* PreferenceData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceData.h; sourceTree = "<group>"; };
 		A5782D202095E9A400CA603A /* PreferenceData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceData.m; sourceTree = "<group>"; };
 		A597E24420934C590001C98A /* PreferenceWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceWindow.xib; sourceTree = "<group>"; };
+		A5AF0AE920CD59770058CA80 /* PlaygroundModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "PlaygroundModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VolumeWindow.xib; sourceTree = "<group>"; };
 		AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
 		BDF339950FBADBE62826DC6C /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
@@ -1181,6 +1182,7 @@
 		FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				A5AF0AE920CD59770058CA80 /* PlaygroundModel 2.xcdatamodel */,
 				FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */,
 			);
 			currentVersion = FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */;
