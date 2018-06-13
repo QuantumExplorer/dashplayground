@@ -31,7 +31,7 @@
 @implementation RepositoriesModalViewController
 
 RepositoriesModalViewController* _repoWindowController;
-NSManagedObject * masternodeObject;
+NSArray * masternodeArrayObjects;
 MasternodesViewController *masternodeCon2;
 
 - (void)windowDidLoad {
@@ -74,13 +74,13 @@ MasternodesViewController *masternodeCon2;
     [self.repoTable editColumn:0 row:row withEvent:nil select:YES];
 }
 
--(void)showRepoWindow:(NSManagedObject*)object controller:(MasternodesViewController*)controller {
+-(void)showRepoWindow:(NSArray*)objects controller:(MasternodesViewController*)controller {
     
     if([_repoWindowController.window isVisible]) return;
     
     _repoWindowController = [[RepositoriesModalViewController alloc] initWithWindowNibName:@"RepositoryWindow"];
     [_repoWindowController.window makeKeyAndOrderFront:self];
-    masternodeObject = object;
+    masternodeArrayObjects = objects;
     
     masternodeCon2 = controller;
     
@@ -158,23 +158,29 @@ MasternodesViewController *masternodeCon2;
         
         //Change masternode state
         masternodeCon2.setupButton.enabled = false;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [masternodeObject setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
-            [[DPDataStore sharedInstance] saveContext:masternodeObject.managedObjectContext];
-        });        
         
-        [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-        
-        NSManagedObject * object = [self.repositoryArrayCon.arrangedObjects objectAtIndex:row];
-        
-        [[DPRepoModalController sharedInstance] setUpMasternodeDashdWithSelectedRepo:masternodeObject repository:object clb:^(BOOL success, NSString *message){
-            if (!success) {
-                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                dict[NSLocalizedDescriptionKey] = message;
-                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                [[NSApplication sharedApplication] presentError:error];
-            }
-        }];
+        for(NSManagedObject *masternode in masternodeArrayObjects)
+        {
+            if([[masternode valueForKey:@"isSelected"] integerValue] != 1) continue;
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            });
+            
+            [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+            
+            NSManagedObject * object = [self.repositoryArrayCon.arrangedObjects objectAtIndex:row];
+            
+            [[DPRepoModalController sharedInstance] setUpMasternodeDashdWithSelectedRepo:masternode repository:object clb:^(BOOL success, NSString *message){
+                if (!success) {
+                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                    dict[NSLocalizedDescriptionKey] = message;
+                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                    [[NSApplication sharedApplication] presentError:error];
+                }
+            }];
+        }
     }
 }
 

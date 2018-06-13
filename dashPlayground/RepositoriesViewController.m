@@ -69,7 +69,7 @@
 //        NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
 //        [availCon showAvailWindow:[self.startCountField integerValue] onBranch:object clb:nil];
         NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-        [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil onRegion:nil serverType:@"t2.small"];
+        [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil onRegion:nil serverType:@"t2.micro"];
     }
     else
     {

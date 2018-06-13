@@ -20,7 +20,7 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 
 -(void)retreiveUnspentOutput:(dashInfoClb)clb forChain:(NSString*)chainNetwork;
 -(NSDictionary*)getUnspentList:(NSString*)chainNetwork;
--(NSMutableArray*)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork;
+-(void)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork clb:(dashDictInfoClb)clb;
 -(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb forChain:(NSString*)chainNetwork;
 
 @end

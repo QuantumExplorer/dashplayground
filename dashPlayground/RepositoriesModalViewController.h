@@ -12,6 +12,6 @@
 
 @interface RepositoriesModalViewController : NSWindowController
 
--(void)showRepoWindow:(NSManagedObject*)object controller:(MasternodesViewController*)controller;
+-(void)showRepoWindow:(NSArray*)objects controller:(MasternodesViewController*)controller;
 
 @end

@@ -16,6 +16,7 @@
 		A516B45720908324009A59C0 /* DialogAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45620908324009A59C0 /* DialogAlert.m */; };
 		A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45A20908514009A59C0 /* PreferenceViewController.m */; };
 		A517D29920AEBEF200BD567A /* DPUnspentController.m in Sources */ = {isa = PBXBuildFile; fileRef = A517D29820AEBEF200BD567A /* DPUnspentController.m */; };
+		A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A518295C20CEDBEC003BFE73 /* Preference.storyboard */; };
 		A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */; };
 		A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */; };
 		A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A532618320A42413004678E8 /* UnspentOutputViewController.m */; };
@@ -119,6 +120,7 @@
 		A516B45A20908514009A59C0 /* PreferenceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceViewController.m; sourceTree = "<group>"; };
 		A517D29720AEBEF200BD567A /* DPUnspentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPUnspentController.h; sourceTree = "<group>"; };
 		A517D29820AEBEF200BD567A /* DPUnspentController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPUnspentController.m; sourceTree = "<group>"; };
+		A518295C20CEDBEC003BFE73 /* Preference.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Preference.storyboard; sourceTree = "<group>"; };
 		A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RepositoryWindow.xib; sourceTree = "<group>"; };
 		A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RepositoriesModalViewController.h; sourceTree = "<group>"; };
 		A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesModalViewController.m; sourceTree = "<group>"; };
@@ -516,6 +518,7 @@
 				A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */,
 				A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
+				A518295C20CEDBEC003BFE73 /* Preference.storyboard */,
 				A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */,
 				A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */,
 				FB2906731E85799F00A31092 /* Info.plist */,
@@ -731,6 +734,7 @@
 				A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */,
 				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
 				A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */,
+				A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
 				A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */,
 			);

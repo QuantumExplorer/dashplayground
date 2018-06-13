@@ -31,7 +31,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType;
 - (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb;
-- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onChainName:(NSString*)chainName clb:(dashClb)clb;
+- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onChainName:(NSString*)chainName clb:(dashSuccessInfo)clb;
 - (void)setUpMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
 
 - (void)startDashd:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
@@ -58,5 +58,8 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NSString*)createSentinelConfFile;
 -(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
 -(void)updateMasternode:(NSManagedObject*)masternode;
+
+-(void)stopDashdOnRemote:(NSManagedObject*)masternode onClb:(dashClb)clb;
+- (void)addNodeToLocal:(NSManagedObject*)masternode clb:(dashClb)clb;
 
 @end

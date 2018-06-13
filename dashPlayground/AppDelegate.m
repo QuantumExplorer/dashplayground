@@ -100,6 +100,8 @@
     NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in checkingMasternodes) {
         
+        if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
+        
         //check masternode chain network
 //        if ([[masternode valueForKey:@"chainNetwork"] stringValue] == nil || [[masternode valueForKey:@"chainNetwork"] count] == 0) {
 //            [[DPMasternodeController sharedInstance] checkMasternodeChainNetwork:masternode];

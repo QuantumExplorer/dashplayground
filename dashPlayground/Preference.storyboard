@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Lfj-Oi-R9a">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Split View Controller-->
+        <scene sceneID="66f-Qg-8WX">
+            <objects>
+                <splitViewController id="Lfj-Oi-R9a" sceneMemberID="viewController">
+                    <splitViewItems>
+                        <splitViewItem id="ha5-1m-3mD"/>
+                        <splitViewItem id="JIU-4T-sY6"/>
+                    </splitViewItems>
+                    <splitView key="splitView" dividerStyle="thin" vertical="YES" id="u6W-Ui-PTV">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <connections>
+                            <outlet property="delegate" destination="Lfj-Oi-R9a" id="IsV-le-04g"/>
+                        </connections>
+                    </splitView>
+                    <connections>
+                        <outlet property="splitView" destination="u6W-Ui-PTV" id="Aj9-3Z-YNn"/>
+                        <segue destination="9Op-S8-Dcs" kind="relationship" relationship="splitItems" id="GIa-gb-eMB"/>
+                        <segue destination="gYo-6Y-0HB" kind="relationship" relationship="splitItems" id="96K-Cd-9BY"/>
+                    </connections>
+                </splitViewController>
+                <customObject id="Qfg-TG-lp5" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="5fu-tJ-pSd">
+            <objects>
+                <viewController id="9Op-S8-Dcs" sceneMemberID="viewController">
+                    <view key="view" id="hgQ-dm-cNN">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="RMF-7R-RaR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="lJt-xt-6hU">
+            <objects>
+                <viewController id="gYo-6Y-0HB" sceneMemberID="viewController">
+                    <view key="view" id="Za3-9e-cVN">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="RHZ-Sb-p5h" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>

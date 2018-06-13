@@ -22,7 +22,7 @@
 @implementation ChainSelectionViewController
 
 ChainSelectionViewController* _chainSelectionWindow;
-NSManagedObject* _masternodeObject;
+NSArray* _masternodeArrayObjects;
 
 - (void)windowDidLoad {
     [super windowDidLoad];
@@ -30,9 +30,9 @@ NSManagedObject* _masternodeObject;
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
 
-- (void)showChainSelectionWindow:(NSManagedObject*)masternode {
+- (void)showChainSelectionWindow:(NSArray*)masternodes {
     if([_chainSelectionWindow.window isVisible]) return;
-    _masternodeObject = masternode;
+    _masternodeArrayObjects = masternodes;
     _chainSelectionWindow = [[ChainSelectionViewController alloc] initWithWindowNibName:@"ChainSelectionWindow"];
     [_chainSelectionWindow.window makeKeyAndOrderFront:self];
 }
@@ -53,34 +53,31 @@ NSManagedObject* _masternodeObject;
         //TODO: find out a way to get local devnet name -> finished
         chainNetwork = [NSString stringWithFormat:@"devnet=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
     }
-    
-    [_masternodeObject setValue:chainNetwork forKey:@"chainNetwork"];
-    [[DPDataStore sharedInstance] saveContext:_masternodeObject.managedObjectContext];
-    
     [_chainSelectionWindow close];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        
-        [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:_masternodeObject onChainName:chainNetworkName clb:^(BOOL success, NSString *message) {
-//            if (!success) {
-//                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-//                dict[NSLocalizedDescriptionKey] = message;
-//                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-//                [[NSApplication sharedApplication] presentError:error];
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
-//                });
-//                return;
-//            }
-//            else {
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
-//                });
-//            }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
-            });
-        }];
+        for(NSManagedObject *masternode in _masternodeArrayObjects)
+        {
+            if([[masternode valueForKey:@"isSelected"] integerValue] == 1) {
+                [masternode setValue:chainNetwork forKey:@"chainNetwork"];
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                
+                [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:masternode onChainName:chainNetworkName clb:^(BOOL success, NSString *message, BOOL isFinished) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
+                    });
+                    if(isFinished == YES) {
+                        [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
+                            if(success) {
+                                [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
+                                    
+                                } forChain:chainNetwork];
+                            }
+                        } forChain:chainNetwork];
+                    }
+                }];
+            }
+        }
     });
     
 }

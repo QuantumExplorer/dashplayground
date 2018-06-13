@@ -11,6 +11,6 @@
 
 @interface ChainSelectionViewController : NSWindowController
 
-- (void)showChainSelectionWindow:(NSManagedObject*)masternode;
+- (void)showChainSelectionWindow:(NSArray*)masternodes;
 
 @end

@@ -20,6 +20,7 @@
 @property (strong) IBOutlet NSTextField *windowLog;
 @property (strong) IBOutlet NSButton *selectAllButton;
 @property (strong) IBOutlet NSTextField *labelField;
+@property (strong) IBOutlet NSButton *refreshButton;
 
 @end
 
@@ -43,8 +44,15 @@
         if(success)
         {
             self.windowLog.stringValue = @"Dash server started";
-            NSMutableArray * unspentArray = [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork];
-            [self processUnspentOutput:unspentArray];
+            [self.arrayController setContent:nil];
+            [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork clb:^(BOOL success, NSDictionary *object) {
+//                [self processUnspentOutput:object];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if(object != nil){
+                        [self showTableContent:object];
+                    }
+                });
+            }];
         }
         else{
             self.windowLog.stringValue = @"Dash server didn't start up";
@@ -58,10 +66,10 @@
 
 -(void)processUnspentOutput:(NSMutableArray*)unspentArray {
     
-    if([unspentArray count] == 0) {
-        [self.arrayController setContent:nil];
-        return;
-    }
+//    if([unspentArray count] == 0) {
+//        [self.arrayController setContent:nil];
+//        return;
+//    }
     for (NSDictionary* unspent in unspentArray) {
         [self showTableContent:unspent];
     }
@@ -69,36 +77,56 @@
 
 -(void)showTableContent:(NSDictionary*)dictionary
 {
-    NSMutableArray *allObjectsClone = [NSMutableArray array];
-    
-    for(NSArray *object in [self.arrayController.arrangedObjects allObjects]) {
-        if([[object valueForKey:@"address"] isEqualToString:[dictionary valueForKey:@"address"]]){
-            [allObjectsClone addObject:object];
-        }
-    }
-    
-    [self.arrayController removeObjects:allObjectsClone];
-    
     [self.arrayController addObject:dictionary];
     
     [self.arrayController rearrangeObjects];
     
-    NSArray *array = [_arrayController arrangedObjects];
+    NSArray *array = [self.arrayController arrangedObjects];
     NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
     
     [_unspentTable editColumn:0 row:row withEvent:nil select:YES];
+    
+    
+//    NSMutableArray *allObjectsClone = [NSMutableArray array];
+//
+//    for(NSArray *object in [self.arrayController.arrangedObjects allObjects]) {
+//        if([[object valueForKey:@"address"] isEqualToString:[dictionary valueForKey:@"address"]]){
+//            [allObjectsClone addObject:object];
+//        }
+//    }
+//
+//    [self.arrayController removeObjects:allObjectsClone];
+//
+//    [self.arrayController addObject:dictionary];
+//
+//    [self.arrayController rearrangeObjects];
+//
+//    NSArray *array = [_arrayController arrangedObjects];
+//    NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
+//
+//    [_unspentTable editColumn:0 row:row withEvent:nil select:YES];
 }
 
 - (IBAction)pressRefresh:(id)sender {
     
     NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
     
+    self.refreshButton.state = true;
     [[DPUnspentController sharedInstance] retreiveUnspentOutput:^(BOOL success,NSDictionary *dict, NSString *message){
         if(success)
         {
             self.windowLog.stringValue = @"Dash server started";
-            NSMutableArray * unspentArray = [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork];
-            [self processUnspentOutput:unspentArray];
+            [self.arrayController setContent:nil];
+            [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork clb:^(BOOL success, NSDictionary *object) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if(success == YES) {
+                        self.refreshButton.state = false;
+                    }
+                    else if(object != nil){
+                        [self showTableContent:object];
+                    }
+                });
+            }];
         }
         else{
             self.windowLog.stringValue = @"Dash server didn't start up";
@@ -155,8 +183,12 @@
     
     for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
     {
-        if([[object valueForKey:@"amount"] integerValue] != 1000) [object setValue:stateValue forKey:@"selected"];
+        [object setValue:stateValue forKey:@"selected"];
     }
+}
+
+- (IBAction)pressSelect:(id)sender {
+    
 }
 
 -(void)deSelectAll {
@@ -166,5 +198,7 @@
         [object setValue:@"0" forKey:@"selected"];
     }
 }
+
+
 
 @end
