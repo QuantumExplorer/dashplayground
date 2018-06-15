@@ -73,21 +73,69 @@ NSString *terminalHeadString = @"";
     
     DPMasternodeController *masternodeCon = [DPMasternodeController sharedInstance];
     masternodeCon.masternodeViewController = self;
+    
+    [self.tableView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
 }
 
 - (IBAction)pressAddNode:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Adding node to local..."];
     
+    NSArray *selectedMasternode = [NSArray array];
+    
     for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
     {
         if([[object valueForKey:@"isSelected"] integerValue] == 1) {
-            [[DPMasternodeController sharedInstance] addNodeToLocal:object clb:^(BOOL success, NSString *message) {
+            selectedMasternode = [selectedMasternode arrayByAddingObject:object];
+        }
+    }
+    
+    if([selectedMasternode count] != 0) {
+        for(NSManagedObject *selectedObject in selectedMasternode)
+        {
+            for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+            {
+                if([[object valueForKey:@"isSelected"] integerValue] != 1 && [object valueForKey:@"publicIP"]) {
+                    if(![[selectedMasternode valueForKey:@"chainNetwork"] isEqualToString:[object valueForKey:@"chainNetwork"]]) continue;
+                    
+                    [[DPMasternodeController sharedInstance] addNodeToRemote:object toPublicIP:[selectedObject valueForKey:@"publicIP"] clb:^(BOOL success, NSString *message) {
+                        if([message length] == 0 || [message length] == 1) {
+                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", [object valueForKey:@"publicIP"], [selectedObject valueForKey:@"publicIP"]]];
+                        }
+                        else {
+                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: %@", [object valueForKey:@"publicIP"], message]];
+                        }
+                    }];
+                }
+            }
+        }
+        
+        
+//        for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+//        {
+//            if([[object valueForKey:@"isSelected"] integerValue] != 1 && [object valueForKey:@"publicIP"]) {
+//                for(NSManagedObject *selectedObject in selectedMasternode)
+//                {
+//                    [[DPMasternodeController sharedInstance] addNodeToRemote:object toPublicIP:[selectedObject valueForKey:@"publicIP"] clb:^(BOOL success, NSString *message) {
+//                        if([message length] == 0 || [message length] == 1) {
+//                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", [object valueForKey:@"publicIP"], [selectedObject valueForKey:@"publicIP"]]];
+//                        }
+//                        else {
+//                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: %@", [object valueForKey:@"publicIP"], message]];
+//                        }
+//                    }];
+//                }
+//            }
+//        }
+        
+        for(NSManagedObject *selectedObject in selectedMasternode)
+        {
+            [[DPMasternodeController sharedInstance] addNodeToLocal:selectedObject clb:^(BOOL success, NSString *message) {
                 if([message length] == 0 || [message length] == 1) {
-                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"added node %@ successfully.", [object valueForKey:@"publicIP"]]];
+                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: added node %@ successfully.", [selectedObject valueForKey:@"publicIP"]]];
                 }
                 else {
-                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"%@ : %@", [object valueForKey:@"publicIP"], message]];
+                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: %@ : %@", [selectedObject valueForKey:@"publicIP"], message]];
                 }
             }];
         }
@@ -126,7 +174,7 @@ NSString *terminalHeadString = @"";
 
 - (IBAction)checkSentinel:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-    [self addStringEventToMasternodeConsole:@"Setting up sentinel on remotes..."];
+    [self addStringEventToMasternodeConsole:@"Checking sentinel on remotes..."];
     
     for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
     {
@@ -174,6 +222,14 @@ NSString *terminalHeadString = @"";
 //    }];
 }
 
+- (IBAction)configureMasternodeSentinel:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    [self addStringEventToMasternodeConsole:@"Configuring sentinel on remotes..."];
+    
+    [[DPMasternodeController sharedInstance] configureMasternodeSentinel:[self.arrayController.arrangedObjects allObjects]];
+}
+
+
 - (IBAction)retreiveInstances:(id)sender {
     [self addStringEvent:@"Refreshing instances."];
     [[DPMasternodeController sharedInstance] getInstancesClb:^(BOOL success, NSString *message) {
@@ -219,19 +275,19 @@ NSString *terminalHeadString = @"";
 }
 
 
-- (IBAction)getKey:(id)sender {
-    NSInteger row = self.tableView.selectedRow;
-    if (row == -1) return;
-    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    if (![object valueForKey:@"key"]) {
-        NSString * key = [[[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"masternode genkey" forChain:[object valueForKey:@"chainNetwork"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        if ([key length] == 51) {
-            [object setValue:key forKey:@"key"];
-        }
-        
-        [[DPDataStore sharedInstance] saveContext];
-    }
-}
+//- (IBAction)getKey:(id)sender {
+//    NSInteger row = self.tableView.selectedRow;
+//    if (row == -1) return;
+//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+//    if (![object valueForKey:@"key"]) {
+//        NSString * key = [[[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"masternode genkey" forChain:[object valueForKey:@"chainNetwork"]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+//        if ([key length] == 51) {
+//            [object setValue:key forKey:@"key"];
+//        }
+//        
+//        [[DPDataStore sharedInstance] saveContext];
+//    }
+//}
 
 - (IBAction)setUp:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
@@ -280,7 +336,9 @@ NSString *terminalHeadString = @"";
     
     for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
     {
-        if(![object valueForKey:@"publicIP"]) continue;
+        if(![object valueForKey:@"publicIP"] || [[object valueForKey:@"instanceState"] integerValue] == InstanceState_Stopped
+           || [[object valueForKey:@"instanceState"] integerValue] == InstanceState_Pending
+           || [[object valueForKey:@"instanceState"] integerValue] == InstanceState_Terminated) continue;
         [object setValue:stateValue forKey:@"isSelected"];
     }
 }
@@ -510,7 +568,7 @@ NSString *terminalHeadString = @"";
     
     for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
     {
-        if([[object valueForKey:@"isSelected"] integerValue] == 1) {
+        if([[object valueForKey:@"isSelected"] integerValue] == 1 ) {
             [self addStringEvent:FS(@"Starting instance %@",[object valueForKey:@"instanceId"])];
             [[DPMasternodeController sharedInstance] startInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
                 [self addStringEvent:FS(@"Instance in boot up process : %@",[object valueForKey:@"instanceId"])];

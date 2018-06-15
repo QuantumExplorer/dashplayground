@@ -55,29 +55,44 @@ NSArray* _masternodeArrayObjects;
     }
     [_chainSelectionWindow close];
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+    dispatch_group_t d_group = dispatch_group_create();
+    dispatch_queue_t bg_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    
+    dispatch_group_async(d_group, bg_queue, ^{
+        
         for(NSManagedObject *masternode in _masternodeArrayObjects)
         {
             if([[masternode valueForKey:@"isSelected"] integerValue] == 1) {
                 [masternode setValue:chainNetwork forKey:@"chainNetwork"];
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                
+
                 [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:masternode onChainName:chainNetworkName clb:^(BOOL success, NSString *message, BOOL isFinished) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
                     });
-                    if(isFinished == YES) {
-                        [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
-                            if(success) {
-                                [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
-                                    
-                                } forChain:chainNetwork];
-                            }
-                        } forChain:chainNetwork];
-                    }
+//                    if(isFinished == YES) {
+//                        [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
+//                            if(success) {
+//                                [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
+//
+//                                } forChain:chainNetwork];
+//                            }
+//                        } forChain:chainNetwork];
+//                    }
                 }];
             }
         }
+    });
+    
+    dispatch_group_notify(d_group, dispatch_get_main_queue(), ^{
+//        dispatch_release(d_group);
+        [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
+            if(success) {
+                [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
+                    
+                } forChain:chainNetwork];
+            }
+        } forChain:chainNetwork];
     });
     
 }

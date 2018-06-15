@@ -49,40 +49,84 @@
     [standardUserDefaults setObject:masterNodePath forKey:MASTERNODEPATH];
 }
 
-- (NSData *)runDashRPCCommand:(NSString *)commandToRun
+- (NSData *)runDashRPCCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb
 {
     if (![self dashCliPath]) return nil;
+    
     NSTask *task = [[NSTask alloc] init];
-    NSLog(@"%@",[self dashCliPath]);
     [task setLaunchPath:[self dashCliPath]];
+    [task setCurrentDirectoryPath:@"/"];
     
     NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
     NSLog(@"run command:%@", commandToRun);
     [task setArguments:arguments];
-
-    NSPipe *pipe = [NSPipe pipe];
-    [task setStandardOutput:pipe];
-
-    NSFileHandle *file = [pipe fileHandleForReading];
     
+    NSPipe *stdoutPipe = [NSPipe pipe];
+    [task setStandardInput:[NSPipe pipe]];
+    [task setStandardOutput:stdoutPipe];
+    
+    NSFileHandle *stdoutHandle = [stdoutPipe fileHandleForReading];
     NSPipe *errorPipe = [NSPipe pipe];
     [task setStandardError:errorPipe];
     
     NSFileHandle *error = [errorPipe fileHandleForReading];
     
-    [task launch];
-    [task waitUntilExit]; //Toey, wait until finish launching task to show error.
-
-//    //Toey, add this stuff to show error alert.
-    NSData * dataError = [error readDataToEndOfFile];
-    if(dataError != nil) {
-        NSString * strError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
-        if([strError length] != 0) {
-            return dataError;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        NSData *dataRead = [stdoutHandle readDataToEndOfFile];
+        while ([dataRead length] > 0) {
+//            NSString *stringRead = [[NSString alloc] initWithData:dataRead encoding:NSUTF8StringEncoding];
+//            NSLog(@"output: %@", stringRead);
+            clb(YES,nil,dataRead);
+            dataRead = [stdoutHandle availableData];
         }
-    }
+        NSData *dataError = [error availableData];
+        while ([dataError length] > 0) {
+            NSString *stringError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
+            NSLog(@"output: %@", stringError);
+            if (dataError != nil) clb(YES,nil,dataError);
+            dataError = [stdoutHandle availableData];
+        }
+    });
     
-    return [file readDataToEndOfFile];
+    [task launch];
+    [task waitUntilExit];
+    
+    
+    
+//    NSTask *task = [[NSTask alloc] init];
+//    NSLog(@"%@",[self dashCliPath]);
+//    [task setLaunchPath:[self dashCliPath]];
+//
+//    NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
+//    NSLog(@"run command:%@", commandToRun);
+//    [task setArguments:arguments];
+//
+//    NSPipe *outputPipe = [NSPipe pipe];
+//    [task setStandardInput:[NSPipe pipe]];
+//    [task setStandardOutput:outputPipe];
+//
+//    NSFileHandle *file = [outputPipe fileHandleForReading];
+//
+//    [task launch];
+////    [task waitUntilExit]; //Toey, wait until finish launching task to show error.
+//
+//    if(withError == YES || withError == TRUE) {
+//        NSPipe *errorPipe = [NSPipe pipe];
+//        [task setStandardError:errorPipe];
+//
+//        NSFileHandle *error = [errorPipe fileHandleForReading];
+//
+//        //Toey, add this stuff to show error alert.
+//        NSData * dataError = [error readDataToEndOfFile];
+//        if(dataError != nil && [dataError bytes] != 0) {
+//            NSString * strError = [[NSString alloc] initWithData:dataError encoding:NSUTF8StringEncoding];
+//            if([strError length] != 0) {
+//                return dataError;
+//            }
+//        }
+//    }
+    
+    return nil;
 }
 
 - (NSDictionary *)runDashRPCCommandArrayWithArray:(NSArray *)commandToRun
@@ -147,10 +191,14 @@
 }
 
 -(NSDictionary*)getSyncStatus:(NSString*)chainNetwork {
-    NSData *output = [self runDashRPCCommand:[NSString stringWithFormat:@"-%@ mnsync status", chainNetwork]];
-    NSError * error = nil;
-    NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:output options:0 error:&error];
-    if (error) return nil;
+    __block NSDictionary * dictionary = nil;
+    [self runDashRPCCommand:[NSString stringWithFormat:@"-%@ mnsync status", chainNetwork] checkError:YES onClb:^(BOOL success, NSString *message, NSData *data) {
+//        NSData *output = [self runDashRPCCommand:[NSString stringWithFormat:@"-%@ mnsync status", chainNetwork] checkError:YES];
+        NSError * error = nil;
+        dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+//        if (error) return nil;
+//        return dictionary;
+    }];
     return dictionary;
 }
 
@@ -314,14 +362,16 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     });
 }
 
-- (NSString *)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork
+- (void)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork onClb:(dashClb)clb
 {
     NSString * prefixCommand;
-    NSString *output = @"";
+    __block NSString *output = @"";
 //    if ([chainNetwork isEqualToString:@"mainnet"] || [chainNetwork isEqualToString:@"testnet"]) prefixCommand = [NSString stringWithFormat:@"-%@",chainNetwork];
 //    else prefixCommand = [NSString stringWithFormat:@"-devnet='%@'",chainNetwork];
     if(chainNetwork == nil) {
-        output = [[NSString alloc] initWithData:[self runDashRPCCommand:[NSString stringWithFormat:@"%@",commandToRun]] encoding:NSUTF8StringEncoding];
+        [self runDashRPCCommand:[NSString stringWithFormat:@"%@",commandToRun] checkError:YES onClb:^(BOOL success, NSString *message, NSData *data) {
+            output = [NSString stringWithUTF8String:[data bytes]];
+        }];
     }
     else {
         if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
@@ -329,22 +379,50 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
         }
         prefixCommand = [NSString stringWithFormat:@"-%@",chainNetwork];
         NSString * fullCommand = [NSString stringWithFormat:@"%@ %@",prefixCommand,commandToRun];
-        NSData *data = [self runDashRPCCommand:fullCommand];
-        if(data != nil) {
-            output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        }
+        [self runDashRPCCommand:fullCommand checkError:YES onClb:^(BOOL success, NSString *message, NSData *data) {
+            if(data != nil) {
+                output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                clb(YES, output);
+            }
+        }];
     }
-    
+}
+
+- (NSString*)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork
+{
+    NSString * prefixCommand;
+    __block NSString *output = @"";
+    //    if ([chainNetwork isEqualToString:@"mainnet"] || [chainNetwork isEqualToString:@"testnet"]) prefixCommand = [NSString stringWithFormat:@"-%@",chainNetwork];
+    //    else prefixCommand = [NSString stringWithFormat:@"-devnet='%@'",chainNetwork];
+    if(chainNetwork == nil) {
+        [self runDashRPCCommand:[NSString stringWithFormat:@"%@",commandToRun] checkError:YES onClb:^(BOOL success, NSString *message, NSData *data) {
+            output = [NSString stringWithUTF8String:[data bytes]];
+        }];
+    }
+    else {
+        if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+            chainNetwork = [NSString stringWithFormat:@"%@ -rpcport=12998 -port=12999", chainNetwork];
+        }
+        prefixCommand = [NSString stringWithFormat:@"-%@",chainNetwork];
+        NSString * fullCommand = [NSString stringWithFormat:@"%@ %@",prefixCommand,commandToRun];
+        [self runDashRPCCommand:fullCommand checkError:YES onClb:^(BOOL success, NSString *message, NSData *data) {
+            if(data != nil) {
+                output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            }
+        }];
+    }
     return output;
 }
 
-- (NSDictionary *)runDashRPCCommandArray:(NSString *)commandToRun
+- (void)runDashRPCCommandArray:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDictInfoClb)clb
 {
-    NSError* error;
-    NSDictionary* outputs = [NSJSONSerialization JSONObjectWithData:[self runDashRPCCommand:commandToRun]
-                                                         options:kNilOptions
-                                                           error:&error];
-    return outputs;
+    __block NSError* error;
+    [self runDashRPCCommand:commandToRun checkError:withError onClb:^(BOOL success, NSString *message, NSData *data) {
+        NSDictionary* outputs = [NSJSONSerialization JSONObjectWithData:data
+                                                  options:kNilOptions
+                                                    error:&error];
+        if(outputs != nil) clb(YES, outputs);
+    }];
 }
 
 -(NSArray*)outputs:(NSString*)chainNetwork {

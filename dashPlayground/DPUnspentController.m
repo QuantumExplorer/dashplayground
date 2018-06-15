@@ -15,7 +15,7 @@
 
 -(void)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork clb:(dashDictInfoClb)clb {
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),^{
     
         for (NSDictionary* unspent in unspentOutputs) {
             
@@ -91,7 +91,10 @@
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
         command = [NSString stringWithFormat:@"-%@ -rpcport=12998 -port=12999 listunspent", chainNetwork];
     }
-    NSDictionary* outputs = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:command];
+    __block NSDictionary *outputs;
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:command checkError:NO onClb:^(BOOL success, NSDictionary *object) {
+        outputs = object;
+    }];
     return outputs;
 }
 
@@ -100,7 +103,11 @@
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
         command = [NSString stringWithFormat:@"-%@ -rpcport=12998 -port=12999 gettransaction %@", chainNetwork, txid];
     }
-    NSDictionary* outputs = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:command];
+    
+    __block NSDictionary* outputs;
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:command checkError:YES onClb:^(BOOL success, NSDictionary *object) {
+        outputs = object;
+    }];
     return outputs;
 }
 
@@ -132,7 +139,10 @@
             if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
                 validateCommand = [NSString stringWithFormat:@"-%@ -rpcport=12998 -port=12999 getrawtransaction %@ 1", chainNetwork, [object valueForKey:@"txid"]];
             }
-            NSDictionary *rawTransaction = [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:validateCommand];
+            __block NSDictionary *rawTransaction;
+            [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:validateCommand checkError:YES onClb:^(BOOL success, NSDictionary *object) {
+                if(object != nil) rawTransaction = object;
+            }];
             NSDictionary *voutListDict = [rawTransaction objectForKey:@"vout"];
             NSDictionary *scriptPubKeyDict;
             NSUInteger vountIndex = 0;
@@ -174,20 +184,26 @@
         
         //let's create this shit
         NSString *processResult = [self processRawTransaction:amount toAddress:addressArray inputString:inputStringWithPubKey count:count forChain:chainNetwork];
-        if(processResult != nil) {
-            NSString *successStr = [NSString stringWithFormat:@"Create %d unspent outputs for %lu sucessfully. Please wait for a while the transaction is being processed...",(int)count , amount];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Success" message:successStr];
-            });
-            clb(YES,[self createTransactionToTable:addressArray]);
-        }
-        else {
-            NSString *failedStr = [NSString stringWithFormat:@"Create unspent output failed."];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:failedStr];
-            });
-            clb(NO,nil);
-        }
+        
+        NSString *successStr = [NSString stringWithFormat:@"Create %d unspent outputs for %lu result %@",(int)count , amount, processResult];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[DialogAlert sharedInstance] showAlertWithOkButton:@"Result" message:successStr];
+        });
+        
+//        if(processResult != nil) {
+//            NSString *successStr = [NSString stringWithFormat:@"Create %d unspent outputs for %lu sucessfully. Please wait for a while the transaction is being processed...",(int)count , amount];
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Success" message:successStr];
+//            });
+//            clb(YES,[self createTransactionToTable:addressArray]);
+//        }
+//        else {
+//            NSString *failedStr = [NSString stringWithFormat:@"Create unspent output failed."];
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:failedStr];
+//            });
+//            clb(NO,nil);
+//        }
     });
 }
 
@@ -255,7 +271,10 @@
     else if([signResult valueForKey:@"errors"])
     {
         NSDictionary *signError = [signResult valueForKey:@"errors"];
-        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Error" message:[signError valueForKey:@"error"]];
+        NSLog(@"%@", [signError valueForKey:@"error"]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[DialogAlert sharedInstance] showAlertWithOkButton:@"Error" message:[signError valueForKey:@"error"]];
+        });
         return nil;
     }
     

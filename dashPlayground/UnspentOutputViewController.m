@@ -38,6 +38,8 @@
     
     // Do any additional setup after loading the view.
     
+    [self.unspentTable setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
+    
     NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
     
     [[DPUnspentController sharedInstance] retreiveUnspentOutput:^(BOOL success,NSDictionary *dict, NSString *message){
@@ -77,14 +79,18 @@
 
 -(void)showTableContent:(NSDictionary*)dictionary
 {
-    [self.arrayController addObject:dictionary];
-    
-    [self.arrayController rearrangeObjects];
-    
-    NSArray *array = [self.arrayController arrangedObjects];
-    NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
-    
-    [_unspentTable editColumn:0 row:row withEvent:nil select:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.arrayController addObject:dictionary];
+        
+        [self.arrayController rearrangeObjects];
+        
+        NSArray *array = [self.arrayController arrangedObjects];
+        NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
+        
+        [self.unspentTable editColumn:0 row:row withEvent:nil select:YES];
+//        if([[dictionary valueForKey:@"amount"] integerValue] == 1000) {
+//        }
+    });
     
     
 //    NSMutableArray *allObjectsClone = [NSMutableArray array];
@@ -149,14 +155,15 @@
         
         NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
         
-        [[DPUnspentController sharedInstance] createTransaction:self.countField.integerValue label:self.labelField.stringValue amount:1000 allObjects:[self.arrayController.arrangedObjects allObjects] clb:^(BOOL success, NSMutableArray *newObjects) {
+        NSArray *cloneObjects = [NSArray array];
+        cloneObjects = [self.arrayController.arrangedObjects allObjects];
+        
+        [[DPUnspentController sharedInstance] createTransaction:self.countField.integerValue label:self.labelField.stringValue amount:1000 allObjects:cloneObjects clb:^(BOOL success, NSMutableArray *newObjects) {
             
-            if(success) {
-                [self processUnspentOutput:newObjects];
-            }
+            if(newObjects != nil) [self processUnspentOutput:newObjects];
         } forChain:chainNetwork];
         
-        [self deSelectAll];
+//        [self deSelectAll];
         [self clearInputFields];
     }
     
@@ -185,9 +192,6 @@
     {
         [object setValue:stateValue forKey:@"selected"];
     }
-}
-
-- (IBAction)pressSelect:(id)sender {
     
 }
 

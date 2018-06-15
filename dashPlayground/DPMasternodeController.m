@@ -502,11 +502,23 @@
     NSString *port = @"19998";
     NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
-        port = @"12998";
+        port = @"12999";
     }
     NSString *command = [NSString stringWithFormat:@"addnode %@:%@ add", [masternode valueForKey:@"publicIP"], port];
     
     NSString *response = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:command forChain:chainNetwork];
+    clb(YES, response);
+}
+
+- (void)addNodeToRemote:(NSManagedObject*)masternode toPublicIP:(NSString*)publicIP clb:(dashClb)clb {
+    NSString *port = @"19998";
+    NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
+    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+        port = @"12999";
+    }
+    NSString *command = [NSString stringWithFormat:@"addnode %@:%@ add", publicIP, port];
+    
+    NSString *response = [[DPMasternodeController sharedInstance] sendRPCCommandString:command toMasternode:masternode];
     clb(YES, response);
 }
 
@@ -595,6 +607,24 @@
 //    });
     
     
+}
+
+- (void)configureMasternodeSentinel:(NSArray*)AllMasternodes {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        for(NSManagedObject *object in AllMasternodes)
+        {
+            if([[object valueForKey:@"isSelected"] integerValue] == 1) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[self masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configure sentinel.conf file for %@", [object valueForKey:@"publicIP"]]];
+                });
+                [self configureRemoteMasternodeSentinel:object clb:^(BOOL success, NSString *message) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[self masternodeViewController] addStringEventToMasternodeConsole:message];
+                    });
+                }];
+            }
+        }
+    });
 }
 
 - (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onChainName:(NSString*)chainName clb:(dashSuccessInfo)clb {
@@ -814,7 +844,10 @@
                 }];
                 if(isContinue == NO) return;
                 
-//                step 5) test sentinel is alive and talking to the still sync'ing wallet
+                //configure sentinel.conf
+                
+                
+//                test sentinel is alive and talking to the still sync'ing wallet
 //
 //                venv/bin/python bin/sentinel.py
 //
@@ -924,6 +957,25 @@
     }];
 }
 
+- (void)configureRemoteMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb {
+    
+    [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        if(success == YES) {
+            NSString *localFilePath = [self createSentinelConfFileForMasternode:masternode];
+            
+            NSString *remoteFilePath = @"/home/ubuntu/.dashcore/sentinel/sentinel.conf";
+            
+            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+            if (uploadSuccess != YES) {
+                NSLog(@"%@",[[sshSession lastError] localizedDescription]);
+                clb(NO, [[sshSession lastError] localizedDescription]);
+            }
+            else {
+                clb(YES, @"Success");
+            }
+        }
+    }];
+}
 
 #pragma mark - Start Remote
 
@@ -1156,8 +1208,20 @@
 }
 
 - (void)startRemoteMasternode:(NSManagedObject*)masternode clb:(dashBoolClb)clb {
-    NSString * string = [NSString stringWithFormat:@"-%@ masternode start-alias %@", [masternode valueForKey:@"chainNetwork"], [masternode valueForKey:@"instanceId"]];
-    NSData * data = [[DPLocalNodeController sharedInstance] runDashRPCCommand:string];
+    NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
+    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+        chainNetwork = [NSString stringWithFormat:@"-%@ -rpcport=12998 -port=12999", chainNetwork];
+    }
+    else {
+        chainNetwork = [NSString stringWithFormat:@"-%@", chainNetwork];
+    }
+    NSString * string = [NSString stringWithFormat:@"%@ masternode start-alias %@", chainNetwork, [masternode valueForKey:@"instanceId"]];
+    clb(NO, NO, string);
+    
+    __block NSData *data;
+    [[DPLocalNodeController sharedInstance] runDashRPCCommand:string checkError:YES onClb:^(BOOL success, NSString *message, NSData *data2) {
+        data = data2;
+    }];
     NSError * error = nil;
     NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
     if (error) {
@@ -1194,7 +1258,10 @@
         chainNetwork = [NSString stringWithFormat:@"%@", chainNetwork];
     }
     NSString * fullCommand = [NSString stringWithFormat:@"-%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ %@",chainNetwork,publicIP,rpcPassword, command];
-    NSData *dataReturn = [[DPLocalNodeController sharedInstance] runDashRPCCommand:fullCommand];
+    __block NSData *dataReturn;
+    [[DPLocalNodeController sharedInstance] runDashRPCCommand:fullCommand checkError:YES onClb:^(BOOL success, NSString *message, NSData *data) {
+        dataReturn = data;
+    }];
     if(dataReturn != nil) return dataReturn;
     else return nil;
 }
@@ -2362,7 +2429,13 @@
     return fileName;
 }
 
--(NSString*)createSentinelConfFile {
+-(NSString*)createSentinelConfFileForMasternode:(NSManagedObject*)masternode {
+    
+    NSString *chainNetwork = @"network=mainnet\n";
+    if ([[masternode valueForKey:@"chainNetwork"] rangeOfString:@"testnet"].location != NSNotFound
+        || [[masternode valueForKey:@"chainNetwork"] rangeOfString:@"devnet"].location != NSNotFound) {
+        chainNetwork = @"network=testnet\n";
+    }
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains
     (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -2372,7 +2445,7 @@
     NSString *fileName = [NSString stringWithFormat:@"%@/sentinel.conf",
                           documentsDirectory];
     //create content - four lines of text
-    NSString *content = @"# specify path to dash.conf or leave blankult=mainnet)\n# default is the same as DashCore\n#dash_conf=/home/evan82/.dashcore/dash.conf\n\n# valid options are mainnet, testnet (default=mainnet)\nnetwork=mainnet\n#network=testnet\n\n# database connection details\ndb_name=database/sentinel.db\ndb_driver=sqlite]";
+    NSString *content = [NSString stringWithFormat:@"# specify path to dash.conf or leave blankult=mainnet)\n# default is the same as DashCore\n#dash_conf=/home/evan82/.dashcore/dash.conf\n\n# valid options are mainnet, testnet (default=mainnet)\n%@\n# database connection details\ndb_name=database/sentinel.db\ndb_driver=sqlite\n", chainNetwork];
     //save content to the documents directory
     [content writeToFile:fileName
               atomically:NO

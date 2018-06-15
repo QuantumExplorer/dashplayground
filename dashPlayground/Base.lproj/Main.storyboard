@@ -437,7 +437,6 @@
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
                                                                     <connections>
-                                                                        <action selector="pressSelect:" target="zmv-s0-gBo" id="9Hk-Mf-kG8"/>
                                                                         <binding destination="asu-q3-nQz" name="value" keyPath="objectValue.selected" id="vWb-bK-cxh"/>
                                                                     </connections>
                                                                 </button>
@@ -1957,7 +1956,7 @@
                                             </buttonCell>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cqs-XI-SNq">
-                                            <rect key="frame" x="13" y="88" width="120" height="32"/>
+                                            <rect key="frame" x="13" y="89" width="120" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Check" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s3B-Vu-e3W">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1968,7 +1967,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xm7-Gg-k6v">
-                                            <rect key="frame" x="13" y="62" width="120" height="32"/>
+                                            <rect key="frame" x="13" y="63" width="120" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="le2-is-EfX">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1976,6 +1975,17 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="checkSentinel:" target="Inw-N2-PBT" id="QUy-wC-fMH"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4sb-l9-i38">
+                                            <rect key="frame" x="13" y="37" width="120" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Configure" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ajJ-Nz-VIs">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="configureMasternodeSentinel:" target="Inw-N2-PBT" id="zyX-DU-Eya"/>
                                             </connections>
                                         </button>
                                     </subviews>

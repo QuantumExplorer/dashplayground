@@ -22,7 +22,17 @@
 }
 
 - (IBAction)runCommand:(id)sender {
-    self.terminalOutput.string = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue] forChain:[[DPDataStore sharedInstance] chainNetwork]];
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue] forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+//    self.terminalOutput.string = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue] forChain:[[DPDataStore sharedInstance] chainNetwork]];
     
 }
 - (IBAction)checkServer:(id)sender {

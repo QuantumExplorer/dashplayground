@@ -20,5 +20,6 @@ typedef void (^dashArrayInfoClb)(BOOL success,NSMutableArray * object);
 typedef void (^dashDictInfoClb)(BOOL success,NSDictionary * object);
 typedef void (^dashSshClb)(BOOL success,NSString * message, NMSSHSession *sshSession);
 typedef void (^dashSuccessInfo)(BOOL success,NSString * message,BOOL isFinished);
+typedef void (^dashDataClb)(BOOL success,NSString * message,NSData *data);
 
 #endif /* DashCallbacks_h */

@@ -34,11 +34,13 @@
 
 -(NSArray*)outputs:(NSString*)chainNetwork;
 
-- (NSData *)runDashRPCCommand:(NSString *)commandToRun;
+- (NSData *)runDashRPCCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb;
 
--(NSString *)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork;
+- (void)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork onClb:(dashClb)clb;
 
--(NSDictionary *)runDashRPCCommandArray:(NSString *)commandToRun;
+- (NSString*)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork;
+
+- (void)runDashRPCCommandArray:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDictInfoClb)clb;
 
 -(NSDictionary *)runDashRPCCommandArrayWithArray:(NSArray *)commandToRun;
 
