@@ -142,5 +142,15 @@
     }];
 }
 
+- (IBAction)pressSetAmi:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    
+    [[DPRepositoryController sharedInstance] setAMIForRepository:object clb:^(BOOL success, NSString *message) {
+        
+    }];
+}
+
 
 @end

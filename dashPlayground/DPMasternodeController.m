@@ -686,11 +686,12 @@
                             return clb(success,message,NO);
                         }
                         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
-                        clb(YES,eventMsg,YES);
+                        [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode];
+    
                         [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
                         [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                         
-                        [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode];
+                        clb(YES,eventMsg,YES);
                     }];
                 }
                 return clb(success,message,NO);
@@ -728,13 +729,11 @@
                                 return clb(success,message,NO);
                             }
                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                clb(YES,eventMsg,YES);
-                                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
-                                [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-                            });
-                            
                             [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode];
+                            
+                            [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                            [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                            clb(YES,eventMsg,YES);
                         }];
                     }
                     return clb(success,message,NO);

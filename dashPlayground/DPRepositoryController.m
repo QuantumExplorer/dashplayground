@@ -9,6 +9,7 @@
 #import "DPRepositoryController.h"
 #import <AFNetworking/AFNetworking.h>
 #import "DPDataStore.h"
+#import "DialogAlert.h"
 
 @implementation DPRepositoryController
 
@@ -59,6 +60,16 @@
     }
     
 }
+
+- (void)setAMIForRepository:(NSManagedObject*)repository clb:(dashClb)clb {
+    NSString *amiID = [[DialogAlert sharedInstance] showAlertWithTextField:@"Set AMI for repository" message:@"Please fill in ami-id"];
+    if([amiID length] == 0 || amiID == nil) return clb(NO, nil);
+    
+    [repository setValue:amiID forKey:@"amiId"];
+    [[DPDataStore sharedInstance] saveContext];
+    clb(YES, @"Successfully.");
+}
+
 
 #pragma mark - Singleton methods
 

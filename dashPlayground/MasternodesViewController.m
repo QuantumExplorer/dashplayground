@@ -96,7 +96,7 @@ NSString *terminalHeadString = @"";
             for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
             {
                 if([[object valueForKey:@"isSelected"] integerValue] != 1 && [object valueForKey:@"publicIP"]) {
-                    if(![[selectedMasternode valueForKey:@"chainNetwork"] isEqualToString:[object valueForKey:@"chainNetwork"]]) continue;
+                    if(![[selectedObject valueForKey:@"chainNetwork"] isEqualToString:[object valueForKey:@"chainNetwork"]]) continue;
                     
                     [[DPMasternodeController sharedInstance] addNodeToRemote:object toPublicIP:[selectedObject valueForKey:@"publicIP"] clb:^(BOOL success, NSString *message) {
                         if([message length] == 0 || [message length] == 1) {

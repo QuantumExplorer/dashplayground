@@ -96,6 +96,23 @@ static NSString *const selectInfoWarning = @"Please make sure you already select
     return alert;
 }
 
+-(NSString *)showAlertWithTextField:(NSString *)title message:(NSString*)message {
+    NSString *strMessage = [NSString stringWithFormat: @"%@", title];
+    NSString *strInformative = [NSString stringWithFormat: @"%@", message];
+    NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 300, 24)];
+    
+    NSAlert *alert = [[NSAlert alloc]init];
+    [alert addButtonWithTitle:@"Ok"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setMessageText:strMessage];
+    [alert setInformativeText:strInformative];
+    [alert setAccessoryView:input];
+    
+    [alert runModal];
+    
+    return [input stringValue];
+}
+
 #pragma mark - Singleton methods
 
 + (DialogAlert *)sharedInstance

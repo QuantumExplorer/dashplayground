@@ -21,6 +21,7 @@
 #import "SshConnection.h"
 #import "DPMasternodeController.h"
 #import "InstanceStateTransformer.h"
+#import "DPChainSelectionController.h"
 
 @interface AppDelegate ()
 
@@ -101,6 +102,10 @@
     for (NSManagedObject * masternode in checkingMasternodes) {
         
         if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
+        
+//        [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:[masternode valueForKey:@"chainNetwork"] onName:@"DRA" onClb:^(BOOL success, NSString *message) {
+//            
+//        }];
         
         //check masternode chain network
 //        if ([[masternode valueForKey:@"chainNetwork"] stringValue] == nil || [[masternode valueForKey:@"chainNetwork"] count] == 0) {

@@ -21,11 +21,11 @@
         NSArray *dashConf = [response componentsSeparatedByString:@"\n"];
         
         for(NSString *line in dashConf) {
-            if([line rangeOfString:@"devnet"].location != NSNotFound) {
-                clb(NO, @"This masternode is already on devnet!");
-                break;
-            }
-            else if ([line rangeOfString:@"mainnet"].location != NSNotFound
+//            if([line rangeOfString:@"devnet"].location != NSNotFound) {
+//                clb(NO, @"This masternode is already on devnet!");
+//                break;
+//            }
+            if ([line rangeOfString:@"mainnet"].location != NSNotFound
                 || [line rangeOfString:@"testnet"].location != NSNotFound)
             {
                 NSString *newLine = [NSString stringWithFormat:@"%@=%@",chain ,devnetName];
@@ -41,6 +41,8 @@
             }
         }
         dashConfClone = [dashConfClone arrayByAddingObject:@"port=12999"];
+        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkaddr=ycocX7F7MEQWpoNaJ7mjYHEPNt2N1Zp1V5"];
+        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkkey=cREWeXYwFMWSnLtrC1osjjf3TXBZX95xZhMRgPQu76BWqdiNbqeM"];
     }
     return dashConfClone;
 }

@@ -100,4 +100,59 @@
         }
     }
 }
+
+- (IBAction)pressGetInfo:(id)sender {
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"getinfo" forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+}
+
+- (IBAction)pressBalance:(id)sender {
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"getbalance" forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+}
+
+- (IBAction)pressMNStatus:(id)sender {
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"mnsync status" forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+}
+
+- (IBAction)pressCommandField:(id)sender {
+    if([self.commandField stringValue].length == 0) return;
+    
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[self.commandField stringValue] forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+}
+
 @end
