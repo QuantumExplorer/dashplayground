@@ -41,8 +41,8 @@
             }
         }
         dashConfClone = [dashConfClone arrayByAddingObject:@"port=12999"];
-        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkaddr=ycocX7F7MEQWpoNaJ7mjYHEPNt2N1Zp1V5"];
-        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkkey=cREWeXYwFMWSnLtrC1osjjf3TXBZX95xZhMRgPQu76BWqdiNbqeM"];
+        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkaddr=yQ8wH3bQYmmYrBVqzqcp1suye7vVCMWorS"];
+        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkkey=cNTZFb9HyF4bHDfPcdYfFexm9CdeKyHpbXRM7F3HLebdRyuSmnkU"];
     }
     return dashConfClone;
 }

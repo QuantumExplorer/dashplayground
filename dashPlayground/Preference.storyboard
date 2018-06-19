@@ -1,58 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Lfj-Oi-R9a">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Split View Controller-->
-        <scene sceneID="66f-Qg-8WX">
+        <!--Window Controller-->
+        <scene sceneID="y7X-nr-vwD">
             <objects>
-                <splitViewController id="Lfj-Oi-R9a" sceneMemberID="viewController">
-                    <splitViewItems>
-                        <splitViewItem id="ha5-1m-3mD"/>
-                        <splitViewItem id="JIU-4T-sY6"/>
-                    </splitViewItems>
-                    <splitView key="splitView" dividerStyle="thin" vertical="YES" id="u6W-Ui-PTV">
-                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                <windowController storyboardIdentifier="mainWindow" id="ETQ-sa-JTc" customClass="PreferenceWindowController" sceneMemberID="viewController">
+                    <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="Wlg-vs-78l">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="245" y="301" width="480" height="270"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
                         <connections>
-                            <outlet property="delegate" destination="Lfj-Oi-R9a" id="IsV-le-04g"/>
+                            <outlet property="delegate" destination="ETQ-sa-JTc" id="oa7-Fj-nb5"/>
                         </connections>
-                    </splitView>
+                    </window>
                     <connections>
-                        <outlet property="splitView" destination="u6W-Ui-PTV" id="Aj9-3Z-YNn"/>
-                        <segue destination="9Op-S8-Dcs" kind="relationship" relationship="splitItems" id="GIa-gb-eMB"/>
-                        <segue destination="gYo-6Y-0HB" kind="relationship" relationship="splitItems" id="96K-Cd-9BY"/>
+                        <segue destination="26M-cl-5Rf" kind="relationship" relationship="window.shadowedContentViewController" id="LAB-6h-ZsB"/>
                     </connections>
-                </splitViewController>
-                <customObject id="Qfg-TG-lp5" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                </windowController>
+                <customObject id="mMn-jw-awG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="-1195" y="641"/>
         </scene>
         <!--View Controller-->
-        <scene sceneID="5fu-tJ-pSd">
+        <scene sceneID="Flg-bZ-4bW">
             <objects>
-                <viewController id="9Op-S8-Dcs" sceneMemberID="viewController">
-                    <view key="view" id="hgQ-dm-cNN">
+                <viewController id="26M-cl-5Rf" sceneMemberID="viewController">
+                    <view key="view" id="htJ-yf-A4F">
+                        <rect key="frame" x="0.0" y="0.0" width="739" height="465"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bdr-22-fvg">
+                                <rect key="frame" x="20" y="20" width="343" height="397"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <connections>
+                                    <segue destination="Ksi-aM-zSN" kind="embed" id="hNq-o2-9PP"/>
+                                </connections>
+                            </containerView>
+                            <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="zVj-Jx-g3j">
+                                <rect key="frame" x="0.0" y="423" width="739" height="5"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </box>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="20F-bp-61L">
+                                <rect key="frame" x="113" y="434" width="534" height="23"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Your preferences for Dash Playground" id="Nf8-1f-N3v">
+                                    <font key="font" metaFont="system" size="18"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <containerView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dPl-T0-dHL">
+                                <rect key="frame" x="371" y="20" width="348" height="397"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <connections>
+                                    <segue destination="vwl-GI-ZN4" kind="embed" id="Kkl-9E-7Go"/>
+                                </connections>
+                            </containerView>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="Mpd-jC-iaZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-379.5" y="634.5"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="D7G-uX-XVt">
+            <objects>
+                <viewController id="Ksi-aM-zSN" sceneMemberID="viewController">
+                    <view key="view" id="1s4-P6-rlF">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DyA-50-tE7">
+                                <rect key="frame" x="18" y="263" width="68" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Dash Core" id="WzJ-JG-baM">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t5K-Zh-9MU">
+                                <rect key="frame" x="18" y="238" width="68" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Dash Core" id="OtT-jn-p7O">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dse-9D-U0C">
+                                <rect key="frame" x="18" y="213" width="68" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Dash Core" id="Hea-TL-YxW">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLk-RN-uC9">
+                                <rect key="frame" x="18" y="188" width="68" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Dash Core" id="RWA-MV-lRi">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="oqM-sD-VMw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-634" y="1206"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="VIy-qF-e76">
+            <objects>
+                <viewController id="vwl-GI-ZN4" sceneMemberID="viewController">
+                    <view key="view" id="Oju-Xn-XhU">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </view>
                 </viewController>
-                <customObject id="RMF-7R-RaR" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <customObject id="QYC-Fh-PUs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="lJt-xt-6hU">
-            <objects>
-                <viewController id="gYo-6Y-0HB" sceneMemberID="viewController">
-                    <view key="view" id="Za3-9e-cVN">
-                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </view>
-                </viewController>
-                <customObject id="RHZ-Sb-p5h" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
+            <point key="canvasLocation" x="-131" y="1206"/>
         </scene>
     </scenes>
 </document>

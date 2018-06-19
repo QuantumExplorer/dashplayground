@@ -981,6 +981,54 @@
 - (void)startDashd:(NSManagedObject*)masternode clb:(dashInfoClb)clb {
     
     if ([[masternode valueForKey:@"syncStatus"] integerValue] == MasternodeSync_Finished) {
+        __block NMSSHSession *ssh;
+        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            ssh = sshSession;
+            
+        }];
+        if(!ssh.authorized) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,nil,@"Could not SSH in");
+            });
+            return;
+        }
+        //  Send some commands and get the output.
+        //            NSString *exportCommand = @"export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.8/lib && dashd";
+        NSError *error = nil;
+        //            NSString *output = [ssh.channel execute:exportCommand error:&error];
+        
+        //start dashd
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd...", [masternode valueForKey:@"instanceId"]];
+            clb(TRUE, nil, eventMsg);
+        });
+        NSString *command;
+        if ([[masternode valueForKey:@"chainNetwork"] rangeOfString:@"devnet"].location != NSNotFound) {
+            command = [NSString stringWithFormat:@"cd ~/src; ./dashd -%@ -rpcport=12998 -port=12999", [masternode valueForKey:@"chainNetwork"]];
+        }
+        else {
+            command = [NSString stringWithFormat:@"cd ~/src; ./dashd"];
+        }
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(success, nil, message);
+            });
+        }];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: dashd is running up, trying to start remote server...", [masternode valueForKey:@"instanceId"]];
+            clb(TRUE, nil, eventMsg);
+        });
+        sleep(20);
+        
+        if(error != nil) {
+            NSLog(@"%@",[error localizedDescription]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], [error localizedDescription]];
+                clb(FALSE, nil, eventMsg);
+                return;
+            });
+        }
+        
         [self startRemoteMasternode:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
             if (!success || !value) {
                 NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
@@ -1042,6 +1090,7 @@
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], [error localizedDescription]];
                     clb(FALSE, nil, eventMsg);
+                    return;
                 });
             }
             
@@ -1135,6 +1184,54 @@
 //                return;
 //            }
             //  Send some commands and get the output.
+            
+            __block NMSSHSession *ssh;
+            [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                ssh = sshSession;
+                
+            }];
+            if(!ssh.authorized) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,nil,@"Could not SSH in");
+                });
+                return;
+            }
+            //  Send some commands and get the output.
+            //            NSString *exportCommand = @"export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.8/lib && dashd";
+            NSError *error = nil;
+            //            NSString *output = [ssh.channel execute:exportCommand error:&error];
+            
+            //start dashd
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd...", [masternode valueForKey:@"instanceId"]];
+                clb(TRUE, nil, eventMsg);
+            });
+            NSString *command;
+            if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+                command = [NSString stringWithFormat:@"cd ~/src; ./dashd -%@ -rpcport=12998 -port=12999", chainNetwork];
+            }
+            else {
+                command = [NSString stringWithFormat:@"cd ~/src; ./dashd"];
+            }
+            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(success, nil, message);
+                });
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: dashd is running up, trying to start remote server...", [masternode valueForKey:@"instanceId"]];
+                clb(TRUE, nil, eventMsg);
+            });
+            sleep(20);
+            
+            if(error != nil) {
+                NSLog(@"%@",[error localizedDescription]);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], [error localizedDescription]];
+                    clb(FALSE, nil, eventMsg);
+                    return;
+                });
+            }
             
             int countConnect = 0;
             while (1) {
@@ -1643,6 +1740,8 @@
 
 -(void)updateMasternodeAttributes:(NSManagedObject*)masternode {
     __block NSString *publicIP = [masternode valueForKey:@"publicIP"];
+    __block NSString *rpcPassword = [masternode valueForKey:@"rpcPassword"];
+    __block NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
             if(success != YES) return;
@@ -1703,6 +1802,14 @@
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
+            
+            //check value "SyncState"
+            NSError *error = nil;
+            NSDictionary * dictionary = [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword error:&error forChain:chainNetwork];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+                [[DPDataStore sharedInstance] saveContext];
+            });
         }];
     });
 }
@@ -2454,6 +2561,47 @@
     return fileName;
 }
 
+- (void)registerProtxForLocal:(NSArray*)AllMasternodes {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        for(NSManagedObject *masternode in AllMasternodes)
+        {
+            if([[masternode valueForKey:@"isSelected"] integerValue] == 1) {
+                [self registerProtxForLocal:[masternode valueForKey:@"publicIP"] onClb:^(BOOL success, NSString *message) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEvent:message];
+                        [masternode setValue:@(0) forKey:@"isSelected"];
+                    });
+                }];
+            }
+        }
+    });
+}
+
+- (void)registerProtxForLocal:(NSString*)publicIP onClb:(dashClb)clb {
+//    protx register yZJg3ocKiCEZEWgag7YgLhtQ9iYnEbu8J6 1000 54.169.150.160:12999 0 yhXupqeWSenszCCHyXLUsBB7fBjEqQ2ssz 0 0 0 yZJg3ocKiCEZEWgag7YgLhtQ9iYnEbu8J6
+    NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
+    __block NSString *collateralAddress;
+    __block NSString *ownerKeyAddr;
+    
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"getnewaddress" forChain:chainNetwork onClb:^(BOOL success, NSString *message) {
+        if(success == YES) {
+            collateralAddress = message;
+        }
+    }];
+    
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"getnewaddress" forChain:chainNetwork onClb:^(BOOL success, NSString *message) {
+        if(success == YES) {
+            ownerKeyAddr = message;
+        }
+    }];
+    
+    if([collateralAddress length] == 0 || [ownerKeyAddr length] == 0) return clb(NO, [NSString stringWithFormat:@"REMOTE-%@: something went wrong with getnewaddress command", publicIP]);
+    
+    NSString *protxCommand = [NSString stringWithFormat:@"protx register %@ 1000 %@:12999 0 %@ 0 0 0 %@", collateralAddress, publicIP, ownerKeyAddr, collateralAddress];
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:protxCommand forChain:chainNetwork onClb:^(BOOL success, NSString *message) {
+        clb(success, [NSString stringWithFormat:@"REMOTE-%@: %@", publicIP, message]);
+    }];
+}
 
 #pragma mark - Singleton methods
 

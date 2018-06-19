@@ -77,6 +77,19 @@ NSString *terminalHeadString = @"";
     [self.tableView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
 }
 
+- (IBAction)pressRegisterProtx:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:0];//set console tab to masternode segment.
+    [self addStringEvent:@"Running command protx register on local..."];
+    
+    NSArray *AllMasternodes = [NSArray init];
+    AllMasternodes = [AllMasternodes initWithArray:[self.arrayController.arrangedObjects allObjects]];
+    
+//    NSArray *AllMasternodes = [self.arrayController.arrangedObjects allObjects];
+    
+    [[DPMasternodeController sharedInstance] registerProtxForLocal:AllMasternodes];
+}
+
+
 - (IBAction)pressAddNode:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Adding node to local..."];
@@ -110,24 +123,6 @@ NSString *terminalHeadString = @"";
             }
         }
         
-        
-//        for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
-//        {
-//            if([[object valueForKey:@"isSelected"] integerValue] != 1 && [object valueForKey:@"publicIP"]) {
-//                for(NSManagedObject *selectedObject in selectedMasternode)
-//                {
-//                    [[DPMasternodeController sharedInstance] addNodeToRemote:object toPublicIP:[selectedObject valueForKey:@"publicIP"] clb:^(BOOL success, NSString *message) {
-//                        if([message length] == 0 || [message length] == 1) {
-//                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", [object valueForKey:@"publicIP"], [selectedObject valueForKey:@"publicIP"]]];
-//                        }
-//                        else {
-//                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: %@", [object valueForKey:@"publicIP"], message]];
-//                        }
-//                    }];
-//                }
-//            }
-//        }
-        
         for(NSManagedObject *selectedObject in selectedMasternode)
         {
             [[DPMasternodeController sharedInstance] addNodeToLocal:selectedObject clb:^(BOOL success, NSString *message) {
@@ -157,19 +152,6 @@ NSString *terminalHeadString = @"";
             [object setValue:@(0) forKey:@"isSelected"];
         }
     }
-//    [self deSelectAll];
-    
-    
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1) {
-//        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to start instance!" message:@"Please make sure you already select an instance."];
-//        return;
-//    }
-//    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//    [[DPMasternodeController sharedInstance] setUpMasternodeSentinel:object clb:^(BOOL success, NSString *message) {
-//        [self addStringEventToMasternodeConsole:message];
-//    }];
 }
 
 - (IBAction)checkSentinel:(id)sender {
@@ -196,30 +178,6 @@ NSString *terminalHeadString = @"";
             }];
         }
     }
-//    [self deSelectAll];
-    
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1) {
-//        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to start instance!" message:@"Please make sure you already select an instance."];
-//        return;
-//    }
-//    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//    [[DPMasternodeController sharedInstance] checkMasternodeSentinel:object clb:^(BOOL success, NSString *message) {
-//        if([message length] == 0) {
-//            [self addStringEventToMasternodeConsole:@"sentinel is now working."];
-//            [object setValue:@(SentinelState_Running) forKey:@"sentinelState"];
-//            [[DPDataStore sharedInstance] saveContext];
-//        }
-//        else if (success != YES){
-//            [object setValue:@(SentinelState_Error) forKey:@"sentinelState"];
-//            [[DPDataStore sharedInstance] saveContext];
-//            [self addStringEventToMasternodeConsole:message];
-//        }
-//        else {
-//            [self addStringEventToMasternodeConsole:message];
-//        }
-//    }];
 }
 
 - (IBAction)configureMasternodeSentinel:(id)sender {
@@ -410,28 +368,34 @@ NSString *terminalHeadString = @"";
                 if([[object valueForKey:@"isSelected"] integerValue] == 1) {
                     if (![object valueForKey:@"key"]) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
-                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                            [[NSApplication sharedApplication] presentError:error];
+                            eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: This remote must first have a key for the masternode before you can start it.", [object valueForKey:@"instanceId"]];
+                            [self addStringEventToMasternodeConsole:eventMsg];
+//                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
+//                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+//                            [[NSApplication sharedApplication] presentError:error];
                             return;
                         });
                     }
                     if (![object valueForKey:@"instanceId"]) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
-                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                            [[NSApplication sharedApplication] presentError:error];
+                            eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: This remote is not available.", [object valueForKey:@"instanceId"]];
+                            [self addStringEventToMasternodeConsole:eventMsg];
+//                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
+//                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+//                            [[NSApplication sharedApplication] presentError:error];
                             return;
                         });
                     }
                     if(![object valueForKey:@"rpcPassword"]) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                            dict[NSLocalizedDescriptionKey] = @"You must first have a rpc password for the masternode before you can start it.";
-                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                            [[NSApplication sharedApplication] presentError:error];
+                            eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: This remote must first have a rpc password for the masternode before you can start it.", [object valueForKey:@"instanceId"]];
+                            [self addStringEventToMasternodeConsole:eventMsg];
+//                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+//                            dict[NSLocalizedDescriptionKey] = @"You must first have a rpc password for the masternode before you can start it.";
+//                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+//                            [[NSApplication sharedApplication] presentError:error];
                             return;
                         });
                     }

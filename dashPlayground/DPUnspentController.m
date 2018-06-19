@@ -15,26 +15,23 @@
 
 -(void)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork clb:(dashDictInfoClb)clb {
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),^{
-    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+
         for (NSDictionary* unspent in unspentOutputs) {
-            
-            NSDictionary * unspentTran = [self getTransactionInfo:[unspent valueForKey:@"txid"] forChain:chainNetwork];
-            NSString *dateTime = [self getDateTime:[unspentTran valueForKey:@"time"]];
-            
+
+//            NSDictionary * unspentTran = [self getTransactionInfo:[unspent valueForKey:@"txid"] forChain:chainNetwork];
+//            NSString *dateTime = [self getDateTime:[unspentTran valueForKey:@"time"]];
+
             NSDictionary * rDict = [NSMutableDictionary dictionary];
-            
+
             [rDict setValue:[unspent valueForKey:@"account"] forKey:@"name"];
             [rDict setValue:[unspent valueForKey:@"txid"] forKey:@"txid"];
             [rDict setValue:[unspent valueForKey:@"confirmations"] forKey:@"confirmations"];
             [rDict setValue:[unspent valueForKey:@"amount"] forKey:@"amount"];
             [rDict setValue:[unspent valueForKey:@"address"] forKey:@"address"];
-            [rDict setValue:dateTime forKey:@"time"];
-            clb(NO, rDict);
+//            [rDict setValue:dateTime forKey:@"time"];
         }
-        
-        clb(YES,nil);
-        
+
     });
     
 }

@@ -22,6 +22,7 @@
 #import "DPMasternodeController.h"
 #import "InstanceStateTransformer.h"
 #import "DPChainSelectionController.h"
+#import "PreferenceWindowController.h"
 
 @interface AppDelegate ()
 
@@ -81,6 +82,10 @@
 //    
 //    [ssh disconnect];
     
+//    NSStoryboard *storyBoard = [NSStoryboard storyboardWithName:@"Preference" bundle:nil]; // get a reference to the storyboard
+//    PreferenceWindowController *prefViewController = [[PreferenceWindowController alloc] init];
+//    prefViewController = [storyBoard instantiateControllerWithIdentifier:@"mainWindow"]; // instantiate your window controller
+//    [prefViewController showWindow:self]; // show the window
     
     //end
     

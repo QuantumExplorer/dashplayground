@@ -84,7 +84,8 @@ NSArray* _masternodeArrayObjects;
         }
     });
     
-    dispatch_group_notify(d_group, dispatch_get_main_queue(), ^{
+    dispatch_group_wait(d_group, DISPATCH_TIME_FOREVER);
+    dispatch_async(dispatch_get_main_queue(), ^{
 //        dispatch_release(d_group);
         [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
             if(success) {

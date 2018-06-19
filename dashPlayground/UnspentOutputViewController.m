@@ -47,19 +47,25 @@
         {
             self.windowLog.stringValue = @"Dash server started";
             [self.arrayController setContent:nil];
-            [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork clb:^(BOOL success, NSDictionary *object) {
-//                [self processUnspentOutput:object];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if(object != nil){
-                        [self showTableContent:object];
-                    }
-                });
-            }];
+            [self processOutput:dict forChain:chainNetwork];
         }
         else{
             self.windowLog.stringValue = @"Dash server didn't start up";
         }
     } forChain:chainNetwork];
+}
+
+-(void)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        for (NSDictionary* unspent in unspentOutputs) {
+            
+            [self showTableContent:unspent];
+        }
+        
+    });
+    
 }
 
 -(AppDelegate*)appDelegate {
@@ -83,34 +89,13 @@
         [self.arrayController addObject:dictionary];
         
         [self.arrayController rearrangeObjects];
+
+//        NSArray *array = [self.arrayController arrangedObjects];
+//        NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
         
-        NSArray *array = [self.arrayController arrangedObjects];
-        NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
-        
-        [self.unspentTable editColumn:0 row:row withEvent:nil select:YES];
-//        if([[dictionary valueForKey:@"amount"] integerValue] == 1000) {
-//        }
+//        [self.unspentTable editColumn:0 row:row withEvent:nil select:YES];
     });
-    
-    
-//    NSMutableArray *allObjectsClone = [NSMutableArray array];
-//
-//    for(NSArray *object in [self.arrayController.arrangedObjects allObjects]) {
-//        if([[object valueForKey:@"address"] isEqualToString:[dictionary valueForKey:@"address"]]){
-//            [allObjectsClone addObject:object];
-//        }
-//    }
-//
-//    [self.arrayController removeObjects:allObjectsClone];
-//
-//    [self.arrayController addObject:dictionary];
-//
-//    [self.arrayController rearrangeObjects];
-//
-//    NSArray *array = [_arrayController arrangedObjects];
-//    NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
-//
-//    [_unspentTable editColumn:0 row:row withEvent:nil select:YES];
+
 }
 
 - (IBAction)pressRefresh:(id)sender {
@@ -123,16 +108,7 @@
         {
             self.windowLog.stringValue = @"Dash server started";
             [self.arrayController setContent:nil];
-            [[DPUnspentController sharedInstance] processOutput:dict forChain:chainNetwork clb:^(BOOL success, NSDictionary *object) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if(success == YES) {
-                        self.refreshButton.state = false;
-                    }
-                    else if(object != nil){
-                        [self showTableContent:object];
-                    }
-                });
-            }];
+            [self processOutput:dict forChain:chainNetwork];
         }
         else{
             self.windowLog.stringValue = @"Dash server didn't start up";

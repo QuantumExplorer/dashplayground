@@ -221,7 +221,7 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 }
 
 - (void)checkDash:(dashActiveClb)clb forChain:(NSString*)chainNetwork {
-    [self checkDashTries:3 clb:clb forChain:chainNetwork];
+    [self checkDashTries:1 clb:clb forChain:chainNetwork];
 }
 
 - (void)checkDashTries:(NSUInteger)timesToTry clb:(dashActiveClb)clb forChain:(NSString*)chainNetwork {

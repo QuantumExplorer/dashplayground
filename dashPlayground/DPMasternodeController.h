@@ -65,5 +65,6 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode;
 
 -(void)configureMasternodeSentinel:(NSArray*)AllMasternodes;
-
+- (void)registerProtxForLocal:(NSString*)publicIP onClb:(dashClb)clb;
+- (void)registerProtxForLocal:(NSArray*)AllMasternodes;
 @end

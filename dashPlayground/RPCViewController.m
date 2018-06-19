@@ -140,6 +140,45 @@
     }];
 }
 
+- (IBAction)pressMNList:(id)sender {
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"masternode list" forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+}
+
+- (IBAction)pressBlockChainInfo:(id)sender {
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"getblockchaininfo" forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+}
+
+- (IBAction)pressUnspentList:(id)sender {
+    self.terminalOutput.string = @"";
+    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"listunspent" forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSMutableString  *newString = [[NSMutableString alloc] init];
+            [newString appendString:[NSString stringWithFormat:@"%@", self.terminalOutput.string]];
+            [newString appendString:message];
+            self.terminalOutput.string = newString;
+        });
+    }];
+}
+
 - (IBAction)pressCommandField:(id)sender {
     if([self.commandField stringValue].length == 0) return;
     
@@ -153,6 +192,7 @@
             self.terminalOutput.string = newString;
         });
     }];
+//    self.commandField.stringValue = @"";
 }
 
 @end
