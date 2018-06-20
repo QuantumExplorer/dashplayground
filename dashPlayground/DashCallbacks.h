@@ -17,7 +17,7 @@ typedef void (^dashBoolClb)(BOOL success,BOOL value,NSString* errorMessage);
 typedef void (^dashActiveClb)(BOOL active);
 typedef void (^dashSyncClb)(BOOL active);
 typedef void (^dashArrayInfoClb)(BOOL success,NSMutableArray * object);
-typedef void (^dashDictInfoClb)(BOOL success,NSDictionary * object);
+typedef void (^dashDictInfoClb)(BOOL success,NSDictionary * dictionary);
 typedef void (^dashSshClb)(BOOL success,NSString * message, NMSSHSession *sshSession);
 typedef void (^dashSuccessInfo)(BOOL success,NSString * message,BOOL isFinished);
 typedef void (^dashDataClb)(BOOL success,NSString * message,NSData *data);

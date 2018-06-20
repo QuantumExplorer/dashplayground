@@ -31,18 +31,19 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType;
 - (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb;
-- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onChainName:(NSString*)chainName clb:(dashSuccessInfo)clb;
+- (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onChainName:(NSString*)chainName onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey clb:(dashSuccessInfo)clb;
 - (void)setUpMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
 
-- (void)startDashd:(NSManagedObject*)masternode clb:(dashInfoClb)clb;
+- (void)startMasternodeOnRemote:(NSManagedObject*)masternode localChain:(NSString*)localChain clb:(dashInfoClb)clb;
+-(void)startDashdOnRemote:(NSManagedObject*)masternode onClb:(dashClb)clb;
 
 -(void)checkMasternode:(NSManagedObject*)masternode;
 
 //-(NSDictionary*)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode;
 
-- (NSDictionary *)runAWSCommandJSON:(NSString *)commandToRun;
-- (NSData *)runAWSCommand:(NSString *)commandToRun;
-- (NSString *)runAWSCommandString:(NSString *)commandToRun;
+- (NSDictionary *)runAWSCommandJSON:(NSString *)commandToRun checkError:(BOOL)withError;
+- (NSData *)runAWSCommand:(NSString *)commandToRun checkError:(BOOL)withError;
+- (NSString *)runAWSCommandString:(NSString *)commandToRun checkError:(BOOL)withError;
 
 -(void)setSshPath:(NSString*)sshPath;
 -(NSString*)sshPath;
@@ -67,4 +68,9 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)configureMasternodeSentinel:(NSArray*)AllMasternodes;
 - (void)registerProtxForLocal:(NSString*)publicIP onClb:(dashClb)clb;
 - (void)registerProtxForLocal:(NSArray*)AllMasternodes;
+- (NSData *)runAWSCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb;
+
+- (void)setUpDevnet:(NSArray*)allMasternodes;
+- (void)setUpMainNode:(NSManagedObject*)masternode;
+
 @end

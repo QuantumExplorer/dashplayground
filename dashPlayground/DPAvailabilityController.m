@@ -17,7 +17,7 @@
     NSMutableArray * availabilityRegions = [NSMutableArray array];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-regions"];
+        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-regions" checkError:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             //NSLog(@"%@",reservation[@"Instances"]);
             for (NSDictionary * dictionary in output[@"Regions"]) {

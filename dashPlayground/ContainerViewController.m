@@ -53,6 +53,9 @@
     [[NSUserDefaults standardUserDefaults] setObject:chainName forKey:@"chainNetworkName"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    DPDataStore *dataStore = [DPDataStore sharedInstance];
+    dataStore.chainNetwork = [NSString stringWithFormat:@"devnet=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
+    
 //    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Chain Network" message:[NSString stringWithFormat:@"The chain network name was set to %@", self.chainNameField.stringValue]];
 }
 

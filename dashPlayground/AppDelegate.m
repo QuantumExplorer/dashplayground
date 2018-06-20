@@ -82,10 +82,6 @@
 //    
 //    [ssh disconnect];
     
-//    NSStoryboard *storyBoard = [NSStoryboard storyboardWithName:@"Preference" bundle:nil]; // get a reference to the storyboard
-//    PreferenceWindowController *prefViewController = [[PreferenceWindowController alloc] init];
-//    prefViewController = [storyBoard instantiateControllerWithIdentifier:@"mainWindow"]; // instantiate your window controller
-//    [prefViewController showWindow:self]; // show the window
     
     //end
     
@@ -108,9 +104,6 @@
         
         if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
         
-//        [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:[masternode valueForKey:@"chainNetwork"] onName:@"DRA" onClb:^(BOOL success, NSString *message) {
-//            
-//        }];
         
         //check masternode chain network
 //        if ([[masternode valueForKey:@"chainNetwork"] stringValue] == nil || [[masternode valueForKey:@"chainNetwork"] count] == 0) {

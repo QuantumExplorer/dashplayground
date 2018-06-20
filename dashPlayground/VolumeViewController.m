@@ -27,8 +27,8 @@
 @implementation VolumeViewController
 
 VolumeViewController* _volumeController;
+NSManagedObject *masternodeObject;
 NSString *instanceId;
-NSManagedObject *mainObject;
 
 - (void)awakeFromNib {
     
@@ -42,8 +42,7 @@ NSManagedObject *mainObject;
     
     if([_volumeController.window isVisible]) return;
     
-    mainObject = object;
-    
+    masternodeObject = object;
     instanceId = [object valueForKey:@"instanceId"];
     
     _volumeController = [[VolumeViewController alloc] initWithWindowNibName:@"VolumeWindow"];
@@ -58,7 +57,7 @@ NSManagedObject *mainObject;
     NSMutableArray * volume = [NSMutableArray array];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-volumes --filters Name=attachment.instance-id,Values=%@", instanceID]];
+        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-volumes --filters Name=attachment.instance-id,Values=%@", instanceID] checkError:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             //NSLog(@"%@",reservation[@"Instances"]);
             for (NSDictionary * dictionary in output[@"Volumes"]) {
@@ -130,22 +129,19 @@ NSManagedObject *mainObject;
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
             
-            NSDictionary *output;
+            NSString *output;
             
             if(isReboot){
-                output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]]];
+                output = [DPmasternodeCon runAWSCommandString:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]] checkError:YES];
             }else{
-                output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --no-reboot --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@,VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]]];
+                output = [DPmasternodeCon runAWSCommandString:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --no-reboot --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@,VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]] checkError:YES];
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                if(output[@"ImageId"])
-                {
-                    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:@"The image is created succesfully."];
-                    [_volumeController.window close];
-                    [self setAmiIdToRepositoryView:output[@"ImageId"] repoPath:[mainObject valueForKey:@"repositoryUrl"]];
-                }
+                [_volumeController.window close];
+                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:[NSString stringWithFormat:@"Created AMI result: %@", output]];
             });
+            
         });
         
     }

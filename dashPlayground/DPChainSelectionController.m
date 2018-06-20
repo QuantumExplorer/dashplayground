@@ -9,10 +9,12 @@
 #import "DPChainSelectionController.h"
 #import "SshConnection.h"
 #import "DPMasternodeController.h"
+#import "DPDataStore.h"
 
 @implementation DPChainSelectionController
 
--(NSArray*)createNewConfigDashContent:(NMSSHSession*)ssh onChain:(NSString*)chain devnetName:(NSString*)devnetName onClb:(dashClb)clb {
+-(NSArray*)createNewConfigDashContent:(NMSSHSession*)ssh onChain:(NSString*)chain devnetName:(NSString*)devnetName onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey onClb:(dashClb)clb {
+    
     NSError *error = nil;
     NSArray *dashConfClone = [NSArray array];
     
@@ -41,13 +43,13 @@
             }
         }
         dashConfClone = [dashConfClone arrayByAddingObject:@"port=12999"];
-        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkaddr=yQ8wH3bQYmmYrBVqzqcp1suye7vVCMWorS"];
-        dashConfClone = [dashConfClone arrayByAddingObject:@"sporkkey=cNTZFb9HyF4bHDfPcdYfFexm9CdeKyHpbXRM7F3HLebdRyuSmnkU"];
+        dashConfClone = [dashConfClone arrayByAddingObject:[NSString stringWithFormat:@"sporkaddr=%@", sporkAddr]];
+        dashConfClone = [dashConfClone arrayByAddingObject:[NSString stringWithFormat:@"sporkkey=%@", sporkKey]];
     }
     return dashConfClone;
 }
 
--(void)configureConfigDashFileForMasternode:(NSManagedObject*)masternode onChain:(NSString*)chain onName:(NSString*)devName onClb:(dashClb)clb {
+-(void)configureConfigDashFileForMasternode:(NSManagedObject*)masternode onChain:(NSString*)chain onName:(NSString*)devName onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey onClb:(dashClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
             
@@ -63,7 +65,7 @@
             }];
             if(isSuccess != YES) return;
             
-            NSArray *dashConfContents = [self createNewConfigDashContent:sshSession onChain:chain devnetName:devName onClb:^(BOOL success, NSString *message) {
+            NSArray *dashConfContents = [self createNewConfigDashContent:sshSession onChain:chain devnetName:devName onSporkAddr:sporkAddr onSporkKey:sporkKey onClb:^(BOOL success, NSString *message) {
                 isSuccess = success;
             }];
             if(isSuccess != YES) return;
@@ -102,9 +104,9 @@
     return fileName;
 }
 
--(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode {
+-(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey {
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) chainNetwork = @"devnet";
-    [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:chainNetwork onName:chainNetworkName onClb:^(BOOL success, NSString *message) {
+    [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:chainNetwork onName:chainNetworkName onSporkAddr:sporkAddr onSporkKey:sporkKey onClb:^(BOOL success, NSString *message) {
         if(success != YES) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network failed."];

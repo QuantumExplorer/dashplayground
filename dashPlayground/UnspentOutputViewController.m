@@ -85,8 +85,10 @@
 
 -(void)showTableContent:(NSDictionary*)dictionary
 {
+    NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] initWithDictionary:dictionary];
+    [mutableDictionary setObject:@"0" forKey:@"selected"];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.arrayController addObject:dictionary];
+        [self.arrayController addObject:mutableDictionary];
         
         [self.arrayController rearrangeObjects];
 
@@ -136,7 +138,21 @@
         
         [[DPUnspentController sharedInstance] createTransaction:self.countField.integerValue label:self.labelField.stringValue amount:1000 allObjects:cloneObjects clb:^(BOOL success, NSMutableArray *newObjects) {
             
-            if(newObjects != nil) [self processUnspentOutput:newObjects];
+            if(newObjects != nil) {
+                NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
+                [[DPUnspentController sharedInstance] retreiveUnspentOutput:^(BOOL success,NSDictionary *dict, NSString *message){
+                    if(success)
+                    {
+                        self.windowLog.stringValue = @"Dash server started";
+                        [self.arrayController setContent:nil];
+                        [self processOutput:dict forChain:chainNetwork];
+                    }
+                    else{
+                        self.windowLog.stringValue = @"Dash server didn't start up";
+                    }
+                } forChain:chainNetwork];
+//                [self processUnspentOutput:newObjects];
+            }
         } forChain:chainNetwork];
         
 //        [self deSelectAll];

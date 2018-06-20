@@ -51,7 +51,7 @@ PreferenceViewController* _windowController;
     DPMasternodeController *DPmasternodeCon = [[DPMasternodeController alloc]init];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-security-groups"];
+        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-security-groups" checkError:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             //NSLog(@"%@",reservation[@"Instances"]);
             if(output[@"SecurityGroups"])
@@ -75,7 +75,7 @@ PreferenceViewController* _windowController;
     DPMasternodeController *DPmasternodeCon = [[DPMasternodeController alloc]init];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-subnets"];
+        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-subnets"  checkError:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             //NSLog(@"%@",reservation[@"Instances"]);
             if(output[@"Subnets"])
@@ -97,7 +97,7 @@ PreferenceViewController* _windowController;
     DPMasternodeController *DPmasternodeCon = [[DPMasternodeController alloc]init];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-key-pairs"];
+        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-key-pairs"  checkError:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             //NSLog(@"%@",reservation[@"Instances"]);
             if(output[@"KeyPairs"])

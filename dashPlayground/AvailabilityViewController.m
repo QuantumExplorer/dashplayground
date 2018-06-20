@@ -51,7 +51,7 @@ NSMutableArray * availabilityRegions;
     DPMasternodeController *DPmasternodeCon = [[DPMasternodeController alloc]init];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-regions"];
+        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:@"ec2 describe-regions" checkError:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             //NSLog(@"%@",reservation[@"Instances"]);
             availabilityRegions = [NSMutableArray array];//initiate the object first

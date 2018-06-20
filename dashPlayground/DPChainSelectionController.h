@@ -14,7 +14,7 @@
 
 +(DPChainSelectionController*)sharedInstance;
 
--(void)configureConfigDashFileForMasternode:(NSManagedObject*)masternode onChain:(NSString*)chain onName:(NSString*)devName onClb:(dashClb)clb;
--(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode;
+-(void)configureConfigDashFileForMasternode:(NSManagedObject*)masternode onChain:(NSString*)chain onName:(NSString*)devName onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey onClb:(dashClb)clb;
+-(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey;
 
 @end

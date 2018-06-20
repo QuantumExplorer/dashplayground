@@ -51,9 +51,25 @@ NSArray* _masternodeArrayObjects;
     else if([self.chainPopUp.objectValue integerValue] == 2) {
         //devnet=DRA -> this is local devnet name
         //TODO: find out a way to get local devnet name -> finished
-        chainNetwork = [NSString stringWithFormat:@"devnet=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
+        chainNetwork = [NSString stringWithFormat:@"devnet=%@", chainNetworkName];
     }
     [_chainSelectionWindow close];
+    
+    NSString *sporkAddr = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"getnewaddress" forChain:chainNetwork];
+    NSString *sporkKey = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[NSString stringWithFormat:@"dumpprivkey %@", sporkAddr] forChain:chainNetwork];
+    
+    if([sporkAddr length] != 35 || [sporkKey length] != 53) {
+        [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"Error while running command getnewaddress or dumpprivkey."];
+        return;
+    }
+    
+    for(NSManagedObject *masternode in _masternodeArrayObjects)
+    {
+        if([[masternode valueForKey:@"isSelected"] integerValue] == 1) {
+            [masternode setValue:chainNetwork forKey:@"chainNetwork"];
+            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+        }
+    }
     
     dispatch_group_t d_group = dispatch_group_create();
     dispatch_queue_t bg_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
@@ -63,22 +79,13 @@ NSArray* _masternodeArrayObjects;
         for(NSManagedObject *masternode in _masternodeArrayObjects)
         {
             if([[masternode valueForKey:@"isSelected"] integerValue] == 1) {
-                [masternode setValue:chainNetwork forKey:@"chainNetwork"];
-                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
 
-                [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:masternode onChainName:chainNetworkName clb:^(BOOL success, NSString *message, BOOL isFinished) {
+                [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:masternode onChainName:chainNetworkName onSporkAddr:sporkAddr onSporkKey:sporkKey clb:^(BOOL success, NSString *message, BOOL isFinished) {
                     dispatch_async(dispatch_get_main_queue(), ^{
+                        [masternode setValue:@(0) forKey:@"isSelected"];
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                         [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
                     });
-//                    if(isFinished == YES) {
-//                        [[DPLocalNodeController sharedInstance] stopDash:^(BOOL success, NSString *message) {
-//                            if(success) {
-//                                [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
-//
-//                                } forChain:chainNetwork];
-//                            }
-//                        } forChain:chainNetwork];
-//                    }
                 }];
             }
         }
