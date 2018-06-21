@@ -2056,6 +2056,61 @@
                                     </subviews>
                                 </view>
                             </box>
+                            <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Xb-Tt-uZF">
+                                <rect key="frame" x="539" y="115" width="521" height="135"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <clipView key="contentView" ambiguous="YES" id="N97-qH-ZwI">
+                                    <rect key="frame" x="1" y="1" width="519" height="133"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="k66-ZE-8e4">
+                                            <rect key="frame" x="0.0" y="0.0" width="519" height="133"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <size key="minSize" width="519" height="133"/>
+                                            <size key="maxSize" width="961" height="10000000"/>
+                                            <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        </textView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </clipView>
+                                <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="URi-DC-22G">
+                                    <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gLm-k5-byO">
+                                    <rect key="frame" x="504" y="1" width="16" height="133"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7yz-li-jg8">
+                                <rect key="frame" x="538" y="259" width="524" height="24"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ca0-qQ-UuX">
+                                    <font key="font" metaFont="system"/>
+                                    <segments>
+                                        <segment label="Local" imageScaling="proportionallyUpOrDown" width="126" selected="YES"/>
+                                        <segment label="Masternode" width="195" tag="1"/>
+                                        <segment label="Terminal" width="195"/>
+                                    </segments>
+                                </segmentedCell>
+                                <connections>
+                                    <action selector="selectedConsoleTab:" target="Inw-N2-PBT" id="cjg-Tz-pDt"/>
+                                </connections>
+                            </segmentedControl>
+                            <textField hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GRs-Hq-axs">
+                                <rect key="frame" x="539" y="85" width="521" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" placeholderString="Command" drawsBackground="YES" id="8ZJ-TY-ie6">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <connections>
+                                        <action selector="pressCommandField:" target="Inw-N2-PBT" id="i9H-ae-WDf"/>
+                                    </connections>
+                                </textFieldCell>
+                            </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qjE-rg-RjO">
                                 <rect key="frame" x="120" y="531" width="95" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2089,8 +2144,8 @@
                                     <action selector="pressSelectAll:" target="Inw-N2-PBT" id="gBM-EU-Xu1"/>
                                 </connections>
                             </button>
-                            <box fixedFrame="YES" title="Devnet Control" titlePosition="belowTop" translatesAutoresizingMaskIntoConstraints="NO" id="T9i-lQ-3lh">
-                                <rect key="frame" x="536" y="76" width="150" height="208"/>
+                            <box hidden="YES" fixedFrame="YES" title="Devnet Control" titlePosition="belowTop" translatesAutoresizingMaskIntoConstraints="NO" id="T9i-lQ-3lh">
+                                <rect key="frame" x="1085" y="75" width="150" height="208"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="rp4-CL-1SJ">
                                     <rect key="frame" x="2" y="2" width="146" height="188"/>
@@ -2140,64 +2195,20 @@
                                                 <action selector="configure:" target="Inw-N2-PBT" id="Ndt-xC-Kw6"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V3r-sG-bDQ">
+                                            <rect key="frame" x="9" y="48" width="127" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Check" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TFg-sm-tGx">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="pressCheckDevnet:" target="Inw-N2-PBT" id="WVb-3R-0c4"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </box>
-                            <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Xb-Tt-uZF">
-                                <rect key="frame" x="711" y="115" width="521" height="135"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <clipView key="contentView" ambiguous="YES" id="N97-qH-ZwI">
-                                    <rect key="frame" x="1" y="1" width="519" height="133"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <textView ambiguous="YES" importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="k66-ZE-8e4">
-                                            <rect key="frame" x="0.0" y="0.0" width="519" height="133"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <size key="minSize" width="519" height="133"/>
-                                            <size key="maxSize" width="961" height="10000000"/>
-                                            <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                        </textView>
-                                    </subviews>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                </clipView>
-                                <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="URi-DC-22G">
-                                    <rect key="frame" x="-100" y="-100" width="87" height="18"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="gLm-k5-byO">
-                                    <rect key="frame" x="504" y="1" width="16" height="133"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
-                            <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7yz-li-jg8">
-                                <rect key="frame" x="710" y="259" width="524" height="24"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ca0-qQ-UuX">
-                                    <font key="font" metaFont="system"/>
-                                    <segments>
-                                        <segment label="Local" imageScaling="proportionallyUpOrDown" width="126" selected="YES"/>
-                                        <segment label="Masternode" width="195" tag="1"/>
-                                        <segment label="Terminal" width="195"/>
-                                    </segments>
-                                </segmentedCell>
-                                <connections>
-                                    <action selector="selectedConsoleTab:" target="Inw-N2-PBT" id="cjg-Tz-pDt"/>
-                                </connections>
-                            </segmentedControl>
-                            <textField hidden="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GRs-Hq-axs">
-                                <rect key="frame" x="711" y="85" width="521" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" placeholderString="Command" drawsBackground="YES" id="8ZJ-TY-ie6">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <connections>
-                                        <action selector="pressCommandField:" target="Inw-N2-PBT" id="i9H-ae-WDf"/>
-                                    </connections>
-                                </textFieldCell>
-                            </textField>
                         </subviews>
                     </view>
                     <connections>
@@ -2209,6 +2220,7 @@
                         <outlet property="consoleTabSegmentedControl" destination="7yz-li-jg8" id="fiK-6P-uyu"/>
                         <outlet property="consoleTextView" destination="k66-ZE-8e4" id="Zae-IX-p4A"/>
                         <outlet property="createAmiButton" destination="Pje-IL-Cbp" id="dzI-ui-xDV"/>
+                        <outlet property="devnetBox" destination="T9i-lQ-3lh" id="BpG-Hn-a6i"/>
                         <outlet property="selectAllButton" destination="6hQ-JF-uLP" id="y3w-tK-A2v"/>
                         <outlet property="setupButton" destination="ck6-t0-kyP" id="n2O-NH-feR"/>
                         <outlet property="startButton" destination="vDA-Fh-ysu" id="LSk-Jg-piH"/>

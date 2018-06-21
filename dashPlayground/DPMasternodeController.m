@@ -497,11 +497,15 @@
     return sftp;
 }
 
-- (void)setUpMainNode:(NSManagedObject*)masternode {
+- (BOOL)setUpMainNode:(NSManagedObject*)masternode {
     NSError *error;
     
     NSDictionary *dictionary = [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:@"mnsync status" toMasternode:masternode error:&error];
-    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: mnsync status: %@", [dictionary valueForKey:@"AssetName"], [masternode valueForKey:@"publicIP"]]];
+    if(dictionary == nil || ![dictionary valueForKey:@"AssetName"]) {
+        [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: the dash core server of main node is not started", [masternode valueForKey:@"publicIP"]]];
+        return NO;
+    }
+    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: mnsync status: %@", [masternode valueForKey:@"publicIP"], [dictionary valueForKey:@"AssetName"]]];
     
     if(![[dictionary valueForKey:@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_FINISHED"]) {
         [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"mnsync next"];
@@ -512,8 +516,9 @@
         //generate 1 block to activate masternode synchronization.
         [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: executing command: generate 1", [masternode valueForKey:@"publicIP"]]];
         [[DPMasternodeController sharedInstance] sendRPCCommandString:@"generate 1" toMasternode:masternode];
-        return;
+        return YES;
     }
+    return YES;
 }
 
 - (void)addNodeToLocal:(NSManagedObject*)masternode clb:(dashClb)clb {
@@ -535,6 +540,15 @@
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
         port = @"12999";
     }
+    
+    NSError *error;
+    NSDictionary *dictionary = [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:@"getinfo" toMasternode:masternode error:&error];
+    if(dictionary == nil || ![dictionary valueForKey:@"blocks"]) {
+        [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: The dash core server is not started", [masternode valueForKey:@"publicIP"]]];
+        return clb(NO,nil);
+    }
+    
+    
     NSString *command = [NSString stringWithFormat:@"addnode %@:%@ add", publicIP, port];
     
     NSString *response = [[DPMasternodeController sharedInstance] sendRPCCommandString:command toMasternode:masternode];
@@ -728,8 +742,11 @@
         
         NSMutableArray * outputs = [[[DPLocalNodeController sharedInstance] outputs:[masternode valueForKey:@"chainNetwork"]] mutableCopy];
         
-        if(outputs == nil) {
-            return clb(FALSE,@"No valid outputs (empty) in local wallet.",NO);
+        if(outputs == nil || [outputs count] == 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(FALSE,@"No valid outputs (empty) in local wallet.",NO);
+            });
+            return;
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -2613,11 +2630,11 @@
         }];
         
         if([localMNStatus isEqualToString:@"MASTERNODE_SYNC_FINISHED"]) {
-
+            [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Your mnsync status is finished, please configure your remotes."]];
         }
         else {
-            //step 1 make dip0001 and bip147 status to be started
-            [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"checking dip0001 and bip147 status, those status need to be active."]];
+            //step 1 make dip0003 and bip147 status to be started
+            [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"checking dip0003 and bip147 status, those status need to be active."]];
             __block BOOL isSucceed = NO;
             __block int countTries = 0;
             while (1) {
@@ -2628,7 +2645,7 @@
                     NSString *dip0003Status = [[[dictionary valueForKey:@"bip9_softforks"] valueForKey:@"dip0003"] valueForKey:@"status"];
                     NSString *bip147Status = [[[dictionary valueForKey:@"bip9_softforks"] valueForKey:@"bip147"] valueForKey:@"status"];
                     
-                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"dip0001: %@, bip147: %@", dip0003Status, bip147Status]];
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"dip0003: %@, bip147: %@", dip0003Status, bip147Status]];
                     
                     if([dip0003Status isEqualToString:@"active"] && [bip147Status isEqualToString:@"active"]) {
                         isSucceed = YES;
@@ -2659,9 +2676,6 @@
             }
         }
     });
-    
-//    [[DPLocalNodeController sharedInstance] runDashRPCCommandString:@"listunspent" forChain:[[DPDataStore sharedInstance] chainNetwork] onClb:^(BOOL success, NSString *message) {
-//    }];
 }
 
 - (void)generateBlock:(NSString*)chainNetwork numBlocks:(NSString*)blocks {
@@ -2670,6 +2684,48 @@
     [[DPLocalNodeController sharedInstance] runDashRPCCommandString:fullCommand forChain:chainNetwork onClb:^(BOOL success, NSString *message) {
 //        [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"%@", message]];
     }];
+}
+
+- (void)checkDevnetNetwork:(NSString*)chainName AllMasternodes:(NSArray*)allMasternodes {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        __block NSDictionary *localInfoDict = nil;
+        [[DPLocalNodeController sharedInstance] runDashRPCCommandArray:[NSString stringWithFormat:@"-devnet=%@ -rpcport=12998 -port='12999 getinfo", chainName] checkError:NO onClb:^(BOOL success, NSDictionary *dictionary) {
+            if(success == YES) {
+                localInfoDict = dictionary;
+            }
+        }];
+        
+        if(localInfoDict == nil) {
+            [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Please make sure your devnet name %@ is running.", chainName]];
+            return;
+        }
+        
+        NSString *chainNetwork = [NSString stringWithFormat:@"devnet=%@", chainName];
+        BOOL devnetSucceed = YES;
+        long blockHeight = [[localInfoDict valueForKey:@"blocks"] longValue];
+        
+        for(NSManagedObject *masternode in allMasternodes) {
+            if([[masternode valueForKey:@"chainNetwork"] isEqualToString:chainNetwork]) {
+                NSError *error;
+                NSDictionary *remoteInfoDict = [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:@"getinfo" toMasternode:masternode error:&error];
+                if(remoteInfoDict == nil) {
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Dashd server at %@ is not running.", [masternode valueForKey:@"publicIP"]]];
+                    continue;
+                }
+                
+                if([[remoteInfoDict valueForKey:@"blocks"] longValue] != [[localInfoDict valueForKey:@"blocks"] longValue]) {
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"The block height between remote %@ (%@) and local (%@) are different", [masternode valueForKey:@"publicIP"], [remoteInfoDict valueForKey:@"blocks"], [localInfoDict valueForKey:@"blocks"]]];
+                    devnetSucceed = NO;
+                }
+            }
+        }
+        
+        if(devnetSucceed == YES) {
+            [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:[NSString stringWithFormat:@"The network of devnet name %@ is working perfectly with the same block height at %ld.", chainName, blockHeight]];
+        }
+    });
 }
 
 #pragma mark - Singleton methods

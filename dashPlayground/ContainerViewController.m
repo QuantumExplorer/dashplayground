@@ -11,6 +11,7 @@
 #import "DPLocalNodeController.h"
 #import "DPDataStore.h"
 #import "DialogAlert.h"
+#import "DPMasternodeController.h"
 
 @interface ContainerViewController ()
 
@@ -36,14 +37,23 @@
     self.chainNameField.hidden = true;
     if([self.chainNetworkButton.objectValue integerValue] == 0){
         dataStore.chainNetwork = @"mainnet";
+        if([[DPMasternodeController sharedInstance] masternodeViewController] != nil) {
+            [[[DPMasternodeController sharedInstance] masternodeViewController] devnetBox].hidden = true;
+        }
     }
     else if([self.chainNetworkButton.objectValue integerValue] == 1){
         dataStore.chainNetwork = @"testnet";
+        if([[DPMasternodeController sharedInstance] masternodeViewController] != nil) {
+            [[[DPMasternodeController sharedInstance] masternodeViewController] devnetBox].hidden = true;
+        }
     }
     else if([self.chainNetworkButton.objectValue integerValue] == 2){
         //devnet=DRA
         self.chainNameField.hidden = false;
         dataStore.chainNetwork = [NSString stringWithFormat:@"devnet=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
+        if([[DPMasternodeController sharedInstance] masternodeViewController] != nil) {
+            [[[DPMasternodeController sharedInstance] masternodeViewController] devnetBox].hidden = false;
+        }
     }
 }
 

@@ -71,6 +71,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (NSData *)runAWSCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb;
 
 - (void)setUpDevnet:(NSArray*)allMasternodes;
-- (void)setUpMainNode:(NSManagedObject*)masternode;
+- (BOOL)setUpMainNode:(NSManagedObject*)masternode;
+- (void)checkDevnetNetwork:(NSString*)chainName AllMasternodes:(NSArray*)allMasternodes;
 
 @end

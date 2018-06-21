@@ -19,6 +19,7 @@
 
 @interface MasternodesViewController : NSViewController <NSTabViewDelegate>
 
+@property (strong) IBOutlet NSBox *devnetBox;
 +(MasternodesViewController*)sharedInstance;
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;

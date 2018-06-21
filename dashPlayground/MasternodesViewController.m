@@ -75,14 +75,38 @@ NSString *terminalHeadString = @"";
     masternodeCon.masternodeViewController = self;
     
     [self.tableView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
+    
+    if ([[[DPDataStore sharedInstance] chainNetwork] rangeOfString:@"devnet"].location != NSNotFound) {
+        self.devnetBox.hidden = false;
+    }
 }
+
+- (IBAction)pressCheckDevnet:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    NSString *chainName = [[DialogAlert sharedInstance] showAlertWithTextField:@"Checking devnet network" message:@"Please enter your devnet name."];
+    
+    if([chainName length] == 0) {
+        [self addStringEventToMasternodeConsole:@"Please make sure you already input your devnet name."];
+    }
+    
+    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking network of devnet name %@.", chainName]];
+    
+    NSArray * AllMasternodes = [NSArray arrayWithArray:[self.arrayController.arrangedObjects allObjects]];
+    [[DPMasternodeController sharedInstance] checkDevnetNetwork:chainName AllMasternodes:AllMasternodes];
+}
+
 
 - (IBAction)pressSetUpDevnet:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Setting up devnet name %@, this would take a while please do not close the application.", [[DPDataStore sharedInstance] chainNetwork]]];
     
-    NSArray * AllMasternodes = [NSArray arrayWithArray:[self.arrayController.arrangedObjects allObjects]];
-    [[DPMasternodeController sharedInstance] setUpDevnet:AllMasternodes];
+    NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Setting up devnet" message:[NSString stringWithFormat:@"Are you sure you want to create devnet with name %@", [[DPDataStore sharedInstance] chainNetwork]]];
+    
+    if ([alert runModal] == NSAlertFirstButtonReturn) {
+        NSArray * AllMasternodes = [NSArray arrayWithArray:[self.arrayController.arrangedObjects allObjects]];
+        [[DPMasternodeController sharedInstance] setUpDevnet:AllMasternodes];
+    }
 }
 
 
@@ -125,7 +149,8 @@ NSString *terminalHeadString = @"";
         return;
     }
     
-    [[DPMasternodeController sharedInstance] setUpMainNode:masternodeObject];
+    BOOL isMainNodeSetUp = [[DPMasternodeController sharedInstance] setUpMainNode:masternodeObject];
+    if(isMainNodeSetUp == NO) return;
     
     if([selectedMasternode count] != 0) {
         for(NSManagedObject *selectedObject in selectedMasternode)
@@ -136,7 +161,10 @@ NSString *terminalHeadString = @"";
                     if(![[selectedObject valueForKey:@"chainNetwork"] isEqualToString:[object valueForKey:@"chainNetwork"]]) continue;
                     
                     [[DPMasternodeController sharedInstance] addNodeToRemote:object toPublicIP:[selectedObject valueForKey:@"publicIP"] clb:^(BOOL success, NSString *message) {
-                        if([message length] == 0 || [message length] == 1) {
+                        if(message == nil) {
+                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: unable to connect dash core server.", [object valueForKey:@"publicIP"]]];
+                        }
+                        else if([message length] == 0 || [message length] == 1) {
                             [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", [object valueForKey:@"publicIP"], [selectedObject valueForKey:@"publicIP"]]];
                         }
                         else {
