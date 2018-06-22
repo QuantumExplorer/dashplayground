@@ -10,7 +10,6 @@
 #import "DPLocalNodeController.h"
 #import "DialogAlert.h"
 #import "DPDataStore.h"
-#import "CKLinkedList.h"
 
 @interface RPCViewController ()
 
@@ -204,21 +203,23 @@
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)fieldEditor
 doCommandBySelector:(SEL)commandSelector {
+    
     if( commandSelector == @selector(moveUp:) ){
         if(currentCommandIndex == 999) {
+            if([commandHistoryArray count] == 0) return NO;
             self.commandField.stringValue = [commandHistoryArray lastObject];
             currentCommandIndex = (int)[commandHistoryArray count]-1;
         }
         else {
-            currentCommandIndex = currentCommandIndex-1;
-            if(currentCommandIndex < 0) return NO;
+            if(currentCommandIndex != 0) currentCommandIndex = currentCommandIndex-1;
+            if(currentCommandIndex < 0 || currentCommandIndex > [commandHistoryArray count]-1) return NO;
             self.commandField.stringValue = [commandHistoryArray objectAtIndex:currentCommandIndex];
         }
         return YES;    // We handled this command; don't pass it on
     }
     else if( commandSelector == @selector(moveDown:) ){
         if(currentCommandIndex != 999) {
-            currentCommandIndex = currentCommandIndex+1;
+            if(currentCommandIndex < [commandHistoryArray count]-1) currentCommandIndex = currentCommandIndex+1;
             if(currentCommandIndex < 0 || currentCommandIndex > [commandHistoryArray count]-1) return NO;
             self.commandField.stringValue = [commandHistoryArray objectAtIndex:currentCommandIndex];
         }

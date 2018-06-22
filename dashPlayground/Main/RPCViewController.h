@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "CKLinkedList.h"
 
 @interface RPCViewController : NSViewController <NSTextFieldDelegate>
 
