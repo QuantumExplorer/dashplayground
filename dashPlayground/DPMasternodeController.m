@@ -22,7 +22,6 @@
 //#import "DFSSHConnector.h"
 //#import "DFSSHOperator.h"
 #import "DialogAlert.h"
-#import "PreferenceViewController.h"
 #import "PreferenceData.h"
 #import <NMSSH/NMSSH.h>
 #import "SshConnection.h"
@@ -1824,9 +1823,9 @@
 
 -(void)checkMasternode:(NSManagedObject*)masternode {
     if(![masternode valueForKey:@"publicIP"]) return;
-    [self checkMasternode:masternode saveContext:TRUE clb:nil];
     [self checkMasternodeChainNetwork:masternode];
     [self updateMasternodeAttributes:masternode];
+    [self checkMasternode:masternode saveContext:TRUE clb:nil];
 }
 
 -(void)checkMasternode:(NSManagedObject*)masternode saveContext:(BOOL)saveContext clb:(dashClb)clb {
@@ -1982,7 +1981,17 @@
 - (NSData *)runAWSCommand:(NSString *)commandToRun checkError:(BOOL)withError
 {
     NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:@"/usr/local/bin/aws"];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if(![[PreferenceData sharedInstance] getAWSPath]) {
+            [[DialogAlert sharedInstance] showWarningAlert:@"AWS" message:@"AWS path not found! Please set up your AWS path."];
+        }
+    });
+    
+    if(![[PreferenceData sharedInstance] getAWSPath]) return [NSData data];
+    
+//    [task setLaunchPath:@"/usr/local/bin/aws"];
+    [task setLaunchPath:[[PreferenceData sharedInstance] getAWSPath]];
     
 //    if([task isRunning])
 //    {
@@ -2088,7 +2097,7 @@
 
 -(void)setUpInstances:(NSInteger)count onBranch:(NSManagedObject*)branch clb:(dashInfoClb)clb onRegion:(NSMutableArray*)regionArray serverType:(NSString*)serverType {
     
-    if (![self sshPath] || ![self getSshName]) {
+    if (![self sshPath] || ![[PreferenceData sharedInstance] getKeyName]) {
         DialogAlert *dialog=[[DialogAlert alloc]init];
         NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
         
@@ -2180,10 +2189,7 @@
     
     }
     else{
-        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create new instance!" message:@"Please configure your AWS account."];
-        
-        PreferenceViewController *prefController = [[PreferenceViewController alloc] init];
-        [prefController showConfiguringWindow];
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create new instance!" message:@"Please configure your AWS account in preference window."];
     }
 }
 
@@ -2312,7 +2318,7 @@
 
 - (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType  {
     
-    if (![self sshPath] || ![self getSshName]) {
+    if (![self sshPath] || ![[PreferenceData sharedInstance] getKeyName]) {
         DialogAlert *dialog=[[DialogAlert alloc]init];
         NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
         
@@ -2375,10 +2381,8 @@
         
     }
     else{
-        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create instance!" message:@"Please configure your AWS account."];
+        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create instance!" message:@"Please configure your AWS account in preference window."];
         
-        PreferenceViewController *prefController = [[PreferenceViewController alloc] init];
-        [prefController showConfiguringWindow];
     }
     
 }

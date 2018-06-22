@@ -29,7 +29,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)terminateInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)getInstancesClb:(dashClb)clb;
 - (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType;
-- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
+//- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
 - (void)setUpMasternodeDashd:(NSManagedObject*)masternode clb:(dashClb)clb;
 - (void)setUpMasternodeConfiguration:(NSManagedObject*)masternode onChainName:(NSString*)chainName onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey clb:(dashSuccessInfo)clb;
 - (void)setUpMasternodeSentinel:(NSManagedObject*)masternode clb:(dashClb)clb;
@@ -47,6 +47,8 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 -(void)setSshPath:(NSString*)sshPath;
 -(NSString*)sshPath;
+-(NSString*)getSshName;
+-(void)setSshName:(NSString*)sshName;
 
 //- (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
 
@@ -58,7 +60,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;
 -(NSString*)createSentinelConfFileForMasternode:(NSManagedObject*)masternode;
 -(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
--(void)updateMasternode:(NSManagedObject*)masternode;
+//-(void)updateMasternode:(NSManagedObject*)masternode;
 
 -(void)stopDashdOnRemote:(NSManagedObject*)masternode onClb:(dashClb)clb;
 - (void)addNodeToLocal:(NSManagedObject*)masternode clb:(dashClb)clb;
@@ -66,9 +68,8 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NSString *)sendRPCCommandString:(NSString*)command toMasternode:(NSManagedObject*)masternode;
 
 -(void)configureMasternodeSentinel:(NSArray*)AllMasternodes;
-- (void)registerProtxForLocal:(NSString*)publicIP onClb:(dashClb)clb;
+- (void)registerProtxForLocal:(NSString*)publicIP localChain:(NSString*)localChain onClb:(dashClb)clb;
 - (void)registerProtxForLocal:(NSArray*)AllMasternodes;
-- (NSData *)runAWSCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb;
 
 - (void)setUpDevnet:(NSArray*)allMasternodes;
 - (BOOL)setUpMainNode:(NSManagedObject*)masternode;

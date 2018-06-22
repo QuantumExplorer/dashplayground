@@ -139,7 +139,12 @@ NSString *instanceId;
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [_volumeController.window close];
-                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:[NSString stringWithFormat:@"Created AMI result: %@", output]];
+                if([output valueForKey:@"ImageId"]) {
+                    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:[NSString stringWithFormat:@"Created AMI successfully."]];
+                }
+                else {
+                    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:[NSString stringWithFormat:@"Created AMI failed."]];
+                }
             });
             
         });

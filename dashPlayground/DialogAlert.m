@@ -50,8 +50,6 @@ static NSString *const selectInfoWarning = @"Please make sure you already select
     
     NSString *filePath = [[panel URL] path];
     
-    NSLog(@"toey %@ %@",fileName,filePath);
-    
     NSArray *sshFileInformation = @[fileName, filePath];
     
     return sshFileInformation;

@@ -26,11 +26,9 @@
 
 - (void)checkDash:(dashActiveClb)clb forChain:(NSString*)chainNetwork;
 
-- (void)checkDashStopped:(dashActiveClb)clb;
+- (void)checkDashStopped:(dashActiveClb)clb forChain:(NSString*)chainNetwork;
 
--(void)checkSyncStatus:(dashSyncClb)clb forChain:(NSString*)chainNetwork;
-
--(NSDictionary*)getSyncStatus;
+-(NSDictionary*)getSyncStatus:(NSString*)chainNetwork;
 
 -(NSArray*)outputs:(NSString*)chainNetwork;
 
@@ -53,5 +51,7 @@
 +(DPLocalNodeController*)sharedInstance;
 
 -(NSString*)masterNodePath;
+
+-(void)setMasterNodePath:(NSString*)masterNodePath;
 
 @end

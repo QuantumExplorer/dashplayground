@@ -7,8 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "CKLinkedList.h"
 
-@interface RPCViewController : NSViewController
+@interface RPCViewController : NSViewController <NSTextFieldDelegate>
+
+@property (nonatomic) NSMutableArray *commandHistoryArray;
+@property (nonatomic) int currentCommandIndex;
+
 @property (strong) IBOutlet NSTextField *commandField;
 - (IBAction)runCommand:(id)sender;
 @property (strong) IBOutlet NSTextView *terminalOutput;

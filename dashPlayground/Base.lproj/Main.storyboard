@@ -24,7 +24,11 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
+                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                            <connections>
+                                                <action selector="openPreference:" target="ACJ-Eq-RXQ" id="tpg-AP-Jvw"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
                                         <menuItem title="Services" id="NMo-om-nkz">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -115,13 +119,6 @@
                                         <menuItem title="Print…" keyEquivalent="p" id="aTl-1u-JFS">
                                             <connections>
                                                 <action selector="print:" target="Ady-hI-5gd" id="qaZ-4w-aoO"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="JVC-eB-1Sl"/>
-                                        <menuItem title="Preference" id="pbC-Yl-3re">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="openPreference:" target="ACJ-Eq-RXQ" id="wf2-NJ-1X0"/>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -602,11 +599,11 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="iCa-cl-50z">
-                                                            <rect key="frame" x="819.5" y="1" width="173" height="17"/>
+                                                            <rect key="frame" x="819.5" y="1" width="174" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dZL-DS-IOn">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="173" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="174" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="jay-T5-hDQ">
                                                                         <font key="font" metaFont="system"/>
@@ -634,7 +631,7 @@
                                     </subviews>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="ohf-Sd-qPt">
-                                    <rect key="frame" x="1" y="274" width="995" height="15"/>
+                                    <rect key="frame" x="1" y="7" width="0.0" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="nHP-cR-Dxj">
@@ -783,7 +780,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                                 <connections>
-                                    <action selector="pressCommandField:" target="BIs-Vd-oI1" id="AgC-P7-bpU"/>
+                                    <action selector="pressCommandField:" target="BIs-Vd-oI1" id="lgk-Ny-qVG"/>
                                 </connections>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P23-lH-HtG">

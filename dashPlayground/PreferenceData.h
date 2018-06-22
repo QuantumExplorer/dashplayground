@@ -29,4 +29,7 @@
 -(NSString*)getKeyName;
 -(void)setKeyName:(NSString*)keyName;
 
+-(NSString*)getAWSPath;
+-(void)setAWSPath:(NSString*)path;
+
 @end

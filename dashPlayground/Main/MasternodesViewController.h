@@ -25,7 +25,7 @@
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
 - (IBAction)retreiveInstances:(id)sender;
-- (IBAction)getKey:(id)sender;
+//- (IBAction)getKey:(id)sender;
 
 @property (strong) IBOutlet NSButtonCell *setupButton;
 - (IBAction)setUp:(id)sender;

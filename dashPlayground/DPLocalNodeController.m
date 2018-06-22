@@ -344,11 +344,11 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
 -(void)checkSyncStatus:(dashSyncClb)clb forChain:(NSString*)chainNetwork {
     dispatch_async(dashCallbackBackgroundMNStatusQueue(), ^{
         int tries = 0;
-        NSDictionary * dictionary = [self getSyncStatus];
+        NSDictionary * dictionary = [self getSyncStatus:chainNetwork];
         while (!dictionary[@"IsSynced"] && tries < 100) {
             sleep(5);
             tries++;
-            dictionary = [self getSyncStatus];
+            dictionary = [self getSyncStatus:chainNetwork];
         }
         if (tries == 100) {
             dispatch_async(dispatch_get_main_queue(), ^{

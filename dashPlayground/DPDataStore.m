@@ -68,7 +68,7 @@
     [fetchRequest setReturnsObjectsAsFaults:FALSE];
     [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"url == %@",repositoryURLPath]];
     
-    NSError *error = nil;
+//    NSError *error = nil;
     
 //    NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
     NSManagedObject * repo = nil;

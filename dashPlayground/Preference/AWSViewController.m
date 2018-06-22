@@ -1,37 +1,64 @@
 //
-//  PreferenceViewController
+//  AWSViewController.m
 //  dashPlayground
+//
+//  Created by NATTAPON AIEMLAOR on 21/6/18.
+//  Copyright © 2018 dashfoundation. All rights reserved.
+//
 
-#import "PreferenceViewController.h"
-#import "AppDelegate.h"
-#import "PreferenceData.h"
-#import "DPDataStore.h"
+#import "AWSViewController.h"
 #import "DPMasternodeController.h"
+#import "PreferenceData.h"
 #import "DialogAlert.h"
 
-@interface PreferenceViewController ()
-
-//@property (nonatomic, strong) IBOutlet NSTableView *SecurityTable;
-@property (strong) IBOutlet NSArrayController *securityArrayController;
+@interface AWSViewController ()
+@property (strong) IBOutlet NSArrayController *subnetArrayController;
+@property (strong) IBOutlet NSArrayController *securityGrArrayController;
+@property (strong) IBOutlet NSArrayController *keyPairArrayController;
 @property (strong) IBOutlet NSTableView *securityTable;
 @property (strong) IBOutlet NSTableView *subnetTable;
-@property (strong) IBOutlet NSArrayController *subnetArrayController;
-@property (strong) IBOutlet NSArrayController *keyPairArrayController;
 @property (strong) IBOutlet NSTableView *keyPairTable;
+@property (strong) IBOutlet NSTextField *awsPathField;
+@property (strong) IBOutlet NSTextField *keyPairField;
 
 @end
 
-@implementation PreferenceViewController
+@implementation AWSViewController
 
-PreferenceViewController* _windowController;
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do view setup here.
+//    NSLog(@"%@, %@, %@", [[PreferenceData sharedInstance] getAWSPath], [[PreferenceData sharedInstance] getSecurityGroupId], [[PreferenceData sharedInstance] getKeyName]);
+    [self initialize];
+}
 
-- (void)awakeFromNib {
-
-    NSLog(@"configuring window loaded");
-
+- (void)initialize {
+    if([[PreferenceData sharedInstance] getAWSPath] != nil) self.awsPathField.stringValue = [[PreferenceData sharedInstance] getAWSPath];
+    if([[DPMasternodeController sharedInstance] sshPath] != nil) self.keyPairField.stringValue = [[DPMasternodeController sharedInstance] sshPath];
     [self fetchingSecurityGr];
     [self fetchingSubnet];
     [self fetchingKeyPairs];
+}
+
+- (IBAction)browseAWSPath:(id)sender {
+    NSOpenPanel* openDlg = [NSOpenPanel openPanel];
+    [openDlg setCanChooseFiles:YES];
+    [openDlg setCanChooseDirectories:YES];
+    [openDlg setAllowsMultipleSelection:NO];
+    if ( [openDlg runModal] == NSModalResponseOK )
+    {
+        NSString* filePath = [openDlg URL].absoluteString;
+        if([filePath length] >= 7) {
+            filePath = [filePath substringFromIndex:7];
+            self.awsPathField.stringValue = filePath;
+        }
+    }
+}
+
+- (IBAction)browseKeyPair:(id)sender {
+    
+    NSArray *fileInfo = [[DialogAlert sharedInstance] getSSHLaunchPathAndName];
+    self.keyPairField.stringValue = fileInfo[1];
 }
 
 - (void) addRowToArrayController:(NSArrayController *)arrayCon tableView:(NSTableView *)tableView dict:(NSDictionary *)dict {
@@ -56,16 +83,16 @@ PreferenceViewController* _windowController;
             //NSLog(@"%@",reservation[@"Instances"]);
             if(output[@"SecurityGroups"])
             {
-                [self.securityArrayController setContent:nil];//clear the table content
+                [self.securityGrArrayController setContent:nil];//clear the table content
             }
             for (NSDictionary * dictionary in output[@"SecurityGroups"]) {
                 
                 NSDictionary *dict = @{@"groupID":[dictionary valueForKey:@"GroupId"]
-                                        ,@"groupName":[dictionary valueForKey:@"GroupName"]
-                                        ,@"vpcID":[dictionary valueForKey:@"VpcId"]
-                                        };
+                                       ,@"groupName":[dictionary valueForKey:@"GroupName"]
+                                       ,@"vpcID":[dictionary valueForKey:@"VpcId"]
+                                       };
                 
-                [self addRowToArrayController:self.securityArrayController tableView:self.securityTable dict:dict];
+                [self addRowToArrayController:self.securityGrArrayController tableView:self.securityTable dict:dict];
             }
         });
     });
@@ -84,9 +111,9 @@ PreferenceViewController* _windowController;
             }
             for (NSDictionary * dictionary in output[@"Subnets"]) {
                 NSDictionary *dict = @{@"subnetID":[dictionary valueForKey:@"SubnetId"]
-                                        ,@"availZone":[dictionary valueForKey:@"AvailabilityZone"]
-                                        ,@"state":[dictionary valueForKey:@"State"]
-                                        };
+                                       ,@"availZone":[dictionary valueForKey:@"AvailabilityZone"]
+                                       ,@"state":[dictionary valueForKey:@"State"]
+                                       };
                 [self addRowToArrayController:self.subnetArrayController tableView:self.subnetTable dict:dict];
             }
         });
@@ -106,80 +133,34 @@ PreferenceViewController* _windowController;
             }
             for (NSDictionary * dictionary in output[@"KeyPairs"]) {
                 NSDictionary *dict = @{@"keyName":[dictionary valueForKey:@"KeyName"]
-                                        ,@"fingerprint":[dictionary valueForKey:@"KeyFingerprint"]
-                                        };
+                                       ,@"fingerprint":[dictionary valueForKey:@"KeyFingerprint"]
+                                       };
                 [self addRowToArrayController:self.keyPairArrayController tableView:self.keyPairTable dict:dict];
             }
         });
     });
 }
 
-- (IBAction)refreshSubnet:(id)sender {
-    [self fetchingSubnet];
-}
-
-
-- (IBAction)createSubnet:(id)sender {
-    
-//    NSDictionary *dict = @{@"subnetID":@"231324"
-//                           ,@"availZone":@"Toey2"
-//                           ,@"state":@"4323236"
-//                           };
-//    [self.subnetArrayController addObject:dict];
-//
-//    [self.subnetArrayController rearrangeObjects];
-//
-//    NSArray *array = [self.subnetArrayController arrangedObjects];
-//    NSUInteger row = [array indexOfObjectIdenticalTo:dict];
-//
-//    [self.subnetTable editColumn:0 row:row withEvent:nil select:YES];
-}
-
 - (IBAction)refreshSecurityGr:(id)sender {
     [self fetchingSecurityGr];
 }
 
-- (IBAction)createSecurityGroup:(id)sender {
-    
-//    NSDictionary *dict = @{@"groupID":@"123"
-//                           ,@"groupName":@"Toey"
-//                           ,@"vpcID":@"456"
-//                           };
-//    [self.securityArrayController addObject:dict];
-//    
-//    [self.securityArrayController rearrangeObjects];
-//
-//    NSArray *array = [self.securityArrayController arrangedObjects];
-//    NSUInteger row = [array indexOfObjectIdenticalTo:dict];
-//    
-//    [self.securityTable editColumn:0 row:row withEvent:nil select:YES];
-    
+- (IBAction)refreshSubnet:(id)sender {
+    [self fetchingSubnet];
 }
 
 - (IBAction)refreshKeyPair:(id)sender {
     [self fetchingKeyPairs];
 }
 
-- (IBAction)createKeyPair:(id)sender {
-    
-    
-}
-
--(void)showConfiguringWindow {
-    if([_windowController.window isVisible]) return;
-    _windowController = [[PreferenceViewController alloc] initWithWindowNibName:@"PreferenceWindow"];
-    [_windowController.window makeKeyAndOrderFront:self];
-}
-
 - (IBAction)pressSave:(id)sender {
-    
     NSInteger securityRow = self.securityTable.selectedRow;
     NSInteger subnetRow = self.subnetTable.selectedRow;
     NSInteger keyPairRow = self.keyPairTable.selectedRow;
     
     if(securityRow != -1)
     {
-        NSManagedObject * object = [self.securityArrayController.arrangedObjects objectAtIndex:securityRow];
+        NSManagedObject * object = [self.securityGrArrayController.arrangedObjects objectAtIndex:securityRow];
         [[PreferenceData sharedInstance] setSecurityGroupId:[object valueForKey:@"groupID"]];
     }
     
@@ -195,9 +176,11 @@ PreferenceViewController* _windowController;
         [[PreferenceData sharedInstance] setKeyName:[object valueForKey:@"keyName"]];
     }
     
-    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Data saved!" message:@"All of preference data are saved."];
+    if([self.awsPathField.stringValue length] != 0) [[PreferenceData sharedInstance] setAWSPath:self.awsPathField.stringValue];
     
-    [_windowController.window close];
+    if([self.keyPairField.stringValue length] != 0) [[DPMasternodeController sharedInstance] setSshPath:self.keyPairField.stringValue];
+    
+    [self dismissController:sender];
 }
 
 @end

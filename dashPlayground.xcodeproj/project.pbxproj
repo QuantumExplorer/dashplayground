@@ -14,7 +14,6 @@
 		A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */; };
 		A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */ = {isa = PBXBuildFile; fileRef = A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */; };
 		A516B45720908324009A59C0 /* DialogAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45620908324009A59C0 /* DialogAlert.m */; };
-		A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45A20908514009A59C0 /* PreferenceViewController.m */; };
 		A517D29920AEBEF200BD567A /* DPUnspentController.m in Sources */ = {isa = PBXBuildFile; fileRef = A517D29820AEBEF200BD567A /* DPUnspentController.m */; };
 		A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A518295C20CEDBEC003BFE73 /* Preference.storyboard */; };
 		A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */; };
@@ -28,7 +27,10 @@
 		A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0D22099BA22004B23FE /* VolumeViewController.m */; };
 		A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5724D4B20A70D4A004BED71 /* ContainerViewController.m */; };
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
-		A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A597E24420934C590001C98A /* PreferenceWindow.xib */; };
+		A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771720DBCEBF009240BD /* DashCoreViewController.m */; };
+		A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771A20DBCEFC009240BD /* LeftContainerViewController.m */; };
+		A581771E20DBD167009240BD /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771D20DBD167009240BD /* PreferencesViewController.m */; };
+		A581772420DC02E9009240BD /* AWSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581772320DC02E9009240BD /* AWSViewController.m */; };
 		A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */; };
 		EB1383B3413C8C6236CB2B47 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */; };
 		FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
@@ -117,8 +119,6 @@
 		A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPAvailabilityController.m; sourceTree = "<group>"; };
 		A516B45620908324009A59C0 /* DialogAlert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DialogAlert.m; sourceTree = "<group>"; };
 		A516B45820908333009A59C0 /* DialogAlert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DialogAlert.h; sourceTree = "<group>"; };
-		A516B45920908509009A59C0 /* PreferenceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceViewController.h; sourceTree = "<group>"; };
-		A516B45A20908514009A59C0 /* PreferenceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceViewController.m; sourceTree = "<group>"; };
 		A517D29720AEBEF200BD567A /* DPUnspentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPUnspentController.h; sourceTree = "<group>"; };
 		A517D29820AEBEF200BD567A /* DPUnspentController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPUnspentController.m; sourceTree = "<group>"; };
 		A518295C20CEDBEC003BFE73 /* Preference.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Preference.storyboard; sourceTree = "<group>"; };
@@ -143,7 +143,14 @@
 		A5724D4B20A70D4A004BED71 /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerViewController.m; sourceTree = "<group>"; };
 		A5782D1F2095E99A00CA603A /* PreferenceData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceData.h; sourceTree = "<group>"; };
 		A5782D202095E9A400CA603A /* PreferenceData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceData.m; sourceTree = "<group>"; };
-		A597E24420934C590001C98A /* PreferenceWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceWindow.xib; sourceTree = "<group>"; };
+		A581771620DBCEBF009240BD /* DashCoreViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashCoreViewController.h; sourceTree = "<group>"; };
+		A581771720DBCEBF009240BD /* DashCoreViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DashCoreViewController.m; sourceTree = "<group>"; };
+		A581771920DBCEFC009240BD /* LeftContainerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LeftContainerViewController.h; sourceTree = "<group>"; };
+		A581771A20DBCEFC009240BD /* LeftContainerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LeftContainerViewController.m; sourceTree = "<group>"; };
+		A581771C20DBD167009240BD /* PreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
+		A581771D20DBD167009240BD /* PreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
+		A581772220DC02E9009240BD /* AWSViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AWSViewController.h; sourceTree = "<group>"; };
+		A581772320DC02E9009240BD /* AWSViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AWSViewController.m; sourceTree = "<group>"; };
 		A5AF0AE920CD59770058CA80 /* PlaygroundModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "PlaygroundModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VolumeWindow.xib; sourceTree = "<group>"; };
 		AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -351,8 +358,48 @@
 			children = (
 				A55DFCC520D775BF006E9890 /* PreferenceWindowController.h */,
 				A55DFCC620D775BF006E9890 /* PreferenceWindowController.m */,
+				A581771620DBCEBF009240BD /* DashCoreViewController.h */,
+				A581771720DBCEBF009240BD /* DashCoreViewController.m */,
+				A581771920DBCEFC009240BD /* LeftContainerViewController.h */,
+				A581771A20DBCEFC009240BD /* LeftContainerViewController.m */,
+				A581771C20DBD167009240BD /* PreferencesViewController.h */,
+				A581771D20DBD167009240BD /* PreferencesViewController.m */,
+				A581772220DC02E9009240BD /* AWSViewController.h */,
+				A581772320DC02E9009240BD /* AWSViewController.m */,
 			);
 			path = Preference;
+			sourceTree = "<group>";
+		};
+		A581772520DCB8E5009240BD /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				FB29066B1E85799F00A31092 /* RepositoriesViewController.h */,
+				FB29066C1E85799F00A31092 /* RepositoriesViewController.m */,
+				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
+				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
+				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
+				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
+				A532618220A42413004678E8 /* UnspentOutputViewController.h */,
+				A532618320A42413004678E8 /* UnspentOutputViewController.m */,
+				A5724D4A20A70D4A004BED71 /* ContainerViewController.h */,
+				A5724D4B20A70D4A004BED71 /* ContainerViewController.m */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		A581772620DCB910009240BD /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
+				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
+				FB46AE891E95618400D4B034 /* DPLocalNodeController.h */,
+				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
+				FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */,
+				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
+				A517D29720AEBEF200BD567A /* DPUnspentController.h */,
+				A517D29820AEBEF200BD567A /* DPUnspentController.m */,
+			);
+			name = Main;
 			sourceTree = "<group>";
 		};
 		FB0683A71E875CDC00F1AFB4 /* Frameworks */ = {
@@ -526,7 +573,6 @@
 				FB2906651E85799F00A31092 /* AppDelegate.h */,
 				FB2906661E85799F00A31092 /* AppDelegate.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
-				A597E24420934C590001C98A /* PreferenceWindow.xib */,
 				A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */,
 				A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
@@ -588,23 +634,12 @@
 		FB5A31C51E9EA205003D4DD8 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				A581772520DCB8E5009240BD /* Main */,
 				A55DFCB920D771C8006E9890 /* Preference */,
-				FB29066B1E85799F00A31092 /* RepositoriesViewController.h */,
-				FB29066C1E85799F00A31092 /* RepositoriesViewController.m */,
-				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
-				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
-				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
-				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
-				A516B45920908509009A59C0 /* PreferenceViewController.h */,
-				A516B45A20908514009A59C0 /* PreferenceViewController.m */,
 				A55FC0D12099BA17004B23FE /* VolumeViewController.h */,
 				A55FC0D22099BA22004B23FE /* VolumeViewController.m */,
 				A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */,
 				A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */,
-				A532618220A42413004678E8 /* UnspentOutputViewController.h */,
-				A532618320A42413004678E8 /* UnspentOutputViewController.m */,
-				A5724D4A20A70D4A004BED71 /* ContainerViewController.h */,
-				A5724D4B20A70D4A004BED71 /* ContainerViewController.m */,
 				A515E7CA20AA953400CB5495 /* AvailabilityViewController.h */,
 				A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */,
 				A544ADDA20CA77FF0036AE29 /* ChainSelectionViewController.h */,
@@ -616,20 +651,13 @@
 		FB5A31C61E9EA942003D4DD8 /* Server Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
-				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
-				FB46AE891E95618400D4B034 /* DPLocalNodeController.h */,
-				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
-				FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */,
-				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
+				A581772620DCB910009240BD /* Main */,
 				A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */,
 				A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */,
 				A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */,
 				A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */,
 				A515E7CD20AA96B800CB5495 /* DPAvailabilityController.h */,
 				A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */,
-				A517D29720AEBEF200BD567A /* DPUnspentController.h */,
-				A517D29820AEBEF200BD567A /* DPUnspentController.m */,
 				A544ADDD20CA78520036AE29 /* DPChainSelectionController.h */,
 				A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */,
 			);
@@ -749,7 +777,6 @@
 				A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */,
 				A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
-				A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -876,6 +903,7 @@
 				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
 				A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
+				A581772420DC02E9009240BD /* AWSViewController.m in Sources */,
 				A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
@@ -887,11 +915,14 @@
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
+				A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */,
 				A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */,
 				A516B45720908324009A59C0 /* DialogAlert.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
+				A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
+				A581771E20DBD167009240BD /* PreferencesViewController.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
@@ -900,7 +931,6 @@
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				A5782D212095E9A400CA603A /* PreferenceData.m in Sources */,
 				A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */,
-				A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */,
 				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 				A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,

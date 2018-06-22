@@ -13,7 +13,6 @@
 #import "SentinelStateTransformer.h"
 #import "DialogAlert.h"
 #import "DPMasternodeController.h"
-#import "PreferenceViewController.h"
 #import "VolumeViewController.h"
 #import "RepositoriesModalViewController.h"
 #import "RepositoriesViewController.h"
@@ -82,6 +81,9 @@
 //    
 //    [ssh disconnect];
     
+//    NSStoryboard *storyBoard = [NSStoryboard storyboardWithName:@"Preference" bundle:nil]; // get a reference to the storyboard
+//    PreferenceWindowController *myPreference = [storyBoard instantiateControllerWithIdentifier:@"mainWindow"]; // instantiate your window controller
+//    [myPreference showWindow:self]; // show the window
     
     //end
     
@@ -381,10 +383,9 @@
 }
 
 - (IBAction)openPreference:(id)sender {
-    
-    PreferenceViewController *prefController = [[PreferenceViewController alloc] init];
-    [prefController showConfiguringWindow];
-    
+    NSStoryboard *storyBoard = [NSStoryboard storyboardWithName:@"Preference" bundle:nil]; // get a reference to the storyboard
+    PreferenceWindowController *myPreference = [storyBoard instantiateControllerWithIdentifier:@"mainWindow"]; // instantiate your window controller
+    [myPreference showWindow:self]; // show the window
 }
 
 @end
