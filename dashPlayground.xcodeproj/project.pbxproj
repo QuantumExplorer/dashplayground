@@ -7,17 +7,32 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */; };
+		9301D4C70E08DD5AB9ABFBF9 /* libPods-dashPlayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FB8E3A54BAC79C93C59105 /* libPods-dashPlayground.a */; };
+		A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */ = {isa = PBXBuildFile; fileRef = A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */; };
+		A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */; };
+		A515E7C020AA904E00CB5495 /* AvailabilityZoneWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */; };
+		A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */; };
+		A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */ = {isa = PBXBuildFile; fileRef = A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */; };
 		A516B45720908324009A59C0 /* DialogAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45620908324009A59C0 /* DialogAlert.m */; };
-		A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A516B45A20908514009A59C0 /* PreferenceViewController.m */; };
+		A517D29920AEBEF200BD567A /* DPUnspentController.m in Sources */ = {isa = PBXBuildFile; fileRef = A517D29820AEBEF200BD567A /* DPUnspentController.m */; };
+		A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A518295C20CEDBEC003BFE73 /* Preference.storyboard */; };
 		A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */; };
 		A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */; };
+		A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A532618320A42413004678E8 /* UnspentOutputViewController.m */; };
+		A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */; };
+		A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */; };
+		A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A558E0C520B54E3C00E853DB /* SshConnection.m */; };
+		A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55DFCC620D775BF006E9890 /* PreferenceWindowController.m */; };
 		A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */; };
 		A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0D22099BA22004B23FE /* VolumeViewController.m */; };
+		A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5724D4B20A70D4A004BED71 /* ContainerViewController.m */; };
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
-		A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A597E24420934C590001C98A /* PreferenceWindow.xib */; };
+		A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771720DBCEBF009240BD /* DashCoreViewController.m */; };
+		A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771A20DBCEFC009240BD /* LeftContainerViewController.m */; };
+		A581771E20DBD167009240BD /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771D20DBD167009240BD /* PreferencesViewController.m */; };
+		A581772420DC02E9009240BD /* AWSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581772320DC02E9009240BD /* AWSViewController.m */; };
 		A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */; };
-		EC76ED00E89649FE175F52D1 /* libPods-dashPlayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */; };
+		EB1383B3413C8C6236CB2B47 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */; };
 		FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683A91E875CDC00F1AFB4 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */; };
@@ -90,26 +105,56 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
+		04FB8E3A54BAC79C93C59105 /* libPods-dashPlayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlayground.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		21DCCC09DF21C9356075CD9A /* Pods-dashPlayground.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.debug.xcconfig"; sourceTree = "<group>"; };
+		39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlaygroundTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		513EA1E735BFC6333CBD7A0A /* Pods-dashPlaygroundTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.debug.xcconfig"; sourceTree = "<group>"; };
+		A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPRepoModalController.h; sourceTree = "<group>"; };
+		A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPRepoModalController.m; sourceTree = "<group>"; };
+		A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChainSelectionWindow.xib; sourceTree = "<group>"; };
+		A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AvailabilityZoneWindow.xib; sourceTree = "<group>"; };
+		A515E7CA20AA953400CB5495 /* AvailabilityViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailabilityViewController.h; sourceTree = "<group>"; };
+		A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvailabilityViewController.m; sourceTree = "<group>"; };
+		A515E7CD20AA96B800CB5495 /* DPAvailabilityController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPAvailabilityController.h; sourceTree = "<group>"; };
+		A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPAvailabilityController.m; sourceTree = "<group>"; };
 		A516B45620908324009A59C0 /* DialogAlert.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DialogAlert.m; sourceTree = "<group>"; };
 		A516B45820908333009A59C0 /* DialogAlert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DialogAlert.h; sourceTree = "<group>"; };
-		A516B45920908509009A59C0 /* PreferenceViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceViewController.h; sourceTree = "<group>"; };
-		A516B45A20908514009A59C0 /* PreferenceViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceViewController.m; sourceTree = "<group>"; };
+		A517D29720AEBEF200BD567A /* DPUnspentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPUnspentController.h; sourceTree = "<group>"; };
+		A517D29820AEBEF200BD567A /* DPUnspentController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPUnspentController.m; sourceTree = "<group>"; };
+		A518295C20CEDBEC003BFE73 /* Preference.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Preference.storyboard; sourceTree = "<group>"; };
 		A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RepositoryWindow.xib; sourceTree = "<group>"; };
 		A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RepositoriesModalViewController.h; sourceTree = "<group>"; };
 		A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RepositoriesModalViewController.m; sourceTree = "<group>"; };
+		A532618220A42413004678E8 /* UnspentOutputViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnspentOutputViewController.h; sourceTree = "<group>"; };
+		A532618320A42413004678E8 /* UnspentOutputViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnspentOutputViewController.m; sourceTree = "<group>"; };
+		A544ADDA20CA77FF0036AE29 /* ChainSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChainSelectionViewController.h; sourceTree = "<group>"; };
+		A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChainSelectionViewController.m; sourceTree = "<group>"; };
+		A544ADDD20CA78520036AE29 /* DPChainSelectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPChainSelectionController.h; sourceTree = "<group>"; };
+		A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPChainSelectionController.m; sourceTree = "<group>"; };
+		A558E0C420B54E3C00E853DB /* SshConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SshConnection.h; sourceTree = "<group>"; };
+		A558E0C520B54E3C00E853DB /* SshConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SshConnection.m; sourceTree = "<group>"; };
+		A55DFCC520D775BF006E9890 /* PreferenceWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceWindowController.h; sourceTree = "<group>"; };
+		A55DFCC620D775BF006E9890 /* PreferenceWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceWindowController.m; sourceTree = "<group>"; };
 		A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPPreferenceController.h; sourceTree = "<group>"; };
 		A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPPreferenceController.m; sourceTree = "<group>"; };
 		A55FC0D12099BA17004B23FE /* VolumeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VolumeViewController.h; sourceTree = "<group>"; };
 		A55FC0D22099BA22004B23FE /* VolumeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VolumeViewController.m; sourceTree = "<group>"; };
+		A5724D4A20A70D4A004BED71 /* ContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerViewController.h; sourceTree = "<group>"; };
+		A5724D4B20A70D4A004BED71 /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerViewController.m; sourceTree = "<group>"; };
 		A5782D1F2095E99A00CA603A /* PreferenceData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceData.h; sourceTree = "<group>"; };
 		A5782D202095E9A400CA603A /* PreferenceData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferenceData.m; sourceTree = "<group>"; };
-		A597E24420934C590001C98A /* PreferenceWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceWindow.xib; sourceTree = "<group>"; };
+		A581771620DBCEBF009240BD /* DashCoreViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashCoreViewController.h; sourceTree = "<group>"; };
+		A581771720DBCEBF009240BD /* DashCoreViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DashCoreViewController.m; sourceTree = "<group>"; };
+		A581771920DBCEFC009240BD /* LeftContainerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LeftContainerViewController.h; sourceTree = "<group>"; };
+		A581771A20DBCEFC009240BD /* LeftContainerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LeftContainerViewController.m; sourceTree = "<group>"; };
+		A581771C20DBD167009240BD /* PreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
+		A581771D20DBD167009240BD /* PreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
+		A581772220DC02E9009240BD /* AWSViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AWSViewController.h; sourceTree = "<group>"; };
+		A581772320DC02E9009240BD /* AWSViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AWSViewController.m; sourceTree = "<group>"; };
+		A5AF0AE920CD59770058CA80 /* PlaygroundModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "PlaygroundModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VolumeWindow.xib; sourceTree = "<group>"; };
-		F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
-		F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-dashPlayground.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.debug.xcconfig"; sourceTree = "<group>"; };
+		AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
+		BDF339950FBADBE62826DC6C /* Pods-dashPlayground.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlayground.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground.release.xcconfig"; sourceTree = "<group>"; };
 		FB0683421E8731AD00F1AFB4 /* DPDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPDataStore.h; sourceTree = "<group>"; };
 		FB0683431E8731AD00F1AFB4 /* DPDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPDataStore.m; sourceTree = "<group>"; };
 		FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = ../../../../../usr/lib/libz.1.dylib; sourceTree = "<group>"; };
@@ -268,7 +313,6 @@
 		FBBFEB281E86EED600BE41BE /* Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
 		FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SWAdditions.h"; sourceTree = "<group>"; };
 		FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SWAdditions.m"; sourceTree = "<group>"; };
-		FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -280,7 +324,7 @@
 				FB0683B31E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
 				FB0683B51E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
 				FB0683AF1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
-				EC76ED00E89649FE175F52D1 /* libPods-dashPlayground.a in Frameworks */,
+				9301D4C70E08DD5AB9ABFBF9 /* libPods-dashPlayground.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,22 +335,71 @@
 				FB0683B61E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
 				FB0683B41E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
 				FB0683B01E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
-				60F06250BF0F9114E69EC8A9 /* libPods-dashPlaygroundTests.a in Frameworks */,
+				EB1383B3413C8C6236CB2B47 /* libPods-dashPlaygroundTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		7DB87EC0D2F43AE3062A55F5 /* Pods */ = {
+		74BA64C381EE93DBB6F6E15B /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */,
-				2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */,
-				FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */,
-				F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */,
+				21DCCC09DF21C9356075CD9A /* Pods-dashPlayground.debug.xcconfig */,
+				BDF339950FBADBE62826DC6C /* Pods-dashPlayground.release.xcconfig */,
+				513EA1E735BFC6333CBD7A0A /* Pods-dashPlaygroundTests.debug.xcconfig */,
+				AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		A55DFCB920D771C8006E9890 /* Preference */ = {
+			isa = PBXGroup;
+			children = (
+				A55DFCC520D775BF006E9890 /* PreferenceWindowController.h */,
+				A55DFCC620D775BF006E9890 /* PreferenceWindowController.m */,
+				A581771620DBCEBF009240BD /* DashCoreViewController.h */,
+				A581771720DBCEBF009240BD /* DashCoreViewController.m */,
+				A581771920DBCEFC009240BD /* LeftContainerViewController.h */,
+				A581771A20DBCEFC009240BD /* LeftContainerViewController.m */,
+				A581771C20DBD167009240BD /* PreferencesViewController.h */,
+				A581771D20DBD167009240BD /* PreferencesViewController.m */,
+				A581772220DC02E9009240BD /* AWSViewController.h */,
+				A581772320DC02E9009240BD /* AWSViewController.m */,
+			);
+			path = Preference;
+			sourceTree = "<group>";
+		};
+		A581772520DCB8E5009240BD /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				FB29066B1E85799F00A31092 /* RepositoriesViewController.h */,
+				FB29066C1E85799F00A31092 /* RepositoriesViewController.m */,
+				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
+				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
+				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
+				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
+				A532618220A42413004678E8 /* UnspentOutputViewController.h */,
+				A532618320A42413004678E8 /* UnspentOutputViewController.m */,
+				A5724D4A20A70D4A004BED71 /* ContainerViewController.h */,
+				A5724D4B20A70D4A004BED71 /* ContainerViewController.m */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		A581772620DCB910009240BD /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
+				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
+				FB46AE891E95618400D4B034 /* DPLocalNodeController.h */,
+				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
+				FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */,
+				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
+				A517D29720AEBEF200BD567A /* DPUnspentController.h */,
+				A517D29820AEBEF200BD567A /* DPUnspentController.m */,
+			);
+			name = Main;
 			sourceTree = "<group>";
 		};
 		FB0683A71E875CDC00F1AFB4 /* Frameworks */ = {
@@ -315,8 +408,8 @@
 				FB0683AC1E875D3A00F1AFB4 /* libcrypto.35.dylib */,
 				FB0683AA1E875D0100F1AFB4 /* libcrypto.0.9.8.dylib */,
 				FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */,
-				F904C70427F8A9BB22D71A97 /* libPods-dashPlayground.a */,
-				0414D936A4F1B983F79235EC /* libPods-dashPlaygroundTests.a */,
+				04FB8E3A54BAC79C93C59105 /* libPods-dashPlayground.a */,
+				39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -456,7 +549,7 @@
 				FB29067B1E85799F00A31092 /* dashPlaygroundTests */,
 				FB2906631E85799F00A31092 /* Products */,
 				FB0683A71E875CDC00F1AFB4 /* Frameworks */,
-				7DB87EC0D2F43AE3062A55F5 /* Pods */,
+				74BA64C381EE93DBB6F6E15B /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -480,8 +573,10 @@
 				FB2906651E85799F00A31092 /* AppDelegate.h */,
 				FB2906661E85799F00A31092 /* AppDelegate.m */,
 				FB29066E1E85799F00A31092 /* Assets.xcassets */,
-				A597E24420934C590001C98A /* PreferenceWindow.xib */,
+				A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */,
+				A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */,
 				FB2906701E85799F00A31092 /* Main.storyboard */,
+				A518295C20CEDBEC003BFE73 /* Preference.storyboard */,
 				A52EFCF3209AF1EB00B0586A /* RepositoryWindow.xib */,
 				A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */,
 				FB2906731E85799F00A31092 /* Info.plist */,
@@ -530,6 +625,8 @@
 				FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */,
 				A516B45820908333009A59C0 /* DialogAlert.h */,
 				A516B45620908324009A59C0 /* DialogAlert.m */,
+				A558E0C420B54E3C00E853DB /* SshConnection.h */,
+				A558E0C520B54E3C00E853DB /* SshConnection.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -537,18 +634,16 @@
 		FB5A31C51E9EA205003D4DD8 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				FB29066B1E85799F00A31092 /* RepositoriesViewController.h */,
-				FB29066C1E85799F00A31092 /* RepositoriesViewController.m */,
-				FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */,
-				FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */,
-				FB0684251E92DA2000F1AFB4 /* RPCViewController.h */,
-				FB0684261E92DA2000F1AFB4 /* RPCViewController.m */,
-				A516B45920908509009A59C0 /* PreferenceViewController.h */,
-				A516B45A20908514009A59C0 /* PreferenceViewController.m */,
+				A581772520DCB8E5009240BD /* Main */,
+				A55DFCB920D771C8006E9890 /* Preference */,
 				A55FC0D12099BA17004B23FE /* VolumeViewController.h */,
 				A55FC0D22099BA22004B23FE /* VolumeViewController.m */,
 				A52EFCF5209AF44100B0586A /* RepositoriesModalViewController.h */,
 				A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */,
+				A515E7CA20AA953400CB5495 /* AvailabilityViewController.h */,
+				A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */,
+				A544ADDA20CA77FF0036AE29 /* ChainSelectionViewController.h */,
+				A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -556,14 +651,15 @@
 		FB5A31C61E9EA942003D4DD8 /* Server Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				FB39482A1E85B418009D115F /* DPMasternodeController.h */,
-				FB39482B1E85B418009D115F /* DPMasternodeController.m */,
-				FB46AE891E95618400D4B034 /* DPLocalNodeController.h */,
-				FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */,
-				FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */,
-				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
+				A581772620DCB910009240BD /* Main */,
 				A55FC0CE20998BD2004B23FE /* DPPreferenceController.h */,
 				A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */,
+				A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */,
+				A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */,
+				A515E7CD20AA96B800CB5495 /* DPAvailabilityController.h */,
+				A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */,
+				A544ADDD20CA78520036AE29 /* DPChainSelectionController.h */,
+				A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */,
 			);
 			name = "Server Controllers";
 			sourceTree = "<group>";
@@ -586,13 +682,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB2906811E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlayground" */;
 			buildPhases = (
-				94B2D357CF027FDAF151CEC9 /* [CP] Check Pods Manifest.lock */,
+				372C67C07B324016DE12C69A /* [CP] Check Pods Manifest.lock */,
 				FB29065E1E85799F00A31092 /* Sources */,
 				FB29065F1E85799F00A31092 /* Frameworks */,
 				FB2906601E85799F00A31092 /* Resources */,
 				FB2906FF1E857E4C00A31092 /* Embed Frameworks */,
-				71EA2F616C86A0EE853F561B /* [CP] Embed Pods Frameworks */,
-				9770C6F6B7C977D210559020 /* [CP] Copy Pods Resources */,
+				1CF4AE814A94455FDFE5B84B /* [CP] Embed Pods Frameworks */,
+				0D922A82FBEF373AEF43AE40 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -607,12 +703,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB2906841E85799F00A31092 /* Build configuration list for PBXNativeTarget "dashPlaygroundTests" */;
 			buildPhases = (
-				8CFC32F0501D3061B0E72B31 /* [CP] Check Pods Manifest.lock */,
+				FEB69C38545E900C20B87E90 /* [CP] Check Pods Manifest.lock */,
 				FB2906741E85799F00A31092 /* Sources */,
 				FB2906751E85799F00A31092 /* Frameworks */,
 				FB2906761E85799F00A31092 /* Resources */,
-				2685535085359E818AA297FC /* [CP] Embed Pods Frameworks */,
-				C78F8BD6BA8F87F38BA600DE /* [CP] Copy Pods Resources */,
+				482F8E367480E7F3A238FC6F /* [CP] Embed Pods Frameworks */,
+				003D70B9A51A3227EFC92378 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -630,7 +726,7 @@
 		FB29065A1E85799F00A31092 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = dashfoundation;
 				TargetAttributes = {
 					FB2906611E85799F00A31092 = {
@@ -674,11 +770,13 @@
 			files = (
 				A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */,
 				FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */,
+				A515E7C020AA904E00CB5495 /* AvailabilityZoneWindow.xib in Resources */,
 				FB1D2B561EAF552B00F7BE2D /* Images.xcassets in Resources */,
 				A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */,
 				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
+				A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */,
+				A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
-				A597E24520934C590001C98A /* PreferenceWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -693,22 +791,37 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2685535085359E818AA297FC /* [CP] Embed Pods Frameworks */ = {
+		003D70B9A51A3227EFC92378 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		71EA2F616C86A0EE853F561B /* [CP] Embed Pods Frameworks */ = {
+		0D922A82FBEF373AEF43AE40 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1CF4AE814A94455FDFE5B84B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -723,25 +836,7 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8CFC32F0501D3061B0E72B31 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-dashPlaygroundTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		94B2D357CF027FDAF151CEC9 /* [CP] Check Pods Manifest.lock */ = {
+		372C67C07B324016DE12C69A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -759,34 +854,37 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9770C6F6B7C977D210559020 /* [CP] Copy Pods Resources */ = {
+		482F8E367480E7F3A238FC6F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlayground/Pods-dashPlayground-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C78F8BD6BA8F87F38BA600DE /* [CP] Copy Pods Resources */ = {
+		FEB69C38545E900C20B87E90 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-dashPlaygroundTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -796,6 +894,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */,
+				A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */,
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
@@ -803,25 +903,36 @@
 				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
 				A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
+				A581772420DC02E9009240BD /* AWSViewController.m in Sources */,
+				A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
+				A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */,
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
+				A517D29920AEBEF200BD567A /* DPUnspentController.m in Sources */,
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
+				A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
+				A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */,
+				A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */,
 				A516B45720908324009A59C0 /* DialogAlert.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
+				A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
+				A581771E20DBD167009240BD /* PreferencesViewController.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
+				A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */,
+				A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				A5782D212095E9A400CA603A /* PreferenceData.m in Sources */,
 				A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */,
-				A516B45B20908514009A59C0 /* PreferenceViewController.m in Sources */,
 				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
+				A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -877,15 +988,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -924,15 +1043,23 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -957,7 +1084,7 @@
 		};
 		FB2906821E85799F00A31092 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA68DCED310B5EAEBABAF6F0 /* Pods-dashPlayground.debug.xcconfig */;
+			baseConfigurationReference = 21DCCC09DF21C9356075CD9A /* Pods-dashPlayground.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -986,7 +1113,7 @@
 		};
 		FB2906831E85799F00A31092 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2663A3718E741E3DFFD58A28 /* Pods-dashPlayground.release.xcconfig */;
+			baseConfigurationReference = BDF339950FBADBE62826DC6C /* Pods-dashPlayground.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1014,7 +1141,7 @@
 		};
 		FB2906851E85799F00A31092 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FE703C50A475A7D2C59F612E /* Pods-dashPlaygroundTests.debug.xcconfig */;
+			baseConfigurationReference = 513EA1E735BFC6333CBD7A0A /* Pods-dashPlaygroundTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -1042,7 +1169,7 @@
 		};
 		FB2906861E85799F00A31092 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F8AC1A4C30C163FF00530FC6 /* Pods-dashPlaygroundTests.release.xcconfig */;
+			baseConfigurationReference = AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -1103,6 +1230,7 @@
 		FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				A5AF0AE920CD59770058CA80 /* PlaygroundModel 2.xcdatamodel */,
 				FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */,
 			);
 			currentVersion = FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */;

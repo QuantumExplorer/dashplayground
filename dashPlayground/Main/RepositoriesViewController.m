@@ -11,10 +11,10 @@
 #import "DPRepositoryController.h"
 #import "DPDataStore.h"
 #import "DialogAlert.h"
+#import "AvailabilityViewController.h"
 
 @interface RepositoriesViewController ()
 
-@property (strong) IBOutlet NSArrayController *arrayController;
 @property (strong) IBOutlet NSTableView *tableView;
 @property (strong) IBOutlet NSTextField *repositoryAddField;
 @property (strong) IBOutlet NSTextField *branchAddField;
@@ -65,8 +65,11 @@
     
     if([self.startCountField integerValue] <= 100 && [self.startCountField integerValue] >= 1)
     {
+//        AvailabilityViewController *availCon = [[AvailabilityViewController alloc] init];
+//        NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+//        [availCon showAvailWindow:[self.startCountField integerValue] onBranch:object clb:nil];
         NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-        [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil];
+        [[DPMasternodeController sharedInstance] setUpInstances:[self.startCountField integerValue] onBranch:object clb:nil onRegion:nil serverType:@"t2.micro"];
     }
     else
     {
@@ -136,6 +139,16 @@
             NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
             [[NSApplication sharedApplication] presentError:error];
         }
+    }];
+}
+
+- (IBAction)pressSetAmi:(id)sender {
+    NSInteger row = self.tableView.selectedRow;
+    if (row == -1) return;
+    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    
+    [[DPRepositoryController sharedInstance] setAMIForRepository:object clb:^(BOOL success, NSString *message) {
+        
     }];
 }
 

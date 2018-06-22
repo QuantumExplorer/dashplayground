@@ -16,6 +16,8 @@
 
 -(void)updateBranchInfo:(NSManagedObject*)branch clb:(dashClb)clb;
 
+- (void)setAMIForRepository:(NSManagedObject*)repository clb:(dashClb)clb;
+
 +(DPRepositoryController*)sharedInstance;
 
 @end

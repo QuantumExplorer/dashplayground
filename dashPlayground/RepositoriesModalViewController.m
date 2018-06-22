@@ -13,6 +13,10 @@
 #import "DialogAlert.h"
 #import "DPRepositoryController.h"
 #import "DPMasternodeController.h"
+#import "DPRepoModalController.h"
+#import "MasternodeStateTransformer.h"
+#import "MasternodeSyncStatusTransformer.h"
+#import "DPRepoModalController.h"
 
 @interface RepositoriesModalViewController ()
 
@@ -27,7 +31,8 @@
 @implementation RepositoriesModalViewController
 
 RepositoriesModalViewController* _repoWindowController;
-NSManagedObject * masternodeObject;
+NSArray * masternodeArrayObjects;
+MasternodesViewController *masternodeCon2;
 
 - (void)windowDidLoad {
     [super windowDidLoad];
@@ -39,7 +44,7 @@ NSManagedObject * masternodeObject;
     
     NSLog(@"repository window loaded");
     
-    NSMutableArray *repoData = [self getRepositoriesData];
+    NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
     [self displayData:repoData];
 }
 
@@ -57,29 +62,6 @@ NSManagedObject * masternodeObject;
     }
 }
 
--(NSMutableArray*)getRepositoriesData {
-    NSArray *repoData = [[DPDataStore sharedInstance] allRepositories];
-    NSMutableArray * repositoryArray = [NSMutableArray array];
-    
-    NSUInteger count = [repoData count];
-    for (NSUInteger i = 0; i < count; i++) {
-        //repository entity
-        NSManagedObject *repository = (NSManagedObject *)[repoData objectAtIndex:i];
-        //branch entity
-        NSManagedObject *branch = (NSManagedObject *)[repository valueForKey:@"branches"];
-        
-        NSDictionary * rDict = [NSMutableDictionary dictionary];
-        
-        [rDict setValue:[repository valueForKey:@"url"] forKey:@"repository.url"];
-        [rDict setValue:[[branch valueForKey:@"name"] anyObject] forKey:@"branchName"];
-        
-        [repositoryArray addObject:rDict];
-    }
-
-    
-    return repositoryArray;
-}
-
 -(void)showContentToTable:(NSDictionary*)dictionary
 {
     [self.repositoryArrayCon addObject:dictionary];
@@ -92,15 +74,21 @@ NSManagedObject * masternodeObject;
     [self.repoTable editColumn:0 row:row withEvent:nil select:YES];
 }
 
--(void)showRepoWindow:(NSManagedObject*)object {
+-(void)showRepoWindow:(NSArray*)objects controller:(MasternodesViewController*)controller {
+    
+    if([_repoWindowController.window isVisible]) return;
     
     _repoWindowController = [[RepositoriesModalViewController alloc] initWithWindowNibName:@"RepositoryWindow"];
     [_repoWindowController.window makeKeyAndOrderFront:self];
-    masternodeObject = object;
+    masternodeArrayObjects = objects;
+    
+    masternodeCon2 = controller;
+    
+    [[DPRepoModalController sharedInstance] setViewController:controller];
 }
 
 - (IBAction)pressRefresh:(id)sender {
-    NSMutableArray *repoData = [self getRepositoriesData];
+    NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
     [self displayData:repoData];
 }
 
@@ -123,7 +111,7 @@ NSManagedObject * masternodeObject;
                     } else {
                         self.repoNameField.stringValue = @"";
                         self.branchField.stringValue = @"";
-                        NSMutableArray *repoData = [self getRepositoriesData];
+                        NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
                         [self displayData:repoData];
                         
                         [[DialogAlert sharedInstance] showAlertWithOkButton:@"Add repository" message:@"Repository is added successfully."];
@@ -140,7 +128,7 @@ NSManagedObject * masternodeObject;
                 } else {
                     self.repoNameField.stringValue = @"";
                     self.branchField.stringValue = @"";
-                    NSMutableArray *repoData = [self getRepositoriesData];
+                    NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
                     [self displayData:repoData];
                     
                     [[DialogAlert sharedInstance] showAlertWithOkButton:@"Add repository" message:@"Repository is added successfully."];
@@ -166,16 +154,33 @@ NSManagedObject * masternodeObject;
     
     if ([alert runModal] == NSAlertFirstButtonReturn) {
         
-        NSManagedObject * object = [self.repositoryArrayCon.arrangedObjects objectAtIndex:row];
+        [_repoWindowController close];
         
-        [[DPMasternodeController sharedInstance] setUpMasternodeDashdWithSelectedRepo:masternodeObject repository:object clb:^(BOOL success, NSString *message) {
-            if (!success) {
-                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                dict[NSLocalizedDescriptionKey] = message;
-                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                [[NSApplication sharedApplication] presentError:error];
-            }
-        }];
+        //Change masternode state
+        masternodeCon2.setupButton.enabled = false;
+        
+        for(NSManagedObject *masternode in masternodeArrayObjects)
+        {
+            if([[masternode valueForKey:@"isSelected"] integerValue] != 1) continue;
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            });
+            
+            [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+            
+            NSManagedObject * object = [self.repositoryArrayCon.arrangedObjects objectAtIndex:row];
+            
+            [[DPRepoModalController sharedInstance] setUpMasternodeDashdWithSelectedRepo:masternode repository:object clb:^(BOOL success, NSString *message){
+                if (!success) {
+                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                    dict[NSLocalizedDescriptionKey] = message;
+                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                    [[NSApplication sharedApplication] presentError:error];
+                }
+            }];
+        }
     }
 }
 

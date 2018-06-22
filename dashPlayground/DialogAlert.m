@@ -8,6 +8,7 @@
 
 #import "DialogAlert.h"
 
+static NSString *const selectInfoWarning = @"Please make sure you already select an instance.";
 
 @implementation DialogAlert
 
@@ -48,8 +49,6 @@
     NSString *fileName = [url lastPathComponent];
     
     NSString *filePath = [[panel URL] path];
-    
-    NSLog(@"toey %@ %@",fileName,filePath);
     
     NSArray *sshFileInformation = @[fileName, filePath];
     
@@ -93,6 +92,23 @@
     [alert setInformativeText:strInformative];
     
     return alert;
+}
+
+-(NSString *)showAlertWithTextField:(NSString *)title message:(NSString*)message {
+    NSString *strMessage = [NSString stringWithFormat: @"%@", title];
+    NSString *strInformative = [NSString stringWithFormat: @"%@", message];
+    NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 300, 24)];
+    
+    NSAlert *alert = [[NSAlert alloc]init];
+    [alert addButtonWithTitle:@"Ok"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setMessageText:strMessage];
+    [alert setInformativeText:strInformative];
+    [alert setAccessoryView:input];
+    
+    [alert runModal];
+    
+    return [input stringValue];
 }
 
 #pragma mark - Singleton methods

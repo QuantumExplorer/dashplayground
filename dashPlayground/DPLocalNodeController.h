@@ -20,28 +20,38 @@
 @property (nonatomic,copy) NSString * dashCliPath;
 @property (nonatomic,copy) NSString * dashDPath;
 
-- (void)startDash:(dashClb)clb;
+- (void)startDash:(dashClb)clb forChain:(NSString*)chainNetwork;
 
-- (void)stopDash:(dashClb)clb;
+- (void)stopDash:(dashClb)clb forChain:(NSString*)chainNetwork;
 
-- (void)checkDash:(dashActiveClb)clb;
+- (void)checkDash:(dashActiveClb)clb forChain:(NSString*)chainNetwork;
 
-- (void)checkDashStopped:(dashActiveClb)clb;
+- (void)checkDashStopped:(dashActiveClb)clb forChain:(NSString*)chainNetwork;
 
--(void)checkSyncStatus:(dashSyncClb)clb;
+-(NSDictionary*)getSyncStatus:(NSString*)chainNetwork;
 
--(NSDictionary*)getSyncStatus;
+-(NSArray*)outputs:(NSString*)chainNetwork;
 
--(NSArray*)outputs;
+- (NSData *)runDashRPCCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb;
 
-- (NSData *)runDashRPCCommand:(NSString *)commandToRun;
+- (void)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork onClb:(dashClb)clb;
 
--(NSString *)runDashRPCCommandString:(NSString *)commandToRun;
+- (NSString*)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork;
+
+- (void)runDashRPCCommandArray:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDictInfoClb)clb;
+
+-(NSDictionary *)runDashRPCCommandArrayWithArray:(NSArray *)commandToRun;
+
+- (NSString *)runDashRPCCommandStringWithArray:(NSArray *)commandToRun;
 
 -(NSDictionary*)masternodeInfoInMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode;
 
 -(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashClb)clb;
 
 +(DPLocalNodeController*)sharedInstance;
+
+-(NSString*)masterNodePath;
+
+-(void)setMasterNodePath:(NSString*)masterNodePath;
 
 @end

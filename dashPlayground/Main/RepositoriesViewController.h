@@ -19,5 +19,7 @@
 - (IBAction)pressStartIntances:(id)sender;
 - (IBAction)refreshBranch:(id)sender;
 
+@property (strong) IBOutlet NSArrayController *arrayController;
+
 @end
 

@@ -13,6 +13,7 @@
 
 @implementation DPDataStore
 
+@synthesize chainNetwork = _chainNetwork;
 
 #pragma mark - Repositories
 
@@ -67,21 +68,24 @@
     [fetchRequest setReturnsObjectsAsFaults:FALSE];
     [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"url == %@",repositoryURLPath]];
     
-    NSError *error = nil;
+//    NSError *error = nil;
     
-    NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
+//    NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
     NSManagedObject * repo = nil;
     NSManagedObject * branch = nil;
-    if (!repositories || !repositories.count) {
-        repo = [self createRepositoryForURLPath:repositoryURLPath inContext:context saveContext:FALSE];
-        branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
-    } else  {
-        repo = [repositories firstObject];
-        branch = [self branchNamed:branchName inRepository:repo];
-        if (!branch) {
-            branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
-        }
-    }
+    repo = [self createRepositoryForURLPath:repositoryURLPath inContext:context saveContext:FALSE];
+    branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
+//    if (!repositories || !repositories.count) {
+//        repo = [self createRepositoryForURLPath:repositoryURLPath inContext:context saveContext:FALSE];
+//        branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
+//    }
+//    else  {
+//        repo = [repositories firstObject];
+//        branch = [self branchNamed:branchName inRepository:repo];
+//        if (!branch) {
+//            branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
+//        }
+//    }
     return branch;
 }
 
@@ -467,6 +471,14 @@ __strong static NSMutableDictionary * mDict = nil;
         // Do any other initialisation stuff here
     });
     return sharedInstance;
+}
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _chainNetwork = @"testnet";
+    }
+    return self;
 }
 
 @end

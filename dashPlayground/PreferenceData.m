@@ -12,6 +12,7 @@
 #define SECURITYGRID @"securityGroupId"
 #define SUBNETID @"subnetID"
 #define KEYNAME @"keyName"
+#define AWSPATH @"awsPath"
 
 @interface PreferenceData ()
 
@@ -48,6 +49,16 @@
 -(void)setKeyName:(NSString*)keyName {
     NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
     [standardUserDefaults setObject:keyName forKey:KEYNAME];
+}
+
+-(NSString*)getAWSPath {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    return [standardUserDefaults stringForKey:AWSPATH];
+}
+
+-(void)setAWSPath:(NSString*)path {
+    NSUserDefaults * standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    [standardUserDefaults setObject:path forKey:AWSPATH];
 }
 
 #pragma mark - Singleton methods

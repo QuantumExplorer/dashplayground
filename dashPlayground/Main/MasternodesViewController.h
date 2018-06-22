@@ -19,21 +19,24 @@
 
 @interface MasternodesViewController : NSViewController <NSTabViewDelegate>
 
+@property (strong) IBOutlet NSBox *devnetBox;
 +(MasternodesViewController*)sharedInstance;
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
 - (IBAction)retreiveInstances:(id)sender;
-- (IBAction)getKey:(id)sender;
+//- (IBAction)getKey:(id)sender;
 
+@property (strong) IBOutlet NSButtonCell *setupButton;
 - (IBAction)setUp:(id)sender;
 - (IBAction)configure:(id)sender;
 - (IBAction)startRemote:(id)sender;
 
 - (IBAction)selectedConsoleTab:(id)sender;
 
+-(void)addStringEventToMasternodeConsole:(NSString*)string;
 -(void)addStringEvent:(NSString*)string;
--(void)addStringEventToTerminalConsole:(NSString*)string;
--(void)setTerminalString:(NSString*)string;
+
+@property (strong) IBOutlet NSSegmentedControl * consoleTabSegmentedControl;
 
 @end

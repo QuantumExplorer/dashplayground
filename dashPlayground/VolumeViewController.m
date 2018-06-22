@@ -10,6 +10,8 @@
 #import "VolumeViewController.h"
 #import "DPMasternodeController.h"
 #import "DialogAlert.h"
+#import "DPDataStore.h"
+#import "DPRepoModalController.h"
 
 @interface VolumeViewController ()
 
@@ -25,6 +27,7 @@
 @implementation VolumeViewController
 
 VolumeViewController* _volumeController;
+NSManagedObject *masternodeObject;
 NSString *instanceId;
 
 - (void)awakeFromNib {
@@ -35,9 +38,12 @@ NSString *instanceId;
     [self getAMI:instanceId];
 }
 
--(void)showAMIWindow:(NSString*)instanceID {
+-(void)showAMIWindow:(NSManagedObject*)object {
     
-    instanceId = instanceID;
+    if([_volumeController.window isVisible]) return;
+    
+    masternodeObject = object;
+    instanceId = [object valueForKey:@"instanceId"];
     
     _volumeController = [[VolumeViewController alloc] initWithWindowNibName:@"VolumeWindow"];
     [_volumeController.window makeKeyAndOrderFront:self];
@@ -51,7 +57,7 @@ NSString *instanceId;
     NSMutableArray * volume = [NSMutableArray array];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-volumes --filters Name=attachment.instance-id,Values=%@", instanceID]];
+        NSDictionary *output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-volumes --filters Name=attachment.instance-id,Values=%@", instanceID] checkError:NO];
         dispatch_async(dispatch_get_main_queue(), ^{
             //NSLog(@"%@",reservation[@"Instances"]);
             for (NSDictionary * dictionary in output[@"Volumes"]) {
@@ -75,7 +81,7 @@ NSString *instanceId;
         });
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [_volumeArrayCon setContent:nil];
+            [self.volumeArrayCon setContent:nil];
             for (NSDictionary* reference in volume) {
                 [self showContentToTable:reference];
             }
@@ -86,9 +92,9 @@ NSString *instanceId;
 
 -(void)showContentToTable:(NSDictionary*)dictionary
 {
-    [_volumeArrayCon addObject:dictionary];
+    [self.volumeArrayCon addObject:dictionary];
 
-    [_volumeArrayCon rearrangeObjects];
+    [self.volumeArrayCon rearrangeObjects];
 
     NSArray *array = [_volumeArrayCon arrangedObjects];
     NSUInteger row = [array indexOfObjectIdenticalTo:dictionary];
@@ -123,23 +129,43 @@ NSString *instanceId;
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
             
-            NSDictionary *output;
+            NSString *output;
             
             if(isReboot){
-                output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]]];
+                output = [DPmasternodeCon runAWSCommandString:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]] checkError:YES];
             }else{
-                output = [DPmasternodeCon runAWSCommandJSON:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --no-reboot --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@,VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]]];
+                output = [DPmasternodeCon runAWSCommandString:[NSString stringWithFormat:@"ec2 create-image --instance-id %@ --name \"%@\" --description \"%@\" --no-reboot --block-device-mappings DeviceName=\"%@\",Ebs={DeleteOnTermination=%@,VolumeType=\"%@\",VolumeSize=%@}", instanceId, imageName, imageDesc, [object valueForKey:@"device"], deleteOnTerminationValue, [object valueForKey:@"volumeType"], [object valueForKey:@"size"]] checkError:YES];
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                if(output[@"ImageId"])
-                {
-                    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:@"The image is created succesfully."];
-                    [_volumeController.window close];
+                [_volumeController.window close];
+                if([output valueForKey:@"ImageId"]) {
+                    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:[NSString stringWithFormat:@"Created AMI successfully."]];
+                }
+                else {
+                    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Create image!" message:[NSString stringWithFormat:@"Created AMI failed."]];
                 }
             });
+            
         });
         
+    }
+}
+
+-(void)setAmiIdToRepositoryView:(NSString*)amiId repoPath:(NSString*)repoPath {
+    NSArray *repoData = [[DPDataStore sharedInstance] allRepositories];
+    
+    NSUInteger count = [repoData count];
+    for (NSUInteger i = 0; i < count; i++) {
+        //repository entity
+        NSManagedObject *repository = (NSManagedObject *)[repoData objectAtIndex:i];
+        //branch entity
+        NSManagedObject *branch = (NSManagedObject *)[repository valueForKey:@"branches"];
+        if([[repository valueForKey:@"url"] isEqualToString:repoPath]) {
+            [branch setValue:amiId forKey:@"amiId"];
+            [[DPDataStore sharedInstance] saveContext];
+            break;
+        }
     }
 }
 

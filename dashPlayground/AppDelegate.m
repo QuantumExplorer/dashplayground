@@ -13,11 +13,15 @@
 #import "SentinelStateTransformer.h"
 #import "DialogAlert.h"
 #import "DPMasternodeController.h"
-#import "PreferenceViewController.h"
 #import "VolumeViewController.h"
 #import "RepositoriesModalViewController.h"
 #import "RepositoriesViewController.h"
 #import <NMSSH/NMSSH.h>
+#import "SshConnection.h"
+#import "DPMasternodeController.h"
+#import "InstanceStateTransformer.h"
+#import "DPChainSelectionController.h"
+#import "PreferenceWindowController.h"
 
 @interface AppDelegate ()
 
@@ -30,51 +34,94 @@
     
 //    Toey, adding some code here to test somethong more easier.
     
+//    NSLog(@"%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]);
+    
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"securityGroupId"];
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"subnetID"];
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"keyName"];
     
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"sshPath"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"SSH_NAME"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"masterNodePath"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashDPath"];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashCliPath"];
     
 //    VolumeViewController *volController = [[VolumeViewController alloc] init];
 //    [volController showAMIWindow:@"test"];
     
-    NMSSHSession *session = [NMSSHSession connectToHost:@"54.255.245.103"
-                                           withUsername:@"ubuntu"];
     
-    if (session.isConnected) {
-        [session authenticateByPublicKey:nil privateKey:[[DPMasternodeController sharedInstance] sshPath] andPassword:nil];
-        
-        if (session.isAuthorized) {
-            NSLog(@"Authentication succeeded");
-            
-            session.channel.requestPty = YES;
-            session.channel.ptyTerminalType = NMSSHChannelPtyTerminalAnsi;
-            
-            
-            NSError *error;
-            NSString *response = [[session channel] execute:@"\n cd sre" error:&error];
-            if(!error)
-            {
-                NSLog(@"Response: %@", response);
-            }
-            else{
-                NSLog(@"Error: %@", error);
-            }
-        }
-    }
     
-    [session disconnect];
-
+//    NMSSHSession *ssh = [NMSSHSession connectToHost:@"54.255.245.103"
+//                                       withUsername:@"ubuntu"];
+//    
+//    if (ssh.isConnected) {
+//        
+//        [ssh authenticateByPublicKey:nil privateKey:[[DPMasternodeController sharedInstance] sshPath] andPassword:nil];
+//        
+//        if (ssh.isAuthorized) {
+//            NSLog(@"[+] Authentication succeeded");
+//        } else {
+//            NSLog(@"Error authenticating with server.");
+//        }
+//    } else {
+//        NSLog(@"Error connecting to server. Sometimes cause by poor to no signal.");
+//    }
+//    
+//    ssh.channel.requestPty = YES;
+//    
+//    NSError *error = nil;
+//    
+//    NSString *response = [ssh.channel execute:@"cd src" error:&error];
+//    if (error) {
+//        error = nil;
+//        [ssh.channel execute:@"mkdir src" error:&error];
+//        if(error)
+//        {
+//            NSLog(@"Error: %@", error.localizedDescription);
+//        }
+//    }
+//    
+//    [ssh disconnect];
+    
+//    NSStoryboard *storyBoard = [NSStoryboard storyboardWithName:@"Preference" bundle:nil]; // get a reference to the storyboard
+//    PreferenceWindowController *myPreference = [storyBoard instantiateControllerWithIdentifier:@"mainWindow"]; // instantiate your window controller
+//    [myPreference showWindow:self]; // show the window
+    
     //end
     
     
-    NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"masternodeState == %@ || ((masternodseState == %@ || masternodseState == %@) && sentinelState == %@)",@(MasternodeState_Checking),@(MasternodeState_Installed),@(MasternodeState_Configured),@(SentinelState_Checking)]];
+//    NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"masternodeState == %@ || ((masternodseState == %@ || masternodseState == %@ || masternodseState == %@) && sentinelState == %@)",@(MasternodeState_Checking),@(MasternodeState_Installed),@(MasternodeState_Configured),@(MasternodeState_SettingUp),@(SentinelState_Checking)]];
+//    for (NSManagedObject * masternode in checkingMasternodes) {
+//        if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
+//            [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+//        }
+//        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+//            [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode];
+//        }
+//        else {
+//            //[[DPMasternodeController sharedInstance] checkSentinel:masternode];
+//        }
+//    }
+    
+    NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in checkingMasternodes) {
+        
+        if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
+        
+        
+        //check masternode chain network
+//        if ([[masternode valueForKey:@"chainNetwork"] stringValue] == nil || [[masternode valueForKey:@"chainNetwork"] count] == 0) {
+//            [[DPMasternodeController sharedInstance] checkMasternodeChainNetwork:masternode];
+//        }
+        
         if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
-        } else {
+        }
+        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+            if([[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Terminated) return;
+            [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
+            }];
+        }
+        else {
             //[[DPMasternodeController sharedInstance] checkSentinel:masternode];
         }
     }
@@ -336,10 +383,9 @@
 }
 
 - (IBAction)openPreference:(id)sender {
-    
-    PreferenceViewController *prefController = [[PreferenceViewController alloc] init];
-    [prefController showConfiguringWindow];
-    
+    NSStoryboard *storyBoard = [NSStoryboard storyboardWithName:@"Preference" bundle:nil]; // get a reference to the storyboard
+    PreferenceWindowController *myPreference = [storyBoard instantiateControllerWithIdentifier:@"mainWindow"]; // instantiate your window controller
+    [myPreference showWindow:self]; // show the window
 }
 
 @end

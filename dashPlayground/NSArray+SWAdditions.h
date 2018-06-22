@@ -11,6 +11,8 @@
 
 @interface NSArray (SWAdditions)
 
++(NSArray*)sharedInstance;
+
 - (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
 
 - (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key objectPath:(NSString*)object;

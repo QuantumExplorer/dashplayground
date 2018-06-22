@@ -7,6 +7,8 @@
 //
 
 #import "NSArray+SWAdditions.h"
+#import "DPLocalNodeController.h"
+#import "DPDataStore.h"
 
 @implementation NSArray (SWAdditions)
 
@@ -329,5 +331,18 @@
     return [NSString stringWithString:res];
 }
 
+#pragma mark - Singleton methods
+
++ (NSArray *)sharedInstance
+{
+    static NSArray *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[NSArray alloc] init];
+        
+        // Do any other initialisation stuff here
+    });
+    return sharedInstance;
+}
 
 @end

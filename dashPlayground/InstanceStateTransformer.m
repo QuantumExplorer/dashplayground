@@ -35,6 +35,8 @@
         return InstanceState_Rebooting;
     } else if ([string isEqualToString:@"shutting-down"]) {
         return InstanceState_Shutting_Down;
+    } else if ([string isEqualToString:@"setting up"]) {
+        return InstanceState_Setting_Up;
     }
     return InstanceState_Stopped;
 }
@@ -63,6 +65,9 @@
             break;
         case InstanceState_Shutting_Down:
             return @"shutting down";
+            break;
+        case InstanceState_Setting_Up:
+            return @"setting up";
             break;
         default:
             return @"stopped";

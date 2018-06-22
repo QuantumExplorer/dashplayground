@@ -19,6 +19,7 @@
 -(void)showAlertWithOkButton:(NSString *)title message:(NSString *)message;
 -(NSAlert *)showAlertWithYesNoButton:(NSString *)title message:(NSString *)message;
 -(void)showWarningAlert:(NSString *)title message:(NSString *)message;
+-(NSString *)showAlertWithTextField:(NSString *)title message:(NSString*)message;
 
 @end
 
