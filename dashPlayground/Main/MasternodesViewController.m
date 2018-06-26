@@ -667,6 +667,14 @@ NSString *terminalHeadString = @"";
         if([[object valueForKey:@"isSelected"] integerValue] == 1) {
             selectedInstance = object;
             countSelected = countSelected+1;
+            
+//            [object setValue:nil forKey:@"transactionId"];
+//                [object setValue:nil forKey:@"transactionOutputIndex"];
+//            [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+            //    dispatch_async(dispatch_get_main_queue(), ^{
+            //        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            //
+            //    });
         }
     }
     

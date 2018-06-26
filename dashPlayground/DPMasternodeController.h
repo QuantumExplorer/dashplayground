@@ -38,6 +38,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)startDashdOnRemote:(NSManagedObject*)masternode onClb:(dashClb)clb;
 
 -(void)checkMasternode:(NSManagedObject*)masternode;
+-(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
 
 //-(NSDictionary*)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode;
 
@@ -74,5 +75,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)setUpDevnet:(NSArray*)allMasternodes;
 - (BOOL)setUpMainNode:(NSManagedObject*)masternode;
 - (void)checkDevnetNetwork:(NSString*)chainName AllMasternodes:(NSArray*)allMasternodes;
+
+-(InstanceState)stateForStateName:(NSString*)string;
 
 @end

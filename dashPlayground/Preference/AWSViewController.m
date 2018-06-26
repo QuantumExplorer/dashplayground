@@ -35,6 +35,8 @@
 - (void)initialize {
     if([[PreferenceData sharedInstance] getAWSPath] != nil) self.awsPathField.stringValue = [[PreferenceData sharedInstance] getAWSPath];
     if([[DPMasternodeController sharedInstance] sshPath] != nil) self.keyPairField.stringValue = [[DPMasternodeController sharedInstance] sshPath];
+    
+    if(![[PreferenceData sharedInstance] getAWSPath]) return;
     [self fetchingSecurityGr];
     [self fetchingSubnet];
     [self fetchingKeyPairs];

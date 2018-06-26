@@ -75,7 +75,7 @@
     {
         NSString* filePath = [openDlg URL].absoluteString;
         if([filePath length] >= 7) {
-            filePath = [filePath substringFromIndex:7];
+            filePath = [[filePath substringFromIndex:7] stringByRemovingPercentEncoding];
             self.masternodeField.stringValue = filePath;
         }
     }

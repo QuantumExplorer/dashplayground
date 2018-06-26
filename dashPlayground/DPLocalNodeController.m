@@ -490,9 +490,11 @@ dispatch_queue_t dashCallbackBackgroundMNStatusQueue() {
     }
     __block NSManagedObject * object = masternode;
     NSString *fullpath = [self getMastetnodeFullPath:[masternode valueForKey:@"chainNetwork"]];
+//    NSString *fullpath = @"/Users/nattapon17/Library/Application Support/DashCore/testnet3/masternode.conf";
     NSError * error = nil;
     NSString *contents = [NSString stringWithContentsOfFile:fullpath encoding:NSUTF8StringEncoding error:&error];
     NSMutableArray * lines = [[contents componentsSeparatedByString:@"\n"] mutableCopy];
+    if(lines == nil) return clb(NO, @"missing information in masternode.conf file");
     NSMutableArray * specialLines = [NSMutableArray array];
     for (int i = ((int)[lines count]) - 1;i> -1;i--) {
         if ([lines[i] hasPrefix:@"#"]) {
