@@ -710,7 +710,6 @@
 //        return;
     }
     
-    
     if ([masternode valueForKey:@"transactionId"] && [masternode valueForKey:@"transactionOutputIndex"]) {
         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configuring masternode configuration file...", [masternode valueForKey:@"instanceId"]];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1169,7 +1168,7 @@
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
                                     [[DPDataStore sharedInstance] saveContext];
-                                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: could not start this masternode.", [masternode valueForKey:@"instanceId"]];
+                                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: could not start this masternode. Mnsync status: %@", [masternode valueForKey:@"instanceId"], dictionary[@"AssetName"]];
                                     clb(FALSE, dictionary, eventMsg);
                                 });
                                 break;
@@ -1274,7 +1273,7 @@
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
                                     [[DPDataStore sharedInstance] saveContext];
-                                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: could not start this masternode.", [masternode valueForKey:@"instanceId"]];
+                                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: could not start this masternode.  Mnsync status: %@", [masternode valueForKey:@"instanceId"], dictionary[@"AssetName"]];
                                     clb(FALSE, dictionary, eventMsg);
                                 });
                                 break;
@@ -1333,7 +1332,7 @@
                 return clb(NO,NO,[error localizedDescription]);
             }
         }
-        if (dictionary && [dictionary[@"result"] isEqualToString:@"successful"]) clb(YES,YES,nil);
+        if (dictionary && [dictionary[@"result"] isEqualToString:@"successful"]) clb(YES,YES,@"masternode started");
         else {
             if(dictionary && dictionary[@"errorMessage"])
             {
@@ -2340,7 +2339,7 @@
     {
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-38ad8444 --count 1 --instance-type %@ --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-e1adaf9d --count 1 --instance-type %@ --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
                                                             serverType,
                                                             [[PreferenceData sharedInstance] getKeyName],
                                                             [[PreferenceData sharedInstance] getSecurityGroupId],

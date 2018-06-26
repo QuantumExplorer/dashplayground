@@ -29,8 +29,9 @@
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
 		A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771720DBCEBF009240BD /* DashCoreViewController.m */; };
 		A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771A20DBCEFC009240BD /* LeftContainerViewController.m */; };
-		A581771E20DBD167009240BD /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771D20DBD167009240BD /* PreferencesViewController.m */; };
 		A581772420DC02E9009240BD /* AWSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581772320DC02E9009240BD /* AWSViewController.m */; };
+		A581772C20E0DA28009240BD /* NetworkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581772B20E0DA28009240BD /* NetworkViewController.m */; };
+		A597FE8120E0EA60000470E6 /* DPNetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = A597FE8020E0EA60000470E6 /* DPNetworkController.m */; };
 		A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */; };
 		EB1383B3413C8C6236CB2B47 /* libPods-dashPlaygroundTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */; };
 		FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
@@ -147,10 +148,12 @@
 		A581771720DBCEBF009240BD /* DashCoreViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DashCoreViewController.m; sourceTree = "<group>"; };
 		A581771920DBCEFC009240BD /* LeftContainerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LeftContainerViewController.h; sourceTree = "<group>"; };
 		A581771A20DBCEFC009240BD /* LeftContainerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LeftContainerViewController.m; sourceTree = "<group>"; };
-		A581771C20DBD167009240BD /* PreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
-		A581771D20DBD167009240BD /* PreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
 		A581772220DC02E9009240BD /* AWSViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AWSViewController.h; sourceTree = "<group>"; };
 		A581772320DC02E9009240BD /* AWSViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AWSViewController.m; sourceTree = "<group>"; };
+		A581772A20E0DA28009240BD /* NetworkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkViewController.h; sourceTree = "<group>"; };
+		A581772B20E0DA28009240BD /* NetworkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkViewController.m; sourceTree = "<group>"; };
+		A597FE7F20E0EA60000470E6 /* DPNetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPNetworkController.h; sourceTree = "<group>"; };
+		A597FE8020E0EA60000470E6 /* DPNetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPNetworkController.m; sourceTree = "<group>"; };
 		A5AF0AE920CD59770058CA80 /* PlaygroundModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "PlaygroundModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		A5EC6BD82099BF0E00B14BAD /* VolumeWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VolumeWindow.xib; sourceTree = "<group>"; };
 		AE51C8789795050F7460AE43 /* Pods-dashPlaygroundTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -362,8 +365,6 @@
 				A581771720DBCEBF009240BD /* DashCoreViewController.m */,
 				A581771920DBCEFC009240BD /* LeftContainerViewController.h */,
 				A581771A20DBCEFC009240BD /* LeftContainerViewController.m */,
-				A581771C20DBD167009240BD /* PreferencesViewController.h */,
-				A581771D20DBD167009240BD /* PreferencesViewController.m */,
 				A581772220DC02E9009240BD /* AWSViewController.h */,
 				A581772320DC02E9009240BD /* AWSViewController.m */,
 			);
@@ -383,6 +384,8 @@
 				A532618320A42413004678E8 /* UnspentOutputViewController.m */,
 				A5724D4A20A70D4A004BED71 /* ContainerViewController.h */,
 				A5724D4B20A70D4A004BED71 /* ContainerViewController.m */,
+				A581772A20E0DA28009240BD /* NetworkViewController.h */,
+				A581772B20E0DA28009240BD /* NetworkViewController.m */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -398,6 +401,8 @@
 				FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */,
 				A517D29720AEBEF200BD567A /* DPUnspentController.h */,
 				A517D29820AEBEF200BD567A /* DPUnspentController.m */,
+				A597FE7F20E0EA60000470E6 /* DPNetworkController.h */,
+				A597FE8020E0EA60000470E6 /* DPNetworkController.m */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -911,8 +916,10 @@
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
+				A597FE8120E0EA60000470E6 /* DPNetworkController.m in Sources */,
 				A517D29920AEBEF200BD567A /* DPUnspentController.m in Sources */,
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
+				A581772C20E0DA28009240BD /* NetworkViewController.m in Sources */,
 				A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */,
@@ -922,7 +929,6 @@
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
 				A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
-				A581771E20DBD167009240BD /* PreferencesViewController.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,

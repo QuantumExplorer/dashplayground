@@ -21,7 +21,6 @@
     NSString *response = [ssh.channel execute:@"cd ~/.dashcore && cat dash.conf" error:&error];
     if(response != nil){
         NSArray *dashConf = [response componentsSeparatedByString:@"\n"];
-        
         for(NSString *line in dashConf) {
 //            if([line rangeOfString:@"devnet"].location != NSNotFound) {
 //                clb(NO, @"This masternode is already on devnet!");
@@ -30,7 +29,7 @@
             if ([line rangeOfString:@"mainnet"].location != NSNotFound
                 || [line rangeOfString:@"testnet"].location != NSNotFound)
             {
-                NSString *newLine = [NSString stringWithFormat:@"%@=%@",chain ,devnetName];
+                NSString *newLine = [NSString stringWithFormat:@"%@=1",chain];
                 dashConfClone = [dashConfClone arrayByAddingObject:newLine];
             }
             else if ([line rangeOfString:@"rpcport"].location != NSNotFound)
@@ -105,19 +104,21 @@
 }
 
 -(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey {
-    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) chainNetwork = @"devnet";
-    [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:chainNetwork onName:chainNetworkName onSporkAddr:sporkAddr onSporkKey:sporkKey onClb:^(BOOL success, NSString *message) {
-        if(success != YES) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network failed."];
-            });
-        }
-        else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network successfully."];
-            });
-        }
-    }];
+    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+        chainNetwork = @"devnet";
+        [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:chainNetwork onName:chainNetworkName onSporkAddr:sporkAddr onSporkKey:sporkKey onClb:^(BOOL success, NSString *message) {
+            if(success != YES) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network failed."];
+                });
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network successfully."];
+                });
+            }
+        }];
+    }
 }
 
 #pragma mark - Singleton methods
