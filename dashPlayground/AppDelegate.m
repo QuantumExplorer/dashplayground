@@ -106,12 +106,6 @@
         
         if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
         
-        
-        //check masternode chain network
-//        if ([[masternode valueForKey:@"chainNetwork"] stringValue] == nil || [[masternode valueForKey:@"chainNetwork"] count] == 0) {
-//            [[DPMasternodeController sharedInstance] checkMasternodeChainNetwork:masternode];
-//        }
-        
         if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
         }
@@ -263,7 +257,7 @@
     
     if (!shouldFail && !error) {
         NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-        NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"PlaygroundModel.storedata"];
+        NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"PlaygroundModel 3.storedata"];
         if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) {
             // Replace this implementation with code to handle the error appropriately.
             error = nil;

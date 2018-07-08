@@ -645,7 +645,7 @@ NSString *terminalHeadString = @"";
             else{
                 [self addStringEvent:FS(@"creating new instance failure.")];
             }
-        } serverType:@"t2.micro"];
+        } serverType:@"t2.small"];
     }
     
 }

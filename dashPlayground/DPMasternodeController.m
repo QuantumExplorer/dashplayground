@@ -1830,98 +1830,100 @@
 -(void)checkMasternode:(NSManagedObject*)masternode saveContext:(BOOL)saveContext clb:(dashClb)clb {
     //we are going to check if a masternode is running, configured, etc...
     //first let's check to see if we have access to rpc
-    if ([masternode valueForKey:@"rpcPassword"]) {
-        //we most likely have access to rpc, it's running
-        [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
-            if (dictionary) {
-                [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
-                [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
-                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-            } else {
-                [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
-                    if (value) {
-                        NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
-                        if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
-                            [masternode setValuesForKeysWithDictionary:dictionary];
-                            [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
-                            if ([masternode hasChanges]) {
-                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                            }
-                            [self updateGitInfoForMasternode:masternode clb:nil];
-                        } else {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
-                                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
-                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                            }
-                            [self updateGitInfoForMasternode:masternode clb:nil];
-                        }
-                    } else {
-                        if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                            [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
-                            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                        }
-                    }
-                }];
-            }
-        }];
-        
-        
-    } else { //we don't have access to the rpc, let's ssh in and retrieve it.
-        [self retrieveConfigurationInfoThroughSSH:masternode clb:^(BOOL success, NSDictionary *info, NSString *errorMessage) {
-            
-            if (![info[@"externalip"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
-                //the masternode has never been configured
-                [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
-                    if (value) {
-                        if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
-                            [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
-                            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                        }
-                        [self updateGitInfoForMasternode:masternode clb:nil];
-                    } else {
-                        if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                            [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
-                            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                        }
-                    }
-                }];
-            } else {
-                [masternode setValue:info[@"rpcpassword"] forKey:@"rpcPassword"];
-                [masternode setValue:info[@"masternodeprivkey"] forKey:@"key"];
-                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
-                    if (dictionary) {
-                        [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
-                        [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
-                        [self updateGitInfoForMasternode:masternode clb:nil];
-                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                    } else {
-                        [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
-                            if (value) {
-                                NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
-                                if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
-                                    [masternode setValuesForKeysWithDictionary:dictionary];
-                                    [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
-                                } else {
-                                    [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
-                                }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        if ([masternode valueForKey:@"rpcPassword"]) {
+            //we most likely have access to rpc, it's running
+            [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
+                if (dictionary) {
+                    [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
+                    [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                } else {
+                    [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
+                        if (value) {
+                            NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
+                            if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
+                                [masternode setValuesForKeysWithDictionary:dictionary];
+                                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
                                 if ([masternode hasChanges]) {
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
                                 [self updateGitInfoForMasternode:masternode clb:nil];
                             } else {
-                                if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                                    [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                                if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
+                                    [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
+                                [self updateGitInfoForMasternode:masternode clb:nil];
                             }
-                        }];
-                    }
-                }];
-            }
-        }];
-        
-    }
+                        } else {
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
+                                [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                            }
+                        }
+                    }];
+                }
+            }];
+            
+            
+        } else { //we don't have access to the rpc, let's ssh in and retrieve it.
+            [self retrieveConfigurationInfoThroughSSH:masternode clb:^(BOOL success, NSDictionary *info, NSString *errorMessage) {
+                
+                if (![info[@"externalip"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
+                    //the masternode has never been configured
+                    [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
+                        if (value) {
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
+                                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                            }
+                            [self updateGitInfoForMasternode:masternode clb:nil];
+                        } else {
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
+                                [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                            }
+                        }
+                    }];
+                } else {
+                    [masternode setValue:info[@"rpcpassword"] forKey:@"rpcPassword"];
+                    [masternode setValue:info[@"masternodeprivkey"] forKey:@"key"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
+                        if (dictionary) {
+                            [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
+                            [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
+                            [self updateGitInfoForMasternode:masternode clb:nil];
+                            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                        } else {
+                            [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
+                                if (value) {
+                                    NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
+                                    if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
+                                        [masternode setValuesForKeysWithDictionary:dictionary];
+                                        [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                                    } else {
+                                        [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                                    }
+                                    if ([masternode hasChanges]) {
+                                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                    }
+                                    [self updateGitInfoForMasternode:masternode clb:nil];
+                                } else {
+                                    if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
+                                        [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                    }
+                                }
+                            }];
+                        }
+                    }];
+                }
+            }];
+            
+        }
+    });
 }
 
 #pragma mark - Masternode Fixes

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9301D4C70E08DD5AB9ABFBF9 /* libPods-dashPlayground.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FB8E3A54BAC79C93C59105 /* libPods-dashPlayground.a */; };
 		A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */ = {isa = PBXBuildFile; fileRef = A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */; };
+		A5142E7720E36259000AB18E /* DebugTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A5142E7620E36259000AB18E /* DebugTypeTransformer.m */; };
 		A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */; };
 		A515E7C020AA904E00CB5495 /* AvailabilityZoneWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */; };
 		A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A515E7CB20AA953400CB5495 /* AvailabilityViewController.m */; };
@@ -112,6 +113,9 @@
 		513EA1E735BFC6333CBD7A0A /* Pods-dashPlaygroundTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dashPlaygroundTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dashPlaygroundTests/Pods-dashPlaygroundTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A50FB29C20A2F9E6008EFD32 /* DPRepoModalController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPRepoModalController.h; sourceTree = "<group>"; };
 		A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPRepoModalController.m; sourceTree = "<group>"; };
+		A5142E7420E2341F000AB18E /* PlaygroundModel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "PlaygroundModel 3.xcdatamodel"; sourceTree = "<group>"; };
+		A5142E7520E36259000AB18E /* DebugTypeTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DebugTypeTransformer.h; sourceTree = "<group>"; };
+		A5142E7620E36259000AB18E /* DebugTypeTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DebugTypeTransformer.m; sourceTree = "<group>"; };
 		A5153E7B20CA5CEE00D6902B /* ChainSelectionWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ChainSelectionWindow.xib; sourceTree = "<group>"; };
 		A515E7BF20AA904E00CB5495 /* AvailabilityZoneWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AvailabilityZoneWindow.xib; sourceTree = "<group>"; };
 		A515E7CA20AA953400CB5495 /* AvailabilityViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailabilityViewController.h; sourceTree = "<group>"; };
@@ -543,6 +547,8 @@
 				FB1D2B531EA455CD00F7BE2D /* SentinelStateTransformer.m */,
 				FB5A31C01E9D2F04003D4DD8 /* TrackingTransformer.h */,
 				FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */,
+				A5142E7520E36259000AB18E /* DebugTypeTransformer.h */,
+				A5142E7620E36259000AB18E /* DebugTypeTransformer.m */,
 			);
 			name = Transformers;
 			sourceTree = "<group>";
@@ -914,6 +920,7 @@
 				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
 				A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */,
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
+				A5142E7720E36259000AB18E /* DebugTypeTransformer.m in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				A597FE8120E0EA60000470E6 /* DPNetworkController.m in Sources */,
@@ -1236,10 +1243,11 @@
 		FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				A5142E7420E2341F000AB18E /* PlaygroundModel 3.xcdatamodel */,
 				A5AF0AE920CD59770058CA80 /* PlaygroundModel 2.xcdatamodel */,
 				FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */,
 			);
-			currentVersion = FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */;
+			currentVersion = A5142E7420E2341F000AB18E /* PlaygroundModel 3.xcdatamodel */;
 			path = PlaygroundModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
