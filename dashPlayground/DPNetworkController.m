@@ -12,8 +12,6 @@
 #import "SshConnection.h"
 #import "DebugTypeTransformer.h"
 #import "DPDataStore.h"
-#import <BRFullTextSearch/BRFullTextSearch.h>
-#import <BRFullTextSearch/CLuceneSearchService.h>
 
 @implementation DPNetworkController
 

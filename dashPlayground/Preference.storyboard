@@ -689,11 +689,11 @@ Gw
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="3JE-Vw-aMI">
-                                                            <rect key="frame" x="230.5" y="1" width="195" height="40"/>
+                                                            <rect key="frame" x="230.5" y="1" width="196" height="40"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wbS-ET-CjV">
-                                                                    <rect key="frame" x="0.0" y="23" width="195" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="23" width="196" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="Fhf-H4-Sxi">
                                                                         <font key="font" metaFont="system"/>
