@@ -1,1 +1,0 @@
-../../../../../../BRFullTextSearch/clucene/src/core/CLucene/search/spans/SpanNearQuery.h

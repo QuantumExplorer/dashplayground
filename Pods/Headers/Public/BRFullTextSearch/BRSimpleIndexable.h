@@ -1,1 +1,0 @@
-../../../BRFullTextSearch/BRFullTextSearch/BRSimpleIndexable.h

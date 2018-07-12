@@ -1,1 +1,0 @@
-../../../BRFullTextSearch/BRFullTextSearch/BRIndexable.h

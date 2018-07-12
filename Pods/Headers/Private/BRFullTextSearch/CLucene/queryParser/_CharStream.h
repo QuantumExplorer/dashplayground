@@ -1,1 +1,0 @@
-../../../../../BRFullTextSearch/clucene/src/core/CLucene/queryParser/_CharStream.h

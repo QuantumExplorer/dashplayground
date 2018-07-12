@@ -1,1 +1,0 @@
-../../../BRFullTextSearch/BRFullTextSearch/CLuceneSearchService.h

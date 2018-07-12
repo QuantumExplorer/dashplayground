@@ -1,1 +1,0 @@
-../../../../../BRFullTextSearch/clucene/src/core/CLucene/analysis/AnalysisHeader.h

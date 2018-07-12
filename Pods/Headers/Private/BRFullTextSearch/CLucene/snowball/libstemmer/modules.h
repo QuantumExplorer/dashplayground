@@ -1,1 +1,0 @@
-../../../../../../BRFullTextSearch/clucene/src/contribs-lib/CLucene/snowball/libstemmer/modules.h

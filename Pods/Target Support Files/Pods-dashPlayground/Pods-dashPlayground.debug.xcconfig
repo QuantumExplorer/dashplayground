@@ -1,10 +1,8 @@
-CLANG_CXX_LANGUAGE_STANDARD = gnu++98
-CLANG_CXX_LIBRARY = libstdc++
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/AFNetworking" "${PODS_ROOT}/Headers/Public/BRFullTextSearch" "${PODS_ROOT}/Headers/Public/NMSSH"
-LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/AFNetworking" "${PODS_CONFIGURATION_BUILD_DIR}/BRFullTextSearch" "${PODS_CONFIGURATION_BUILD_DIR}/NMSSH" "${PODS_ROOT}/NMSSH/NMSSH-OSX/Libraries/lib"
-OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/AFNetworking" -isystem "${PODS_ROOT}/Headers/Public/BRFullTextSearch" -isystem "${PODS_ROOT}/Headers/Public/NMSSH"
-OTHER_LDFLAGS = $(inherited) -ObjC -stdlib=libstdc++ -l"AFNetworking" -l"BRFullTextSearch" -l"NMSSH" -l"crypto" -l"ssh2" -l"ssl" -l"stdc++" -l"z" -framework "CFNetwork" -framework "CoreServices" -framework "Security" -framework "SystemConfiguration"
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/AFNetworking" "${PODS_ROOT}/Headers/Public/NMSSH"
+LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/AFNetworking" "${PODS_CONFIGURATION_BUILD_DIR}/NMSSH" "${PODS_ROOT}/NMSSH/NMSSH-OSX/Libraries/lib"
+OTHER_CFLAGS = $(inherited) -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/AFNetworking" -isystem "${PODS_ROOT}/Headers/Public/NMSSH"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"AFNetworking" -l"NMSSH" -l"crypto" -l"ssh2" -l"ssl" -l"z" -framework "CFNetwork" -framework "CoreServices" -framework "Security" -framework "SystemConfiguration"
 PODS_BUILD_DIR = ${BUILD_DIR}
 PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
 PODS_PODFILE_DIR_PATH = ${SRCROOT}/.

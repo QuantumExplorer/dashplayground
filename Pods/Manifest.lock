@@ -12,42 +12,16 @@ PODS:
   - AFNetworking/Reachability (3.2.1)
   - AFNetworking/Security (3.2.1)
   - AFNetworking/Serialization (3.2.1)
-  - BRFullTextSearch (1.1.1):
-    - BRFullTextSearch/Core (= 1.1.1)
-  - BRFullTextSearch/API (1.1.1)
-  - BRFullTextSearch/CLucene (1.1.1):
-    - BRFullTextSearch/CLucene-Contribs-Lib
-    - BRFullTextSearch/CLucene-Core
-    - BRFullTextSearch/CLucene-Shared
-  - BRFullTextSearch/CLucene-Config (1.1.1)
-  - BRFullTextSearch/CLucene-Contribs-Lib (1.1.1):
-    - BRFullTextSearch/CLucene-Core
-    - BRFullTextSearch/CLucene-Shared
-  - BRFullTextSearch/CLucene-Core (1.1.1):
-    - BRFullTextSearch/CLucene-Core-API
-    - BRFullTextSearch/CLucene-Shared
-  - BRFullTextSearch/CLucene-Core-API (1.1.1):
-    - BRFullTextSearch/CLucene-Config
-  - BRFullTextSearch/CLucene-Shared (1.1.1):
-    - BRFullTextSearch/CLucene-Core-API
-  - BRFullTextSearch/Core (1.1.1):
-    - BRFullTextSearch/API
-    - BRFullTextSearch/Implementation-CLucene
-  - BRFullTextSearch/Implementation-CLucene (1.1.1):
-    - BRFullTextSearch/API
-    - BRFullTextSearch/CLucene
-  - NMSSH (2.2.8)
+  - NMSSH (2.3.0)
 
 DEPENDENCIES:
   - AFNetworking
-  - BRFullTextSearch
   - NMSSH
 
 SPEC CHECKSUMS:
   AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
-  BRFullTextSearch: 4c3094b9f53c445ca7e37dcf4be7c2a13c45d2c2
-  NMSSH: b722885a07485a2c03ffa3ea56a7b0308dbdc37c
+  NMSSH: 3633ce1e98bc860e309130042718d019434ddbf9
 
-PODFILE CHECKSUM: fff4b65aa01cfe9ef0e138260ec5a24be8ec9c7e
+PODFILE CHECKSUM: 3451c4e2cc6dd2d167094f7a24cb0755d0261f2b
 
 COCOAPODS: 1.4.0

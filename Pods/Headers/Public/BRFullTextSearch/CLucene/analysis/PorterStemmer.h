@@ -1,1 +1,0 @@
-../../../../../BRFullTextSearch/clucene/src/contribs-lib/CLucene/analysis/PorterStemmer.h
