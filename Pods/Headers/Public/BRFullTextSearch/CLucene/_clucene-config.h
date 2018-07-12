@@ -1,0 +1,1 @@
+../../../../BRFullTextSearch/BRFullTextSearch/CLucene/_clucene-config.h

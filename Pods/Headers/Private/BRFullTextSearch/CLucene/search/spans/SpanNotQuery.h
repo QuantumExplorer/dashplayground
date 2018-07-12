@@ -1,0 +1,1 @@
+../../../../../../BRFullTextSearch/clucene/src/core/CLucene/search/spans/SpanNotQuery.h

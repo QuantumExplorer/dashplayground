@@ -1,0 +1,1 @@
+../../../../BRFullTextSearch/clucene/src/shared/CLucene/SharedHeader.h

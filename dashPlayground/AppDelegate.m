@@ -47,44 +47,6 @@
 //    VolumeViewController *volController = [[VolumeViewController alloc] init];
 //    [volController showAMIWindow:@"test"];
     
-    
-    
-//    NMSSHSession *ssh = [NMSSHSession connectToHost:@"54.255.245.103"
-//                                       withUsername:@"ubuntu"];
-//    
-//    if (ssh.isConnected) {
-//        
-//        [ssh authenticateByPublicKey:nil privateKey:[[DPMasternodeController sharedInstance] sshPath] andPassword:nil];
-//        
-//        if (ssh.isAuthorized) {
-//            NSLog(@"[+] Authentication succeeded");
-//        } else {
-//            NSLog(@"Error authenticating with server.");
-//        }
-//    } else {
-//        NSLog(@"Error connecting to server. Sometimes cause by poor to no signal.");
-//    }
-//    
-//    ssh.channel.requestPty = YES;
-//    
-//    NSError *error = nil;
-//    
-//    NSString *response = [ssh.channel execute:@"cd src" error:&error];
-//    if (error) {
-//        error = nil;
-//        [ssh.channel execute:@"mkdir src" error:&error];
-//        if(error)
-//        {
-//            NSLog(@"Error: %@", error.localizedDescription);
-//        }
-//    }
-//    
-//    [ssh disconnect];
-    
-//    NSStoryboard *storyBoard = [NSStoryboard storyboardWithName:@"Preference" bundle:nil]; // get a reference to the storyboard
-//    PreferenceWindowController *myPreference = [storyBoard instantiateControllerWithIdentifier:@"mainWindow"]; // instantiate your window controller
-//    [myPreference showWindow:self]; // show the window
-    
     //end
     
     

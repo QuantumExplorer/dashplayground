@@ -1,0 +1,1 @@
+../../../../../BRFullTextSearch/clucene/src/core/CLucene/store/_Lock.h

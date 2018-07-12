@@ -1,0 +1,1 @@
+../../../../../BRFullTextSearch/clucene/src/core/CLucene/search/WildcardTermEnum.h

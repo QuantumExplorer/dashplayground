@@ -1,0 +1,1 @@
+../../../../../BRFullTextSearch/clucene/src/core/CLucene/queryParser/QueryToken.h

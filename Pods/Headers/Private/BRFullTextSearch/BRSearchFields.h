@@ -1,0 +1,1 @@
+../../../BRFullTextSearch/BRFullTextSearch/BRSearchFields.h

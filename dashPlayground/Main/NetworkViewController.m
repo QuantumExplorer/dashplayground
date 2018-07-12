@@ -82,7 +82,7 @@
     if(![object valueForKey:@"publicIP"]) return;
 
     
-    [self addStringEvent:[NSString stringWithFormat:@"Trying to get debug.log contents from %@.", [object valueForKey:@"publicIP"]]];
+    [self addStringEvent:[NSString stringWithFormat:@"Downloading debug.log file from %@.", [object valueForKey:@"publicIP"]]];
     [[DPNetworkController sharedInstance] getDebugLogFileFromMasternode:object clb:^(BOOL success, NSString *message) {
         if(success == YES) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -121,13 +121,19 @@
 }
 
 - (IBAction)selectDataTypes:(id)sender {
+    
+    
+    
     NSLog(@"%@", [self.dataTypeItemsButton.selectedItem title]);
     
     if([[self.dataTypeItemsButton.selectedItem title] isEqualToString:@"All"]) {
-        self.debugLogField.string = self.currentDebugLog;
-        return;
+        if([self.debugLogField.string length] != 0) {
+            self.debugLogField.string = self.currentDebugLog;
+            return;
+        }
     }
     
+    [self addStringEvent:[NSString stringWithFormat:@"Changing filter to %@", [self.dataTypeItemsButton.selectedItem title]]];
     self.debugLogField.string = @"";
     NSMutableString *cloneLogField = [NSMutableString string];
     

@@ -1,0 +1,1 @@
+../../../../../BRFullTextSearch/clucene/src/contribs-lib/CLucene/highlighter/WeightedTerm.h
