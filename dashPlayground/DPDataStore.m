@@ -113,6 +113,46 @@
     return branch;
 }
 
+#pragma mark - Message
+
+-(void)createMessageToMasternode:(NSManagedObject*)masternode dataType:(int)dataType atLine:(int)line {
+    [self createMessageToMasternode:masternode dataType:dataType atLine:line inContext:self.mainContext saveContext:FALSE];
+}
+
+-(NSManagedObject*)createMessageToMasternode:(NSManagedObject*)masternode dataType:(int)dataType atLine:(int)line
+                                 inContext:(NSManagedObjectContext*)context saveContext:(BOOL)saveContext {
+    NSManagedObject *messageObject = (NSManagedObject*)[self createInsertedNewObjectForEntityNamed:@"Message" inContext:context];
+    [messageObject setValue:@(dataType) forKey:@"type"];
+    [messageObject setValue:@(line) forKey:@"atLine"];
+//    [messageObject setValue:message forKey:@"message"];
+//    [messageObject setValue:masternode forKey:@"masternode"];
+    if (saveContext) {
+        [self saveContext:context];
+    }
+    return messageObject;
+}
+
+-(NSArray*)getMessageObjectsFromMasternode:(NSManagedObject *)masternode {
+    return [self getLogMessageFromMasternode:masternode inContext:self.mainContext];
+}
+
+-(NSArray*)getLogMessageFromMasternode:(NSManagedObject *)masternode inContext:(NSManagedObjectContext*)context {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Message"
+                                              inManagedObjectContext:context];
+//    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"masternode == %@",masternode]];
+    [fetchRequest setEntity:entity];
+    
+    NSError *error = nil;
+    
+    NSArray *messageObject = [self executeFetchRequest:fetchRequest inContext:context error:&error];
+    if ([messageObject count] == 0) {
+        return nil;
+    } else  {
+        return messageObject;
+    }
+    
+}
 
 #pragma mark - Masternodes
 

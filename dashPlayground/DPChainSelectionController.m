@@ -29,8 +29,14 @@
             if ([line rangeOfString:@"mainnet"].location != NSNotFound
                 || [line rangeOfString:@"testnet"].location != NSNotFound)
             {
-                NSString *newLine = [NSString stringWithFormat:@"%@=1",chain];
-                dashConfClone = [dashConfClone arrayByAddingObject:newLine];
+                if ([chain rangeOfString:@"devnet"].location != NSNotFound) {
+                    NSString *newLine = [NSString stringWithFormat:@"devnet=%@",devnetName];
+                    dashConfClone = [dashConfClone arrayByAddingObject:newLine];
+                }
+                else {
+                    NSString *newLine = [NSString stringWithFormat:@"%@=1",chain];
+                    dashConfClone = [dashConfClone arrayByAddingObject:newLine];
+                }
             }
             else if ([line rangeOfString:@"rpcport"].location != NSNotFound)
             {
@@ -62,6 +68,11 @@
             [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
                 isSuccess = success;
             }];
+            if(isSuccess != YES) {
+                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                    isSuccess = success;
+                }];
+            }
             if(isSuccess != YES) return;
             
             NSArray *dashConfContents = [self createNewConfigDashContent:sshSession onChain:chain devnetName:devName onSporkAddr:sporkAddr onSporkKey:sporkKey onClb:^(BOOL success, NSString *message) {
@@ -104,6 +115,21 @@
 }
 
 -(void)executeConfigurationMethod:(NSString*)chainNetwork onName:(NSString*)chainNetworkName onMasternode:(NSManagedObject*)masternode onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey {
+    if(chainNetwork == nil &&  chainNetworkName != nil) {
+        chainNetwork = @"devnet";
+        [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:chainNetwork onName:chainNetworkName onSporkAddr:sporkAddr onSporkKey:sporkKey onClb:^(BOOL success, NSString *message) {
+            if(success != YES) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network failed."];
+                });
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:@"configure chain network successfully."];
+                });
+            }
+        }];
+    }
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
         chainNetwork = @"devnet";
         [[DPChainSelectionController sharedInstance] configureConfigDashFileForMasternode:masternode onChain:chainNetwork onName:chainNetworkName onSporkAddr:sporkAddr onSporkKey:sporkKey onClb:^(BOOL success, NSString *message) {

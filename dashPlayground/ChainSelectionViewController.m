@@ -82,7 +82,7 @@ NSArray* _masternodeArrayObjects;
 
                 [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:masternode onChainName:chainNetworkName onSporkAddr:sporkAddr onSporkKey:sporkKey clb:^(BOOL success, NSString *message, BOOL isFinished) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [masternode setValue:@(0) forKey:@"isSelected"];
+//                        [masternode setValue:@(0) forKey:@"isSelected"];
                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                         [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
                     });

@@ -11,15 +11,19 @@
 #import "DPMasternodeController.h"
 #import "DPNetworkController.h"
 #import "DPDataStore.h"
+#import "DebugTypeTransformer.h"
 
 @interface NetworkViewController ()
 
+@property (strong) IBOutlet NSPopUpButton *dataTypeItemsButton;
 @property (strong) IBOutlet NSArrayController *arrayController;
 @property (strong) IBOutlet NSTableView *tableView;
 
 @property (strong) ConsoleEventArray * consoleEvents;
 @property (strong) IBOutlet NSTextView *consoleTextField;
 @property (strong) IBOutlet NSTextView *debugLogField;
+
+@property (nonatomic,strong) NSString * currentDebugLog;
 
 @end
 
@@ -31,6 +35,7 @@
     
     [self setUpConsole];
     [self initializeTable];
+    [self createLogDataType];
 }
 
 - (void)initializeTable {
@@ -40,6 +45,11 @@
         [self showTableContent:masternode];
         [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
+}
+
+- (void)createLogDataType {
+    [self.dataTypeItemsButton removeAllItems];
+    [self.dataTypeItemsButton addItemsWithTitles:[[DebugTypeTransformer sharedInstance] getAllDataTypes]];
 }
 
 -(void)showTableContent:(NSManagedObject*)object
@@ -72,11 +82,12 @@
     if(![object valueForKey:@"publicIP"]) return;
 
     
-    [self addStringEvent:[NSString stringWithFormat:@"Trying to get debug.log contents from %@.", [object valueForKey:@"publicIP"]]];
+    [self addStringEvent:[NSString stringWithFormat:@"Downloading debug.log file from %@.", [object valueForKey:@"publicIP"]]];
     [[DPNetworkController sharedInstance] getDebugLogFileFromMasternode:object clb:^(BOOL success, NSString *message) {
         if(success == YES) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.debugLogField.string = message;
+                self.currentDebugLog = message;
             });
         }
         else {
@@ -108,6 +119,32 @@
     NSString * consoleEventString = [self.consoleEvents printOut];
     self.consoleTextField.string = consoleEventString;
 }
+
+- (IBAction)selectDataTypes:(id)sender {
+    
+    
+    
+    NSLog(@"%@", [self.dataTypeItemsButton.selectedItem title]);
+    
+    if([[self.dataTypeItemsButton.selectedItem title] isEqualToString:@"All"]) {
+        if([self.debugLogField.string length] != 0) {
+            self.debugLogField.string = self.currentDebugLog;
+            return;
+        }
+    }
+    
+    [self addStringEvent:[NSString stringWithFormat:@"Changing filter to %@", [self.dataTypeItemsButton.selectedItem title]]];
+    self.debugLogField.string = @"";
+    NSMutableString *cloneLogField = [NSMutableString string];
+    
+    [[DPNetworkController sharedInstance] findSpecificDataType:self.currentDebugLog datatype:[self.dataTypeItemsButton.selectedItem title] onClb:^(BOOL success, NSString *message) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [cloneLogField appendFormat:@"%@\n", message];
+            self.debugLogField.string = cloneLogField;
+        });
+    }];
+}
+
 
 -(AppDelegate*)appDelegate {
     return [NSApplication sharedApplication].delegate;

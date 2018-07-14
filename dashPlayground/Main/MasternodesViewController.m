@@ -376,7 +376,7 @@ NSString *terminalHeadString = @"";
                     });
                 }];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [object setValue:@(0) forKey:@"isSelected"];
+//                    [object setValue:@(0) forKey:@"isSelected"];
                     [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                 });
             }
@@ -645,7 +645,7 @@ NSString *terminalHeadString = @"";
             else{
                 [self addStringEvent:FS(@"creating new instance failure.")];
             }
-        } serverType:@"t2.micro"];
+        } serverType:@"t2.2xlarge"];
     }
     
 }

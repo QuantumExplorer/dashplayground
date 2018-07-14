@@ -10,6 +10,8 @@
 #import "PreferenceData.h"
 #import "DPMasternodeController.h"
 #import "SshConnection.h"
+#import "DebugTypeTransformer.h"
+#import "DPDataStore.h"
 
 @implementation DPNetworkController
 
@@ -36,6 +38,24 @@
             NSString *response = [sshSession.channel execute:command error:&error];
             clb(YES, response);
         }];
+    });
+}
+
+- (void)findSpecificDataType:(NSString*)log datatype:(NSString*)type onClb:(dashClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        NSArray *logSubLine = [log componentsSeparatedByString:@"\n"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF contains %@", type];
+        NSArray *list = [logSubLine filteredArrayUsingPredicate:predicate];
+        
+        if([list count] == 0) {
+            clb(YES, @"Not found!");
+        }
+        else {
+            NSString * result = [list componentsJoinedByString:@"\n"];
+            clb(YES, result);
+        }
+        
     });
 }
 

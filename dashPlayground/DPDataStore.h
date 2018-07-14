@@ -68,4 +68,8 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(void)deleteRepository:(NSManagedObject*)object;
 
+-(void)createMessageToMasternode:(NSManagedObject*)masternode dataType:(int)dataType atLine:(int)line;
+
+-(NSArray*)getMessageObjectsFromMasternode:(NSManagedObject *)masternode;
+
 @end
