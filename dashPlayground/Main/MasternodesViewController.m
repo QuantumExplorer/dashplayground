@@ -47,6 +47,16 @@
 @property (strong) IBOutlet NSTextField *commandTextField;
 
 @property (strong) NMSSHSession *ssh;
+
+//Table Column
+@property (atomic) BOOL chainColumnBool;
+@property (atomic) BOOL instanceStateColumnBool;
+@property (atomic) BOOL masternodeStateColumnBool;
+@property (atomic) BOOL syncStatusColumnBool;
+@property (atomic) BOOL gitBranchColumnBool;
+@property (atomic) BOOL publicIPColumnBool;
+@property (atomic) BOOL gitCommitColumnBool;
+
 @end
 
 @implementation MasternodesViewController
@@ -69,6 +79,7 @@ NSString *terminalHeadString = @"";
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setUpConsole];
+    [self initilizeTableColumnAttributes];
     masternodeController = self;
     
     DPMasternodeController *masternodeCon = [DPMasternodeController sharedInstance];
@@ -79,6 +90,16 @@ NSString *terminalHeadString = @"";
     if ([[[DPDataStore sharedInstance] chainNetwork] rangeOfString:@"devnet"].location != NSNotFound) {
         self.devnetBox.hidden = false;
     }
+}
+
+- (void)initilizeTableColumnAttributes {
+    _chainColumnBool = NO;
+    _instanceStateColumnBool = NO;
+    _masternodeStateColumnBool = NO;
+    _syncStatusColumnBool = NO;
+    _gitBranchColumnBool = NO;
+    _publicIPColumnBool = NO;
+    _gitCommitColumnBool = NO;
 }
 
 - (IBAction)pressCheckDevnet:(id)sender {
@@ -799,6 +820,51 @@ NSString *terminalHeadString = @"";
 }
 
 #pragma mark - Table View
+
+- (void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn {
+    if([[tableColumn title] isEqualToString:@"IP Address"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"publicIP" ascending:_publicIPColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_publicIPColumnBool == YES) _publicIPColumnBool = NO;
+        else _publicIPColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Chain"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"chainNetwork" ascending:_chainColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_chainColumnBool == YES) _chainColumnBool = NO;
+        else _chainColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Instance State"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"instanceState" ascending:_instanceStateColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_instanceStateColumnBool == YES) _instanceStateColumnBool = NO;
+        else _instanceStateColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Masternode State"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"masternodeState" ascending:_masternodeStateColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_masternodeStateColumnBool == YES) _masternodeStateColumnBool = NO;
+        else _masternodeStateColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Sync State"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"syncStatus" ascending:_syncStatusColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_syncStatusColumnBool == YES) _syncStatusColumnBool = NO;
+        else _syncStatusColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Branch"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"gitBranch" ascending:_gitBranchColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_gitBranchColumnBool == YES) _gitBranchColumnBool = NO;
+        else _gitBranchColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Git Head"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"gitCommit" ascending:_gitCommitColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_gitCommitColumnBool == YES) _gitCommitColumnBool = NO;
+        else _gitCommitColumnBool = YES;
+    }
+}
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
 //    NSInteger row = self.tableView.selectedRow;
