@@ -74,7 +74,8 @@
     NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in checkingMasternodes) {
         
-//        if ([[masternode valueForKey:@"chainNetwork"] rangeOfString:@"devnet"].location != NSNotFound) {
+//        if ([[masternode valueForKey:@"chainNetwork"] rangeOfString:@"devnet"].location != NSNotFound
+//            && [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Running) {
 //            [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
 //                [sshSession.channel uploadFile:@"/Users/nattapon17/Desktop/Dash/dash-cli" to:@"/home/ubuntu/src/dash/src/dash-cli"];
 //                [sshSession.channel uploadFile:@"/Users/nattapon17/Desktop/Dash/dashd" to:@"/home/ubuntu/src/dash/src/dashd"];
@@ -82,7 +83,7 @@
 //        }
         
         if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
-        
+
         if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
         }

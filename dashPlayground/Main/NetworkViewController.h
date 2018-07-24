@@ -8,8 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
+#import "DPTableView.h"
 
-@interface NetworkViewController : NSViewController <NSTabViewDelegate>
+@interface NetworkViewController : NSViewController <DPTableViewDelegate,NSTabViewDelegate>
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 

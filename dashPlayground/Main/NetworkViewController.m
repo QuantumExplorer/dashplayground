@@ -25,6 +25,11 @@
 
 @property (nonatomic,strong) NSString * currentDebugLog;
 
+//table
+@property (atomic) BOOL publicIPColumnBool;
+@property (atomic) BOOL instanceStateColumnBool;
+@property (atomic) BOOL chainNetworkColumnBool;
+
 @end
 
 @implementation NetworkViewController
@@ -44,6 +49,33 @@
     for (NSManagedObject * masternode in masternodesArray) {
         [self showTableContent:masternode];
         [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+    }
+    
+    _publicIPColumnBool = NO;
+    _instanceStateColumnBool = NO;
+    _chainNetworkColumnBool = NO;
+}
+
+#pragma mark - Table View
+
+- (void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn {
+    if([[tableColumn title] isEqualToString:@"IP Address"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"publicIP" ascending:_publicIPColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_publicIPColumnBool == YES) _publicIPColumnBool = NO;
+        else _publicIPColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Instance State"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"instanceState" ascending:_instanceStateColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_instanceStateColumnBool == YES) _instanceStateColumnBool = NO;
+        else _instanceStateColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Chain"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"chainNetwork" ascending:_chainNetworkColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_chainNetworkColumnBool == YES) _chainNetworkColumnBool = NO;
+        else _chainNetworkColumnBool = YES;
     }
 }
 
