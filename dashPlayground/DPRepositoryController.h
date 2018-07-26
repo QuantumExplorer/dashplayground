@@ -14,6 +14,8 @@
 
 -(void)addRepositoryForUser:(NSString*)user repoName:(NSString*)repoName branch:(NSString*)branch clb:(dashClb)clb;
 
+-(void)addPrivateRepositoryForUser:(NSString*)user repoName:(NSString*)repoName branch:(NSString*)branch clb:(dashClb)clb;
+
 -(void)updateBranchInfo:(NSManagedObject*)branch clb:(dashClb)clb;
 
 - (void)setAMIForRepository:(NSManagedObject*)repository clb:(dashClb)clb;

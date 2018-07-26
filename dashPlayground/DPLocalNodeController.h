@@ -54,4 +54,6 @@
 
 -(void)setMasterNodePath:(NSString*)masterNodePath;
 
+- (NSDictionary *)runCurlCommandJSON:(NSString *)commandToRun checkError:(BOOL)withError;
+
 @end

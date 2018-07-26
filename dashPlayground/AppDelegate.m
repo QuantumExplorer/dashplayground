@@ -44,32 +44,8 @@
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashDPath"];
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashCliPath"];
     
-//    VolumeViewController *volController = [[VolumeViewController alloc] init];
-//    [volController showAMIWindow:@"test"];
-    
-//    [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:@"13.229.223.250" openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-//        [sshSession.sftp connect];
-//        [sshSession.sftp copyContentsOfPath:@"/home/ubuntu/src/dash/src/dash-cli" toFileAtPath:@"/Users/nattapon17/Desktop/Dash/" progress:nil];
-//        [sshSession.channel downloadFile:@"/home/ubuntu/src/dash/src/dash-cli" to:@"/Users/nattapon17/Desktop/Dash/"];
-//    }];
-    
-//    scp -i ~/Documents/ssh/TOEY_DASH.pem ubuntu@13.229.223.250:/home/ubuntu/src/dash/src/dashd /Users/nattapon17/Desktop/Dash/
     
     //end
-    
-    
-//    NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"masternodeState == %@ || ((masternodseState == %@ || masternodseState == %@ || masternodseState == %@) && sentinelState == %@)",@(MasternodeState_Checking),@(MasternodeState_Installed),@(MasternodeState_Configured),@(MasternodeState_SettingUp),@(SentinelState_Checking)]];
-//    for (NSManagedObject * masternode in checkingMasternodes) {
-//        if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
-//            [[DPMasternodeController sharedInstance] checkMasternode:masternode];
-//        }
-//        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
-//            [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode];
-//        }
-//        else {
-//            //[[DPMasternodeController sharedInstance] checkSentinel:masternode];
-//        }
-//    }
     
     NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in checkingMasternodes) {

@@ -67,13 +67,6 @@
 
 //Toey
 
--(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh error:(NSError*)error percentageClb:(dashPercentageClb)clb {
-    
-    NSString *command = [NSString stringWithFormat:@"git clone %@ ~/src/dash",repositoryPath];
-    [self sendExecuteCommand:command onSSH:ssh error:error];
-    
-}
-
 -(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error percentageClb:(dashPercentageClb)clb {
     
     for (NSUInteger index = 0;index<[commands count];index++) {
@@ -1688,7 +1681,7 @@
                 }
                 else {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [masternode setValue:@"none" forKey:@"chainNetwork"];
+                        [masternode setValue:@"Unknown" forKey:@"chainNetwork"];
                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     });
                 }
@@ -1791,6 +1784,10 @@
                     [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 }
+                else {
+                    [masternode setValue:@"" forKey:@"gitCommit"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }
             });
             
             //check value "branch.name"
@@ -1810,6 +1807,12 @@
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@"" forKey:@"gitBranch"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                });
+            }
             
             //check value "sentinelGitCommit"
             gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
@@ -1817,6 +1820,12 @@
             if(gitValues != nil) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"sentinelGitCommit"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                });
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@"" forKey:@"sentinelGitCommit"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
@@ -1835,6 +1844,12 @@
                 }
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [masternode setValue:gitBranch forKey:@"sentinelGitBranch"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                });
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@"" forKey:@"sentinelGitBranch"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
@@ -2155,7 +2170,7 @@
             NSString *imageId = @"";
             if([[branch valueForKey:@"amiId"] isEqualToString:@""] || [branch valueForKey:@"amiId"] == nil)
             {
-                imageId = @"ami-b7a1d95d"; //this is initial dash image id
+                imageId = @"ami-78d69092"; //this is initial dash image id
             }
             else{
                 imageId = [branch valueForKey:@"amiId"];
@@ -2371,7 +2386,11 @@
     {
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id ami-b7a1d95d --count 1 --instance-type %@ --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+            
+            NSString *intialAMIID = @"ami-78d69092";
+            
+            NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 run-instances --image-id %@ --count 1 --instance-type %@ --key-name %@ --security-group-ids %@ --instance-initiated-shutdown-behavior terminate --subnet-id %@",
+                                                            intialAMIID,
                                                             serverType,
                                                             [[PreferenceData sharedInstance] getKeyName],
                                                             [[PreferenceData sharedInstance] getSecurityGroupId],
