@@ -60,7 +60,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NMSSHSession*)connectInstance:(NSManagedObject*)masternode;
 -(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;
 -(NSString*)createSentinelConfFileForMasternode:(NSManagedObject*)masternode;
--(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
+//-(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
 //-(void)updateMasternode:(NSManagedObject*)masternode;
 
 -(void)stopDashdOnRemote:(NSManagedObject*)masternode onClb:(dashClb)clb;

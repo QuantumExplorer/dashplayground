@@ -48,7 +48,7 @@
     NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in masternodesArray) {
         [self showTableContent:masternode];
-        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+//        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
     
     _publicIPColumnBool = NO;

@@ -26,6 +26,9 @@
 		A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55DFCC620D775BF006E9890 /* PreferenceWindowController.m */; };
 		A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */; };
 		A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0D22099BA22004B23FE /* VolumeViewController.m */; };
+		A5604828210B14AF00DA161D /* VersioningViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5604827210B14AF00DA161D /* VersioningViewController.m */; };
+		A560482B210B74E800DA161D /* DAPIStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A560482A210B74E800DA161D /* DAPIStateTransformer.m */; };
+		A560482E210B74F800DA161D /* DashDriveStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A560482D210B74F800DA161D /* DashDriveStateTransformer.m */; };
 		A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5724D4B20A70D4A004BED71 /* ContainerViewController.m */; };
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
 		A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771720DBCEBF009240BD /* DashCoreViewController.m */; };
@@ -144,6 +147,12 @@
 		A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPPreferenceController.m; sourceTree = "<group>"; };
 		A55FC0D12099BA17004B23FE /* VolumeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VolumeViewController.h; sourceTree = "<group>"; };
 		A55FC0D22099BA22004B23FE /* VolumeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VolumeViewController.m; sourceTree = "<group>"; };
+		A5604826210B14AF00DA161D /* VersioningViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VersioningViewController.h; sourceTree = "<group>"; };
+		A5604827210B14AF00DA161D /* VersioningViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VersioningViewController.m; sourceTree = "<group>"; };
+		A5604829210B74E800DA161D /* DAPIStateTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DAPIStateTransformer.h; sourceTree = "<group>"; };
+		A560482A210B74E800DA161D /* DAPIStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DAPIStateTransformer.m; sourceTree = "<group>"; };
+		A560482C210B74F800DA161D /* DashDriveStateTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashDriveStateTransformer.h; sourceTree = "<group>"; };
+		A560482D210B74F800DA161D /* DashDriveStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DashDriveStateTransformer.m; sourceTree = "<group>"; };
 		A5724D4A20A70D4A004BED71 /* ContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerViewController.h; sourceTree = "<group>"; };
 		A5724D4B20A70D4A004BED71 /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerViewController.m; sourceTree = "<group>"; };
 		A5782D1F2095E99A00CA603A /* PreferenceData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceData.h; sourceTree = "<group>"; };
@@ -390,6 +399,8 @@
 				A5724D4B20A70D4A004BED71 /* ContainerViewController.m */,
 				A581772A20E0DA28009240BD /* NetworkViewController.h */,
 				A581772B20E0DA28009240BD /* NetworkViewController.m */,
+				A5604826210B14AF00DA161D /* VersioningViewController.h */,
+				A5604827210B14AF00DA161D /* VersioningViewController.m */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -549,6 +560,10 @@
 				FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */,
 				A5142E7520E36259000AB18E /* DebugTypeTransformer.h */,
 				A5142E7620E36259000AB18E /* DebugTypeTransformer.m */,
+				A5604829210B74E800DA161D /* DAPIStateTransformer.h */,
+				A560482A210B74E800DA161D /* DAPIStateTransformer.m */,
+				A560482C210B74F800DA161D /* DashDriveStateTransformer.h */,
+				A560482D210B74F800DA161D /* DashDriveStateTransformer.m */,
 			);
 			name = Transformers;
 			sourceTree = "<group>";
@@ -925,6 +940,7 @@
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				A597FE8120E0EA60000470E6 /* DPNetworkController.m in Sources */,
 				A517D29920AEBEF200BD567A /* DPUnspentController.m in Sources */,
+				A560482E210B74F800DA161D /* DashDriveStateTransformer.m in Sources */,
 				FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */,
 				A581772C20E0DA28009240BD /* NetworkViewController.m in Sources */,
 				A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */,
@@ -938,11 +954,13 @@
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
+				A5604828210B14AF00DA161D /* VersioningViewController.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */,
 				A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				A5782D212095E9A400CA603A /* PreferenceData.m in Sources */,
+				A560482B210B74E800DA161D /* DAPIStateTransformer.m in Sources */,
 				A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */,
 				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 				A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */,
