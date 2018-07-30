@@ -29,6 +29,7 @@
 		A5604828210B14AF00DA161D /* VersioningViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5604827210B14AF00DA161D /* VersioningViewController.m */; };
 		A560482B210B74E800DA161D /* DAPIStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A560482A210B74E800DA161D /* DAPIStateTransformer.m */; };
 		A560482E210B74F800DA161D /* DashDriveStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A560482D210B74F800DA161D /* DashDriveStateTransformer.m */; };
+		A5604831210EE6B000DA161D /* DPVersioningController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5604830210EE6B000DA161D /* DPVersioningController.m */; };
 		A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5724D4B20A70D4A004BED71 /* ContainerViewController.m */; };
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
 		A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771720DBCEBF009240BD /* DashCoreViewController.m */; };
@@ -153,6 +154,8 @@
 		A560482A210B74E800DA161D /* DAPIStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DAPIStateTransformer.m; sourceTree = "<group>"; };
 		A560482C210B74F800DA161D /* DashDriveStateTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashDriveStateTransformer.h; sourceTree = "<group>"; };
 		A560482D210B74F800DA161D /* DashDriveStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DashDriveStateTransformer.m; sourceTree = "<group>"; };
+		A560482F210EE6B000DA161D /* DPVersioningController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPVersioningController.h; sourceTree = "<group>"; };
+		A5604830210EE6B000DA161D /* DPVersioningController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPVersioningController.m; sourceTree = "<group>"; };
 		A5724D4A20A70D4A004BED71 /* ContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerViewController.h; sourceTree = "<group>"; };
 		A5724D4B20A70D4A004BED71 /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerViewController.m; sourceTree = "<group>"; };
 		A5782D1F2095E99A00CA603A /* PreferenceData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceData.h; sourceTree = "<group>"; };
@@ -418,6 +421,8 @@
 				A517D29820AEBEF200BD567A /* DPUnspentController.m */,
 				A597FE7F20E0EA60000470E6 /* DPNetworkController.h */,
 				A597FE8020E0EA60000470E6 /* DPNetworkController.m */,
+				A560482F210EE6B000DA161D /* DPVersioningController.h */,
+				A5604830210EE6B000DA161D /* DPVersioningController.m */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -963,6 +968,7 @@
 				A560482B210B74E800DA161D /* DAPIStateTransformer.m in Sources */,
 				A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */,
 				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
+				A5604831210EE6B000DA161D /* DPVersioningController.m in Sources */,
 				A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */,
 				FB2906671E85799F00A31092 /* AppDelegate.m in Sources */,
 			);

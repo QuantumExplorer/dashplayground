@@ -41,7 +41,7 @@
     if([githubUsername length] == 0 || [githubPassword length] == 0) return;
     
     NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@", user, repoName, branch, githubUsername, githubPassword] checkError:YES];
-    
+
     if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
         NSManagedObject * object = [[DPDataStore sharedInstance] branchNamed:branch onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repoName]];
         [object setValue:[[repositoryDict objectForKey:@"object"] objectForKey:@"sha"] forKey:@"lastCommitSha"];

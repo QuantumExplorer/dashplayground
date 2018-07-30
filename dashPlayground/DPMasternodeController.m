@@ -1861,6 +1861,22 @@
                 [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
                 [[DPDataStore sharedInstance] saveContext];
             });
+            
+            //check value "repositoryUrl"
+            gitCommand = [[NSArray alloc] initWithObjects:@"config --get remote.origin.url", nil];
+            gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
+            if(gitValues != nil) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:[gitValues valueForKey:@"config --get remote.origin.url"] forKey:@"repositoryUrl"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                });
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@"" forKey:@"repositoryUrl"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                });
+            }
         }];
     });
 }

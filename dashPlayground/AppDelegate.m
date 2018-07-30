@@ -22,6 +22,7 @@
 #import "InstanceStateTransformer.h"
 #import "DPChainSelectionController.h"
 #import "PreferenceWindowController.h"
+#import "DPVersioningController.h"
 
 @interface AppDelegate ()
 
@@ -43,7 +44,6 @@
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"masterNodePath"];
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashDPath"];
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"dashCliPath"];
-    
     
     //end
     

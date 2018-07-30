@@ -10,6 +10,10 @@
 #import "DPMasternodeController.h"
 #import "DPDataStore.h"
 #import "ConsoleEventArray.h"
+#import <AFNetworking/AFNetworking.h>
+#import "DPLocalNodeController.h"
+#import "DPVersioningController.h"
+#import "MasternodeStateTransformer.h"
 
 @interface VersioningViewController ()
 
@@ -21,7 +25,7 @@
 
 //Core
 @property (strong) IBOutlet NSTextField *currentCoreTextField;
-@property (strong) IBOutlet NSComboBox *versionCoreButton;
+@property (strong) IBOutlet NSPopUpButton *versionCoreButton;
 @property (strong) IBOutlet NSButton *coreUpdateButton;
 
 //Sentinel
@@ -36,8 +40,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do view setup here.
-    
+    [self setUpConsole];
     [self initializeTable];
+}
+
+-(void)setUpConsole {
+    self.consoleEvents = [[ConsoleEventArray alloc] init];
 }
 
 - (void)initializeTable {
@@ -76,6 +84,7 @@
     if(row == -1) {
         self.coreUpdateButton.enabled = false;
         self.currentCoreTextField.stringValue = @"";
+        [self.versionCoreButton removeAllItems];
         
         self.sentinelUpdateButton.enabled = false;
         self.currentSentinelTextField.stringValue = @"";
@@ -83,6 +92,7 @@
     }
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
+    //Show current git head
     if([[object valueForKey:@"gitCommit"] length] > 0) {
         self.currentCoreTextField.stringValue = [object valueForKey:@"gitCommit"];
         self.coreUpdateButton.enabled = true;
@@ -101,6 +111,23 @@
         self.currentSentinelTextField.stringValue = @"";
     }
     
+    //Show repositories version
+    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed
+        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running) {
+        NSMutableArray *commitArrayData = [[DPVersioningController sharedInstance] getGitCommitInfo:object repositoryUrl:[object valueForKey:@"repositoryUrl"] onBranch:[object valueForKey:@"gitBranch"]];
+        [self.versionCoreButton removeAllItems];
+        [self.versionCoreButton addItemsWithTitles:commitArrayData];
+    }
+    
+}
+
+- (IBAction)refresh:(id)sender {
+    [self addStringEvent:@"Refreshing instance(s)."];
+    NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodes];
+    for (NSManagedObject * masternode in masternodesArray) {
+//        [self showTableContent:masternode];
+        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+    }
 }
 
 @end

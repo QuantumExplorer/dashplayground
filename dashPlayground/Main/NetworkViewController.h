@@ -10,7 +10,7 @@
 #import "AppDelegate.h"
 #import "DPTableView.h"
 
-@interface NetworkViewController : NSViewController <DPTableViewDelegate,NSTabViewDelegate>
+@interface NetworkViewController : NSViewController <NSTabViewDelegate>
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
