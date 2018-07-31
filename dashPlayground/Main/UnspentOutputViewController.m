@@ -22,6 +22,13 @@
 @property (strong) IBOutlet NSTextField *labelField;
 @property (strong) IBOutlet NSButton *refreshButton;
 
+//table
+@property (atomic) BOOL accountColumnBool;
+@property (atomic) BOOL addressColumnBool;
+@property (atomic) BOOL txidColumnBool;
+@property (atomic) BOOL amountColumnBool;
+@property (atomic) BOOL confirmationColumnBool;
+
 @end
 
 @implementation UnspentOutputViewController
@@ -35,6 +42,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self initializeTableColumn];
     
     // Do any additional setup after loading the view.
     
@@ -53,6 +61,14 @@
             self.windowLog.stringValue = @"Dash server didn't start up";
         }
     } forChain:chainNetwork];
+}
+
+- (void)initializeTableColumn {
+    _accountColumnBool = NO;
+    _addressColumnBool = NO;
+    _txidColumnBool = NO;
+    _amountColumnBool = NO;
+    _confirmationColumnBool = NO;
 }
 
 -(void)processOutput:(NSDictionary*)unspentOutputs forChain:(NSString*)chainNetwork {
@@ -195,6 +211,39 @@
     }
 }
 
+#pragma mark - Table View
 
+- (void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn {
+    if([[tableColumn title] isEqualToString:@"Name"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"account" ascending:_accountColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_accountColumnBool == YES) _accountColumnBool = NO;
+        else _accountColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"From Address"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"address" ascending:_addressColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_addressColumnBool == YES) _addressColumnBool = NO;
+        else _addressColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Transaction Hash"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"txid" ascending:_txidColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_txidColumnBool == YES) _txidColumnBool = NO;
+        else _txidColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Amount"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"amount" ascending:_amountColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_amountColumnBool == YES) _amountColumnBool = NO;
+        else _amountColumnBool = YES;
+    }
+    else if([[tableColumn title] isEqualToString:@"Confirmations"]) {
+        NSSortDescriptor* sortDescriptor = [[NSSortDescriptor alloc] initWithKey: @"confirmations" ascending:_confirmationColumnBool];
+        [self.arrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+        if(_confirmationColumnBool == YES) _confirmationColumnBool = NO;
+        else _confirmationColumnBool = YES;
+    }
+}
 
 @end

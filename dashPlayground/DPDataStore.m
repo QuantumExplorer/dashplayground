@@ -14,6 +14,8 @@
 @implementation DPDataStore
 
 @synthesize chainNetwork = _chainNetwork;
+@synthesize githubUsername = _githubUsername;
+@synthesize githubPassword = _githubPassword;
 
 #pragma mark - Repositories
 

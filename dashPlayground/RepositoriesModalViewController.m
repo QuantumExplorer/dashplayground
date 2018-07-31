@@ -157,7 +157,23 @@ MasternodesViewController *masternodeCon2;
         [_repoWindowController close];
         
         //Change masternode state
-        masternodeCon2.setupButton.enabled = false;
+//        masternodeCon2.setupButton.enabled = false;
+        
+        //reset git username and password
+        [DPDataStore sharedInstance].githubUsername = @"";
+        [DPDataStore sharedInstance].githubPassword = @"";
+        NSManagedObject * repositoryObject = [self.repositoryArrayCon.arrangedObjects objectAtIndex:row];
+        
+        if([[repositoryObject valueForKey:@"repoType"] integerValue] == 1) {
+            if([[[DPDataStore sharedInstance] githubUsername] length] == 0) {
+                NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username"];
+                [DPDataStore sharedInstance].githubUsername = githubUsername;
+            }
+            if([[[DPDataStore sharedInstance] githubPassword] length] == 0) {
+                NSString *githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
+                [DPDataStore sharedInstance].githubPassword = githubPassword;
+            }
+        }
         
         for(NSManagedObject *masternode in masternodeArrayObjects)
         {
@@ -170,9 +186,8 @@ MasternodesViewController *masternodeCon2;
             
             [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
             
-            NSManagedObject * object = [self.repositoryArrayCon.arrangedObjects objectAtIndex:row];
             
-            [[DPRepoModalController sharedInstance] setUpMasternodeDashdWithSelectedRepo:masternode repository:object clb:^(BOOL success, NSString *message){
+            [[DPRepoModalController sharedInstance] setUpMasternodeDashdWithSelectedRepo:masternode repository:repositoryObject clb:^(BOOL success, NSString *message){
                 if (!success) {
                     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
                     dict[NSLocalizedDescriptionKey] = message;

@@ -1,16 +1,15 @@
 //
-//  NetworkViewController.h
+//  VersioningViewController.h
 //  dashPlayground
 //
-//  Created by NATTAPON AIEMLAOR on 25/6/18.
+//  Created by NATTAPON AIEMLAOR on 27/7/18.
 //  Copyright © 2018 dashfoundation. All rights reserved.
 //
-
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
 #import "DPTableView.h"
 
-@interface NetworkViewController : NSViewController <NSTabViewDelegate>
+@interface VersioningViewController : NSViewController
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 

@@ -14,9 +14,13 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 @interface DPDataStore : NSObject {
     NSString *_chainNetwork;
+    NSString *_githubUsername;
+    NSString *_githubPassword;
 }
 
 @property(strong, nonatomic, readwrite) NSString *chainNetwork;
+@property(strong, nonatomic, readwrite) NSString *githubUsername;
+@property(strong, nonatomic, readwrite) NSString *githubPassword;
 
 +(DPDataStore*)sharedInstance;
 

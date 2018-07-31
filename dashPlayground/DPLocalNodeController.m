@@ -49,6 +49,34 @@
     [standardUserDefaults setObject:masterNodePath forKey:MASTERNODEPATH];
 }
 
+- (NSDictionary *)runCurlCommandJSON:(NSString *)commandToRun checkError:(BOOL)withError
+{
+    NSData * data = [self runCurlCommand:commandToRun checkError:withError];
+    
+    NSError * error = nil;
+    NSDictionary *output = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error: &error];
+    return output;
+}
+
+- (NSData *)runCurlCommand:(NSString *)commandToRun checkError:(BOOL)withError
+{
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/usr/bin/curl"];
+    
+    NSArray *arguments = [commandToRun componentsSeparatedByString:@" "];
+//    NSLog(@"run command:%@", commandToRun);
+    [task setArguments:arguments];
+    
+    NSPipe *pipe = [NSPipe pipe];
+    [task setStandardOutput:pipe];
+    
+    NSFileHandle *file = [pipe fileHandleForReading];
+    
+    [task launch];
+    
+    return [file readDataToEndOfFile];
+}
+
 - (NSData *)runDashRPCCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb
 {
     if (![self dashCliPath]) return nil;

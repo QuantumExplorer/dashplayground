@@ -71,7 +71,12 @@
 //    clb(YES,command);
     __block BOOL clonedSuccess = NO;
     [self sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *call) {
-        clb(success,call);
+        if(success == NO) {
+            clb(success,call);
+        }
+        else {
+            clb(success,@"Cloning repository...");
+        }
         clonedSuccess = success;
     }];
     
@@ -89,6 +94,9 @@
             clb(YES,command);
             [self sendExecuteCommand:command onSSH:ssh error:error dashClb:clb];
         }
+    }
+    else {
+        clb(NO, @"Error while trying to send git clone command.");
     }
 }
 
@@ -145,7 +153,7 @@
     NSString *response = [ssh.channel execute:command error:&error];
     if (error) {
         NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
-        NSString *errorStr = [NSString stringWithFormat:@"SSH: error executing command %@ - %@", command, [error localizedDescription]];
+        NSString *errorStr = [NSString stringWithFormat:@"SSH: %@", [error localizedDescription]];
         clb(NO, errorStr);
         return;
     }

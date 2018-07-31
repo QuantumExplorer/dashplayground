@@ -29,6 +29,11 @@ MasternodesViewController *masternodeCon;
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     __block NSString * repositoryPath = [repository valueForKey:@"repository.url"];
     __block NSString * branchName = [repository valueForKey:@"branchName"];
+    __block NSUInteger repoType = [[repository valueForKey:@"repoType"] integerValue];
+    
+    __block NSString *githubUsername = [[DPDataStore sharedInstance] githubUsername];
+    __block NSString *githubPassword = [[DPDataStore sharedInstance] githubPassword];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
         __block NMSSHSession *ssh;
@@ -63,45 +68,63 @@ MasternodesViewController *masternodeCon;
         }
         
         //clone repository
-        [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh onBranch:branchName error:error dashClb:^(BOOL success, NSString *call) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [masternodeCon addStringEventToMasternodeConsole:call];
-                [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
-                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-            });
-        }];
-        
-        //now let's make all this shit
+        if(repoType == 1) {//private repository
+            NSArray *pathComponents = [repositoryPath componentsSeparatedByString:@"//"];
+            if([pathComponents count] < 2) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternodeCon addStringEventToMasternodeConsole:@"Error: something went wrong with repository path."];
+                });
+                return;
+            }
+            repositoryPath = [NSString stringWithFormat:@"https://%@:%@@%@", githubUsername, githubPassword, pathComponents[1]];
+        }
         __block BOOL isSuccess = YES;
-        [[SshConnection sharedInstance] sendDashCommandsList:@[@"autogen.sh",@"configure"] onSSH:ssh onPath:@"~/src/dash/" error:error dashClb:^(BOOL success, NSString *call) {
+        [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh onBranch:branchName error:error dashClb:^(BOOL success, NSString *call) {
+            isSuccess = success;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [masternodeCon addStringEventToMasternodeConsole:call];
-                if(success == NO) {
-                    isSuccess = NO;
+                if(isSuccess == YES) {
+                    [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }
+                else {
                     return;
                 }
             });
         }];
+        if(isSuccess == NO) return;
+        
+        //now let's make all this shit
+        [[SshConnection sharedInstance] sendDashCommandsList:@[@"autogen.sh",@"configure"] onSSH:ssh onPath:@"~/src/dash/" error:error dashClb:^(BOOL success, NSString *call) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [masternodeCon addStringEventToMasternodeConsole:call];
+            });
+            if(success == NO) {
+                isSuccess = NO;
+                return;
+            }
+        }];
+        if(isSuccess == NO) return;
         
         [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [masternodeCon addStringEventToMasternodeConsole:message];
-                if(success == NO) {
-                    isSuccess = NO;
-                    return;
-                }
             });
+            if(success == NO) {
+                isSuccess = NO;
+                return;
+            }
         }];
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            [ssh disconnect];
+            [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
             if(isSuccess == NO) {
                 [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 [[DialogAlert sharedInstance] showWarningAlert:@"Set up" message:@"Set up failed!"];
                 return;
             }
-            [ssh disconnect];
-            [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
             [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];
@@ -135,6 +158,7 @@ MasternodesViewController *masternodeCon;
         
         [rDict setValue:[repository valueForKey:@"url"] forKey:@"repository.url"];
         [rDict setValue:[[branch valueForKey:@"name"] anyObject] forKey:@"branchName"];
+        [rDict setValue:[[branch valueForKey:@"repoType"] anyObject] forKey:@"repoType"];
         
         [repositoryArray addObject:rDict];
     }
