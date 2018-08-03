@@ -1714,7 +1714,7 @@
                 checkResult = success;
             }];
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
                 NSLog(@"SSH-%@: %@", publicIP, message);
                 clb(success,message);
                 checkResult = success;
@@ -1731,7 +1731,7 @@
                     checkResult = success;
                 }];
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
                     NSLog(@"SSH-%@: %@", publicIP, message);
                     clb(success,message);
                     checkResult = success;
@@ -1742,7 +1742,7 @@
                 NSString *response = [ssh.channel execute:@"ls ~/src/dash/src/dashd" error:&error];
                 if(error || [response length] == 0) {//no
                     
-                    [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                    [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
                         NSLog(@"SSH-%@: %@", publicIP, message);
                         clb(success,message);
                         checkResult = success;

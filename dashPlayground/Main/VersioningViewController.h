@@ -13,4 +13,6 @@
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 
+-(void)addStringEvent:(NSString*)string;
+
 @end

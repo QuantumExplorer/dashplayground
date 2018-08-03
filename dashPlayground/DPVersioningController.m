@@ -11,8 +11,13 @@
 #import "DPMasternodeController.h"
 #import "DialogAlert.h"
 #import "DPDataStore.h"
+#import "SshConnection.h"
+#import "VersioningViewController.h"
+
 
 @implementation DPVersioningController
+
+@synthesize versioningViewController = _versioningViewController;
 
 - (NSMutableArray*)getGitCommitInfo:(NSManagedObject*)masternode repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch {
     
@@ -36,6 +41,8 @@
                     [DPDataStore sharedInstance].githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username"];
                     [DPDataStore sharedInstance].githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
                 }
+                
+                if([[[DPDataStore sharedInstance] githubUsername] length] <= 1 || [[[DPDataStore sharedInstance] githubPassword] length] <= 1) return nil;
                 
                 gitCommitDic = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"-u %@:%@ https://api.github.com/repos/%@/%@/commits?sha=%@",[[DPDataStore sharedInstance] githubUsername], [[DPDataStore sharedInstance] githubPassword], gitOwner, gitRepo, gitBranch] checkError:NO];
                 
@@ -82,6 +89,67 @@
     }
     
     return gitCommitArray;
+}
+
+- (void)updateCore:(NSString*)publicIP repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch commitHead:(NSString*)commitHead {
+    if([repositoryUrl length] > 1 && [gitBranch length] > 1) {
+        repositoryUrl = [repositoryUrl stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        NSArray *repoArray = [repositoryUrl componentsSeparatedByString:@"/"];
+        
+        if([repoArray count] == 5) {
+            NSString *gitOwner = [repoArray objectAtIndex:3];
+            NSString *gitRepo = [repoArray objectAtIndex:4];
+            gitRepo = [gitRepo substringToIndex:[gitRepo length] - 4];
+            
+            __block NSString *downloadDashCliCommand = [NSString stringWithFormat:@"wget http://54.255.153.128/core/%@-%@/%@/%@/dash-cli", gitOwner, gitRepo, gitBranch, commitHead];
+            __block NSString *downloadDashDCommand = [NSString stringWithFormat:@"wget http://54.255.153.128/core/%@-%@/%@/%@/dashd", gitOwner, gitRepo, gitBranch, commitHead];
+            
+            
+            [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                if(success == YES) {
+                    
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+                        
+                        __block BOOL isAllowedToContiunue = NO;
+                        
+                        NSError *error = nil;
+                        NSString *downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashCliCommand];
+                        
+                        [self.versioningViewController addStringEvent:@"Downloading dash-cli..."];
+                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                            NSLog(@"%@", message);
+                            
+                            if([message length] == 0) {
+                                [self.versioningViewController addStringEvent:@"Downloaded dash-cli successfully!"];
+                            }
+                            else {
+                                [self.versioningViewController addStringEvent:message];
+                            }
+                            isAllowedToContiunue = success;
+                        }];
+                        
+                        if(isAllowedToContiunue == NO) return;
+                        
+                        downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
+                        [self.versioningViewController addStringEvent:@"Downloading dashd..."];
+                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                            NSLog(@"%@", message);
+                            
+                            if([message length] == 0) {
+                                [self.versioningViewController addStringEvent:@"Downloaded dashd successfully!"];
+                            }
+                            else {
+                                [self.versioningViewController addStringEvent:message];
+                            }
+                        }];
+                    });
+                }
+            }];
+        }
+    }
+    else {
+        [self.versioningViewController addStringEvent:@"Error! There is some missing attributes. Please refresh and try again."];
+    }
 }
 
 #pragma mark - Singleton methods

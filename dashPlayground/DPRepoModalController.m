@@ -106,7 +106,7 @@ MasternodesViewController *masternodeCon;
         }];
         if(isSuccess == NO) return;
         
-        [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src; make --file=~/src/Makefile" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+        [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [masternodeCon addStringEventToMasternodeConsole:message];
             });

@@ -14,6 +14,7 @@
 #import "DPLocalNodeController.h"
 #import "DPVersioningController.h"
 #import "MasternodeStateTransformer.h"
+#import "DialogAlert.h"
 
 @interface VersioningViewController ()
 
@@ -33,6 +34,8 @@
 @property (strong) IBOutlet NSComboBox *versionSentinelButton;
 @property (strong) IBOutlet NSButton *sentinelUpdateButton;
 
+@property (atomic) NSManagedObject* selectedObject;
+
 @end
 
 @implementation VersioningViewController
@@ -42,6 +45,8 @@
     // Do view setup here.
     [self setUpConsole];
     [self initializeTable];
+    
+    [DPVersioningController sharedInstance].versioningViewController = self;
 }
 
 -(void)setUpConsole {
@@ -91,6 +96,8 @@
         return;
     }
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [self addStringEvent:@"Fetching information."];
+    self.selectedObject = object;
     
     //Show current git head
     if([[object valueForKey:@"gitCommit"] length] > 0) {
@@ -116,9 +123,10 @@
         || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running) {
         NSMutableArray *commitArrayData = [[DPVersioningController sharedInstance] getGitCommitInfo:object repositoryUrl:[object valueForKey:@"repositoryUrl"] onBranch:[object valueForKey:@"gitBranch"]];
         [self.versionCoreButton removeAllItems];
-        [self.versionCoreButton addItemsWithTitles:commitArrayData];
+        if(commitArrayData != nil) [self.versionCoreButton addItemsWithTitles:commitArrayData];
     }
     
+    [self addStringEvent:@"Fetched information."];
 }
 
 - (IBAction)refresh:(id)sender {
@@ -129,5 +137,24 @@
         [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
 }
+
+- (IBAction)updateCoreButton:(id)sender {
+    NSArray *coreHead = [[self.versionCoreButton.selectedItem title] componentsSeparatedByString:@","];
+    
+    if([coreHead count] == 2)
+    {
+        NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warnning!" message:@"Are you sure you already stopped dashd server before updating new version?"];
+        
+        if ([alert runModal] == NSAlertFirstButtonReturn) {
+            [[DPVersioningController sharedInstance] updateCore:[self.selectedObject valueForKey:@"publicIP"] repositoryUrl:[self.selectedObject valueForKey:@"repositoryUrl"] onBranch:[self.selectedObject valueForKey:@"gitBranch"] commitHead:[coreHead objectAtIndex:0]];
+        }
+    }
+    
+    
+}
+
+- (IBAction)updateSentinelButton:(id)sender {
+}
+
 
 @end

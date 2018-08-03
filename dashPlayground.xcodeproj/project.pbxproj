@@ -30,6 +30,8 @@
 		A560482B210B74E800DA161D /* DAPIStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A560482A210B74E800DA161D /* DAPIStateTransformer.m */; };
 		A560482E210B74F800DA161D /* DashDriveStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A560482D210B74F800DA161D /* DashDriveStateTransformer.m */; };
 		A5604831210EE6B000DA161D /* DPVersioningController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5604830210EE6B000DA161D /* DPVersioningController.m */; };
+		A560483421143DED00DA161D /* BuildServerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A560483321143DED00DA161D /* BuildServerViewController.m */; };
+		A560483721143E1300DA161D /* DPBuildServerController.m in Sources */ = {isa = PBXBuildFile; fileRef = A560483621143E1300DA161D /* DPBuildServerController.m */; };
 		A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5724D4B20A70D4A004BED71 /* ContainerViewController.m */; };
 		A5782D212095E9A400CA603A /* PreferenceData.m in Sources */ = {isa = PBXBuildFile; fileRef = A5782D202095E9A400CA603A /* PreferenceData.m */; };
 		A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A581771720DBCEBF009240BD /* DashCoreViewController.m */; };
@@ -156,6 +158,10 @@
 		A560482D210B74F800DA161D /* DashDriveStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DashDriveStateTransformer.m; sourceTree = "<group>"; };
 		A560482F210EE6B000DA161D /* DPVersioningController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPVersioningController.h; sourceTree = "<group>"; };
 		A5604830210EE6B000DA161D /* DPVersioningController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPVersioningController.m; sourceTree = "<group>"; };
+		A560483221143DED00DA161D /* BuildServerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BuildServerViewController.h; sourceTree = "<group>"; };
+		A560483321143DED00DA161D /* BuildServerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BuildServerViewController.m; sourceTree = "<group>"; };
+		A560483521143E1300DA161D /* DPBuildServerController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPBuildServerController.h; sourceTree = "<group>"; };
+		A560483621143E1300DA161D /* DPBuildServerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPBuildServerController.m; sourceTree = "<group>"; };
 		A5724D4A20A70D4A004BED71 /* ContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerViewController.h; sourceTree = "<group>"; };
 		A5724D4B20A70D4A004BED71 /* ContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerViewController.m; sourceTree = "<group>"; };
 		A5782D1F2095E99A00CA603A /* PreferenceData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceData.h; sourceTree = "<group>"; };
@@ -404,6 +410,8 @@
 				A581772B20E0DA28009240BD /* NetworkViewController.m */,
 				A5604826210B14AF00DA161D /* VersioningViewController.h */,
 				A5604827210B14AF00DA161D /* VersioningViewController.m */,
+				A560483221143DED00DA161D /* BuildServerViewController.h */,
+				A560483321143DED00DA161D /* BuildServerViewController.m */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -423,6 +431,8 @@
 				A597FE8020E0EA60000470E6 /* DPNetworkController.m */,
 				A560482F210EE6B000DA161D /* DPVersioningController.h */,
 				A5604830210EE6B000DA161D /* DPVersioningController.m */,
+				A560483521143E1300DA161D /* DPBuildServerController.h */,
+				A560483621143E1300DA161D /* DPBuildServerController.m */,
 			);
 			name = Main;
 			sourceTree = "<group>";
@@ -958,7 +968,9 @@
 				A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
+				A560483421143DED00DA161D /* BuildServerViewController.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
+				A560483721143E1300DA161D /* DPBuildServerController.m in Sources */,
 				A5604828210B14AF00DA161D /* VersioningViewController.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */,

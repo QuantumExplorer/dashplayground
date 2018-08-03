@@ -146,8 +146,8 @@
 
 -(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error dashClb:(dashClb)clb {
     
-    NSString *executeStr = [NSString stringWithFormat:@"executing command %@", command];
-    clb(YES, executeStr);
+//    NSString *executeStr = [NSString stringWithFormat:@"executing command %@", command];
+//    clb(YES, executeStr);
 //    [ssh.channel startShell:&error];
     error = nil;
     NSString *response = [ssh.channel execute:command error:&error];
