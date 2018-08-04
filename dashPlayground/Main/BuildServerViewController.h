@@ -7,7 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "AppDelegate.h"
+#import "DPTableView.h"
 
 @interface BuildServerViewController : NSViewController
+
+@property (readonly, strong, nonatomic) AppDelegate *appDelegate;
+
+-(void)addStringEvent:(NSString*)string;
 
 @end

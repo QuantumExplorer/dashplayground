@@ -44,7 +44,7 @@
     [super viewDidLoad];
     // Do view setup here.
     [self setUpConsole];
-    [self initializeTable];
+    [self initialize];
     
     [DPVersioningController sharedInstance].versioningViewController = self;
 }
@@ -53,13 +53,16 @@
     self.consoleEvents = [[ConsoleEventArray alloc] init];
 }
 
-- (void)initializeTable {
+- (void)initialize {
 //    [self addStringEvent:@"Initializing instances from AWS."];
     NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in masternodesArray) {
         [self showTableContent:masternode];
 //        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
+    
+    [self.versionCoreButton removeAllItems];
+    [self.versionSentinelButton removeAllItems];
 }
 
 -(void)showTableContent:(NSManagedObject*)object

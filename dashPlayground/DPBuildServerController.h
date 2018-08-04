@@ -7,7 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BuildServerViewController.h"
+#import <NMSSH/NMSSH.h>
 
-@interface DPBuildServerController : NSObject
+@interface DPBuildServerController : NSObject {
+    BuildServerViewController *_buildServerViewController;
+}
+
+@property(strong, nonatomic, readwrite) BuildServerViewController *buildServerViewController;
+
++(DPBuildServerController*)sharedInstance;
+
+-(NSString*)getBuildServerIP;
+-(void)setBuildServerIP:(NSString*)ipAddress;
+
+- (NSMutableArray*)getAllRepository:(NMSSHSession*)buildServerSession;
 
 @end
