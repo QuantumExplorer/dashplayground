@@ -23,4 +23,8 @@
 
 - (NSMutableArray*)getAllRepository:(NMSSHSession*)buildServerSession;
 
+- (NSMutableArray*)getCompileData:(NMSSHSession*)buildServerSession;
+
+- (void)compileCheck:(NMSSHSession*)buildServerSession withRepository:(NSManagedObject*)repoObject;
+
 @end

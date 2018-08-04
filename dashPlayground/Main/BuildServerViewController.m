@@ -87,6 +87,8 @@
                 [self addStringEvent:@"Build server connected!"];
                 
                 NSMutableArray *repositoryArray = [[DPBuildServerController sharedInstance] getAllRepository:sshSession];
+                NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:sshSession];
+                [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
                 [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
             }
             else {
@@ -109,21 +111,41 @@
         
         [self.downloadArrayController setContent:nil];
         [self.commitArrayController setContent:nil];
+        [self.compileArrayController setContent:nil];
         
         [self addStringEvent:@"Build server disconnected!"];
     }
 }
 
-- (IBAction)refresh:(id)sender {
-    [self addStringEvent:@"Refreshing data..."];
+- (IBAction)refreshDownload:(id)sender {
     
     if([self.buildServerStatusText.stringValue isEqualToString:@"Connected"]) {
+        [self addStringEvent:@"Refreshing download data..."];
         [self.commitArrayController setContent:nil];
         NSMutableArray *repositoryArray = [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession];
         [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
     }
 }
 
+- (IBAction)refreshCompile:(id)sender {
+    
+    if([self.buildServerStatusText.stringValue isEqualToString:@"Connected"]) {
+        [self addStringEvent:@"Refreshing compile data..."];
+        [self.compileArrayController setContent:nil];
+        NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession];
+        [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
+    }
+}
+
+- (IBAction)compileCheck:(id)sender {
+    NSInteger row = self.compileTable.selectedRow;
+    if(row == -1) {
+        return;
+    }
+    NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
+    
+    [[DPBuildServerController sharedInstance] compileCheck:self.buildServerSession withRepository:object];
+}
 
 -(void)addStringEvent:(NSString*)string {
     dispatch_async(dispatch_get_main_queue(), ^{
