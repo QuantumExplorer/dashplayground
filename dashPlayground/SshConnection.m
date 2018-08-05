@@ -152,7 +152,7 @@
     error = nil;
     NSString *response = [ssh.channel execute:command error:&error];
     if (error) {
-        NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
+//        NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
         NSString *errorStr = [NSString stringWithFormat:@"SSH: %@", [error localizedDescription]];
         clb(NO, errorStr);
         return;

@@ -105,7 +105,7 @@ NSString *terminalHeadString = @"";
 - (IBAction)pressCheckDevnet:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     
-    NSString *chainName = [[DialogAlert sharedInstance] showAlertWithTextField:@"Checking devnet network" message:@"Please enter your devnet name."];
+    NSString *chainName = [[DialogAlert sharedInstance] showAlertWithTextField:@"Checking devnet network" message:@"Please enter your devnet name." placeHolder:@""];
     
     if([chainName length] == 0) {
         [self addStringEventToMasternodeConsole:@"Please make sure you already input your devnet name."];

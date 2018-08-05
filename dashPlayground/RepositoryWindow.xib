@@ -139,7 +139,7 @@
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                             <prototypeCellViews>
                                                 <tableCellView id="PIv-Ii-HrI">
-                                                    <rect key="frame" x="321.5" y="1" width="295" height="17"/>
+                                                    <rect key="frame" x="322" y="1" width="295" height="17"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dqc-r7-xIv">

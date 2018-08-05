@@ -166,7 +166,7 @@ MasternodesViewController *masternodeCon2;
         
         if([[repositoryObject valueForKey:@"repoType"] integerValue] == 1) {
             if([[[DPDataStore sharedInstance] githubUsername] length] == 0) {
-                NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username"];
+                NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
                 [DPDataStore sharedInstance].githubUsername = githubUsername;
             }
             if([[[DPDataStore sharedInstance] githubPassword] length] == 0) {

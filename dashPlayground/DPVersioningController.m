@@ -38,7 +38,7 @@
                 //Pop up to ask for Github username and password
                 
                 if([[[DPDataStore sharedInstance] githubUsername] length] <= 1 || [[[DPDataStore sharedInstance] githubPassword] length] <= 1) {
-                    [DPDataStore sharedInstance].githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username"];
+                    [DPDataStore sharedInstance].githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
                     [DPDataStore sharedInstance].githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
                 }
                 

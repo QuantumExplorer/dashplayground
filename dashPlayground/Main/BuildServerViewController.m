@@ -64,7 +64,7 @@
 }
 
 - (IBAction)changeServerIP:(id)sender {
-    NSString *bsIP = [[DialogAlert sharedInstance] showAlertWithTextField:@"IP Address" message:@"Please input your build server public IP here."];
+    NSString *bsIP = [[DialogAlert sharedInstance] showAlertWithTextField:@"IP Address" message:@"Please input your build server public IP here." placeHolder:@""];
     
     if([bsIP length] > 0) {
         [[DPBuildServerController sharedInstance] setBuildServerIP:bsIP];
@@ -90,6 +90,8 @@
                 NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:sshSession];
                 [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
                 [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
+                
+                [self updateCompileStatus];
             }
             else {
                 self.buildServerStatusText.stringValue = @"Disconnected";
@@ -103,6 +105,8 @@
     }
     else {
         [self.buildServerSession disconnect];
+        
+        self.buildServerSession = nil;
         
         self.connectButton.title = @"Connect";
         
@@ -134,7 +138,18 @@
         [self.compileArrayController setContent:nil];
         NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession];
         [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
+        [self updateCompileStatus];
     }
+}
+
+- (IBAction)compileUpdate:(id)sender {
+    NSInteger row = self.compileTable.selectedRow;
+    if(row == -1) {
+        return;
+    }
+    NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
+    
+    [[DPBuildServerController sharedInstance] updateRepository:object buildServerSession:self.buildServerSession];
 }
 
 - (IBAction)compileCheck:(id)sender {
@@ -144,7 +159,32 @@
     }
     NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
     
-    [[DPBuildServerController sharedInstance] compileCheck:self.buildServerSession withRepository:object];
+    [[DPBuildServerController sharedInstance] compileCheck:self.buildServerSession withRepository:object reportConsole:YES];
+}
+
+- (IBAction)addCompileRepo:(id)sender {
+    if([self.buildServerStatusText.stringValue isEqualToString:@"Connected"]) {
+        NSString *httpsLinkRepo = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github link" message:@"Please enter repository link." placeHolder:@"(ex. https://github.com/owner/repo)"];
+        NSString *branch = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github branch" message:@"Please enter branch." placeHolder:@"(ex. master)"];
+        
+        if(httpsLinkRepo == nil || branch == nil) return;
+        
+        [[DPBuildServerController sharedInstance] cloneRepository:self.buildServerSession withGitLink:httpsLinkRepo withBranch:branch type:@"core"];
+        
+        [self.compileArrayController setContent:nil];
+        NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession];
+        [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
+        [self updateCompileStatus];
+    }
+}
+
+
+- (void)updateCompileStatus {
+    NSArray * allObjects = [NSArray arrayWithArray:[self.compileArrayController.arrangedObjects allObjects]];
+    
+    for(NSManagedObject *object in allObjects) {
+        [[DPBuildServerController sharedInstance] compileCheck:self.buildServerSession withRepository:object reportConsole:NO];
+    }
 }
 
 -(void)addStringEvent:(NSString*)string {

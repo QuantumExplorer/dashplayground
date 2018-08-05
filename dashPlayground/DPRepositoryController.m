@@ -35,7 +35,7 @@
 
 -(void)addPrivateRepositoryForUser:(NSString*)user repoName:(NSString*)repoName branch:(NSString*)branch clb:(dashClb)clb {
     
-    NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username"];
+    NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
     NSString *githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
     
     if([githubUsername length] == 0 || [githubPassword length] == 0) return;
@@ -80,7 +80,7 @@
                 }];
             }
             else {
-                NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username"];
+                NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
                 NSString *githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
                 
                 if([githubUsername length] == 0 || [githubPassword length] == 0) return;
@@ -100,7 +100,7 @@
 }
 
 - (void)setAMIForRepository:(NSManagedObject*)repository clb:(dashClb)clb {
-    NSString *amiID = [[DialogAlert sharedInstance] showAlertWithTextField:@"Set AMI for repository" message:@"Please fill in ami-id"];
+    NSString *amiID = [[DialogAlert sharedInstance] showAlertWithTextField:@"Set AMI for repository" message:@"Please fill in ami-id" placeHolder:@""];
     if([amiID length] == 0 || amiID == nil) return clb(NO, nil);
     
     [repository setValue:amiID forKey:@"amiId"];
