@@ -31,4 +31,6 @@
 
 - (void)updateRepository:(NSManagedObject*)repoObject buildServerSession:(NMSSHSession*)buildServerSession;
 
+- (void)copyDashAppToApache:(NSManagedObject*)repoObject buildServerSession:(NMSSHSession*)buildServerSession;
+
 @end

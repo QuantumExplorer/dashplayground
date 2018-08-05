@@ -251,7 +251,6 @@
                 }
                 else {
                     if ([message rangeOfString:@"could not read Username"].location != NSNotFound) {
-                        [self updateRepoCredential:buildServerSession repoObject:repoObject];
                         [self.buildServerViewController addStringEvent:message];
                     }
                     else {
@@ -265,7 +264,6 @@
         }
         else {
             if ([message rangeOfString:@"could not read Username"].location != NSNotFound) {
-                [self updateRepoCredential:buildServerSession repoObject:repoObject];
                 [self.buildServerViewController addStringEvent:message];
             }
             else {
@@ -279,7 +277,7 @@
     }];
 }
 
-- (void)updateRepoCredential:(NMSSHSession*)buildServerSession repoObject:(NSManagedObject*)repoObject {
+- (void)updateRepoCredential:(NMSSHSession*)buildServerSession repoObject:(NSManagedObject*)repoObject gitUsername:(NSString*)gitUsername gitPassword:(NSString*)gitPassword {
     NSString *type = [repoObject valueForKey:@"type"];
     NSString *owner = [repoObject valueForKey:@"owner"];
     NSString *repoName = [repoObject valueForKey:@"repoName"];
@@ -303,9 +301,6 @@
             
             __block NSError *error = nil;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git config --global credential.helper cache", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
-            }];
-            
             __block NSString *command = [NSString stringWithFormat:@"git clone -b %@ %@ ~/src/%@/%@-%@/%@", branch, gitlink, type, gitOwner, gitRepo, branch];
             
             [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
@@ -314,8 +309,6 @@
                 }
                 else if([message length] == 0) {
                     [self.buildServerViewController addStringEvent:@"Clone successfully!"];
-                    command = [NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@ && git config --global credential.helper cache", type, gitOwner, gitRepo, branch];
-                    [buildServerSession.channel execute:command error:&error];
                 }
                 else if ([message rangeOfString:@"could not read Username"].location != NSNotFound) {
                     NSString *gitUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github" message:@"Please enter your github username." placeHolder:@"(ex. user01)"];
@@ -323,6 +316,8 @@
                     
                     if(gitUsername != nil || gitPassword != nil) {
                         [self cloneRepository:buildServerSession withGitLink:[NSString stringWithFormat:@"https://%@:%@@github.com/%@/%@.git", gitUsername, gitPassword, gitOwner, gitRepo] withBranch:branch type:type];
+                        
+                        [buildServerSession.channel execute:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git config --global user.name \"%@\" && git config --global user.password \"%@\" && git config credential.helper store", type, gitOwner, gitRepo, branch, gitUsername, gitPassword] error:&error];
                     }
                 }
                 else {
@@ -342,23 +337,82 @@
 }
 
 - (void)updateRepository:(NSManagedObject*)repoObject buildServerSession:(NMSSHSession*)buildServerSession {
+    NSString *gitOwner = [repoObject valueForKey:@"owner"];
+    NSString *gitRepo = [repoObject valueForKey:@"repoName"];
+    NSString *branch = [repoObject valueForKey:@"branch"];
+    NSString *type = [repoObject valueForKey:@"type"];
     NSString *repoStatus = [repoObject valueForKey:@"status"];
+    NSError *error = nil;
+    
     if([repoStatus isEqualToString:@"up-to-date"]) {
-        [self.buildServerViewController addStringEvent:@"This repository is already up to date."];
-        return;
+        
+        NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warning" message:@"Are you sure you want to re compile this repository?"];
+        if ([alert runModal] == NSAlertFirstButtonReturn) {
+            //now let's make all this shit
+            
+            [self.buildServerViewController addStringEvent:@"This will take around 30 mins. Please do not close the program!"];
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+                
+                __block BOOL isSuccess = YES;
+                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && ./autogen.sh", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.buildServerViewController addStringEvent:message];
+                    });
+                    isSuccess = success;
+                }];
+                if(isSuccess == NO) return;
+                
+                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && ./configure", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.buildServerViewController addStringEvent:message];
+                    });
+                    isSuccess = success;
+                }];
+                if(isSuccess == NO) return;
+                
+                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && make --file=Makefile -j10 -l15", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self.buildServerViewController addStringEvent:message];
+                    });
+                    isSuccess = success;
+                }];
+                
+                if(isSuccess == YES) {//copy dashd and dash-cli to apache2
+                    [self copyDashAppToApache:repoObject buildServerSession:buildServerSession];
+                }
+            });
+        }
     }
-    else {
-        NSString *gitOwner = [repoObject valueForKey:@"owner"];
-        NSString *gitRepo = [repoObject valueForKey:@"repoName"];
-        NSString *branch = [repoObject valueForKey:@"branch"];
-        NSString *type = [repoObject valueForKey:@"type"];
+    else if([repoStatus isEqualToString:@"out-of-date"]) {
         __block NSString *command = [NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@ && git fetch && git pull && git rev-parse --short HEAD", type, gitOwner, gitRepo, branch];
-        NSError *error = nil;
         
         [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
-            NSLog(@"%@", message);
+            [self.buildServerViewController addStringEvent:message];
+            [self compileCheck:buildServerSession withRepository:repoObject reportConsole:NO];
+            
         }];
     }
+}
+
+- (void)copyDashAppToApache:(NSManagedObject*)repoObject buildServerSession:(NMSSHSession*)buildServerSession {
+    NSString *gitOwner = [repoObject valueForKey:@"owner"];
+    NSString *gitRepo = [repoObject valueForKey:@"repoName"];
+    NSString *branch = [repoObject valueForKey:@"branch"];
+    NSString *type = [repoObject valueForKey:@"type"];
+    
+    __block NSError *error = nil;
+    __block NSString *command = [NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git rev-parse HEAD", type, gitOwner, gitRepo, branch];
+    
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
+        if([message length] == 41) {
+            command = [NSString stringWithFormat:@"sudo mkdir -p /var/www/html/%@/%@-%@/%@/%@ cd ~/src/%@/%@-%@/%@/src/ && sudo cp dashd /var/www/html/%@/%@-%@/%@/%@/", type, gitOwner, gitRepo, branch, message, type, gitOwner, gitRepo, branch, type, gitOwner, gitRepo, branch, message];
+            [buildServerSession.channel execute:command error:&error];
+            
+            command = [NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/src/ && sudo cp dash-cli /var/www/html/%@/%@-%@/%@/%@/", type, gitOwner, gitRepo, branch, type, gitOwner, gitRepo, branch, message];
+            [buildServerSession.channel execute:command error:&error];
+        }
+    }];
 }
 
 #pragma mark - Singleton methods

@@ -187,6 +187,19 @@
     }
 }
 
+- (IBAction)pressAddDownload:(id)sender {
+    NSInteger row = self.compileTable.selectedRow;
+    if(row == -1) {
+        return;
+    }
+    NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
+    
+    [self addStringEvent:@"Creating download link..."];
+    
+    [[DPBuildServerController sharedInstance] copyDashAppToApache:object buildServerSession:self.buildServerSession];
+}
+
+
 -(void)addStringEvent:(NSString*)string {
     dispatch_async(dispatch_get_main_queue(), ^{
         if([string length] == 0 || string == nil) return;
