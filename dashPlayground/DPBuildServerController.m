@@ -77,7 +77,7 @@
                     branchList = [self getBranchList:buildServerSession onPath:@"/var/www/html" fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] storageType:type];
                     if([branchList count] > 0) {
                         for(NSString *branch in branchList) {
-                            commitList = [self getCommitList:buildServerSession fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] fromBranch:branch storageType:type];
+                            commitList = [self getVersionsList:buildServerSession fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] fromBranch:branch storageType:type];
                             dateList = [self getCreatedDirectoryDate:buildServerSession fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] fromBranch:branch storageType:type commitList:commitList];
                             
                             NSDictionary *tableDict = [NSMutableDictionary dictionary];
@@ -176,7 +176,7 @@
     return dateList;
 }
 
-- (NSMutableArray*)getCommitList:(NMSSHSession*)buildServerSession fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo fromBranch:(NSString*)branch storageType:(NSString*)type {
+- (NSMutableArray*)getVersionsList:(NMSSHSession*)buildServerSession fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo fromBranch:(NSString*)branch storageType:(NSString*)type {
     
     __block NSMutableArray *commitList = [NSMutableArray array];
     
@@ -242,12 +242,16 @@
                         [self.buildServerViewController addStringEvent:message];
                     }
                     [repoObject setValue:@"up-to-date" forKey:@"status"];
+                    
+                    NSString *compileStatus = [self checkExistingOfDashdInRepo:buildServerSession type:type Owner:owner RepoName:repoName onBranch:branch];
+                    [repoObject setValue:compileStatus forKey:@"compileStatus"];
                 }
                 else if ([message rangeOfString:@"Your branch is behind"].location != NSNotFound) {
                     if(report == YES) {
                         [self.buildServerViewController addStringEvent:message];
                     }
                     [repoObject setValue:@"out-of-date" forKey:@"status"];
+                    [repoObject setValue:@"need to re-compile" forKey:@"compileStatus"];
                 }
                 else {
                     if ([message rangeOfString:@"could not read Username"].location != NSNotFound) {
@@ -259,6 +263,14 @@
                         }
                         [repoObject setValue:@"unknown" forKey:@"status"];
                     }
+                }
+            }];
+            
+            command = [NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git rev-parse HEAD", type, owner, repoName, branch];
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
+                if([message length] == 41) {
+                    [repoObject setValue:[message substringToIndex:7] forKey:@"gitCommit"];
                 }
             }];
         }
@@ -275,6 +287,35 @@
         }
         
     }];
+}
+
+- (NSString*)checkExistingOfDashdInRepo:(NMSSHSession*)buildServerSession type:(NSString*)type Owner:(NSString*)gitOwner RepoName:(NSString*)gitRepo onBranch:(NSString*)branch {
+    
+    __block NSString *compileStatus = @"";
+    
+    __block NSError *error = nil;
+    __block NSString *command = [NSString stringWithFormat:@"ls ~/src/%@/%@-%@/%@/src/dashd", type, gitOwner, gitRepo, branch];
+    
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
+        if ([message rangeOfString:@"No such file or directory"].location != NSNotFound) {
+            compileStatus = @"need to compile";
+        }
+        else if ([message rangeOfString:[NSString stringWithFormat:@"/home/ubuntu/src/%@/%@-%@/%@/src/dashd\n", type, gitOwner, gitRepo, branch]].location != NSNotFound) {
+            
+            //then check dashcli
+            command = [NSString stringWithFormat:@"ls ~/src/%@/%@-%@/%@/src/dash-cli", type, gitOwner, gitRepo, branch];
+            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error dashClb:^(BOOL success, NSString *message) {
+                if ([message rangeOfString:@"No such file or directory"].location != NSNotFound) {
+                    compileStatus = @"need to compile";
+                }
+                else if ([message rangeOfString:[NSString stringWithFormat:@"/home/ubuntu/src/%@/%@-%@/%@/src/dash-cli\n", type, gitOwner, gitRepo, branch]].location != NSNotFound) {
+                    compileStatus = @"finished";
+                }
+            }];
+        }
+    }];
+    
+    return compileStatus;
 }
 
 - (void)updateRepoCredential:(NMSSHSession*)buildServerSession repoObject:(NSManagedObject*)repoObject gitUsername:(NSString*)gitUsername gitPassword:(NSString*)gitPassword {

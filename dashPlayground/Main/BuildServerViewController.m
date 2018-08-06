@@ -29,7 +29,7 @@
 //Array Controller
 @property (strong) IBOutlet NSArrayController *compileArrayController;
 @property (strong) IBOutlet NSArrayController *downloadArrayController;
-@property (strong) IBOutlet NSArrayController *commitArrayController;
+@property (strong) IBOutlet NSArrayController *versionArrayController;
 
 //Table
 @property (strong) IBOutlet NSTableView *compileTable;
@@ -114,22 +114,42 @@
         self.buildServerStatusText.textColor = [NSColor redColor];
         
         [self.downloadArrayController setContent:nil];
-        [self.commitArrayController setContent:nil];
+        [self.versionArrayController setContent:nil];
         [self.compileArrayController setContent:nil];
         
         [self addStringEvent:@"Build server disconnected!"];
     }
 }
 
+#pragma mark - Download
+
 - (IBAction)refreshDownload:(id)sender {
     
     if([self.buildServerStatusText.stringValue isEqualToString:@"Connected"]) {
         [self addStringEvent:@"Refreshing download data..."];
-        [self.commitArrayController setContent:nil];
+        [self.versionArrayController setContent:nil];
         NSMutableArray *repositoryArray = [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession];
         [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
     }
 }
+
+- (IBAction)pressAddDownload:(id)sender {
+    NSInteger row = self.compileTable.selectedRow;
+    if(row == -1) {
+        return;
+    }
+    NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
+    
+    [self addStringEvent:@"Creating download link..."];
+    
+    [[DPBuildServerController sharedInstance] copyDashAppToApache:object buildServerSession:self.buildServerSession];
+    
+    [self.versionArrayController setContent:nil];
+    NSMutableArray *repositoryArray = [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession];
+    [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
+}
+
+#pragma mark - Compile
 
 - (IBAction)refreshCompile:(id)sender {
     
@@ -187,19 +207,6 @@
     }
 }
 
-- (IBAction)pressAddDownload:(id)sender {
-    NSInteger row = self.compileTable.selectedRow;
-    if(row == -1) {
-        return;
-    }
-    NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
-    
-    [self addStringEvent:@"Creating download link..."];
-    
-    [[DPBuildServerController sharedInstance] copyDashAppToApache:object buildServerSession:self.buildServerSession];
-}
-
-
 -(void)addStringEvent:(NSString*)string {
     dispatch_async(dispatch_get_main_queue(), ^{
         if([string length] == 0 || string == nil) return;
@@ -226,13 +233,13 @@
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
     NSInteger row = self.downloadTable.selectedRow;
     if(row == -1) {
-        [self.commitArrayController setContent:nil];
+        [self.versionArrayController setContent:nil];
         return;
     }
     NSManagedObject * object = [self.downloadArrayController.arrangedObjects objectAtIndex:row];
     
     if([[object valueForKey:@"commitInfo"] count] > 0) {
-        [self showTableContent:[object valueForKey:@"commitInfo"] onArrayController:self.commitArrayController];
+        [self showTableContent:[object valueForKey:@"commitInfo"] onArrayController:self.versionArrayController];
     }
 }
 
