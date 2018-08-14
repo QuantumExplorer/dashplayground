@@ -362,10 +362,10 @@
                         <tabViewItem label="Versions" id="lQ3-3Q-uPy"/>
                         <tabViewItem label="Control" id="ufv-Nh-D7Q"/>
                         <tabViewItem id="frA-Tl-heA"/>
+                        <tabViewItem label="Build Server" id="wFD-EK-m9b"/>
                         <tabViewItem label="Network" id="2hp-ju-83u"/>
                         <tabViewItem label="Local" id="lGt-F2-k3F"/>
                         <tabViewItem label="Unspent Output" id="tab-zy-jMY"/>
-                        <tabViewItem label="Build Server" id="wFD-EK-m9b"/>
                     </tabViewItems>
                     <tabView key="tabView" type="noTabsNoBorder" id="qND-JS-OXg">
                         <rect key="frame" x="0.0" y="0.0" width="624" height="423"/>
@@ -380,10 +380,10 @@
                         <segue destination="XfG-lQ-9wD" kind="relationship" relationship="tabItems" id="YsE-Ob-l7I"/>
                         <segue destination="Inw-N2-PBT" kind="relationship" relationship="tabItems" id="o3m-Hk-eUg"/>
                         <segue destination="SVm-Iz-46y" kind="relationship" relationship="tabItems" id="K60-fx-njp"/>
+                        <segue destination="CVB-DR-3wQ" kind="relationship" relationship="tabItems" id="FUR-7a-RZ0"/>
                         <segue destination="0fg-CN-6oo" kind="relationship" relationship="tabItems" id="0RW-QF-lFQ"/>
                         <segue destination="BIs-Vd-oI1" kind="relationship" relationship="tabItems" id="lEN-4X-Gfp"/>
                         <segue destination="zmv-s0-gBo" kind="relationship" relationship="tabItems" id="Rk5-Sa-7MK"/>
-                        <segue destination="CVB-DR-3wQ" kind="relationship" relationship="tabItems" id="FUR-7a-RZ0"/>
                     </connections>
                 </tabViewController>
                 <customObject id="CYk-hc-lsC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -1096,7 +1096,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="do3-4g-tdD">
-                                                            <rect key="frame" x="197.5" y="1" width="199" height="17"/>
+                                                            <rect key="frame" x="198" y="1" width="199" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="cYd-Oe-egg">
@@ -1176,7 +1176,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="4oB-tx-dY6">
-                                                            <rect key="frame" x="533.5" y="1" width="351" height="17"/>
+                                                            <rect key="frame" x="534" y="1" width="351" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="cWy-zV-17y">
@@ -3724,8 +3724,9 @@
                                                             <rect key="frame" x="117" y="1" width="114" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2I0-w4-TNL">
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2I0-w4-TNL">
                                                                     <rect key="frame" x="0.0" y="0.0" width="114" height="17"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="UIH-Qp-qID">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -3736,11 +3737,6 @@
                                                                     </connections>
                                                                 </textField>
                                                             </subviews>
-                                                            <constraints>
-                                                                <constraint firstItem="2I0-w4-TNL" firstAttribute="centerX" secondItem="Bu3-yq-28U" secondAttribute="centerX" id="Kuu-xY-PSZ"/>
-                                                                <constraint firstItem="2I0-w4-TNL" firstAttribute="centerY" secondItem="Bu3-yq-28U" secondAttribute="centerY" id="THe-Tm-6CO"/>
-                                                                <constraint firstItem="2I0-w4-TNL" firstAttribute="leading" secondItem="Bu3-yq-28U" secondAttribute="leading" constant="2" id="Y7t-1L-5xX"/>
-                                                            </constraints>
                                                             <connections>
                                                                 <outlet property="textField" destination="2I0-w4-TNL" id="cW4-OS-0WI"/>
                                                             </connections>
@@ -3827,7 +3823,7 @@
                                                         </tableCellView>
                                                     </prototypeCellViews>
                                                 </tableColumn>
-                                                <tableColumn identifier="" width="100" minWidth="10" maxWidth="3.4028234663852886e+38" id="AlG-RD-7L1">
+                                                <tableColumn identifier="" width="100.5" minWidth="10" maxWidth="3.4028234663852886e+38" id="AlG-RD-7L1">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Type">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -3841,7 +3837,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="A9g-Sa-Nbt">
-                                                            <rect key="frame" x="340.5" y="1" width="100" height="17"/>
+                                                            <rect key="frame" x="340.5" y="1" width="101" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="WIe-E4-5OY">
@@ -3979,7 +3975,7 @@
                                                 </tableColumn>
                                             </tableColumns>
                                             <connections>
-                                                <binding destination="UWx-F9-oJs" name="content" keyPath="arrangedObjects" id="4OB-eO-x4l"/>
+                                                <binding destination="UWx-F9-oJs" name="content" keyPath="arrangedObjects" id="Mkh-iZ-7EE"/>
                                                 <outlet property="delegate" destination="CVB-DR-3wQ" id="4eS-mR-t6C"/>
                                             </connections>
                                         </tableView>
@@ -4426,7 +4422,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="VZF-UZ-IHc">
-                                                            <rect key="frame" x="384.5" y="1" width="80" height="17"/>
+                                                            <rect key="frame" x="384.5" y="1" width="81" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="kUr-f0-iP0">
@@ -4591,9 +4587,9 @@
                                 </constraints>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hZ8-PY-WKg">
-                                <rect key="frame" x="1166" y="495" width="56" height="17"/>
+                                <rect key="frame" x="1166" y="495" width="35" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Versions" id="mbW-lK-L1A">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Build" id="mbW-lK-L1A">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -4651,6 +4647,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="buildArrayController" destination="UWx-F9-oJs" id="hBO-QG-ff3"/>
                         <outlet property="buildServerIPText" destination="tAF-29-IHL" id="i6H-EG-DDK"/>
                         <outlet property="buildServerStatusText" destination="REl-qa-qQM" id="CW7-C4-3JN"/>
                         <outlet property="commitTable" destination="l7S-U9-FTM" id="6Yn-fl-19t"/>
@@ -4660,7 +4657,6 @@
                         <outlet property="consoleTextField" destination="epq-eA-UOs" id="X7V-PO-xsW"/>
                         <outlet property="downloadArrayController" destination="dMb-Oz-4zQ" id="mlV-tc-q3q"/>
                         <outlet property="downloadTable" destination="ouI-P8-NSn" id="x9z-j1-zCh"/>
-                        <outlet property="versionArrayController" destination="UWx-F9-oJs" id="5Wt-Lf-jr4"/>
                     </connections>
                 </viewController>
                 <customObject id="eBd-fs-ADA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

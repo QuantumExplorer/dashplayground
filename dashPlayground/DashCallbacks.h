@@ -16,10 +16,11 @@ typedef void (^dashInfoClb)(BOOL success,NSDictionary * object,NSString* errorMe
 typedef void (^dashBoolClb)(BOOL success,BOOL value,NSString* errorMessage);
 typedef void (^dashActiveClb)(BOOL active);
 typedef void (^dashSyncClb)(BOOL active);
-typedef void (^dashArrayInfoClb)(BOOL success,NSMutableArray * object);
+typedef void (^dashMutaArrayInfoClb)(BOOL success,NSMutableArray * object);
 typedef void (^dashDictInfoClb)(BOOL success,NSDictionary * dictionary);
 typedef void (^dashSshClb)(BOOL success,NSString * message, NMSSHSession *sshSession);
 typedef void (^dashSuccessInfo)(BOOL success,NSString * message,BOOL isFinished);
 typedef void (^dashDataClb)(BOOL success,NSString * message,NSData *data);
+typedef void (^dashArrayClb)(BOOL success,NSArray *array);
 
 #endif /* DashCallbacks_h */

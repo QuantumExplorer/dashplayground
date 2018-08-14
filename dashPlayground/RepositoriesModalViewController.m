@@ -38,15 +38,19 @@ MasternodesViewController *masternodeCon2;
     [super windowDidLoad];
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-}
-
-- (void)awakeFromNib {
-    
     NSLog(@"repository window loaded");
     
     NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
     [self displayData:repoData];
 }
+
+//- (void)awakeFromNib {
+//
+//    NSLog(@"repository window loaded");
+//
+//    NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
+//    [self displayData:repoData];
+//}
 
 -(void)displayData:(NSMutableArray*)repoData {
     if(repoData.count > 0)
@@ -58,7 +62,7 @@ MasternodesViewController *masternodeCon2;
     }
     else {
         [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"Repository data is empty."];
-        [_repoWindowController close];
+        [_repoWindowController.window close];
     }
 }
 

@@ -145,22 +145,23 @@
 }
 
 -(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error dashClb:(dashClb)clb {
-    
-//    NSString *executeStr = [NSString stringWithFormat:@"executing command %@", command];
-//    clb(YES, executeStr);
-//    [ssh.channel startShell:&error];
-    error = nil;
-    NSString *response = [ssh.channel execute:command error:&error];
-    if (error) {
-//        NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
-        NSString *errorStr = [NSString stringWithFormat:@"SSH: %@", [error localizedDescription]];
-        clb(NO, errorStr);
-        return;
-    }
-    else {
-//        NSLog(@"SSH: %@", response);
-        clb(YES, response);
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+    //    NSString *executeStr = [NSString stringWithFormat:@"executing command %@", command];
+    //    clb(YES, executeStr);
+    //    [ssh.channel startShell:&error];
+        __block NSError *error = nil;
+        NSString *response = [ssh.channel execute:command error:&error];
+        if (error) {
+    //        NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
+            NSString *errorStr = [NSString stringWithFormat:@"SSH: %@", [error localizedDescription]];
+            clb(NO, errorStr);
+            return;
+        }
+        else {
+    //        NSLog(@"SSH: %@", response);
+            clb(YES, response);
+        }
+    });
 } 
 
 //End Toey

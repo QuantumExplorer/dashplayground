@@ -26,86 +26,104 @@
     [standardUserDefaults setObject:ipAddress forKey:BUILD_SERVER_IP];
 }
 
-- (NSMutableArray*)getCompileData:(NMSSHSession*)buildServerSession {
-    NSArray *storageType = [NSArray arrayWithObjects:@"core", @"dapi", @"dashdrive", nil];
+- (void)getCompileData:(NMSSHSession*)buildServerSession dashClb:(dashMutaArrayInfoClb)clb {
     
-    NSMutableArray *tableArray = [NSMutableArray array];
-    
-    for(NSString *type in storageType) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSArray *storageType = [NSArray arrayWithObjects:@"core", @"dapi", @"dashdrive", nil];
         
-        if([type isEqualToString:@"core"]) {
-            NSArray *ownerAndRepoNameArray = [self getDirectory:type onPath:@"~/src" onSession:buildServerSession];
-            NSMutableArray *branchList;
-            if([ownerAndRepoNameArray count] > 0) {
-                for(NSDictionary *dict in ownerAndRepoNameArray) {
-                    branchList = [self getBranchList:buildServerSession onPath:@"~/src" fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] storageType:type];
-                    
-                    if([branchList count] > 0) {
-                        for(NSString *branch in branchList) {
-                            NSDictionary *tableDict = [NSMutableDictionary dictionary];
-                            [tableDict setValue:[NSString stringWithFormat:@"%@-%@", [dict valueForKey:@"owner"], [dict valueForKey:@"repo"]] forKey:@"repoInfo"];
-                            [tableDict setValue:branch forKey:@"branch"];
-                            [tableDict setValue:type forKey:@"type"];
-                            [tableDict setValue:[dict valueForKey:@"owner"] forKey:@"owner"];
-                            [tableDict setValue:[dict valueForKey:@"repo"] forKey:@"repoName"];
-                            [tableArray addObject: tableDict];
+        for(NSString *type in storageType) {
+            
+            if([type isEqualToString:@"core"]) {
+                [self getDirectory:type onPath:@"~/src" onSession:buildServerSession clb:^(BOOL success, NSArray *array) {
+                    if(success == YES) {
+                        if([array count] > 0) {
+                            for(NSDictionary *dict in array) {
+                                [self getBranchList:buildServerSession onPath:@"~/src" fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] storageType:type clb:^(BOOL success, NSMutableArray *object) {
+                                    if(success == YES) {
+                                        if([object count] > 0) {
+                                            for(NSString *branch in object) {
+                                                NSMutableArray *tableArray = [NSMutableArray array];
+                                                NSDictionary *tableDict = [NSMutableDictionary dictionary];
+                                                [tableDict setValue:[NSString stringWithFormat:@"%@-%@", [dict valueForKey:@"owner"], [dict valueForKey:@"repo"]] forKey:@"repoInfo"];
+                                                [tableDict setValue:branch forKey:@"branch"];
+                                                [tableDict setValue:type forKey:@"type"];
+                                                [tableDict setValue:[dict valueForKey:@"owner"] forKey:@"owner"];
+                                                [tableDict setValue:[dict valueForKey:@"repo"] forKey:@"repoName"];
+                                                [tableArray addObject: tableDict];
+                                                
+                                                clb(YES, tableArray);
+                                            }
+                                        }
+                                    }
+                                }];
+                            }
                         }
                     }
-                }
+                }];
             }
         }
-    }
-    
-    return tableArray;
+    });
 }
 
-- (NSMutableArray*)getAllRepository:(NMSSHSession*)buildServerSession {
-    NSArray *storageType = [NSArray arrayWithObjects:@"core", @"dapi", @"dashdrive", nil];
+- (void)getAllRepository:(NMSSHSession*)buildServerSession dashClb:(dashMutaArrayInfoClb)clb {
     
-    NSMutableArray *tableArray = [NSMutableArray array];
-    
-    for(NSString *type in storageType) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSArray *storageType = [NSArray arrayWithObjects:@"core", @"dapi", @"dashdrive", nil];
         
-        if([type isEqualToString:@"core"]) {
-            
-            NSArray *ownerAndRepoNameArray = [self getDirectory:type onPath:@"/var/www/html" onSession:buildServerSession];
-            NSMutableArray *branchList;
-            NSMutableArray *commitList = [NSMutableArray array];
-            NSMutableArray *dateList;
-            if([ownerAndRepoNameArray count] > 0) {
-                for(NSDictionary *dict in ownerAndRepoNameArray) {
-                    branchList = [self getBranchList:buildServerSession onPath:@"/var/www/html" fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] storageType:type];
-                    if([branchList count] > 0) {
-                        for(NSString *branch in branchList) {
-                            commitList = [self getVersionsList:buildServerSession fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] fromBranch:branch storageType:type];
-                            dateList = [self getCreatedDirectoryDate:buildServerSession fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] fromBranch:branch storageType:type commitList:commitList];
-                            
-                            NSDictionary *tableDict = [NSMutableDictionary dictionary];
-                            [tableDict setValue:[dict valueForKey:@"owner"] forKey:@"owner"];
-                            [tableDict setValue:[dict valueForKey:@"repo"] forKey:@"repo"];
-                            [tableDict setValue:branch forKey:@"branch"];
-                            [tableDict setValue:dateList forKey:@"commitInfo"];
-                            [tableDict setValue:type forKey:@"type"];
-                            [tableArray addObject: tableDict];
+        for(NSString *type in storageType) {
+            if([type isEqualToString:@"core"]) {
+                
+                [self getDirectory:type onPath:@"/var/www/html" onSession:buildServerSession clb:^(BOOL success, NSArray *array) {
+                    if(success == YES) {
+                        __block NSMutableArray *commitList = [NSMutableArray array];
+                        __block NSMutableArray *dateList;
+                        if([array count] > 0) {
+                            for(NSDictionary *dict in array) {
+                                [self getBranchList:buildServerSession onPath:@"/var/www/html" fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] storageType:type clb:^(BOOL success, NSMutableArray *object) {
+                                    if(success == YES) {
+                                        if([object count] > 0) {
+                                            for(NSString *branch in object) {
+                                                [self getVersionsList:buildServerSession fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] fromBranch:branch storageType:type clb:^(BOOL success, NSMutableArray *object) {
+                                                    if(success == YES) {
+                                                        commitList = object;
+                                                        
+                                                        [self getCreatedDirectoryDate:buildServerSession fromOwner:[dict valueForKey:@"owner"] fromRepo:[dict valueForKey:@"repo"] fromBranch:branch storageType:type commitList:commitList clb:^(BOOL success, NSMutableArray *object) {
+                                                            if(success == YES) {
+                                                                dateList = object;
+                                                                
+                                                                NSMutableArray *tableArray = [NSMutableArray array];
+                                                                NSDictionary *tableDict = [NSMutableDictionary dictionary];
+                                                                [tableDict setValue:[dict valueForKey:@"owner"] forKey:@"owner"];
+                                                                [tableDict setValue:[dict valueForKey:@"repo"] forKey:@"repo"];
+                                                                [tableDict setValue:branch forKey:@"branch"];
+                                                                [tableDict setValue:dateList forKey:@"commitInfo"];
+                                                                [tableDict setValue:type forKey:@"type"];
+                                                                [tableArray addObject: tableDict];
+                                                                clb(YES, tableArray);
+                                                            }
+                                                        }];
+                                                    }
+                                                }];
+                                            }
+                                        }
+                                    }
+                                }];
+                            }
                         }
                     }
-                }
+                }];
+            }
+            else if([type isEqualToString:@"dapi"]) {
+                
+            }
+            else {
+                
             }
         }
-        else if([type isEqualToString:@"dapi"]) {
-            
-        }
-        else {
-            
-        }
-    }
-    
-    return tableArray;
+    });
 }
 
-- (NSArray *)getDirectory:(NSString*)type onPath:(NSString*)path onSession:(NMSSHSession*)buildServerSession  {
-    
-    __block NSArray *ownerAndRepoNameArray = [NSArray array];
+- (void)getDirectory:(NSString*)type onPath:(NSString*)path onSession:(NMSSHSession*)buildServerSession clb:(dashArrayClb)clb  {
     
     NSString *command = [NSString stringWithFormat:@"cd %@/%@ && ls -p | grep \"/\"", path, type];
     
@@ -117,18 +135,16 @@
             NSArray *directory = [message componentsSeparatedByString:@"\n"];
             
             if([directory count] > 0) {
+                __block NSArray *ownerAndRepoNameArray = [NSArray array];
                 ownerAndRepoNameArray = [self getOwnerAndRepoName:directory];
+                clb(YES, ownerAndRepoNameArray);
             }
         }
         
     }];
-    
-    return ownerAndRepoNameArray;
 }
 
-- (NSMutableArray*)getBranchList:(NMSSHSession*)buildServerSession onPath:(NSString*)path fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo storageType:(NSString*)type {
-    
-    __block NSMutableArray *branchList = [NSMutableArray array];
+- (void)getBranchList:(NMSSHSession*)buildServerSession onPath:(NSString*)path fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo storageType:(NSString*)type clb:(dashMutaArrayInfoClb)clb {
     
     NSString *command = [NSString stringWithFormat:@"cd %@/%@/%@-%@/ && ls -p | grep \"/\"", path, type, gitOwner, gitRepo];
     
@@ -140,19 +156,18 @@
             NSArray *branchArray = [message componentsSeparatedByString:@"\n"];
             for(NSString *branch in branchArray) {
                 if([branch length] > 0) {
+                    __block NSMutableArray *branchList = [NSMutableArray array];
                     NSString *branchName = [branch substringToIndex:[branch length] -1];
                     [branchList addObject:branchName];
+                    clb(YES, branchList);
                 }
             }
         }
         
     }];
-    
-    return branchList;
 }
 
-- (NSMutableArray*)getCreatedDirectoryDate:(NMSSHSession*)buildServerSession fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo fromBranch:(NSString*)branch storageType:(NSString*)type commitList:(NSArray*)commitList {
-    __block NSMutableArray *dateList = [NSMutableArray array];
+- (void)getCreatedDirectoryDate:(NMSSHSession*)buildServerSession fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo fromBranch:(NSString*)branch storageType:(NSString*)type commitList:(NSArray*)commitList clb:(dashMutaArrayInfoClb)clb {
     
     for(NSDictionary* commit in commitList) {
         NSString *command = [NSString stringWithFormat:@"cd /var/www/html/%@/%@-%@/%@ && ls -ldc %@", type, gitOwner, gitRepo, branch, [commit valueForKey:@"commitSha"]];
@@ -163,22 +178,19 @@
             if ([message rangeOfString:@"SSH:"].location == NSNotFound) {
                 NSArray *messageArray = [message componentsSeparatedByString:@" "];
                 if([messageArray count] == 10) {
+                    __block NSMutableArray *dateList = [NSMutableArray array];
                     NSDictionary *dateDict = [NSMutableDictionary dictionary];
                     [dateDict setValue:[NSString stringWithFormat:@"%@ %@ %@",[messageArray objectAtIndex:7], [messageArray objectAtIndex:5], [messageArray objectAtIndex:8]] forKey:@"date"];
                     [dateDict setValue:[messageArray objectAtIndex:9] forKey:@"commitSha"];
                     [dateList addObject:dateDict];
+                    clb(YES, dateList);
                 }
             }
         }];
     }
-    
-    
-    return dateList;
 }
 
-- (NSMutableArray*)getVersionsList:(NMSSHSession*)buildServerSession fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo fromBranch:(NSString*)branch storageType:(NSString*)type {
-    
-    __block NSMutableArray *commitList = [NSMutableArray array];
+- (void)getVersionsList:(NMSSHSession*)buildServerSession fromOwner:(NSString*)gitOwner fromRepo:(NSString*)gitRepo fromBranch:(NSString*)branch storageType:(NSString*)type clb:(dashMutaArrayInfoClb)clb {
     
     NSString *command = [NSString stringWithFormat:@"cd /var/www/html/%@/%@-%@/%@ && ls -p | grep \"/\"", type, gitOwner, gitRepo, branch];
     
@@ -190,18 +202,18 @@
             NSArray *commitArray = [message componentsSeparatedByString:@"\n"];
             for(NSString *commitHash in commitArray) {
                 if([commitHash length] > 0) {
+                    __block NSMutableArray *commitList = [NSMutableArray array];
                     NSString *newCommitHash = [commitHash substringToIndex:[commitHash length] -1];
                     NSDictionary *dict = [NSMutableDictionary dictionary];
                     [dict setValue:branch forKey:@"branch"];
                     [dict setValue:newCommitHash forKey:@"commitSha"];
                     [commitList addObject:dict];
+                    clb(YES, commitList);
                 }
             }
         }
         
     }];
-    
-    return commitList;
 }
 
 - (NSArray*)getOwnerAndRepoName:(NSArray*)directory {
@@ -220,6 +232,17 @@
     }
     
     return ownerAndRepoArray;
+}
+
+- (void)comepileCheck:(NMSSHSession*)buildServerSession allObject:(NSArray*)allObjects {
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+//        for(NSManagedObject *object in allObjects) {
+//            [self compileCheck:buildServerSession withRepository:object reportConsole:NO];
+//        }
+//    });
+    for(NSManagedObject *object in allObjects) {
+        [self compileCheck:buildServerSession withRepository:object reportConsole:NO];
+    }
 }
 
 - (void)compileCheck:(NMSSHSession*)buildServerSession withRepository:(NSManagedObject*)repoObject reportConsole:(BOOL)report {

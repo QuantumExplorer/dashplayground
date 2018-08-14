@@ -83,7 +83,13 @@
         if(countObject == 10) break;
         countObject = countObject+1;
         
-        NSString *data = [NSString stringWithFormat:@"%@, Date: %@", [commitObject valueForKey:@"sha"], [[[commitObject valueForKey:@"commit"] valueForKey:@"committer"] valueForKey:@"date"]];
+        NSString *message = [NSString stringWithFormat:@"%@...", [[[commitObject valueForKey:@"commit"] valueForKey:@"message"] substringToIndex:20] ];
+        
+        NSString *date = [NSString stringWithFormat:@"%@", [[[commitObject valueForKey:@"commit"] valueForKey:@"author"] valueForKey:@"date"]];
+        
+        NSString *sha = [NSString stringWithFormat:@"%@", [[commitObject valueForKey:@"sha"] substringToIndex:7]];
+        
+        NSString *data = [NSString stringWithFormat:@"%@, Date: %@, Message: %@", sha, date, message];
         
         [gitCommitArray addObject:data];
     }

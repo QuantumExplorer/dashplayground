@@ -29,7 +29,7 @@
 //Array Controller
 @property (strong) IBOutlet NSArrayController *compileArrayController;
 @property (strong) IBOutlet NSArrayController *downloadArrayController;
-@property (strong) IBOutlet NSArrayController *versionArrayController;
+@property (strong) IBOutlet NSArrayController *buildArrayController;
 
 //Table
 @property (strong) IBOutlet NSTableView *compileTable;
@@ -77,6 +77,7 @@
     if([self.connectButton.title isEqualToString:@"Connect"]) {
         [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[[DPBuildServerController sharedInstance] getBuildServerIP] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
             if(sshSession.isAuthorized) {
+                
                 self.buildServerSession = sshSession;
                 
                 self.buildServerStatusText.stringValue = @"Connected";
@@ -86,12 +87,16 @@
                 
                 [self addStringEvent:@"Build server connected!"];
                 
-                NSMutableArray *repositoryArray = [[DPBuildServerController sharedInstance] getAllRepository:sshSession];
-                NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:sshSession];
-                [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
-                [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
+                [[DPBuildServerController sharedInstance] getAllRepository:sshSession dashClb:^(BOOL success, NSMutableArray *object) {
+                    [self showTableContent:object onArrayController:self.downloadArrayController];
+                }];
                 
-                [self updateCompileStatus];
+                [[DPBuildServerController sharedInstance] getCompileData:sshSession dashClb:^(BOOL success, NSMutableArray *object) {
+                    [self showTableContent:object onArrayController:self.compileArrayController];
+                    [self updateCompileStatus];
+                }];
+                
+//                [self updateCompileStatus];
             }
             else {
                 self.buildServerStatusText.stringValue = @"Disconnected";
@@ -114,7 +119,7 @@
         self.buildServerStatusText.textColor = [NSColor redColor];
         
         [self.downloadArrayController setContent:nil];
-        [self.versionArrayController setContent:nil];
+        [self.buildArrayController setContent:nil];
         [self.compileArrayController setContent:nil];
         
         [self addStringEvent:@"Build server disconnected!"];
@@ -127,9 +132,10 @@
     
     if([self.buildServerStatusText.stringValue isEqualToString:@"Connected"]) {
         [self addStringEvent:@"Refreshing download data..."];
-        [self.versionArrayController setContent:nil];
-        NSMutableArray *repositoryArray = [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession];
-        [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
+        [self.buildArrayController setContent:nil];
+        [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession dashClb:^(BOOL success, NSMutableArray *object) {
+            [self showTableContent:object onArrayController:self.downloadArrayController];
+        }];
     }
 }
 
@@ -144,9 +150,10 @@
     
     [[DPBuildServerController sharedInstance] copyDashAppToApache:object buildServerSession:self.buildServerSession];
     
-    [self.versionArrayController setContent:nil];
-    NSMutableArray *repositoryArray = [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession];
-    [self showTableContent:repositoryArray onArrayController:self.downloadArrayController];
+    [self.buildArrayController setContent:nil];
+    [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession dashClb:^(BOOL success, NSMutableArray *object) {
+        [self showTableContent:object onArrayController:self.downloadArrayController];
+    }];
 }
 
 #pragma mark - Compile
@@ -156,8 +163,9 @@
     if([self.buildServerStatusText.stringValue isEqualToString:@"Connected"]) {
         [self addStringEvent:@"Refreshing compile data..."];
         [self.compileArrayController setContent:nil];
-        NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession];
-        [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
+        [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession dashClb:^(BOOL success, NSMutableArray *object) {
+            [self showTableContent:object onArrayController:self.compileArrayController];
+        }];
         [self updateCompileStatus];
     }
 }
@@ -192,8 +200,9 @@
         [[DPBuildServerController sharedInstance] cloneRepository:self.buildServerSession withGitLink:httpsLinkRepo withBranch:branch type:@"core"];
         
         [self.compileArrayController setContent:nil];
-        NSMutableArray *compileDataArray = [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession];
-        [self showTableContent:compileDataArray onArrayController:self.compileArrayController];
+        [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession dashClb:^(BOOL success, NSMutableArray *object) {
+            [self showTableContent:object onArrayController:self.compileArrayController];
+        }];
         [self updateCompileStatus];
     }
 }
@@ -202,9 +211,7 @@
 - (void)updateCompileStatus {
     NSArray * allObjects = [NSArray arrayWithArray:[self.compileArrayController.arrangedObjects allObjects]];
     
-    for(NSManagedObject *object in allObjects) {
-        [[DPBuildServerController sharedInstance] compileCheck:self.buildServerSession withRepository:object reportConsole:NO];
-    }
+    [[DPBuildServerController sharedInstance] comepileCheck:self.buildServerSession allObject:allObjects];
 }
 
 -(void)addStringEvent:(NSString*)string {
@@ -222,24 +229,25 @@
 }
 
 -(void)showTableContent:(NSMutableArray*)contentArray onArrayController:(NSArrayController*)arrayController {
-    
-    [arrayController setContent:nil];
-    for(NSDictionary *dict in contentArray) {
-        [arrayController addObject:dict];
-    }
-    [arrayController rearrangeObjects];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for(NSDictionary *dict in contentArray) {
+            [arrayController addObject:dict];
+        }
+        [arrayController rearrangeObjects];
+    });
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
     NSInteger row = self.downloadTable.selectedRow;
     if(row == -1) {
-        [self.versionArrayController setContent:nil];
+        [self.buildArrayController setContent:nil];
         return;
     }
     NSManagedObject * object = [self.downloadArrayController.arrangedObjects objectAtIndex:row];
     
     if([[object valueForKey:@"commitInfo"] count] > 0) {
-        [self showTableContent:[object valueForKey:@"commitInfo"] onArrayController:self.versionArrayController];
+        [self.buildArrayController setContent:nil];
+        [self showTableContent:[object valueForKey:@"commitInfo"] onArrayController:self.buildArrayController];
     }
 }
 

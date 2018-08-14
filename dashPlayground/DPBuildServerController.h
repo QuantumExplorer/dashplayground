@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "BuildServerViewController.h"
 #import <NMSSH/NMSSH.h>
+#import "DashCallbacks.h"
 
 @interface DPBuildServerController : NSObject {
     BuildServerViewController *_buildServerViewController;
@@ -21,11 +22,13 @@
 -(NSString*)getBuildServerIP;
 -(void)setBuildServerIP:(NSString*)ipAddress;
 
-- (NSMutableArray*)getAllRepository:(NMSSHSession*)buildServerSession;
+- (void)getAllRepository:(NMSSHSession*)buildServerSession dashClb:(dashMutaArrayInfoClb)clb;
 
-- (NSMutableArray*)getCompileData:(NMSSHSession*)buildServerSession;
+- (void)getCompileData:(NMSSHSession*)buildServerSession dashClb:(dashMutaArrayInfoClb)clb;
 
 - (void)compileCheck:(NMSSHSession*)buildServerSession withRepository:(NSManagedObject*)repoObject reportConsole:(BOOL)report;
+
+- (void)comepileCheck:(NMSSHSession*)buildServerSession allObject:(NSArray*)allObjects;
 
 - (void)cloneRepository:(NMSSHSession*)buildServerSession withGitLink:(NSString*)gitlink withBranch:(NSString*)branch type:(NSString*)type;
 

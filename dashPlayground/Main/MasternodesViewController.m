@@ -323,7 +323,7 @@ NSString *terminalHeadString = @"";
 
 - (IBAction)setUp:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-    [self addStringEventToMasternodeConsole:@"Setting up sentinel on remotes..."];
+    [self addStringEventToMasternodeConsole:@"Setting up masternode on remotes..."];
     
     NSArray *masternodes = [self.arrayController.arrangedObjects allObjects];
     RepositoriesModalViewController *repoController = [[RepositoriesModalViewController alloc] init];
@@ -666,7 +666,7 @@ NSString *terminalHeadString = @"";
             else{
                 [self addStringEvent:FS(@"creating new instance failure.")];
             }
-        } serverType:@"t2.large"];
+        } serverType:@"t2.micro"];
     }
     
 }
