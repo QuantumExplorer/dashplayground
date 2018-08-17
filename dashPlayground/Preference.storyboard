@@ -74,9 +74,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="905" height="641"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AZb-KE-xwl">
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AZb-KE-xwl">
                                 <rect key="frame" x="351" y="406" width="202" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="bevel" title="Dash Core" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="HjN-ME-OnD">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system" size="25"/>
@@ -85,9 +84,8 @@
                                     <segue destination="ZPU-1X-DGK" kind="sheet" id="3aa-Kp-Its"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="roV-x4-fFv">
-                                <rect key="frame" x="315" y="275" width="274" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="roV-x4-fFv">
+                                <rect key="frame" x="315" y="314" width="274" height="32"/>
                                 <buttonCell key="cell" type="bevel" title="Amazon Web Service" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="WtZ-3L-AD5">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system" size="25"/>
@@ -96,12 +94,126 @@
                                     <segue destination="M50-5h-a6a" kind="sheet" id="pRF-27-HEh"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Iux-WE-BdS">
+                                <rect key="frame" x="315" y="222" width="274" height="32"/>
+                                <buttonCell key="cell" type="bevel" title="Github" bezelStyle="rounded" alignment="center" imageScaling="proportionallyDown" inset="2" id="tJc-Bm-f2D">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system" size="25"/>
+                                </buttonCell>
+                                <connections>
+                                    <segue destination="raf-Rx-L6K" kind="sheet" id="Rhk-FH-EE6"/>
+                                </connections>
+                            </button>
                         </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="roV-x4-fFv" secondAttribute="trailing" constant="316" id="Jve-ah-CfD"/>
+                            <constraint firstAttribute="trailing" secondItem="AZb-KE-xwl" secondAttribute="trailing" constant="352" id="aC9-XR-0q1"/>
+                            <constraint firstItem="roV-x4-fFv" firstAttribute="leading" secondItem="1s4-P6-rlF" secondAttribute="leading" constant="315" id="eHk-8m-Die"/>
+                            <constraint firstItem="roV-x4-fFv" firstAttribute="top" secondItem="AZb-KE-xwl" secondAttribute="bottom" constant="60" id="geW-0J-dBV"/>
+                            <constraint firstItem="AZb-KE-xwl" firstAttribute="top" secondItem="1s4-P6-rlF" secondAttribute="top" constant="203" id="hez-Cs-3Kw"/>
+                            <constraint firstItem="AZb-KE-xwl" firstAttribute="leading" secondItem="1s4-P6-rlF" secondAttribute="leading" constant="351" id="iXn-Y4-CVy"/>
+                            <constraint firstItem="Iux-WE-BdS" firstAttribute="leading" secondItem="1s4-P6-rlF" secondAttribute="leading" constant="315" id="kto-vW-iGE"/>
+                            <constraint firstAttribute="trailing" secondItem="Iux-WE-BdS" secondAttribute="trailing" constant="316" id="rPL-tF-q3F"/>
+                            <constraint firstItem="Iux-WE-BdS" firstAttribute="top" secondItem="roV-x4-fFv" secondAttribute="bottom" constant="60" id="tzG-VS-KkJ"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <customObject id="oqM-sD-VMw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1891.5" y="2459.5"/>
+        </scene>
+        <!--Github View Controller-->
+        <scene sceneID="7BJ-EE-Cft">
+            <objects>
+                <viewController id="raf-Rx-L6K" customClass="GithubViewController" sceneMemberID="viewController">
+                    <view key="view" id="dnd-7G-LtK">
+                        <rect key="frame" x="0.0" y="0.0" width="905" height="635"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AIh-s0-wna">
+                                <rect key="frame" x="108" y="496" width="226" height="24"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="SSH Path" id="nf7-5z-6Wt">
+                                    <font key="font" metaFont="system" size="20"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="170-9x-Ehm">
+                                <rect key="frame" x="322" y="497" width="473" height="22"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" placeholderString="/Users/user1/Documents/key_name.pem" drawsBackground="YES" id="VM7-Ku-C5z">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9qA-kA-7Xk">
+                                <rect key="frame" x="108" y="427" width="226" height="24"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Access Token" id="ea1-9W-E9u">
+                                    <font key="font" metaFont="system" size="20"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <secureTextField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dZT-Sz-4dI">
+                                <rect key="frame" x="322" y="426" width="473" height="22"/>
+                                <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="40 digits" drawsBackground="YES" usesSingleLineMode="YES" id="6kE-47-aUs">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <allowedInputSourceLocales>
+                                        <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                    </allowedInputSourceLocales>
+                                </secureTextFieldCell>
+                            </secureTextField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lfi-oo-2EE">
+                                <rect key="frame" x="811" y="13" width="80" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fYa-ax-9Zt">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="pressSave:" target="raf-Rx-L6K" id="hK8-gh-oqV"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oDG-RI-6CA">
+                                <rect key="frame" x="730" y="13" width="82" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dSa-At-vnj">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="dismissController:" target="raf-Rx-L6K" id="ib2-os-MSf"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="dZT-Sz-4dI" secondAttribute="trailing" constant="110" id="2iq-Gr-kyt"/>
+                            <constraint firstAttribute="trailing" secondItem="170-9x-Ehm" secondAttribute="trailing" constant="110" id="3zk-W2-yIG"/>
+                            <constraint firstAttribute="trailing" secondItem="9qA-kA-7Xk" secondAttribute="trailing" constant="573" id="AwL-fK-dmk"/>
+                            <constraint firstItem="9qA-kA-7Xk" firstAttribute="leading" secondItem="dnd-7G-LtK" secondAttribute="leading" constant="110" id="Bb5-8n-IoY"/>
+                            <constraint firstItem="AIh-s0-wna" firstAttribute="top" secondItem="dnd-7G-LtK" secondAttribute="top" constant="115" id="K0Q-fA-BAF"/>
+                            <constraint firstItem="dZT-Sz-4dI" firstAttribute="top" secondItem="AIh-s0-wna" secondAttribute="bottom" constant="48" id="T6a-93-URs"/>
+                            <constraint firstItem="170-9x-Ehm" firstAttribute="top" secondItem="dnd-7G-LtK" secondAttribute="top" constant="116" id="eHc-dw-ryW"/>
+                            <constraint firstItem="170-9x-Ehm" firstAttribute="leading" secondItem="dnd-7G-LtK" secondAttribute="leading" constant="322" id="fpx-l7-KfW"/>
+                            <constraint firstItem="AIh-s0-wna" firstAttribute="leading" secondItem="dnd-7G-LtK" secondAttribute="leading" constant="110" id="h6T-9j-Rl3"/>
+                            <constraint firstItem="dZT-Sz-4dI" firstAttribute="leading" secondItem="dnd-7G-LtK" secondAttribute="leading" constant="322" id="pVm-79-LaJ"/>
+                            <constraint firstItem="9qA-kA-7Xk" firstAttribute="top" secondItem="AIh-s0-wna" secondAttribute="bottom" constant="45" id="qZ3-eN-OGZ"/>
+                            <constraint firstAttribute="trailing" secondItem="AIh-s0-wna" secondAttribute="trailing" constant="573" id="rbL-op-Ssj"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="accessTokenTextField" destination="dZT-Sz-4dI" id="w0S-EK-c8y"/>
+                        <outlet property="sshPathTextField" destination="170-9x-Ehm" id="89n-vC-6XB"/>
+                    </connections>
+                </viewController>
+                <customObject id="SO2-Lk-tOW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2883.5" y="3176.5"/>
         </scene>
         <!--Dash Core View Controller-->
         <scene sceneID="dqu-7Y-TXZ">

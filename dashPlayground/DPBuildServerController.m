@@ -9,6 +9,7 @@
 #import "DPBuildServerController.h"
 #import "SshConnection.h"
 #import "DialogAlert.h"
+#import "GithubAPI.h"
 
 #define BUILD_SERVER_IP @"[BUILD_SERVER_IP]"
 
@@ -179,10 +180,21 @@
                 NSArray *messageArray = [message componentsSeparatedByString:@" "];
                 if([messageArray count] == 10) {
                     __block NSMutableArray *dateList = [NSMutableArray array];
-                    NSDictionary *dateDict = [NSMutableDictionary dictionary];
-                    [dateDict setValue:[NSString stringWithFormat:@"%@ %@ %@",[messageArray objectAtIndex:7], [messageArray objectAtIndex:5], [messageArray objectAtIndex:8]] forKey:@"date"];
-                    [dateDict setValue:[messageArray objectAtIndex:9] forKey:@"commitSha"];
-                    [dateList addObject:dateDict];
+                    NSDictionary *buildDict = [NSMutableDictionary dictionary];
+                    [buildDict setValue:[NSString stringWithFormat:@"%@ %@ %@",[messageArray objectAtIndex:7], [messageArray objectAtIndex:5], [messageArray objectAtIndex:8]] forKey:@"date"];
+                    [buildDict setValue:[messageArray objectAtIndex:9] forKey:@"commitSha"];
+                    
+                    NSString *commitSha = [[messageArray objectAtIndex:9] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                    NSDictionary *commitDict = [[GithubAPI sharedInstance] getSingleCommitDictionaryData:gitOwner Repo:gitRepo Commit:commitSha];
+                    
+                    NSString *commitMsg = [NSString stringWithFormat:@"%@", [[commitDict valueForKey:@"commit"] valueForKey:@"message"]];
+                    if([[[commitDict valueForKey:@"commit"] valueForKey:@"message"] length] > 20) {
+                        long halfStr = [[[commitDict valueForKey:@"commit"] valueForKey:@"message"] length]/2;
+                        commitMsg = [NSString stringWithFormat:@"%@...", [[[commitDict valueForKey:@"commit"] valueForKey:@"message"] substringToIndex:halfStr]];
+                    }
+                    [buildDict setValue:commitMsg forKey:@"message"];
+                    
+                    [dateList addObject:buildDict];
                     clb(YES, dateList);
                 }
             }
