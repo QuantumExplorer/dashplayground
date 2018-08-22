@@ -144,7 +144,7 @@
 - (IBAction)updateCoreButton:(id)sender {
     NSArray *coreHead = [[self.versionCoreButton.selectedItem title] componentsSeparatedByString:@","];
     
-    if([coreHead count] == 2)
+    if([coreHead count] == 3)
     {
         NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warnning!" message:@"Are you sure you already stopped dashd server before updating new version?"];
         

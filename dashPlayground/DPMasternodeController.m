@@ -812,7 +812,7 @@
     else {
         command = [NSString stringWithFormat:@"cd ~/src; ./dashd"];
     }
-    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
         dispatch_async(dispatch_get_main_queue(), ^{
             clb(NO, message);
         });
@@ -864,7 +864,7 @@
                 NSError *error = nil;
                 NSString *command = @"sudo apt-get update";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     isContinue = success;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(isContinue, message);
@@ -874,7 +874,7 @@
                 
                 command = @"sudo apt-get install -y git python-virtualenv";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     isContinue = success;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(isContinue, message);
@@ -890,7 +890,7 @@
                 }];
                 if(isContinue == NO) return;
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(success, message);
                     });
@@ -898,7 +898,7 @@
                 
                 command = @"cd ~/.dashcore/sentinel; virtualenv venv";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     isContinue = success;
                     if(success == NO){
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -908,7 +908,7 @@
                         //if failed try another command
                         NSString *command = @"cd ~/.dashcore/sentinel; sudo apt-get install -y virtualenv";
                         
-                        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                             isContinue = success;
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 clb(isContinue, message);
@@ -925,7 +925,7 @@
                 
                 command = @"cd ~/.dashcore/sentinel; venv/bin/pip install -r requirements.txt";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     isContinue = success;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(isContinue, message);
@@ -944,7 +944,7 @@
 //                This is exactly what we want to see at this stage
                 command = @"cd ~/.dashcore/sentinel; venv/bin/python bin/sentinel.py";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     isContinue = success;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(isContinue, message);
@@ -987,7 +987,7 @@
                 
                 command = @"echo \"$(echo '* * * * * cd /home/ubuntu/.dashcore/sentinel && ./venv/bin/python bin/sentinel.py 2>&1 >> sentinel-cron.log' ; crontab -l)\" | crontab -";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     isContinue = success;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(isContinue, message);
@@ -1017,7 +1017,7 @@
                 NSError *error = nil;
                 NSString *command = @"cd ~/.dashcore/sentinel; venv/bin/python bin/sentinel.py";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(success, message);
                     });
@@ -1037,11 +1037,11 @@
             __block BOOL isSuccess = YES;
             NSError *error = nil;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                 isSuccess = success;
             }];
             if(isSuccess != YES) {
-                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     isSuccess = success;
                 }];
             }
@@ -1639,12 +1639,12 @@
             __block BOOL isSuccess = YES;
             NSError *error = nil;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                 isSuccess = success;
             }];
             if(isSuccess != YES) return;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore && cat dash.conf" onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore && cat dash.conf" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                 isSuccess = success;
                 if(success == YES && message != nil){
                     NSArray *dashConf = [message componentsSeparatedByString:@"\n"];
@@ -1714,7 +1714,7 @@
                 checkResult = success;
             }];
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                 NSLog(@"SSH-%@: %@", publicIP, message);
                 clb(success,message);
                 checkResult = success;
@@ -1731,7 +1731,7 @@
                     checkResult = success;
                 }];
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     NSLog(@"SSH-%@: %@", publicIP, message);
                     clb(success,message);
                     checkResult = success;
@@ -1742,7 +1742,7 @@
                 NSString *response = [ssh.channel execute:@"ls ~/src/dash/src/dashd" error:&error];
                 if(error || [response length] == 0) {//no
                     
-                    [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error dashClb:^(BOOL success, NSString *message) {
+                    [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                         NSLog(@"SSH-%@: %@", publicIP, message);
                         clb(success,message);
                         checkResult = success;

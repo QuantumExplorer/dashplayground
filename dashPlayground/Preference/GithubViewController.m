@@ -31,6 +31,22 @@
     if([[DPDataStore sharedInstance] getGithubSshPath] != nil) self.sshPathTextField.stringValue = [[DPDataStore sharedInstance] getGithubSshPath];
 }
 
+- (IBAction)browseSshPath:(id)sender {
+    NSOpenPanel* openDlg = [NSOpenPanel openPanel];
+    [openDlg setCanChooseFiles:YES];
+    [openDlg setCanChooseDirectories:YES];
+    [openDlg setAllowsMultipleSelection:NO];
+    if ( [openDlg runModal] == NSModalResponseOK )
+    {
+        NSString* filePath = [openDlg URL].absoluteString;
+        if([filePath length] >= 7) {
+            filePath = [filePath substringFromIndex:7];
+            self.sshPathTextField.stringValue = filePath;
+        }
+    }
+}
+
+
 - (IBAction)pressSave:(id)sender {
     if([self.accessTokenTextField.stringValue length] != 0) [[DPDataStore sharedInstance] setGithubAccessToken:self.accessTokenTextField.stringValue];
     if([self.sshPathTextField.stringValue length] != 0) [[DPDataStore sharedInstance] setGithubSshPath:self.sshPathTextField.stringValue];

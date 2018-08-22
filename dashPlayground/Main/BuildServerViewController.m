@@ -93,10 +93,7 @@
                 
                 [[DPBuildServerController sharedInstance] getCompileData:sshSession dashClb:^(BOOL success, NSMutableArray *object) {
                     [self showTableContent:object onArrayController:self.compileArrayController];
-                    [self updateCompileStatus];
                 }];
-                
-//                [self updateCompileStatus];
             }
             else {
                 self.buildServerStatusText.stringValue = @"Disconnected";
@@ -132,7 +129,7 @@
     
     if([self.buildServerStatusText.stringValue isEqualToString:@"Connected"]) {
         [self addStringEvent:@"Refreshing download data..."];
-        [self.buildArrayController setContent:nil];
+        [self.downloadArrayController setContent:nil];
         [[DPBuildServerController sharedInstance] getAllRepository:self.buildServerSession dashClb:^(BOOL success, NSMutableArray *object) {
             [self showTableContent:object onArrayController:self.downloadArrayController];
         }];
@@ -166,7 +163,6 @@
         [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession dashClb:^(BOOL success, NSMutableArray *object) {
             [self showTableContent:object onArrayController:self.compileArrayController];
         }];
-        [self updateCompileStatus];
     }
 }
 
@@ -178,16 +174,6 @@
     NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
     
     [[DPBuildServerController sharedInstance] updateRepository:object buildServerSession:self.buildServerSession];
-}
-
-- (IBAction)compileCheck:(id)sender {
-    NSInteger row = self.compileTable.selectedRow;
-    if(row == -1) {
-        return;
-    }
-    NSManagedObject * object = [self.compileArrayController.arrangedObjects objectAtIndex:row];
-    
-    [[DPBuildServerController sharedInstance] compileCheck:self.buildServerSession withRepository:object reportConsole:YES];
 }
 
 - (IBAction)addCompileRepo:(id)sender {
@@ -203,15 +189,7 @@
         [[DPBuildServerController sharedInstance] getCompileData:self.buildServerSession dashClb:^(BOOL success, NSMutableArray *object) {
             [self showTableContent:object onArrayController:self.compileArrayController];
         }];
-        [self updateCompileStatus];
     }
-}
-
-
-- (void)updateCompileStatus {
-    NSArray * allObjects = [NSArray arrayWithArray:[self.compileArrayController.arrangedObjects allObjects]];
-    
-    [[DPBuildServerController sharedInstance] comepileCheck:self.buildServerSession allObject:allObjects];
 }
 
 -(void)addStringEvent:(NSString*)string {

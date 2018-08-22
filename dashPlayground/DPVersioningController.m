@@ -83,7 +83,13 @@
         if(countObject == 10) break;
         countObject = countObject+1;
         
-        NSString *message = [NSString stringWithFormat:@"%@...", [[[commitObject valueForKey:@"commit"] valueForKey:@"message"] substringToIndex:20] ];
+        NSString *message;
+        if([[[commitObject valueForKey:@"commit"] valueForKey:@"message"] length] > 20) {
+            message = [NSString stringWithFormat:@"%@...", [[[commitObject valueForKey:@"commit"] valueForKey:@"message"] substringToIndex:20] ];
+        }
+        else{
+            message = [NSString stringWithFormat:@"%@", [[commitObject valueForKey:@"commit"] valueForKey:@"message"]];
+        }
         
         NSString *date = [NSString stringWithFormat:@"%@", [[[commitObject valueForKey:@"commit"] valueForKey:@"author"] valueForKey:@"date"]];
         
@@ -122,7 +128,7 @@
                         NSString *downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashCliCommand];
                         
                         [self.versioningViewController addStringEvent:@"Downloading dash-cli..."];
-                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
@@ -138,7 +144,7 @@
                         
                         downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
                         [self.versioningViewController addStringEvent:@"Downloading dashd..."];
-                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error dashClb:^(BOOL success, NSString *message) {
+                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
