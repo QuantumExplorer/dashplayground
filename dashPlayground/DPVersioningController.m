@@ -13,7 +13,7 @@
 #import "DPDataStore.h"
 #import "SshConnection.h"
 #import "VersioningViewController.h"
-
+#import "DPBuildServerController.h"
 
 @implementation DPVersioningController
 
@@ -93,7 +93,7 @@
         
         NSString *date = [NSString stringWithFormat:@"%@", [[[commitObject valueForKey:@"commit"] valueForKey:@"author"] valueForKey:@"date"]];
         
-        NSString *sha = [NSString stringWithFormat:@"%@", [[commitObject valueForKey:@"sha"] substringToIndex:7]];
+        NSString *sha = [NSString stringWithFormat:@"%@", [commitObject valueForKey:@"sha"]];
         
         NSString *data = [NSString stringWithFormat:@"%@, Date: %@, Message: %@", sha, date, message];
         
@@ -113,8 +113,8 @@
             NSString *gitRepo = [repoArray objectAtIndex:4];
             gitRepo = [gitRepo substringToIndex:[gitRepo length] - 4];
             
-            __block NSString *downloadDashCliCommand = [NSString stringWithFormat:@"wget http://54.255.153.128/core/%@-%@/%@/%@/dash-cli", gitOwner, gitRepo, gitBranch, commitHead];
-            __block NSString *downloadDashDCommand = [NSString stringWithFormat:@"wget http://54.255.153.128/core/%@-%@/%@/%@/dashd", gitOwner, gitRepo, gitBranch, commitHead];
+            __block NSString *downloadDashCliCommand = [NSString stringWithFormat:@"wget http://%@/core/%@-%@/%@/%@/dash-cli", [[DPBuildServerController sharedInstance] getBuildServerIP], gitOwner, gitRepo, gitBranch, commitHead];
+            __block NSString *downloadDashDCommand = [NSString stringWithFormat:@"wget http://%@/core/%@-%@/%@/%@/dashd", [[DPBuildServerController sharedInstance] getBuildServerIP], gitOwner, gitRepo, gitBranch, commitHead];
             
             
             [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {

@@ -465,8 +465,8 @@
                 }];
                 if(isSuccess == NO) return;
                 
-                [self.buildServerViewController addStringEvent:@"Executing make --file=Makefile -j9 -l9"];
-                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && make --file=Makefile -j9 -l9", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [self.buildServerViewController addStringEvent:@"Executing make --file=Makefile -j4 -l8"];
+                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && make --file=Makefile -j4 -l8", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                     [self.buildServerViewController addStringEvent:message];
                     isSuccess = success;
                 }];
@@ -515,6 +515,7 @@
                 [buildServerSession.channel execute:command error:&error];
                 
                 [repoObject setValue:@"finished" forKey:@"compileStatus"];
+                [self.buildServerViewController addStringEvent:@"Finished compiling."];
             }
         }];
     });

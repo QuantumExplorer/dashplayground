@@ -122,8 +122,7 @@
     }
     
     //Show repositories version
-    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed
-        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running) {
+    if ([[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial || [[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_SettingUp) {
         NSMutableArray *commitArrayData = [[DPVersioningController sharedInstance] getGitCommitInfo:object repositoryUrl:[object valueForKey:@"repositoryUrl"] onBranch:[object valueForKey:@"gitBranch"]];
         [self.versionCoreButton removeAllItems];
         if(commitArrayData != nil) [self.versionCoreButton addItemsWithTitles:commitArrayData];

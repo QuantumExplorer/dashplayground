@@ -1096,7 +1096,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="do3-4g-tdD">
-                                                            <rect key="frame" x="198" y="1" width="199" height="17"/>
+                                                            <rect key="frame" x="197.5" y="1" width="199" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="cYd-Oe-egg">
@@ -1176,7 +1176,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="4oB-tx-dY6">
-                                                            <rect key="frame" x="534" y="1" width="351" height="17"/>
+                                                            <rect key="frame" x="533.5" y="1" width="351" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="cWy-zV-17y">
@@ -4045,18 +4045,8 @@
                                                 <action selector="compileUpdate:" target="CVB-DR-3wQ" id="5cZ-RD-Ava"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eMM-s8-GLF">
-                                            <rect key="frame" x="14" y="87" width="139" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Add Repository" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xJp-x5-10f">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="addCompileRepo:" target="CVB-DR-3wQ" id="iiS-CZ-Xqb"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b2p-iw-VKG">
-                                            <rect key="frame" x="14" y="61" width="139" height="32"/>
+                                            <rect key="frame" x="14" y="87" width="139" height="32"/>
                                             <buttonCell key="cell" type="push" title="Add Download" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5yZ-mo-Ikk">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -4067,15 +4057,12 @@
                                         </button>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="b2p-iw-VKG" firstAttribute="top" secondItem="eMM-s8-GLF" secondAttribute="bottom" constant="5" id="3DO-Vu-iJB"/>
-                                        <constraint firstItem="eMM-s8-GLF" firstAttribute="top" secondItem="e3l-gH-bm9" secondAttribute="bottom" constant="5" id="Lla-ug-OSA"/>
                                         <constraint firstAttribute="trailing" secondItem="e3l-gH-bm9" secondAttribute="trailing" constant="20" id="NmI-HV-7Ic"/>
+                                        <constraint firstItem="b2p-iw-VKG" firstAttribute="top" secondItem="e3l-gH-bm9" secondAttribute="bottom" constant="5" id="Tqr-4s-9ob"/>
                                         <constraint firstItem="e3l-gH-bm9" firstAttribute="leading" secondItem="maQ-u9-nms" secondAttribute="leading" constant="20" id="VSg-zs-aD7"/>
                                         <constraint firstItem="e3l-gH-bm9" firstAttribute="top" secondItem="maQ-u9-nms" secondAttribute="top" constant="10" id="ZG5-le-jyl"/>
                                         <constraint firstItem="b2p-iw-VKG" firstAttribute="leading" secondItem="maQ-u9-nms" secondAttribute="leading" constant="20" id="aL0-iY-YNW"/>
-                                        <constraint firstItem="eMM-s8-GLF" firstAttribute="leading" secondItem="maQ-u9-nms" secondAttribute="leading" constant="20" id="aXk-hv-LPR"/>
                                         <constraint firstAttribute="trailing" secondItem="b2p-iw-VKG" secondAttribute="trailing" constant="20" id="fL2-pH-z4R"/>
-                                        <constraint firstAttribute="trailing" secondItem="eMM-s8-GLF" secondAttribute="trailing" constant="20" id="jqC-JF-LZ7"/>
                                     </constraints>
                                 </view>
                                 <constraints>
@@ -4607,6 +4594,17 @@
                                 </buttonCell>
                                 <connections>
                                     <action selector="refreshDownload:" target="CVB-DR-3wQ" id="lzW-Wn-do4"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eMM-s8-GLF">
+                                <rect key="frame" x="169" y="486" width="133" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Add Repository" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="xJp-x5-10f">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="addCompileRepo:" target="CVB-DR-3wQ" id="iiS-CZ-Xqb"/>
                                 </connections>
                             </button>
                         </subviews>
