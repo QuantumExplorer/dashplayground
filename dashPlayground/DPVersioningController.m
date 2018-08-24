@@ -153,7 +153,35 @@
                             else {
                                 [self.versioningViewController addStringEvent:message];
                             }
+                            isAllowedToContiunue = success;
                         }];
+                        
+                        if(isAllowedToContiunue == YES) {
+                            NSString *command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dash-cli"];
+                            
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                                
+                            }];
+                            
+                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dash-cli.1 dash-cli && chmod +x dash-cli"];
+                            
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                                
+                            }];
+                            
+                            //dashd
+                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dashd"];
+                            
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                                
+                            }];
+                            
+                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dashd.1 dashd && chmod +x dashd"];
+                            
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                                
+                            }];
+                        }
                     });
                 }
             }];
