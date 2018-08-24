@@ -23,6 +23,7 @@
 #import "DPChainSelectionController.h"
 #import "PreferenceWindowController.h"
 #import "DPVersioningController.h"
+#import "GithubAPI.h"
 
 @interface AppDelegate ()
 

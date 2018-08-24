@@ -14,6 +14,7 @@
 #import "DPLocalNodeController.h"
 #import "DPVersioningController.h"
 #import "MasternodeStateTransformer.h"
+#import "DialogAlert.h"
 
 @interface VersioningViewController ()
 
@@ -33,6 +34,8 @@
 @property (strong) IBOutlet NSComboBox *versionSentinelButton;
 @property (strong) IBOutlet NSButton *sentinelUpdateButton;
 
+@property (atomic) NSManagedObject* selectedObject;
+
 @end
 
 @implementation VersioningViewController
@@ -41,20 +44,25 @@
     [super viewDidLoad];
     // Do view setup here.
     [self setUpConsole];
-    [self initializeTable];
+    [self initialize];
+    
+    [DPVersioningController sharedInstance].versioningViewController = self;
 }
 
 -(void)setUpConsole {
     self.consoleEvents = [[ConsoleEventArray alloc] init];
 }
 
-- (void)initializeTable {
+- (void)initialize {
 //    [self addStringEvent:@"Initializing instances from AWS."];
     NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in masternodesArray) {
         [self showTableContent:masternode];
 //        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
+    
+    [self.versionCoreButton removeAllItems];
+    [self.versionSentinelButton removeAllItems];
 }
 
 -(void)showTableContent:(NSManagedObject*)object
@@ -91,6 +99,8 @@
         return;
     }
     NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    [self addStringEvent:@"Fetching information."];
+    self.selectedObject = object;
     
     //Show current git head
     if([[object valueForKey:@"gitCommit"] length] > 0) {
@@ -112,13 +122,13 @@
     }
     
     //Show repositories version
-    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed
-        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running) {
+    if ([[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial || [[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_SettingUp) {
         NSMutableArray *commitArrayData = [[DPVersioningController sharedInstance] getGitCommitInfo:object repositoryUrl:[object valueForKey:@"repositoryUrl"] onBranch:[object valueForKey:@"gitBranch"]];
         [self.versionCoreButton removeAllItems];
-        [self.versionCoreButton addItemsWithTitles:commitArrayData];
+        if(commitArrayData != nil) [self.versionCoreButton addItemsWithTitles:commitArrayData];
     }
     
+    [self addStringEvent:@"Fetched information."];
 }
 
 - (IBAction)refresh:(id)sender {
@@ -129,5 +139,24 @@
         [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
 }
+
+- (IBAction)updateCoreButton:(id)sender {
+    NSArray *coreHead = [[self.versionCoreButton.selectedItem title] componentsSeparatedByString:@","];
+    
+    if([coreHead count] == 3)
+    {
+        NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warnning!" message:@"Are you sure you already stopped dashd server before updating new version?"];
+        
+        if ([alert runModal] == NSAlertFirstButtonReturn) {
+            [[DPVersioningController sharedInstance] updateCore:[self.selectedObject valueForKey:@"publicIP"] repositoryUrl:[self.selectedObject valueForKey:@"repositoryUrl"] onBranch:[self.selectedObject valueForKey:@"gitBranch"] commitHead:[coreHead objectAtIndex:0]];
+        }
+    }
+    
+    
+}
+
+- (IBAction)updateSentinelButton:(id)sender {
+}
+
 
 @end

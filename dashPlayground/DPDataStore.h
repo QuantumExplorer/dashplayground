@@ -76,4 +76,12 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(NSArray*)getMessageObjectsFromMasternode:(NSManagedObject *)masternode;
 
+-(NSString*)getGithubAccessToken;
+
+-(void)setGithubAccessToken:(NSString *)githubAccessToken;
+
+-(NSString*)getGithubSshPath;
+
+-(void)setGithubSshPath:(NSString *)githubSshPath;
+
 @end

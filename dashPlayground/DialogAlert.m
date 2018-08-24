@@ -94,10 +94,11 @@ static NSString *const selectInfoWarning = @"Please make sure you already select
     return alert;
 }
 
--(NSString *)showAlertWithTextField:(NSString *)title message:(NSString*)message {
+-(NSString *)showAlertWithTextField:(NSString *)title message:(NSString*)message placeHolder:(NSString*)placeHolderStr {
     NSString *strMessage = [NSString stringWithFormat: @"%@", title];
     NSString *strInformative = [NSString stringWithFormat: @"%@", message];
     NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 300, 24)];
+    [input setPlaceholderString:placeHolderStr];
     
     NSAlert *alert = [[NSAlert alloc]init];
     [alert addButtonWithTitle:@"Ok"];
@@ -106,7 +107,9 @@ static NSString *const selectInfoWarning = @"Please make sure you already select
     [alert setInformativeText:strInformative];
     [alert setAccessoryView:input];
     
-    [alert runModal];
+//    [alert runModal];
+    
+    if ([alert runModal] != NSAlertFirstButtonReturn) return nil;
     
     return [input stringValue];
 }
@@ -123,7 +126,9 @@ static NSString *const selectInfoWarning = @"Please make sure you already select
     [alert setInformativeText:strInformative];
     [alert setAccessoryView:input];
     
-    [alert runModal];
+//    [alert runModal];
+    
+    if ([alert runModal] != NSAlertFirstButtonReturn) return nil;
     
     return [input stringValue];
 }

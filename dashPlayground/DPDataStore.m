@@ -17,6 +17,24 @@
 @synthesize githubUsername = _githubUsername;
 @synthesize githubPassword = _githubPassword;
 
+-(void)setGithubAccessToken:(NSString *)githubAccessToken {
+    [[NSUserDefaults standardUserDefaults] setObject:githubAccessToken forKey:@"githubAccessToken"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+-(NSString*)getGithubAccessToken {
+    return [[NSUserDefaults standardUserDefaults] stringForKey:@"githubAccessToken"];
+}
+
+-(void)setGithubSshPath:(NSString *)githubSshPath {
+    [[NSUserDefaults standardUserDefaults] setObject:githubSshPath forKey:@"githubSshPath"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+-(NSString*)getGithubSshPath {
+    return [[NSUserDefaults standardUserDefaults] stringForKey:@"githubSshPath"];
+}
+
 #pragma mark - Repositories
 
 -(NSArray*)allRepositories {

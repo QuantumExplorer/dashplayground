@@ -105,7 +105,7 @@ NSString *terminalHeadString = @"";
 - (IBAction)pressCheckDevnet:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     
-    NSString *chainName = [[DialogAlert sharedInstance] showAlertWithTextField:@"Checking devnet network" message:@"Please enter your devnet name."];
+    NSString *chainName = [[DialogAlert sharedInstance] showAlertWithTextField:@"Checking devnet network" message:@"Please enter your devnet name." placeHolder:@""];
     
     if([chainName length] == 0) {
         [self addStringEventToMasternodeConsole:@"Please make sure you already input your devnet name."];
@@ -323,7 +323,7 @@ NSString *terminalHeadString = @"";
 
 - (IBAction)setUp:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-    [self addStringEventToMasternodeConsole:@"Setting up sentinel on remotes..."];
+    [self addStringEventToMasternodeConsole:@"Setting up masternode on remotes..."];
     
     NSArray *masternodes = [self.arrayController.arrangedObjects allObjects];
     RepositoriesModalViewController *repoController = [[RepositoriesModalViewController alloc] init];
@@ -900,6 +900,45 @@ NSString *terminalHeadString = @"";
 //        self.createAmiButton.enabled = false;
 //    }
 }
+
+#pragma mark - Block Control
+
+- (IBAction)pressInvalidateButton:(id)sender {
+    
+    NSString *blockhash = [[DialogAlert sharedInstance] showAlertWithTextField:@"Validating Block" message:@"Please input block hash that you want to validate." placeHolder:@"hash"];
+    
+    if([blockhash length] > 0) {
+        [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Invalidating block hash %@", blockhash]];
+        
+        NSArray *masternodeObjects = [self.arrayController.arrangedObjects allObjects];
+        
+        [[DPMasternodeController sharedInstance] validateMasternodeBlock:masternodeObjects blockHash:blockhash clb:^(BOOL success, NSString *message) {
+            if(success == YES) {
+                [self addStringEventToMasternodeConsole:message];
+            }
+        }];
+    }
+}
+
+- (IBAction)pressReconsiderButton:(id)sender {
+    
+    NSString *blockhash = [[DialogAlert sharedInstance] showAlertWithTextField:@"Reconsidering Block" message:@"Please input block hash that you want to reconsider." placeHolder:@"hash"];
+    
+    if([blockhash length] > 0) {
+        [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Reconsidering block hash %@", blockhash]];
+        
+        NSArray *masternodeObjects = [self.arrayController.arrangedObjects allObjects];
+        
+        [[DPMasternodeController sharedInstance] validateMasternodeBlock:masternodeObjects blockHash:blockhash clb:^(BOOL success, NSString *message) {
+            if(success == YES) {
+                [self addStringEventToMasternodeConsole:message];
+            }
+        }];
+    }
+}
+
 
 #pragma mark - Singleton methods
 

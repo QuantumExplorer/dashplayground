@@ -8,13 +8,19 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "VersioningViewController.h"
 
-@interface DPVersioningController : NSObject
+@interface DPVersioningController : NSObject {
+    VersioningViewController *_versioningViewController;
+}
+@property(strong, nonatomic, readwrite) VersioningViewController *versioningViewController;
 
 +(DPVersioningController*)sharedInstance;
 
 - (NSMutableArray*)getGitCommitInfo:(NSManagedObject*)masternode repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch;
 
 - (NSMutableArray*)getGitCommitArrayData:(NSDictionary*)dict;
+
+- (void)updateCore:(NSString*)publicIP repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch commitHead:(NSString*)commitHead;
 
 @end

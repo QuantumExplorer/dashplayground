@@ -108,7 +108,7 @@
     return outputs;
 }
 
--(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashArrayInfoClb)clb forChain:(NSString*)chainNetwork {
+-(void)createTransaction:(NSInteger)count label:(NSString*)label amount:(NSUInteger)amount allObjects:(NSArray*)allObjects clb:(dashMutaArrayInfoClb)clb forChain:(NSString*)chainNetwork {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         //get local address
         NSMutableArray *addressArray = [[NSMutableArray alloc]init];

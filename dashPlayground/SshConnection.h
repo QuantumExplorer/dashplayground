@@ -22,6 +22,6 @@ typedef void (^dashPercentageClb)(NSString * call,float percentage);
 -(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh  onBranch:(NSString*)branchName error:(NSError*)error dashClb:(dashClb)clb;
 -(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error dashClb:(dashClb)clb;
 -(void)sendWriteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error percentageClb:(dashPercentageClb)clb;
--(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error dashClb:(dashClb)clb;
+-(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error mainThread:(BOOL)mainThread dashClb:(dashClb)clb;
 
 @end
