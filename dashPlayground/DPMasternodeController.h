@@ -79,4 +79,6 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 -(InstanceState)stateForStateName:(NSString*)string;
 
+- (void)validateMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb;
+
 @end

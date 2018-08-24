@@ -2799,6 +2799,41 @@
     });
 }
 
+#pragma mark - Block Control
+- (void)validateMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        for(NSManagedObject* masternode in masternodeObjects) {
+            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+                
+                NSString *response = [[DPMasternodeController sharedInstance] sendRPCCommandString:[NSString stringWithFormat:@"invalidateblock %@", blockHash] toMasternode:masternode];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@(0) forKey:@"isSelected"];
+                });
+                response = [NSString stringWithFormat:@"%@: %@", [masternode valueForKey:@"publicIP"], response];
+                clb(YES, response);
+            }
+        }
+    });
+}
+
+- (void)reconsiderMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        for(NSManagedObject* masternode in masternodeObjects) {
+            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+                
+                NSString *response = [[DPMasternodeController sharedInstance] sendRPCCommandString:[NSString stringWithFormat:@"reconsiderblock %@", blockHash] toMasternode:masternode];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@(0) forKey:@"isSelected"];
+                });
+                response = [NSString stringWithFormat:@"%@: %@", [masternode valueForKey:@"publicIP"], response];
+                clb(YES, response);
+            }
+        }
+    });
+}
+
 #pragma mark - Singleton methods
 
 + (DPMasternodeController *)sharedInstance
