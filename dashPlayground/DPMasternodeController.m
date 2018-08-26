@@ -2834,6 +2834,23 @@
     });
 }
 
+- (void)clearBannedOnNodes:(NSArray*)masternodeObjects withCallback:(dashClb)clb {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        for(NSManagedObject* masternode in masternodeObjects) {
+            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+                
+                NSString *response = [[DPMasternodeController sharedInstance] sendRPCCommandString:@"clearbanned" toMasternode:masternode];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@(0) forKey:@"isSelected"];
+                });
+                response = [NSString stringWithFormat:@"%@: %@", [masternode valueForKey:@"publicIP"], response];
+                clb(YES, response);
+            }
+        }
+    });
+}
+
 #pragma mark - Singleton methods
 
 + (DPMasternodeController *)sharedInstance

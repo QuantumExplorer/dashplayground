@@ -495,7 +495,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="8Fq-VX-H3b">
-                                                            <rect key="frame" x="221" y="1" width="170" height="17"/>
+                                                            <rect key="frame" x="220.5" y="1" width="170" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GU0-SI-f6f">
@@ -532,7 +532,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="vgE-Sq-3BD">
-                                                            <rect key="frame" x="394" y="1" width="270" height="17"/>
+                                                            <rect key="frame" x="393.5" y="1" width="270" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o2H-2j-ISd">
@@ -569,7 +569,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="P0n-jZ-5TG">
-                                                            <rect key="frame" x="667" y="1" width="150" height="17"/>
+                                                            <rect key="frame" x="666.5" y="1" width="150" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bNR-uS-c8s">
@@ -606,7 +606,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="iCa-cl-50z">
-                                                            <rect key="frame" x="820" y="1" width="639" height="17"/>
+                                                            <rect key="frame" x="819.5" y="1" width="639" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dZL-DS-IOn">
@@ -1485,7 +1485,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="30R-mc-lr7">
-                                                            <rect key="frame" x="271" y="1" width="186" height="17"/>
+                                                            <rect key="frame" x="270.5" y="1" width="186" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cxe-WO-GlG">
@@ -1641,7 +1641,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="97g-cB-D1R">
-                                                            <rect key="frame" x="885" y="1" width="127" height="17"/>
+                                                            <rect key="frame" x="884.5" y="1" width="127" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3T7-Cd-buJ">
@@ -1717,7 +1717,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="4Zt-Hb-ftS">
-                                                            <rect key="frame" x="1015" y="1" width="124" height="17"/>
+                                                            <rect key="frame" x="1014.5" y="1" width="124" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a1f-Dn-spw">
@@ -1797,7 +1797,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="74S-i0-TXU">
-                                                            <rect key="frame" x="1293" y="1" width="461" height="17"/>
+                                                            <rect key="frame" x="1292.5" y="1" width="461" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Evz-eT-9R0">
@@ -2014,13 +2014,13 @@
                                 </constraints>
                             </box>
                             <box title="Sentinel Control" titlePosition="belowTop" translatesAutoresizingMaskIntoConstraints="NO" id="MyD-tL-GBa">
-                                <rect key="frame" x="380" y="105" width="161" height="142"/>
+                                <rect key="frame" x="380" y="133" width="161" height="114"/>
                                 <view key="contentView" id="MbY-h4-MQo">
-                                    <rect key="frame" x="2" y="2" width="157" height="122"/>
+                                    <rect key="frame" x="2" y="2" width="157" height="94"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="48H-oB-LYa">
-                                            <rect key="frame" x="14" y="84" width="130" height="32"/>
+                                            <rect key="frame" x="14" y="56" width="130" height="32"/>
                                             <buttonCell key="cell" type="push" title="Set Up/Update" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kHc-e0-1ki">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -2030,23 +2030,13 @@
                                             </buttonCell>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cqs-XI-SNq">
-                                            <rect key="frame" x="14" y="59" width="129" height="32"/>
+                                            <rect key="frame" x="14" y="31" width="129" height="32"/>
                                             <buttonCell key="cell" type="push" title="Check" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s3B-Vu-e3W">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="checkSentinel:" target="Inw-N2-PBT" id="hBO-UE-QMP"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xm7-Gg-k6v">
-                                            <rect key="frame" x="14" y="32" width="130" height="32"/>
-                                            <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="le2-is-EfX">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="checkSentinel:" target="Inw-N2-PBT" id="QUy-wC-fMH"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4sb-l9-i38">
@@ -2063,13 +2053,10 @@
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="4sb-l9-i38" secondAttribute="trailing" constant="20" id="4a3-pL-JbV"/>
                                         <constraint firstItem="48H-oB-LYa" firstAttribute="leading" secondItem="MbY-h4-MQo" secondAttribute="leading" constant="20" id="Ecz-dK-OY4"/>
-                                        <constraint firstItem="xm7-Gg-k6v" firstAttribute="leading" secondItem="MbY-h4-MQo" secondAttribute="leading" constant="20" id="H6O-qI-OBu"/>
                                         <constraint firstItem="48H-oB-LYa" firstAttribute="top" secondItem="MbY-h4-MQo" secondAttribute="top" constant="10" id="Nrl-aw-A8S"/>
-                                        <constraint firstItem="xm7-Gg-k6v" firstAttribute="top" secondItem="cqs-XI-SNq" secondAttribute="bottom" constant="6" id="QmV-9J-w8f"/>
                                         <constraint firstItem="4sb-l9-i38" firstAttribute="leading" secondItem="MbY-h4-MQo" secondAttribute="leading" constant="20" id="a1J-M4-DNo"/>
                                         <constraint firstAttribute="bottom" secondItem="4sb-l9-i38" secondAttribute="bottom" constant="13" id="dNa-H2-HpI"/>
-                                        <constraint firstAttribute="trailing" secondItem="xm7-Gg-k6v" secondAttribute="trailing" constant="19" id="dbN-bV-3sv"/>
-                                        <constraint firstItem="4sb-l9-i38" firstAttribute="top" secondItem="xm7-Gg-k6v" secondAttribute="bottom" constant="5" id="hEs-S0-UaL"/>
+                                        <constraint firstItem="4sb-l9-i38" firstAttribute="top" secondItem="cqs-XI-SNq" secondAttribute="bottom" constant="4" id="lsU-cP-m76"/>
                                         <constraint firstAttribute="trailing" secondItem="48H-oB-LYa" secondAttribute="trailing" constant="19" id="ml0-bj-wxU"/>
                                         <constraint firstAttribute="trailing" secondItem="cqs-XI-SNq" secondAttribute="trailing" constant="20" id="t9q-66-GQK"/>
                                         <constraint firstItem="cqs-XI-SNq" firstAttribute="top" secondItem="48H-oB-LYa" secondAttribute="bottom" constant="4" id="tGn-Gb-oiU"/>
@@ -2077,7 +2064,6 @@
                                     </constraints>
                                 </view>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="136" id="MUM-49-0gd"/>
                                     <constraint firstAttribute="width" constant="155" id="vsV-AH-YSw"/>
                                 </constraints>
                             </box>
@@ -2253,13 +2239,13 @@
                                 </constraints>
                             </box>
                             <box title="Block Control" titlePosition="belowTop" translatesAutoresizingMaskIntoConstraints="NO" id="LBd-BY-KuM">
-                                <rect key="frame" x="380" y="16" width="161" height="87"/>
+                                <rect key="frame" x="380" y="19" width="161" height="112"/>
                                 <view key="contentView" id="AOZ-2Q-q1Q">
-                                    <rect key="frame" x="2" y="2" width="157" height="67"/>
+                                    <rect key="frame" x="2" y="2" width="157" height="92"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S8y-3h-nu0">
-                                            <rect key="frame" x="14" y="34" width="130" height="32"/>
+                                            <rect key="frame" x="14" y="59" width="130" height="32"/>
                                             <buttonCell key="cell" type="push" title="Invalidate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ypr-Pa-e0Y">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -2269,7 +2255,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="R1P-zk-oiR">
-                                            <rect key="frame" x="14" y="8" width="130" height="32"/>
+                                            <rect key="frame" x="14" y="33" width="130" height="32"/>
                                             <buttonCell key="cell" type="push" title="Reconsider" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hEt-Hm-mF1">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -2278,19 +2264,31 @@
                                                 <action selector="pressReconsiderButton:" target="Inw-N2-PBT" id="EFl-k5-bSA"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9EN-qf-Ren">
+                                            <rect key="frame" x="14" y="8" width="130" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Clear Banned" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dDa-Pe-QEN">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="pressClearBannedButton:" target="Inw-N2-PBT" id="UR8-cI-qeS"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="S8y-3h-nu0" firstAttribute="top" secondItem="AOZ-2Q-q1Q" secondAttribute="top" constant="5" id="36F-Nr-a3m"/>
-                                        <constraint firstAttribute="bottom" secondItem="R1P-zk-oiR" secondAttribute="bottom" constant="15" id="DzB-z1-8qR"/>
+                                        <constraint firstAttribute="bottom" secondItem="9EN-qf-Ren" secondAttribute="bottom" constant="15" id="4pG-GO-hag"/>
+                                        <constraint firstItem="9EN-qf-Ren" firstAttribute="top" secondItem="R1P-zk-oiR" secondAttribute="bottom" constant="4" id="CFh-zG-vgN"/>
                                         <constraint firstItem="S8y-3h-nu0" firstAttribute="leading" secondItem="AOZ-2Q-q1Q" secondAttribute="leading" constant="20" id="G63-pP-NZQ"/>
                                         <constraint firstAttribute="trailing" secondItem="R1P-zk-oiR" secondAttribute="trailing" constant="19" id="J0a-Ws-guC"/>
                                         <constraint firstItem="R1P-zk-oiR" firstAttribute="leading" secondItem="AOZ-2Q-q1Q" secondAttribute="leading" constant="20" id="RJ6-jl-gmL"/>
+                                        <constraint firstItem="9EN-qf-Ren" firstAttribute="leading" secondItem="R1P-zk-oiR" secondAttribute="leading" id="The-Q0-VMR"/>
                                         <constraint firstAttribute="trailing" secondItem="S8y-3h-nu0" secondAttribute="trailing" constant="19" id="Xqz-oX-R4y"/>
+                                        <constraint firstItem="9EN-qf-Ren" firstAttribute="trailing" secondItem="R1P-zk-oiR" secondAttribute="trailing" id="yLy-JN-hc7"/>
                                         <constraint firstItem="R1P-zk-oiR" firstAttribute="top" secondItem="S8y-3h-nu0" secondAttribute="bottom" constant="5" id="zOt-NE-Wsb"/>
                                     </constraints>
                                 </view>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="81" id="Bf0-2n-hIy"/>
                                     <constraint firstAttribute="width" constant="155" id="TfK-xa-gp7"/>
                                 </constraints>
                             </box>
@@ -2432,7 +2430,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="Fxq-bu-yUr">
-                                                            <rect key="frame" x="167" y="1" width="176" height="17"/>
+                                                            <rect key="frame" x="166.5" y="1" width="176" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="dhc-Fw-PVJ">
@@ -2518,7 +2516,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="eBv-5s-6l8">
-                                                            <rect key="frame" x="548" y="1" width="149" height="17"/>
+                                                            <rect key="frame" x="547.5" y="1" width="149" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Hlu-bl-N4j">
@@ -3800,7 +3798,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="DCf-h0-MBW">
-                                                            <rect key="frame" x="234" y="1" width="104" height="17"/>
+                                                            <rect key="frame" x="233.5" y="1" width="104" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="RWR-Sq-E8J">
@@ -3880,7 +3878,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="A9g-Sa-Nbt">
-                                                            <rect key="frame" x="341" y="1" width="101" height="17"/>
+                                                            <rect key="frame" x="340.5" y="1" width="101" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="WIe-E4-5OY">
@@ -3990,7 +3988,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="7Xe-wi-fzg">
-                                                            <rect key="frame" x="100" y="1" width="105" height="17"/>
+                                                            <rect key="frame" x="99.5" y="1" width="106" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QbX-k7-OUK">
@@ -4285,7 +4283,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="IaB-xg-qzL">
-                                                            <rect key="frame" x="294" y="1" width="88" height="17"/>
+                                                            <rect key="frame" x="293.5" y="1" width="88" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="uyp-Gg-6iu">
@@ -4445,7 +4443,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView id="VZF-UZ-IHc">
-                                                            <rect key="frame" x="385" y="1" width="81" height="17"/>
+                                                            <rect key="frame" x="384.5" y="1" width="81" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="kUr-f0-iP0">

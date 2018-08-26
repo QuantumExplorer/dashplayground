@@ -931,12 +931,27 @@ NSString *terminalHeadString = @"";
         
         NSArray *masternodeObjects = [self.arrayController.arrangedObjects allObjects];
         
-        [[DPMasternodeController sharedInstance] validateMasternodeBlock:masternodeObjects blockHash:blockhash clb:^(BOOL success, NSString *message) {
+        [[DPMasternodeController sharedInstance] reconsiderMasternodeBlock:masternodeObjects blockHash:blockhash clb:^(BOOL success, NSString *message) {
             if(success == YES) {
                 [self addStringEventToMasternodeConsole:message];
             }
         }];
     }
+}
+
+- (IBAction)pressClearBannedButton:(id)sender {
+    
+
+        [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    [self addStringEventToMasternodeConsole:@"Clear Banned for Nodes:"];
+        
+        NSArray *masternodeObjects = [self.arrayController.arrangedObjects allObjects];
+        
+        [[DPMasternodeController sharedInstance] clearBannedOnNodes:masternodeObjects withCallback:^(BOOL success, NSString *message) {
+            if(success == YES) {
+                [self addStringEventToMasternodeConsole:message];
+            }
+        }];
 }
 
 
