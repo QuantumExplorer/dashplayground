@@ -1079,6 +1079,41 @@
     }];
 }
 
+#pragma mark - Reseting Data
+
+-(void)wipeDataOnRemote:(NSManagedObject*)masternode onClb:(dashClb)clb {
+    if([masternode valueForKey:@"publicIP"] == nil) return;
+    __block NSString * chainNetwork = [masternode valueForKey:@"chainNetwork"];
+    if (!chainNetwork || [chainNetwork isEqualToString:@""]) return;
+    chainNetwork = [chainNetwork stringByReplacingOccurrencesOfString:@"=" withString:@"-"];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            
+            if(success != YES) return;
+            
+            __block BOOL isSuccess = YES;
+            NSError *error = nil;
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/.dashcore/%@",chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                isSuccess = success;
+            }];
+            if(isSuccess != YES) return;
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"mv ~/.dashcore/%@/wallet.dat ~/.dashcore/%@/wallet",chainNetwork,chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            }];
+
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/.dashcore/%@; (rm *.dat || true) && (rm *.log || true) && rm -rf blocks && rm -rf chainstate && rm -rf database && rm -rf evodb",chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            }];
+            
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"mv ~/.dashcore/%@/wallet ~/.dashcore/%@/wallet.dat",chainNetwork,chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            }];
+        }];
+    });
+}
+
+
 #pragma mark - Start Remote
 
 - (void)startMasternodeOnRemote:(NSManagedObject*)masternode localChain:(NSString*)localChain clb:(dashInfoClb)clb {
@@ -1692,12 +1727,12 @@
 }
 
 -(void)checkMasternodeIsProperlyInstalled:(NSManagedObject*)masternode onSSH:(NMSSHSession*)ssh {
-    [self IsMasternodeIsProperlyInstalled:masternode onSSH:ssh dashClb:^(BOOL success, NSString *message) {
+    [self checkMasternodeIsProperlyInstalled:masternode onSSH:ssh dashClb:^(BOOL success, NSString *message) {
         
     }];
 }
 
--(void)IsMasternodeIsProperlyInstalled:(NSManagedObject*)masternode onSSH:(NMSSHSession*)ssh dashClb:(dashClb)clb {
+-(void)checkMasternodeIsProperlyInstalled:(NSManagedObject*)masternode onSSH:(NMSSHSession*)ssh dashClb:(dashClb)clb {
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
@@ -2841,6 +2876,22 @@
             if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
                 
                 NSString *response = [[DPMasternodeController sharedInstance] sendRPCCommandString:@"clearbanned" toMasternode:masternode];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [masternode setValue:@(0) forKey:@"isSelected"];
+                });
+                response = [NSString stringWithFormat:@"%@: %@", [masternode valueForKey:@"publicIP"], response];
+                clb(YES, response);
+            }
+        }
+    });
+}
+
+- (void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        for(NSManagedObject* masternode in masternodeObjects) {
+            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+                
+                NSString *response = [[DPMasternodeController sharedInstance] sendRPCCommandString:@"getblockchaininfo" toMasternode:masternode];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [masternode setValue:@(0) forKey:@"isSelected"];
                 });

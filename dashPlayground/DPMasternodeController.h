@@ -81,6 +81,8 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 - (void)validateMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb;
 - (void)reconsiderMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb;
+- (void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashClb)clb;
 - (void)clearBannedOnNodes:(NSArray*)masternodeObjects withCallback:(dashClb)clb;
+- (void)wipeDataOnRemote:(NSManagedObject*)masternode onClb:(dashClb)clb;
 
 @end

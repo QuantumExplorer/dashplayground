@@ -67,7 +67,9 @@
         else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
             if([[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Terminated) return;
             [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-                [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
+                if (success) {
+                    [[DPMasternodeController sharedInstance] checkMasternodeIsProperlyInstalled:masternode onSSH:sshSession];
+                }
             }];
         }
         else {
