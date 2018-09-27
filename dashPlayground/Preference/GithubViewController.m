@@ -28,7 +28,7 @@
 - (void)initialize {
     if([[DPDataStore sharedInstance] getGithubAccessToken] != nil) self.accessTokenTextField.stringValue = [[DPDataStore sharedInstance] getGithubAccessToken];
     
-    if([[DPDataStore sharedInstance] getGithubSshPath] != nil) self.sshPathTextField.stringValue = [[DPDataStore sharedInstance] getGithubSshPath];
+    if([[DPDataStore sharedInstance] getGithubSSHPath] != nil) self.sshPathTextField.stringValue = [[DPDataStore sharedInstance] getGithubSSHPath];
 }
 
 - (IBAction)browseSshPath:(id)sender {
@@ -49,7 +49,7 @@
 
 - (IBAction)pressSave:(id)sender {
     if([self.accessTokenTextField.stringValue length] != 0) [[DPDataStore sharedInstance] setGithubAccessToken:self.accessTokenTextField.stringValue];
-    if([self.sshPathTextField.stringValue length] != 0) [[DPDataStore sharedInstance] setGithubSshPath:self.sshPathTextField.stringValue];
+    if([self.sshPathTextField.stringValue length] != 0) [[DPDataStore sharedInstance] setGithubSSHPath:self.sshPathTextField.stringValue];
     
     [self dismissController:sender];
 }

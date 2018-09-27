@@ -89,6 +89,8 @@
 		FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
 		FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */; };
 		FBBFEB5D1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */; };
+		FBEBB105215D5E430058E7C3 /* NSMutableData+Security.m in Sources */ = {isa = PBXBuildFile; fileRef = FB670633215D59C2005A658E /* NSMutableData+Security.m */; };
+		FBEBB107215D5E490058E7C3 /* NSData+Security.m in Sources */ = {isa = PBXBuildFile; fileRef = FB67062F215D58B0005A658E /* NSData+Security.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -327,6 +329,11 @@
 		FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPRepositoryController.h; sourceTree = "<group>"; };
 		FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPRepositoryController.m; sourceTree = "<group>"; };
 		FB5A31CB1E9EAD21003D4DD8 /* DashCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashCallbacks.h; sourceTree = "<group>"; };
+		FB67062F215D58B0005A658E /* NSData+Security.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Security.m"; sourceTree = "<group>"; };
+		FB670630215D58B0005A658E /* NSData+Security.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Security.h"; sourceTree = "<group>"; };
+		FB670632215D58CC005A658E /* IntTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntTypes.h; sourceTree = "<group>"; };
+		FB670633215D59C2005A658E /* NSMutableData+Security.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableData+Security.m"; sourceTree = "<group>"; };
+		FB670634215D59C2005A658E /* NSMutableData+Security.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableData+Security.h"; sourceTree = "<group>"; };
 		FB96BFB61F0B90D900220B4B /* ConsoleEventArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConsoleEventArray.h; sourceTree = "<group>"; };
 		FB96BFB71F0B90D900220B4B /* ConsoleEventArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConsoleEventArray.m; sourceTree = "<group>"; };
 		FB96BFB91F0B90F200220B4B /* ConsoleEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConsoleEvent.h; sourceTree = "<group>"; };
@@ -676,6 +683,11 @@
 				A516B45620908324009A59C0 /* DialogAlert.m */,
 				A558E0C420B54E3C00E853DB /* SshConnection.h */,
 				A558E0C520B54E3C00E853DB /* SshConnection.m */,
+				FB670632215D58CC005A658E /* IntTypes.h */,
+				FB670630215D58B0005A658E /* NSData+Security.h */,
+				FB67062F215D58B0005A658E /* NSData+Security.m */,
+				FB670634215D59C2005A658E /* NSMutableData+Security.h */,
+				FB670633215D59C2005A658E /* NSMutableData+Security.m */,
 				A52327FB2126A6BC0007AA33 /* GithubAPI.h */,
 				A52327FC2126A6BC0007AA33 /* GithubAPI.m */,
 			);
@@ -782,7 +794,7 @@
 				TargetAttributes = {
 					FB2906611E85799F00A31092 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 9P659Y78B6;
+						DevelopmentTeam = 44RJ69WHFF;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
@@ -948,6 +960,7 @@
 				A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */,
 				A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */,
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
+				FBEBB107215D5E490058E7C3 /* NSData+Security.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
 				A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */,
@@ -985,6 +998,7 @@
 				A5604828210B14AF00DA161D /* VersioningViewController.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */,
+				FBEBB105215D5E430058E7C3 /* NSMutableData+Security.m in Sources */,
 				A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */,
 				FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				A5782D212095E9A400CA603A /* PreferenceData.m in Sources */,
@@ -1150,7 +1164,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9P659Y78B6;
+				DEVELOPMENT_TEAM = 44RJ69WHFF;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/dashPlayground",
@@ -1179,7 +1193,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9P659Y78B6;
+				DEVELOPMENT_TEAM = 44RJ69WHFF;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/dashPlayground",

@@ -9,30 +9,31 @@
 #import "DPDataStore.h"
 #import "AppDelegate.h"
 #import "NSArray+SWAdditions.h"
+#import "NSData+Security.h"
 
+#define GITHUB_ACCESS_TOKEN @"GITHUB_ACCESS_TOKEN"
+#define GITHUB_SSH_PATH @"GITHUB_SSH_PATH"
 
 @implementation DPDataStore
 
-@synthesize chainNetwork = _chainNetwork;
-@synthesize githubUsername = _githubUsername;
-@synthesize githubPassword = _githubPassword;
-
 -(void)setGithubAccessToken:(NSString *)githubAccessToken {
-    [[NSUserDefaults standardUserDefaults] setObject:githubAccessToken forKey:@"githubAccessToken"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    setKeychainString(githubAccessToken, GITHUB_ACCESS_TOKEN, YES);
 }
 
 -(NSString*)getGithubAccessToken {
-    return [[NSUserDefaults standardUserDefaults] stringForKey:@"githubAccessToken"];
+    NSError * error = nil;
+    NSString * string = getKeychainString(GITHUB_ACCESS_TOKEN, &error);
+    if (!error) return string;
+    return @"";
 }
 
--(void)setGithubSshPath:(NSString *)githubSshPath {
-    [[NSUserDefaults standardUserDefaults] setObject:githubSshPath forKey:@"githubSshPath"];
+-(void)setGithubSSHPath:(NSString *)githubSshPath {
+    [[NSUserDefaults standardUserDefaults] setObject:githubSshPath forKey:GITHUB_SSH_PATH];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
--(NSString*)getGithubSshPath {
-    return [[NSUserDefaults standardUserDefaults] stringForKey:@"githubSshPath"];
+-(NSString*)getGithubSSHPath {
+    return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_SSH_PATH];
 }
 
 #pragma mark - Repositories

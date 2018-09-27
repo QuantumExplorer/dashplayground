@@ -12,6 +12,6 @@
 
 +(GithubAPI*)sharedInstance;
 
-- (NSDictionary*)getSingleCommitDictionaryData:(NSString*)owner Repo:(NSString*)repo Commit:(NSString*)commitSha;
+- (NSDictionary*)getSingleCommitDictionaryData:(NSString*)owner repository:(NSString*)repo commit:(NSString*)commitSha;
 
 @end

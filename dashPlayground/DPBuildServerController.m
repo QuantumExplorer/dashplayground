@@ -211,7 +211,7 @@
                     [buildDict setValue:[messageArray objectAtIndex:hashIndex] forKey:@"commitSha"];
                     
                     NSString *commitSha = [[messageArray objectAtIndex:hashIndex] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-                    NSDictionary *commitDict = [[GithubAPI sharedInstance] getSingleCommitDictionaryData:gitOwner Repo:gitRepo Commit:commitSha];
+                    NSDictionary *commitDict = [[GithubAPI sharedInstance] getSingleCommitDictionaryData:gitOwner repository:gitRepo commit:commitSha];
                     
                     NSString *commitMsg = [NSString stringWithFormat:@"%@", [[commitDict valueForKey:@"commit"] valueForKey:@"message"]];
                     if([[[commitDict valueForKey:@"commit"] valueForKey:@"message"] length] > 20) {

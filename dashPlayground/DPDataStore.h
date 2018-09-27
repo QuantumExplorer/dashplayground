@@ -12,15 +12,11 @@
 
 typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
-@interface DPDataStore : NSObject {
-    NSString *_chainNetwork;
-    NSString *_githubUsername;
-    NSString *_githubPassword;
-}
+@interface DPDataStore : NSObject
 
-@property(strong, nonatomic, readwrite) NSString *chainNetwork;
-@property(strong, nonatomic, readwrite) NSString *githubUsername;
-@property(strong, nonatomic, readwrite) NSString *githubPassword;
+@property(strong, nonatomic) NSString *chainNetwork;
+@property(strong, nonatomic) NSString *githubUsername;
+@property(strong, nonatomic) NSString *githubPassword;
 
 +(DPDataStore*)sharedInstance;
 
@@ -80,8 +76,8 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(void)setGithubAccessToken:(NSString *)githubAccessToken;
 
--(NSString*)getGithubSshPath;
+-(NSString*)getGithubSSHPath;
 
--(void)setGithubSshPath:(NSString *)githubSshPath;
+-(void)setGithubSSHPath:(NSString *)githubSshPath;
 
 @end
