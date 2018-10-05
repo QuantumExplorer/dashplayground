@@ -21,6 +21,7 @@
 #import <NMSSH/NMSSH.h>
 #import "SentinelStateTransformer.h"
 #import "ChainSelectionViewController.h"
+#import "Masternode+CoreDataClass.h"
 
 @interface MasternodesViewController ()
 
@@ -147,18 +148,19 @@ NSString *terminalHeadString = @"";
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Adding node to local..."];
     
-    NSArray *selectedMasternode = [NSArray array];
-    NSManagedObject *masternodeObject;
+    NSMutableArray <Masternode*> * selectedMasternodes = [NSMutableArray array];
+    Masternode *masternode = nil;
     int countMasternode = 0;
     
-    for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+    for(Masternode *object in [self.arrayController.arrangedObjects allObjects])
     {
         if([[object valueForKey:@"isSelected"] integerValue] == 1) {
-            selectedMasternode = [selectedMasternode arrayByAddingObject:object];
+            [selectedMasternodes addObject:object];
             countMasternode = countMasternode+1;
-            masternodeObject = object;
+            masternode = (Masternode*)object;
         }
     }
+    if (!masternode || ![selectedMasternodes count]) return;
     
     if(countMasternode > 1) {
         [self addStringEventToMasternodeConsole:@"Main node can be chosen only 1."];
@@ -170,44 +172,47 @@ NSString *terminalHeadString = @"";
         return;
     }
     
-    BOOL isMainNodeSetUp = [[DPMasternodeController sharedInstance] setUpMainNode:masternodeObject];
-    if(isMainNodeSetUp == NO) return;
-    
-    if([selectedMasternode count] != 0) {
-        for(NSManagedObject *selectedObject in selectedMasternode)
-        {
-            for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
-            {
-                if([[object valueForKey:@"isSelected"] integerValue] != 1 && [object valueForKey:@"publicIP"]) {
-                    if(![[selectedObject valueForKey:@"chainNetwork"] isEqualToString:[object valueForKey:@"chainNetwork"]]) continue;
-                    
-                    [[DPMasternodeController sharedInstance] addNodeToRemote:object toPublicIP:[selectedObject valueForKey:@"publicIP"] clb:^(BOOL success, NSString *message) {
-                        if(message == nil) {
-                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: unable to connect dash core server.", [object valueForKey:@"publicIP"]]];
+    [[DPMasternodeController sharedInstance] setUpMainNode:masternode clb:^(BOOL active) {
+        if (active) {
+                for(Masternode *selectedMasternode in selectedMasternodes)
+                {
+                    for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
+                    {
+                        if(!masternode.isSelected && masternode.publicIP) {
+                            if(![selectedMasternode.chainNetwork isEqualToString:masternode.chainNetwork]) continue;
+                            
+                            [[DPMasternodeController sharedInstance] addNodeToRemote:masternode toPublicIP:selectedMasternode.publicIP clb:^(BOOL success, NSString *message) {
+                                if(message == nil) {
+                                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: unable to connect dash core server.", masternode.publicIP]];
+                                }
+                                else if([message length] == 0 || [message length] == 1) {
+                                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", masternode.publicIP, selectedMasternode.publicIP]];
+                                }
+                                else {
+                                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: %@", masternode.publicIP, message]];
+                                }
+                            }];
                         }
-                        else if([message length] == 0 || [message length] == 1) {
-                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", [object valueForKey:@"publicIP"], [selectedObject valueForKey:@"publicIP"]]];
+                    }
+                }
+                
+                for(Masternode *selectedMasternode in selectedMasternodes)
+                {
+                    [[DPMasternodeController sharedInstance] addNodeToLocal:selectedMasternode clb:^(BOOL success, NSString *message) {
+                        if([message length] == 0 || [message length] == 1) {
+                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: added node %@ successfully.", [selectedMasternode valueForKey:@"publicIP"]]];
                         }
                         else {
-                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: %@", [object valueForKey:@"publicIP"], message]];
+                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: %@ : %@", [selectedMasternode valueForKey:@"publicIP"], message]];
                         }
                     }];
                 }
             }
-        }
         
-        for(NSManagedObject *selectedObject in selectedMasternode)
-        {
-            [[DPMasternodeController sharedInstance] addNodeToLocal:selectedObject clb:^(BOOL success, NSString *message) {
-                if([message length] == 0 || [message length] == 1) {
-                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: added node %@ successfully.", [selectedObject valueForKey:@"publicIP"]]];
-                }
-                else {
-                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: %@ : %@", [selectedObject valueForKey:@"publicIP"], message]];
-                }
-            }];
-        }
-    }
+    }];
+
+    
+    
 //    [self deSelectAll];
 }
 

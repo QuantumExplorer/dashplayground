@@ -47,5 +47,6 @@
 @dynamic version;
 @dynamic branch;
 @dynamic sentinelBranch;
+@dynamic lastKnownHeight;
 
 @end

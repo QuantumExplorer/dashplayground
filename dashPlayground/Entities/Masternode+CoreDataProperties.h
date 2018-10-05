@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int16_t dashDriveState;
 @property (nullable, nonatomic, copy) NSDate *debugLastFetched;
 @property (nonatomic) int32_t debugLineCount;
+@property (nonatomic) int64_t lastKnownHeight;
 @property (nullable, nonatomic, copy) NSString *debugOutput;
 @property (nullable, nonatomic, copy) NSString *gitBranch;
 @property (nullable, nonatomic, copy) NSString *gitCommit;
