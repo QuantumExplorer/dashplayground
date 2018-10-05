@@ -30,7 +30,6 @@
 @dynamic instanceType;
 @dynamic isSelected;
 @dynamic key;
-@dynamic lastBlock;
 @dynamic masternodeState;
 @dynamic operationPercentageDone;
 @dynamic publicIP;

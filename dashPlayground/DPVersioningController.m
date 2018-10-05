@@ -14,12 +14,13 @@
 #import "SshConnection.h"
 #import "VersioningViewController.h"
 #import "DPBuildServerController.h"
+#import "Masternode+CoreDataClass.h"
 
 @implementation DPVersioningController
 
 @synthesize versioningViewController = _versioningViewController;
 
-- (NSMutableArray*)getGitCommitInfo:(NSManagedObject*)masternode repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch {
+- (NSMutableArray*)getGitCommitInfo:(Masternode*)masternode repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch {
     
     if([repositoryUrl length] > 1 && [gitBranch length] > 1) {
         repositoryUrl = [repositoryUrl stringByReplacingOccurrencesOfString:@"\n" withString:@""];

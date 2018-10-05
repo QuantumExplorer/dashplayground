@@ -32,7 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int16_t instanceType;
 @property (nonatomic) BOOL isSelected;
 @property (nullable, nonatomic, copy) NSString *key;
-@property (nonatomic) int64_t lastBlock;
 @property (nonatomic) int16_t masternodeState;
 @property (nonatomic) float operationPercentageDone;
 @property (nullable, nonatomic, copy) NSString *publicIP;

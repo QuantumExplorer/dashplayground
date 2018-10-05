@@ -1667,34 +1667,6 @@
                 return clb(YES,YES,nil);
             }
         });
-        
-        
-        //        CkoSsh * ssh = [self sshIn:publicIP];
-        //        if (!ssh) {
-        //            dispatch_async(dispatch_get_main_queue(), ^{
-        //                clb(NO,NO,@"Could not ssh in");
-        //            });
-        //            return;
-        //        }
-        //        //  Send some commands and get the output.
-        //        NSString *strOutput = [[ssh QuickCommand: @"ls src | grep '^dash$'" charset: @"ansi"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        //        if (ssh.LastMethodSuccess != YES) {
-        //            NSLog(@"%@",ssh.LastErrorText);
-        //            [ssh Disconnect];
-        //            dispatch_async(dispatch_get_main_queue(), ^{
-        //                clb(NO,NO,@"ssh failure");
-        //            });
-        //            return;
-        //        }
-        //        [ssh Disconnect];
-        //
-        //        dispatch_async(dispatch_get_main_queue(), ^{
-        //            if ([strOutput isEqualToString:@"dash"]) {
-        //                return clb(YES,YES,nil);
-        //            }else {
-        //                return clb(YES,NO,nil);
-        //            }
-        //        });
     });
 }
 
@@ -1852,9 +1824,10 @@
 }
 
 -(void)updateMasternodeAttributes:(Masternode*)masternode {
-    __block NSString *publicIP = [masternode valueForKey:@"publicIP"];
-    __block NSString *rpcPassword = [masternode valueForKey:@"rpcPassword"];
-    __block NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
+    __block NSString *publicIP = masternode.publicIP;
+    __block NSString *rpcPassword = masternode.rpcPassword;
+    __block NSString *chainNetwork = masternode.chainNetwork;
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
             if(success != YES) return;
@@ -1939,18 +1912,10 @@
             }
             
             //check value "SyncState"
-
+            
             [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:publicIP rpcPassword:rpcPassword forChain:chainNetwork clb:^(BOOL success, NSDictionary *syncStatusDictionary, NSString * errorMessage) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     masternode.syncStatus = [MasternodeSyncStatusTransformer typeForTypeName:syncStatusDictionary[@"AssetName"]];
-                    [[DPDataStore sharedInstance] saveContext];
-                });
-            }];
-            
-            
-            [self getInfo:masternode clb:^(BOOL success, NSDictionary *nodeInfo, NSString *errorMessage) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    masternode.lastKnownHeight = 0;
                     [[DPDataStore sharedInstance] saveContext];
                 });
             }];
@@ -1977,8 +1942,13 @@
 -(void)checkMasternode:(Masternode*)masternode {
     if(![masternode valueForKey:@"publicIP"]) return;
     [self checkMasternodeChainNetwork:masternode clb:^(BOOL success, NSString *message) {
-        [self updateMasternodeAttributes:masternode];
-        [self checkMasternode:masternode saveContext:TRUE clb:nil];
+        if (success) {
+            [self checkMasternode:masternode saveContext:TRUE clb:^(BOOL success, NSString *message) {
+                if (success && masternode.masternodeState == MasternodeState_Running) {
+                    [self updateMasternodeAttributes:masternode];
+                }
+            }];
+        }
     }];
     
 }
@@ -1991,38 +1961,42 @@
             //we most likely have access to rpc, it's running
             [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                 if (dictionary) {
-                    [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
-                    [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
+                    masternode.masternodeState = MasternodeState_Running;
+                    masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    clb(TRUE,nil);
                 } else {
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                         if (value) {
                             NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
                             if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
                                 [masternode setValuesForKeysWithDictionary:dictionary];
-                                [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                                masternode.masternodeState = MasternodeState_Configured;
                                 if ([masternode hasChanges]) {
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
-                                [self updateGitInfoForMasternode:masternode clb:nil];
+                                [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                                    clb(success,errorMessage);
+                                }];
                             } else {
                                 if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
-                                    [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                                    masternode.masternodeState = MasternodeState_Installed;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
-                                [self updateGitInfoForMasternode:masternode clb:nil];
+                                [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                                    clb(success,errorMessage);
+                                }];
                             }
                         } else {
                             if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                                [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                                masternode.masternodeState = MasternodeState_Initial;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                clb(TRUE,nil);
                             }
                         }
                     }];
                 }
             }];
-            
-            
         } else { //we don't have access to the rpc, let's ssh in and retrieve it.
             [self retrieveConfigurationInfoThroughSSH:masternode clb:^(BOOL success, NSDictionary *info, NSString *errorMessage) {
                 
@@ -2031,45 +2005,53 @@
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                         if (value) {
                             if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
-                                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                                masternode.masternodeState = MasternodeState_Installed;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                             }
-                            [self updateGitInfoForMasternode:masternode clb:nil];
+                            [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                                clb(success,errorMessage);
+                            }];
                         } else {
                             if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                                [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                                masternode.masternodeState = MasternodeState_Initial;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                clb(TRUE,nil);
                             }
                         }
                     }];
                 } else {
-                    [masternode setValue:info[@"rpcpassword"] forKey:@"rpcPassword"];
-                    [masternode setValue:info[@"masternodeprivkey"] forKey:@"key"];
+                    masternode.rpcPassword = info[@"rpcpassword"];
+                    masternode.key = info[@"masternodeprivkey"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                         if (dictionary) {
-                            [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
-                            [masternode setValue:dictionary[@"blocks"] forKey:@"lastBlock"];
-                            [self updateGitInfoForMasternode:masternode clb:nil];
+                            masternode.masternodeState = MasternodeState_Running;
+                            masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
                             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                            [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                                clb(success,errorMessage);
+                            }];
                         } else {
                             [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                                 if (value) {
                                     NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
                                     if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
                                         [masternode setValuesForKeysWithDictionary:dictionary];
-                                        [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                                        masternode.masternodeState = MasternodeState_Configured;
                                     } else {
-                                        [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                                        masternode.masternodeState = MasternodeState_Installed;
                                     }
                                     if ([masternode hasChanges]) {
                                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                     }
-                                    [self updateGitInfoForMasternode:masternode clb:nil];
+                                    [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                                        clb(success,errorMessage);
+                                    }];
                                 } else {
                                     if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                                        [masternode setValue:@(MasternodeState_Initial) forKey:@"masternodeState"];
+                                        masternode.masternodeState = MasternodeState_Initial;
                                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                        clb(YES,nil);
                                     }
                                 }
                             }];
@@ -2077,7 +2059,6 @@
                     }];
                 }
             }];
-            
         }
     });
 }
@@ -2917,7 +2898,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
             if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
-
+                
                 [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:[NSString stringWithFormat:@"reconsiderblock %@", blockHash] toMasternode:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString * errorMessage) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         masternode.isSelected = NO;
@@ -2935,7 +2916,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
             if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
-
+                
                 [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:@"clearbanned" toMasternode:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString * errorMessage) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         masternode.isSelected = NO;

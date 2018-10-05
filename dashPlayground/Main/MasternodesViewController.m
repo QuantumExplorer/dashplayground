@@ -439,20 +439,20 @@ NSString *terminalHeadString = @"";
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Wiping all dash data on remotes..."];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+        for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
         {
-            if([[object valueForKey:@"isSelected"] integerValue] == 1) {
+            if(masternode.isSelected) {
 //                [[DPMasternodeController sharedInstance] stopDashdOnRemote:object onClb:^(BOOL success, NSString *message) {
-                    [[DPMasternodeController sharedInstance] wipeDataOnRemote:object onClb:^(BOOL success, NSString *message) {
+                    [[DPMasternodeController sharedInstance] wipeDataOnRemote:masternode onClb:^(BOOL success, NSString *message) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [self addStringEventToMasternodeConsole:message];
                         });
                     }];
 //                }];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [object setValue:nil forKey:@"lastBlock"];
-                    [object setValue:@(0) forKey:@"isSelected"];
-                    [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                    masternode.lastKnownHeight = 0;
+                    masternode.isSelected = NO;
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
         }
