@@ -29,10 +29,25 @@
 @property (strong) IBOutlet NSPopUpButton *versionCoreButton;
 @property (strong) IBOutlet NSButton *coreUpdateButton;
 
+@property (strong) IBOutlet NSTextField *currentDapiVersionTextField;
+@property (strong) IBOutlet NSPopUpButton *dapiVersionPopUpButton;
+@property (strong) IBOutlet NSButton *dapiUpdateButton;
+@property (strong) IBOutlet NSButton *dapiUpdateToLatestButton;
+
+@property (strong) IBOutlet NSTextField *currentDashDriveVersionTextField;
+@property (strong) IBOutlet NSPopUpButton *dashDriveVersionPopUpButton;
+@property (strong) IBOutlet NSButton *dashDriveUpdateButton;
+@property (strong) IBOutlet NSButton *dashDriveUpdateToLatestButton;
+
+@property (strong) IBOutlet NSButton *insightUpdateButton;
+@property (strong) IBOutlet NSButton *insightUpdateToLatestButton;
+
 //Sentinel
 @property (strong) IBOutlet NSTextField *currentSentinelTextField;
 @property (strong) IBOutlet NSComboBox *versionSentinelButton;
+
 @property (strong) IBOutlet NSButton *sentinelUpdateButton;
+@property (strong) IBOutlet NSButton *sentinelUpdateToLatestButton;
 
 @property (atomic) NSManagedObject* selectedObject;
 
@@ -128,6 +143,11 @@
         if(commitArrayData != nil) [self.versionCoreButton addItemsWithTitles:commitArrayData];
     }
     
+    //Show dapi version
+    NSMutableArray *commitArrayData = [[DPVersioningController sharedInstance] getGitCommitInfo:object repositoryUrl:@"https://github.com/dashevo/dapi.git" onBranch:@"develop"];
+    [self.dapiVersionPopUpButton removeAllItems];
+    if(commitArrayData != nil) [self.dapiVersionPopUpButton addItemsWithTitles:commitArrayData];
+    
     [self addStringEvent:@"Fetched information."];
 }
 
@@ -145,7 +165,7 @@
     
     if([coreHead count] == 3)
     {
-        NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warnning!" message:@"Are you sure you already stopped dashd server before updating new version?"];
+        NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warning!" message:@"Are you sure you already stopped dashd server before updating new version?"];
         
         if ([alert runModal] == NSAlertFirstButtonReturn) {
             [[DPVersioningController sharedInstance] updateCore:[self.selectedObject valueForKey:@"publicIP"] repositoryUrl:[self.selectedObject valueForKey:@"repositoryUrl"] onBranch:[self.selectedObject valueForKey:@"gitBranch"] commitHead:[coreHead objectAtIndex:0]];
@@ -155,7 +175,37 @@
     
 }
 
-- (IBAction)updateSentinelButton:(id)sender {
+- (IBAction)updateDapi:(id)sender {
+    
+}
+
+- (IBAction)updateDapiToLatest:(id)sender {
+    NSArray *dapiHead = [[self.dapiVersionPopUpButton.selectedItem title] componentsSeparatedByString:@","];
+    [[DPVersioningController sharedInstance] updateDapi:[self.selectedObject valueForKey:@"publicIP"] repositoryUrl:[self.selectedObject valueForKey:@"repositoryUrl"] onBranch:@"develop" commitHead:[dapiHead objectAtIndex:0]];
+}
+
+- (IBAction)updateDashDrive:(id)sender {
+
+}
+
+- (IBAction)updateDashDriveToLatest:(id)sender {
+
+}
+
+- (IBAction)updateInsight:(id)sender {
+    
+}
+
+- (IBAction)updateInsightToLatest:(id)sender {
+    
+}
+
+- (IBAction)updateSentinel:(id)sender {
+    
+}
+
+- (IBAction)updateSentinelToLatest:(id)sender {
+    
 }
 
 

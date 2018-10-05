@@ -15,12 +15,14 @@
 }
 @property(strong, nonatomic, readwrite) VersioningViewController *versioningViewController;
 
-+(DPVersioningController*)sharedInstance;
++ (DPVersioningController*)sharedInstance;
 
 - (NSMutableArray*)getGitCommitInfo:(NSManagedObject*)masternode repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch;
 
 - (NSMutableArray*)getGitCommitArrayData:(NSDictionary*)dict;
 
 - (void)updateCore:(NSString*)publicIP repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch commitHead:(NSString*)commitHead;
+
+- (void)updateDapi:(NSString*)publicIP repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch commitHead:(NSString*)commitHead;
 
 @end

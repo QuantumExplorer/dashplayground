@@ -97,48 +97,41 @@ MasternodesViewController *masternodeCon2;
 }
 
 - (IBAction)pressAddRepository:(id)sender {
-    NSString * branch = [self.branchField stringValue];
-    if (!branch || [branch isEqualToString:@""]) branch = @"master";
+    NSString * branchName = [self.branchField stringValue];
+    if (!branchName || [branchName isEqualToString:@""]) branchName = @"master";
     if (![[self.repoNameField stringValue] isEqualToString:@""]) {
         NSString * url = [self.repoNameField stringValue];
         NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
         NSArray *matches = [linkDetector matchesInString:url options:0 range:NSMakeRange(0, [url length])];
+        NSString * user = nil;
+        NSString * repositoryLocation = nil;
         if ([matches count] && [matches[0] isKindOfClass:[NSTextCheckingResult class]] && ((NSTextCheckingResult*)matches[0]).resultType == NSTextCheckingTypeLink) {
             NSURL * url = ((NSTextCheckingResult*)matches[0]).URL;
             if ([url.host isEqualToString:@"github.com"] && ([url.pathExtension isEqualToString:@"git"] || !url.pathExtension) && url.pathComponents.count > 2) {
-                [[DPRepositoryController sharedInstance] addRepositoryForUser:url.pathComponents[1] repoName:[url.lastPathComponent stringByDeletingPathExtension] branch:branch clb:^(BOOL success, NSString *message) {
-                    if (!success) {
-                        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                        dict[NSLocalizedDescriptionKey] = message;
-                        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                        [[NSApplication sharedApplication] presentError:error];
-                    } else {
-                        self.repoNameField.stringValue = @"";
-                        self.branchField.stringValue = @"";
-                        NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
-                        [self displayData:repoData];
-                        
-                        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Add repository" message:@"Repository is added successfully."];
-                    }
-                }];
+                user = url.pathComponents[1];
+                repositoryLocation = [url.lastPathComponent stringByDeletingPathExtension];
+            } else {
+                return;
             }
         } else {
-            [[DPRepositoryController sharedInstance] addRepositoryForUser:url repoName:@"dash" branch:branch clb:^(BOOL success, NSString *message) {
-                if (!success) {
-                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                    dict[NSLocalizedDescriptionKey] = message;
-                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                    [[NSApplication sharedApplication] presentError:error];
-                } else {
-                    self.repoNameField.stringValue = @"";
-                    self.branchField.stringValue = @"";
-                    NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
-                    [self displayData:repoData];
-                    
-                    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Add repository" message:@"Repository is added successfully."];
-                }
-            }];
+            user = url;
+            repositoryLocation = @"dash";
         }
+        [[DPRepositoryController sharedInstance] addRepository:repositoryLocation forProject:0 forUser:user branchName:branchName isPrivate:NO clb:^(BOOL success, NSString *message) {
+            if (!success) {
+                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                dict[NSLocalizedDescriptionKey] = message;
+                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                [[NSApplication sharedApplication] presentError:error];
+            } else {
+                self.repoNameField.stringValue = @"";
+                self.branchField.stringValue = @"";
+                NSMutableArray *repoData = [[DPRepoModalController sharedInstance] getRepositoriesData];
+                [self displayData:repoData];
+                
+                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Add repository" message:@"Repository is added successfully."];
+            }
+        }];
     } else {
         NSMutableDictionary *dict = [NSMutableDictionary dictionary];
         dict[NSLocalizedDescriptionKey] = @"Fields are empty";

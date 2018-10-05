@@ -18,7 +18,8 @@
 @property (strong) IBOutlet NSTableView *tableView;
 @property (strong) IBOutlet NSTextField *repositoryAddField;
 @property (strong) IBOutlet NSTextField *branchAddField;
-@property (strong) IBOutlet NSPopUpButton *repoTypeButton;
+@property (strong) IBOutlet NSPopUpButton *repositoryAvailabilityPopUpButton;
+@property (strong) IBOutlet NSPopUpButton *repositoryProjectPopUpButton;
 
 @end
 
@@ -81,73 +82,60 @@
 }
 
 - (IBAction)pressAddRepository:(id)sender {
-    NSString * branch = [self.branchAddField stringValue];
-    if (!branch || [branch isEqualToString:@""]) branch = @"master";
+    NSString * branchName = [self.branchAddField stringValue];
+    if (!branchName || [branchName isEqualToString:@""]) branchName = @"master";
     
-    NSUInteger repoType = [self.repoTypeButton.objectValue integerValue];
+    NSUInteger repositoryAvailabilityIndex = [self.repositoryAvailabilityPopUpButton.objectValue integerValue];
+    NSUInteger repositoryProjectIndex = [self.repositoryProjectPopUpButton.objectValue integerValue];
+    BOOL isPrivate = (repositoryAvailabilityIndex != 0);
     
     if ([[self.repositoryAddField stringValue] length] > 0) {
         NSString * url = [_repositoryAddField stringValue];
         NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
         NSArray *matches = [linkDetector matchesInString:url options:0 range:NSMakeRange(0, [url length])];
+        NSString * repositoryLocation = nil;
+        NSString * user = nil;
         if ([matches count] && [matches[0] isKindOfClass:[NSTextCheckingResult class]] && ((NSTextCheckingResult*)matches[0]).resultType == NSTextCheckingTypeLink) {
             NSURL * url = ((NSTextCheckingResult*)matches[0]).URL;
             if ([url.host isEqualToString:@"github.com"] && ([url.pathExtension isEqualToString:@"git"] || !url.pathExtension) && url.pathComponents.count > 2) {
-                if(repoType == 0) {
-                    [[DPRepositoryController sharedInstance] addRepositoryForUser:url.pathComponents[1] repoName:[url.lastPathComponent stringByDeletingPathExtension] branch:branch clb:^(BOOL success, NSString *message) {
-                        if (!success) {
-                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                            dict[NSLocalizedDescriptionKey] = message;
-                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                            [[NSApplication sharedApplication] presentError:error];
-                        } else {
-                            self.repositoryAddField.stringValue = @"";
-                            self.branchAddField.stringValue = @"";
-                        }
-                    }];
-                }
-                else {
-                    [[DPRepositoryController sharedInstance] addPrivateRepositoryForUser:url.pathComponents[1] repoName:[url.lastPathComponent stringByDeletingPathExtension] branch:branch clb:^(BOOL success, NSString *message) {
-                        if (!success) {
-                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                            dict[NSLocalizedDescriptionKey] = message;
-                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                            [[NSApplication sharedApplication] presentError:error];
-                        } else {
-                            self.repositoryAddField.stringValue = @"";
-                            self.branchAddField.stringValue = @"";
-                        }
-                    }];
-                }
+                repositoryLocation = [url.lastPathComponent stringByDeletingPathExtension];
+                user = url.pathComponents[1];
             }
         } else {
-            if(repoType == 0) {
-                [[DPRepositoryController sharedInstance] addRepositoryForUser:url repoName:@"dash" branch:branch clb:^(BOOL success, NSString *message) {
-                    if (!success) {
-                        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                        dict[NSLocalizedDescriptionKey] = message;
-                        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                        [[NSApplication sharedApplication] presentError:error];
-                    } else {
-                        self.repositoryAddField.stringValue = @"";
-                        self.branchAddField.stringValue = @"";
-                    }
-                }];
+            switch (repositoryProjectIndex) {
+                case DPRepositoryProject_Core:
+                    repositoryLocation = @"dash";
+                    break;
+                case DPRepositoryProject_Dapi:
+                    repositoryLocation = @"dapi";
+                    break;
+                case DPRepositoryProject_Drive:
+                    repositoryLocation = @"dashdrive";
+                    break;
+                case DPRepositoryProject_Insight:
+                    repositoryLocation = @"insight";
+                    break;
+                case DPRepositoryProject_Sentinel:
+                    repositoryLocation = @"sentinel";
+                    break;
+                    
+                default:
+                    break;
             }
-            else {
-                [[DPRepositoryController sharedInstance] addPrivateRepositoryForUser:url repoName:@"dash" branch:branch clb:^(BOOL success, NSString *message) {
-                    if (!success) {
-                        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                        dict[NSLocalizedDescriptionKey] = message;
-                        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                        [[NSApplication sharedApplication] presentError:error];
-                    } else {
-                        self.repositoryAddField.stringValue = @"";
-                        self.branchAddField.stringValue = @"";
-                    }
-                }];
-            }
+            
+            user = url;
         }
+        [[DPRepositoryController sharedInstance] addRepository:repositoryLocation forProject:repositoryProjectIndex forUser:user branchName:branchName isPrivate:isPrivate clb:^(BOOL success, NSString *message) {
+            if (!success) {
+                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                dict[NSLocalizedDescriptionKey] = message;
+                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                [[NSApplication sharedApplication] presentError:error];
+            } else {
+                self.repositoryAddField.stringValue = @"";
+                self.branchAddField.stringValue = @"";
+            }
+        }];
     } else {
         NSMutableDictionary *dict = [NSMutableDictionary dictionary];
         dict[NSLocalizedDescriptionKey] = @"Fields are empty";

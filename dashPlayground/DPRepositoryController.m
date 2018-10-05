@@ -11,41 +11,46 @@
 #import "DPDataStore.h"
 #import "DialogAlert.h"
 #import "DPLocalNodeController.h"
+#import "Branch+CoreDataClass.h"
 
 @implementation DPRepositoryController
 
--(void)addRepositoryForUser:(NSString*)user repoName:(NSString*)repoName branch:(NSString*)branch clb:(dashClb)clb {
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    [manager GET:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@",user,repoName,branch] parameters:nil progress:nil success:^(NSURLSessionTask *task, id responseObject) {
-        if ([[responseObject objectForKey:@"object"] objectForKey:@"sha"]) {
-            NSManagedObject * object = [[DPDataStore sharedInstance] branchNamed:branch onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repoName]];
-            [object setValue:[[responseObject objectForKey:@"object"] objectForKey:@"sha"] forKey:@"lastCommitSha"];
-            [object setValue:@(0) forKey:@"repoType"];
-            [[DPDataStore sharedInstance] saveContext];
-            return clb(YES,nil);
-        } else {
-            return clb(NO,@"Error fetching repository");
-        }
-        
-    } failure:^(NSURLSessionTask *operation, NSError *error) {
-        return clb(NO,@"Repository doesn't seem to exist");
-    }];
+-(void)addRepository:(NSString*)repositoryLocation forProject:(DPRepositoryProject)project forUser:(NSString*)user branchName:(NSString*)branchName isPrivate:(BOOL)isPrivate clb:(dashClb)clb {
+    if (isPrivate) {
+        [self addPrivateRepository:repositoryLocation forUser:user forProject:project branchName:branchName clb:clb];
+    } else {
+        AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+        [manager GET:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@",user,repositoryLocation,branchName] parameters:nil progress:nil success:^(NSURLSessionTask *task, id responseObject) {
+            if ([[responseObject objectForKey:@"object"] objectForKey:@"sha"]) {
+                Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
+                branch.lastCommitSha = [[responseObject objectForKey:@"object"] objectForKey:@"sha"];
+                branch.repository.availability = isPrivate;
+                [[DPDataStore sharedInstance] saveContext];
+                return clb(YES,nil);
+            } else {
+                return clb(NO,@"Error fetching repository");
+            }
+            
+        } failure:^(NSURLSessionTask *operation, NSError *error) {
+            return clb(NO,@"Repository doesn't seem to exist");
+        }];
+    }
     
 }
 
--(void)addPrivateRepositoryForUser:(NSString*)user repoName:(NSString*)repoName branch:(NSString*)branch clb:(dashClb)clb {
+-(void)addPrivateRepository:(NSString*)repositoryLocation forUser:(NSString*)user forProject:(DPRepositoryProject)project branchName:(NSString*)branchName clb:(dashClb)clb {
     
     NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
     NSString *githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
     
     if([githubUsername length] == 0 || [githubPassword length] == 0) return;
     
-    NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@", user, repoName, branch, githubUsername, githubPassword] checkError:YES];
-
+    NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@", user, repositoryLocation, branchName, githubUsername, githubPassword] checkError:YES];
+    
     if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
-        NSManagedObject * object = [[DPDataStore sharedInstance] branchNamed:branch onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repoName]];
-        [object setValue:[[repositoryDict objectForKey:@"object"] objectForKey:@"sha"] forKey:@"lastCommitSha"];
-        [object setValue:@(1) forKey:@"repoType"];
+        Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
+        branch.lastCommitSha = [[repositoryDict objectForKey:@"object"] objectForKey:@"sha"];
+        branch.repository.availability = 1;
         [[DPDataStore sharedInstance] saveContext];
         return clb(YES,nil);
     } else {

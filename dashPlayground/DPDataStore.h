@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 #import "InstanceStateTransformer.h"
+#import "Repository+CoreDataClass.h"
+
+@class Repository,Branch;
 
 typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
@@ -22,7 +25,7 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 #pragma mark - Repositories
 
--(NSManagedObject*)branchNamed:(NSString*)string onRepositoryURLPath:(NSString*)repositoryURLPath;
+-(Branch*)branchNamed:(NSString*)string inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath;
 
 #pragma mark - Masternodes
 

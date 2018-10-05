@@ -23,12 +23,12 @@
 - (id)transformedValue:(id)value
 {
     if (value) {
-    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-    NSArray *matches = [linkDetector matchesInString:value options:0 range:NSMakeRange(0, [value length])];
+        NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+        NSArray *matches = [linkDetector matchesInString:value options:0 range:NSMakeRange(0, [value length])];
         if ([matches count] && [matches[0] isKindOfClass:[NSTextCheckingResult class]] && ((NSTextCheckingResult*)matches[0]).resultType == NSTextCheckingTypeLink) {
             NSURL * url = ((NSTextCheckingResult*)matches[0]).URL;
-            if ([url.host isEqualToString:@"github.com"] && [url.lastPathComponent isEqualToString:@"dash.git"] && url.pathComponents.count > 2) {
-                return [NSString stringWithFormat:@"gh:%@",url.pathComponents[1]];
+            if ([url.host isEqualToString:@"github.com"] && url.pathComponents.count > 2) {
+                return [NSString stringWithFormat:@"gh:%@/%@",url.pathComponents[1],[url.pathComponents[2] stringByDeletingPathExtension]];
             }
         }
         

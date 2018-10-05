@@ -27,6 +27,7 @@
 #import "SshConnection.h"
 #import "SentinelStateTransformer.h"
 #import "DPChainSelectionController.h"
+#import "Branch+CoreDataClass.h"
 
 #define MASTERNODE_PRIVATE_KEY_STRING @"[MASTERNODE_PRIVATE_KEY]"
 #define RPC_PASSWORD_STRING @"[RPC_PASSWORD]"
@@ -1502,7 +1503,7 @@
         }
         dispatch_async(dispatch_get_main_queue(), ^{
             if (remote) {
-                NSManagedObject * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
+                Branch * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] inProject:DPRepositoryProject_Core onRepositoryURLPath:remote];
                 if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [masternode setValue:branch forKey:@"branch"];
