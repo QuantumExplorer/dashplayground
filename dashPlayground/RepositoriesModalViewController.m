@@ -14,7 +14,7 @@
 #import "DPRepositoryController.h"
 #import "DPMasternodeController.h"
 #import "DPRepoModalController.h"
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 #import "MasternodeSyncStatusTransformer.h"
 #import "DPRepoModalController.h"
 
@@ -168,7 +168,7 @@ MasternodesViewController *masternodeCon2;
             if([[masternode valueForKey:@"isSelected"] integerValue] != 1) continue;
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+                [masternode setValue:@(DashcoreState_SettingUp) forKey:@"masternodeState"];
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             });
             

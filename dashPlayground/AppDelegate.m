@@ -9,7 +9,7 @@
 #import "AppDelegate.h"
 #import "DPMasternodeController.h"
 #import "DPDataStore.h"
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 #import "SentinelStateTransformer.h"
 #import "DialogAlert.h"
 #import "DPMasternodeController.h"
@@ -61,10 +61,10 @@
         
         if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
 
-        if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Checking) {
+        if ([[masternode valueForKey:@"dashcoreState"] integerValue] == DashcoreState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
         }
-        else if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+        else if ([[masternode valueForKey:@"dashcoreState"] integerValue] == DashcoreState_SettingUp) {
             if([[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Terminated) return;
             [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                 if (success) {

@@ -89,8 +89,8 @@
 		FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
 		FB9EBCF11E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
 		FB9EBCF21E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */; };
-		FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */; };
-		FB9EBCF61E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */; };
+		FB9EBCF51E98752500AE8AC3 /* DashcoreStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* DashcoreStateTransformer.m */; };
+		FB9EBCF61E98752500AE8AC3 /* DashcoreStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* DashcoreStateTransformer.m */; };
 		FBB974C621678AEB00E2F976 /* Repository+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FBB974C021678AEB00E2F976 /* Repository+CoreDataClass.m */; };
 		FBB974C721678AEB00E2F976 /* Repository+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FBB974C121678AEB00E2F976 /* Repository+CoreDataProperties.m */; };
 		FBB974C821678AEB00E2F976 /* Branch+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FBB974C421678AEB00E2F976 /* Branch+CoreDataClass.m */; };
@@ -366,8 +366,8 @@
 		FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceTypeTransformer.m; sourceTree = "<group>"; };
 		FB9EBCEF1E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeSyncStatusTransformer.h; sourceTree = "<group>"; };
 		FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodeSyncStatusTransformer.m; sourceTree = "<group>"; };
-		FB9EBCF31E98752500AE8AC3 /* MasternodeStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodeStateTransformer.h; sourceTree = "<group>"; };
-		FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasternodeStateTransformer.m; sourceTree = "<group>"; };
+		FB9EBCF31E98752500AE8AC3 /* DashcoreStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DashcoreStateTransformer.h; sourceTree = "<group>"; };
+		FB9EBCF41E98752500AE8AC3 /* DashcoreStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DashcoreStateTransformer.m; sourceTree = "<group>"; };
 		FBB974A42167874A00E2F976 /* PlaygroundModel 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "PlaygroundModel 4.xcdatamodel"; sourceTree = "<group>"; };
 		FBB974BE21678AEB00E2F976 /* Repository+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Repository+CoreDataProperties.h"; sourceTree = "<group>"; };
 		FBB974BF21678AEB00E2F976 /* Repository+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Repository+CoreDataClass.h"; sourceTree = "<group>"; };
@@ -617,8 +617,8 @@
 				FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */,
 				FB9EBCEF1E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.h */,
 				FB9EBCF01E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m */,
-				FB9EBCF31E98752500AE8AC3 /* MasternodeStateTransformer.h */,
-				FB9EBCF41E98752500AE8AC3 /* MasternodeStateTransformer.m */,
+				FB9EBCF31E98752500AE8AC3 /* DashcoreStateTransformer.h */,
+				FB9EBCF41E98752500AE8AC3 /* DashcoreStateTransformer.m */,
 				FB1D2B521EA455CD00F7BE2D /* SentinelStateTransformer.h */,
 				FB1D2B531EA455CD00F7BE2D /* SentinelStateTransformer.m */,
 				FB5A31C01E9D2F04003D4DD8 /* TrackingTransformer.h */,
@@ -971,7 +971,7 @@
 				A581772420DC02E9009240BD /* AWSViewController.m in Sources */,
 				A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
-				FB9EBCF51E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
+				FB9EBCF51E98752500AE8AC3 /* DashcoreStateTransformer.m in Sources */,
 				A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */,
 				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				A5142E7720E36259000AB18E /* DebugTypeTransformer.m in Sources */,
@@ -1037,7 +1037,7 @@
 				FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				FB0684281E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB5A31CA1E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
-				FB9EBCF61E98752500AE8AC3 /* MasternodeStateTransformer.m in Sources */,
+				FB9EBCF61E98752500AE8AC3 /* DashcoreStateTransformer.m in Sources */,
 				FB9EBCEE1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

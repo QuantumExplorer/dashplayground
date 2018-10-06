@@ -13,7 +13,7 @@
 #import <AFNetworking/AFNetworking.h>
 #import "DPLocalNodeController.h"
 #import "DPVersioningController.h"
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 #import "DialogAlert.h"
 #import "Masternode+CoreDataClass.h"
 
@@ -27,7 +27,7 @@
 
 //Core
 @property (strong) IBOutlet NSTextField *currentCoreTextField;
-@property (strong) IBOutlet NSPopUpButton *versionCoreButton;
+@property (strong) IBOutlet NSPopUpButton *coreVersionPopupButton;
 @property (strong) IBOutlet NSButton *coreUpdateButton;
 
 @property (strong) IBOutlet NSTextField *currentDapiVersionTextField;
@@ -74,14 +74,14 @@
 }
 
 - (void)initialize {
-//    [self addStringEvent:@"Initializing instances from AWS."];
-    NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodes];
+    //    [self addStringEvent:@"Initializing instances from AWS."];
+    NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"instanceState == %@",@(InstanceState_Running)]];
     for (NSManagedObject * masternode in masternodesArray) {
         [self showTableContent:masternode];
-//        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
+        //        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
     
-    [self.versionCoreButton removeAllItems];
+    [self.coreVersionPopupButton removeAllItems];
     [self.versionSentinelButton removeAllItems];
 }
 
@@ -112,7 +112,7 @@
     if(row == -1) {
         self.coreUpdateButton.enabled = false;
         self.currentCoreTextField.stringValue = @"";
-        [self.versionCoreButton removeAllItems];
+        [self.coreVersionPopupButton removeAllItems];
         
         self.sentinelUpdateButton.enabled = false;
         self.currentSentinelTextField.stringValue = @"";
@@ -142,21 +142,21 @@
     }
     
     //Show repositories version
-    if (masternode.masternodeState != MasternodeState_Initial || masternode.masternodeState != MasternodeState_SettingUp) {
+    if (masternode.dashcoreState != DashcoreState_Initial || masternode.dashcoreState != DashcoreState_SettingUp) {
         [[DPVersioningController sharedInstance] fetchGitCommitInfoOnMasternode:masternode forProject:DPRepositoryProject_Core clb:^(BOOL success, NSArray *commitArrayData) {
             if (success) {
-            [self.versionCoreButton removeAllItems];
-            if(commitArrayData != nil) [self.versionCoreButton addItemsWithTitles:commitArrayData];
+                [self.coreVersionPopupButton removeAllItems];
+                if(commitArrayData != nil) [self.coreVersionPopupButton addItemsWithTitles:commitArrayData];
             }
         }];
     }
     
     
     //Show dapi version
-    if (masternode.masternodeState != MasternodeState_Initial || masternode.masternodeState != MasternodeState_SettingUp) {
+    if (masternode.dashcoreState != DashcoreState_Initial || masternode.dashcoreState != DashcoreState_SettingUp) {
         [[DPVersioningController sharedInstance] fetchGitCommitInfoOnMasternode:masternode forProject:DPRepositoryProject_Dapi clb:^(BOOL success, NSArray *commitArrayData) {
             if (success) {
-                [self.versionCoreButton removeAllItems];
+                [self.dapiVersionPopUpButton removeAllItems];
                 if(commitArrayData != nil) [self.dapiVersionPopUpButton addItemsWithTitles:commitArrayData];
             }
         }];
@@ -168,13 +168,13 @@
     [self addStringEvent:@"Refreshing instance(s)."];
     NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodes];
     for (NSManagedObject * masternode in masternodesArray) {
-//        [self showTableContent:masternode];
+        //        [self showTableContent:masternode];
         [[DPMasternodeController sharedInstance] checkMasternode:masternode];
     }
 }
 
 - (IBAction)updateCoreButton:(id)sender {
-    NSArray *coreHead = [[self.versionCoreButton.selectedItem title] componentsSeparatedByString:@","];
+    NSArray *coreHead = [[self.coreVersionPopupButton.selectedItem title] componentsSeparatedByString:@","];
     
     if([coreHead count] == 3)
     {
@@ -198,11 +198,11 @@
 }
 
 - (IBAction)updateDashDrive:(id)sender {
-
+    
 }
 
 - (IBAction)updateDashDriveToLatest:(id)sender {
-
+    
 }
 
 - (IBAction)updateInsight:(id)sender {

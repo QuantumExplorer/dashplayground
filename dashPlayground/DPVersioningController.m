@@ -26,33 +26,33 @@
         return;
     }
     
-            NSDictionary *gitCommitDictionary = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/commits?sha=%@", repository.owner, repository.name, branch.name] checkError:NO];
+    NSDictionary *gitCommitDictionary = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/commits?sha=%@", repository.owner, repository.name, branch.name] checkError:NO];
+    
+    //if not found, let's assume this repository is private
+    if([gitCommitDictionary count] == 2 && [[gitCommitDictionary valueForKey:@"message"] isEqualToString:@"Not Found"]) {
+        
+        //Pop up to ask for Github username and password
+        
+        [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
+            if (!authenticated) return;
+            NSDictionary *gitCommitDictionary = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"-u %@:%@ https://api.github.com/repos/%@/%@/commits?sha=%@",githubUsername, githubPassword, repository.owner, repository.name, branch.name] checkError:NO];
             
-            //if not found, let's assume this repository is private
-            if([gitCommitDictionary count] == 2 && [[gitCommitDictionary valueForKey:@"message"] isEqualToString:@"Not Found"]) {
-                
-                //Pop up to ask for Github username and password
-                
-                [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
-                    if (!authenticated) return;
-                    NSDictionary *gitCommitDictionary = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"-u %@:%@ https://api.github.com/repos/%@/%@/commits?sha=%@",githubUsername, githubPassword, repository.owner, repository.name, branch.name] checkError:NO];
-                    
-                    //if user put wrong username/password then reset attributes and do nothing
-                    if([gitCommitDictionary count] == 2 && [[gitCommitDictionary valueForKey:@"message"] isEqualToString:@"Bad credentials"]) {
-                        //todo deal with bad credentials
-                        [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"Wrong username or password."];
-                    }
-                    else {//if authentication passed
-                        clb(YES,[self splitGitCommitArrayData:gitCommitDictionary]);
-                    }
-                }];
-                
+            //if user put wrong username/password then reset attributes and do nothing
+            if([gitCommitDictionary count] == 2 && [[gitCommitDictionary valueForKey:@"message"] isEqualToString:@"Bad credentials"]) {
+                //todo deal with bad credentials
+                [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"Wrong username or password."];
             }
-            else {//if everything's ok
+            else {//if authentication passed
                 clb(YES,[self splitGitCommitArrayData:gitCommitDictionary]);
             }
+        }];
+        
+    }
+    else {//if everything's ok
+        clb(YES,[self splitGitCommitArrayData:gitCommitDictionary]);
+    }
     
-
+    
 }
 
 - (NSMutableArray*)splitGitCommitArrayData:(NSDictionary*)dict {
@@ -183,7 +183,7 @@
             NSString *gitRepo = [repoArray objectAtIndex:4];
             gitRepo = [gitRepo substringToIndex:[gitRepo length] - 4];
             
-    
+            
             
             
             [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
@@ -221,48 +221,48 @@
                         
                         
                         
-
                         
-//                        NSString *checkDapiCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
-//                        [self.delegate versionControllerRelayMessage:@"Downloading dashd..."];
-//                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-//                            NSLog(@"%@", message);
-//
-//                            if([message length] == 0) {
-//                                [self.delegate versionControllerRelayMessage:@"Downloaded dashd successfully!"];
-//                            }
-//                            else {
-//                                [self.delegate versionControllerRelayMessage:message];
-//                            }
-//                            isAllowedToContiunue = success;
-//                        }];
-//
-//                        if(isAllowedToContiunue == YES) {
-//                            NSString *command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dash-cli"];
-//
-//                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-//
-//                            }];
-//
-//                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dash-cli.1 dash-cli && chmod +x dash-cli"];
-//
-//                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-//
-//                            }];
-//
-//                            //dashd
-//                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dashd"];
-//
-//                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-//
-//                            }];
-//
-//                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dashd.1 dashd && chmod +x dashd"];
-//
-//                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-//
-//                            }];
-//                        }
+                        
+                        //                        NSString *checkDapiCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
+                        //                        [self.delegate versionControllerRelayMessage:@"Downloading dashd..."];
+                        //                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //                            NSLog(@"%@", message);
+                        //
+                        //                            if([message length] == 0) {
+                        //                                [self.delegate versionControllerRelayMessage:@"Downloaded dashd successfully!"];
+                        //                            }
+                        //                            else {
+                        //                                [self.delegate versionControllerRelayMessage:message];
+                        //                            }
+                        //                            isAllowedToContiunue = success;
+                        //                        }];
+                        //
+                        //                        if(isAllowedToContiunue == YES) {
+                        //                            NSString *command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dash-cli"];
+                        //
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //
+                        //                            }];
+                        //
+                        //                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dash-cli.1 dash-cli && chmod +x dash-cli"];
+                        //
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //
+                        //                            }];
+                        //
+                        //                            //dashd
+                        //                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dashd"];
+                        //
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //
+                        //                            }];
+                        //
+                        //                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dashd.1 dashd && chmod +x dashd"];
+                        //
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //
+                        //                            }];
+                        //                        }
                     });
                 }
             }];

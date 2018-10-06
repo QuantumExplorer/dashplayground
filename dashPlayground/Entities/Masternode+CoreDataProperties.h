@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 //states
 @property (nonatomic) int16_t instanceState;
-@property (nonatomic) int16_t masternodeState;
+@property (nonatomic) int16_t dashcoreState;
 @property (nonatomic) int16_t dapiState;
 @property (nonatomic) int16_t dashDriveState;
 @property (nonatomic) int16_t sentinelState;

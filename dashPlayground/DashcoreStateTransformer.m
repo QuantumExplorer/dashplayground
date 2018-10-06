@@ -6,9 +6,9 @@
 //  Copyright © 2017 dashfoundation. All rights reserved.
 //
 
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 
-@implementation MasternodeStateTransformer
+@implementation DashcoreStateTransformer
 
 + (Class)transformedValueClass
 {
@@ -23,28 +23,28 @@
 - (id)transformedValue:(id)value
 {
     switch ([value integerValue]) {
-        case MasternodeState_Initial:
+        case DashcoreState_Initial:
             return @"Initial";
             break;
-        case MasternodeState_Checking:
+        case DashcoreState_Checking:
             return @"Checking";
             break;
-        case MasternodeState_Installed:
+        case DashcoreState_Installed:
             return @"Installed";
             break;
-        case MasternodeState_Configured:
+        case DashcoreState_Configured:
             return @"Configured";
             break;
-        case MasternodeState_Running:
+        case DashcoreState_Running:
             return @"Running";
             break;
-        case MasternodeState_Error:
+        case DashcoreState_Error:
             return @"Error";
             break;
-        case MasternodeState_SettingUp:
+        case DashcoreState_SettingUp:
             return @"Setting up";
             break;
-        case MasternodeState_Stopped:
+        case DashcoreState_Stopped:
             return @"Stopped";
             break;
         default:

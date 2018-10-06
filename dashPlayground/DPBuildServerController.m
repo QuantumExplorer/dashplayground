@@ -10,6 +10,9 @@
 #import "SshConnection.h"
 #import "DialogAlert.h"
 #import "GithubAPI.h"
+#import "Repository+CoreDataClass.h"
+#import "Branch+CoreDataClass.h"
+#import "ProjectTypeTransformer.h"
 
 #define BUILD_SERVER_IP @"[BUILD_SERVER_IP]"
 
@@ -372,14 +375,13 @@
     }];
 }
 
-- (void)updateRepoCredential:(NMSSHSession*)buildServerSession repoObject:(NSManagedObject*)repoObject gitUsername:(NSString*)gitUsername gitPassword:(NSString*)gitPassword {
-    NSString *type = [repoObject valueForKey:@"type"];
-    NSString *owner = [repoObject valueForKey:@"owner"];
-    NSString *repoName = [repoObject valueForKey:@"repoName"];
-    NSString *branch = [repoObject valueForKey:@"branch"];
+- (void)updateRepositoryCredentials:(NMSSHSession*)buildServerSession forBranch:(Branch*)branch gitUsername:(NSString*)gitUsername gitPassword:(NSString*)gitPassword {
+    Repository * repository = branch.repository;
+    NSString *projectDirectory = [ProjectTypeTransformer directoryForProject:branch.repository.project];
+
     
     NSError *error = nil;
-    [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git config --global credential.helper cache", type, owner, repoName, branch] onSSH:buildServerSession error:error  mainThread:YES dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git config --global credential.helper cache", projectDirectory, repository.owner, repository.name, branch.name] onSSH:buildServerSession error:error  mainThread:YES dashClb:^(BOOL success, NSString *message) {
         
     }];
 }

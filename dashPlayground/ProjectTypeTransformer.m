@@ -36,6 +36,28 @@
     return DPRepositoryProject_Unknown;
 }
 
++(NSString*)directoryForProject:(NSInteger)project {
+    switch (project) {
+        case DPRepositoryProject_Core:
+            return @"dash";
+            break;
+        case DPRepositoryProject_Dapi:
+            return @"dapi";
+            break;
+        case DPRepositoryProject_Drive:
+            return @"dashdrive";
+            break;
+        case DPRepositoryProject_Insight:
+            return @"dashcore-node";
+            break;
+        case DPRepositoryProject_Sentinel:
+            return @"sentinel";
+            break;
+        default:
+            return @"unknown";
+            break;
+    }
+}
 
 - (id)transformedValue:(id)value
 {

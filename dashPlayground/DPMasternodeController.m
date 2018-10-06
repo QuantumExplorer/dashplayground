@@ -16,7 +16,7 @@
 #import "CkoSshKey.h"
 #import "CkoStringBuilder.h"
 #import "DPLocalNodeController.h"
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 #import "MasternodeSyncStatusTransformer.h"
 //#import "DFSSHServer.h"
 //#import "DFSSHConnector.h"
@@ -653,8 +653,8 @@
     //        [ssh Disconnect];
     //
     //        dispatch_async(dispatch_get_main_queue(), ^{
-    //            if ([[masternode valueForKey:@"masternodeState"] integerValue] == MasternodeState_Initial) {
-    //                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+    //            if ([[masternode valueForKey:@"masternodeState"] integerValue] == DashcoreState_Initial) {
+    //                [masternode setValue:@(DashcoreState_Installed) forKey:@"masternodeState"];
     //            }
     //            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
     //        });
@@ -742,7 +742,7 @@
                         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
                         [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode onSporkAddr:sporkAddr onSporkKey:sporkKey];
                         
-                        [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                        [masternode setValue:@(DashcoreState_Configured) forKey:@"masternodeState"];
                         [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                         
                         clb(YES,eventMsg,YES);
@@ -788,7 +788,7 @@
                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
                             [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode onSporkAddr:sporkAddr onSporkKey:sporkKey];
                             
-                            [masternode setValue:@(MasternodeState_Configured) forKey:@"masternodeState"];
+                            [masternode setValue:@(DashcoreState_Configured) forKey:@"masternodeState"];
                             [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                             clb(YES,eventMsg,YES);
                         }];
@@ -1173,7 +1173,7 @@
                     clb(FALSE,nil,eventMsg);
                 } else {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [masternode setValue:@(MasternodeState_Running) forKey:@"masternodeState"];
+                        [masternode setValue:@(DashcoreState_Running) forKey:@"masternodeState"];
                         [[DPDataStore sharedInstance] saveContext];
                     });
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
@@ -1517,8 +1517,8 @@
 #pragma mark - SSH Query Remote
 
 -(void)updateGitInfoForMasternode:(Masternode*)masternode clb:(dashInfoClb)clb {
-    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
-    __block NSString * branchName = [masternode valueForKeyPath:@"branch.name"];
+    __block NSString * publicIP = masternode.publicIP;
+    __block NSString * branchName = masternode.coreBranch.name;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
         __block NMSSHSession *ssh;
@@ -1546,51 +1546,20 @@
                 Branch * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] inProject:DPRepositoryProject_Core onRepositoryURLPath:remote];
                 if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [masternode setValue:branch forKey:@"branch"];
+                        masternode.coreBranch = branch;
                         if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
                     });
                     return;
                 }
             }
-            if (![[masternode valueForKey:@"gitCommit"] isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
+            if (![masternode.coreGitCommitVersion isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+                   masternode.coreGitCommitVersion = gitValues[@"rev-parse --short HEAD"];
                     if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
                 });
                 return;
             }
         });
-        
-        //        CkoSsh * ssh = [self sshIn:publicIP];
-        //        if (!ssh) {
-        //            dispatch_async(dispatch_get_main_queue(), ^{
-        //                clb(NO,nil,@"Could not ssh in");
-        //            });
-        //            return;
-        //        }
-        //
-        //        NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh];
-        //        [ssh Disconnect];
-        //        __block NSString * remote = nil;
-        //        NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
-        //
-        //        if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
-        //            remote = remoteInfoLine[1];
-        //        }
-        //        dispatch_async(dispatch_get_main_queue(), ^{
-        //            if (remote) {
-        //                Masternode * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] onRepositoryURLPath:remote];
-        //                if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
-        //                    [masternode setValue:branch forKey:@"branch"];
-        //                    return clb(YES,@{@"hasChanges":@(TRUE)},nil);
-        //                }
-        //            }
-        //            if (![[masternode valueForKey:@"gitCommit"] isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
-        //                [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
-        //                return clb(YES,@{@"hasChanges":@(TRUE)},nil);
-        //            }
-        //        });
-        
     });
 }
 
@@ -1865,11 +1834,11 @@
         }
         
         if(checkResult == YES) {
-            [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+            [masternode setValue:@(DashcoreState_Installed) forKey:@"masternodeState"];
             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
         }
         else {
-            [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+            [masternode setValue:@(DashcoreState_SettingUp) forKey:@"masternodeState"];
             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
         }
     });
@@ -1931,13 +1900,13 @@
             NSDictionary * gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/.dashcore/sentinel"];
             if(gitValues != nil) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"sentinelGitCommit"];
+                    masternode.sentinelGitCommitVersion = gitValues[@"rev-parse --short HEAD"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternode setValue:@"" forKey:@"sentinelGitCommit"];
+                    masternode.sentinelGitCommitVersion = nil;
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
@@ -1955,13 +1924,14 @@
                     }
                 }
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternode setValue:gitBranch forKey:@"sentinelGitBranch"];
+                    masternode.sentinelBranch = nil;//[Branch branchWithRepository] <-Todo assign proper value
+                    //[masternode setValue:gitBranch forKey:@"sentinelGitBranch"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternode setValue:@"" forKey:@"sentinelGitBranch"];
+                    masternode.sentinelBranch = nil;
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 });
             }
@@ -2001,7 +1971,7 @@
     [self checkMasternodeChainNetwork:masternode clb:^(BOOL success, NSString *message) {
         if (success) {
             [self checkMasternode:masternode saveContext:TRUE clb:^(BOOL success, NSString *message) {
-                if (success && masternode.masternodeState == MasternodeState_Running) {
+                if (success && masternode.dashcoreState == DashcoreState_Running) {
                     [self updateMasternodeAttributes:masternode clb:^(BOOL success, NSString *message) {
                         
                     }];
@@ -2021,7 +1991,7 @@
             [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                 if (dictionary) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                    masternode.masternodeState = MasternodeState_Running;
+                    masternode.dashcoreState = DashcoreState_Running;
                     masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                         
@@ -2033,7 +2003,7 @@
                             NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
                             if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
                                 [masternode setValuesForKeysWithDictionary:dictionary];
-                                masternode.masternodeState = MasternodeState_Configured;
+                                masternode.dashcoreState = DashcoreState_Configured;
                                 if ([masternode hasChanges]) {
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
@@ -2041,8 +2011,8 @@
                                     clb(success,errorMessage);
                                 }];
                             } else {
-                                if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
-                                    masternode.masternodeState = MasternodeState_Installed;
+                                if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Installed) {
+                                    masternode.dashcoreState = DashcoreState_Installed;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
                                 [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
@@ -2050,8 +2020,8 @@
                                 }];
                             }
                         } else {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                                masternode.masternodeState = MasternodeState_Initial;
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Initial) {
+                                masternode.dashcoreState = DashcoreState_Initial;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 clb(TRUE,nil);
                             }
@@ -2072,16 +2042,16 @@
                     //the masternode has never been configured
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                         if (value) {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Installed) {
-                                masternode.masternodeState = MasternodeState_Installed;
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Installed) {
+                                masternode.dashcoreState = DashcoreState_Installed;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                             }
                             [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
                                 clb(success,errorMessage);
                             }];
                         } else {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                                masternode.masternodeState = MasternodeState_Initial;
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Initial) {
+                                masternode.dashcoreState = DashcoreState_Initial;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 clb(TRUE,nil);
                             }
@@ -2093,7 +2063,7 @@
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                         if (dictionary) {
-                            masternode.masternodeState = MasternodeState_Running;
+                            masternode.dashcoreState = DashcoreState_Running;
                             masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
                             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                             [self updateGitInfoForMasternode:masternode clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
@@ -2105,9 +2075,9 @@
                                     NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
                                     if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
                                         [masternode setValuesForKeysWithDictionary:dictionary];
-                                        masternode.masternodeState = MasternodeState_Configured;
+                                        masternode.dashcoreState = DashcoreState_Configured;
                                     } else {
-                                        masternode.masternodeState = MasternodeState_Installed;
+                                        masternode.dashcoreState = DashcoreState_Installed;
                                     }
                                     if ([masternode hasChanges]) {
                                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
@@ -2116,8 +2086,8 @@
                                         clb(success,errorMessage);
                                     }];
                                 } else {
-                                    if ([[masternode valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial) {
-                                        masternode.masternodeState = MasternodeState_Initial;
+                                    if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Initial) {
+                                        masternode.dashcoreState = DashcoreState_Initial;
                                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                         clb(YES,nil);
                                     }
@@ -2344,7 +2314,7 @@
             for (NSDictionary * dictionary in output[@"Instances"]) {
                 NSDictionary * rDict = [NSMutableDictionary dictionary];
                 [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-                [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+                [rDict setValue:@(DashcoreState_Initial)  forKey:@"masternodeState"];
                 [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
                 [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
             }
@@ -2561,7 +2531,7 @@
             for (NSDictionary * dictionary in output[@"Instances"]) {
                 NSDictionary * rDict = [NSMutableDictionary dictionary];
                 [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-                [rDict setValue:@(MasternodeState_Initial)  forKey:@"masternodeState"];
+                [rDict setValue:@(DashcoreState_Initial)  forKey:@"masternodeState"];
                 [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
                 [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
             }

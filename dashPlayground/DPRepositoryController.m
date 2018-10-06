@@ -13,6 +13,7 @@
 #import "DPLocalNodeController.h"
 #import "Branch+CoreDataClass.h"
 #import "NSData+Security.h"
+#import "DPAuthenticationManager.h"
 
 @implementation DPRepositoryController
 
@@ -40,23 +41,23 @@
 }
 
 -(void)addPrivateRepository:(NSString*)repositoryLocation forUser:(NSString*)user forProject:(DPRepositoryProject)project branchName:(NSString*)branchName clb:(dashClb)clb {
+    [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
+        if (authenticated) {
+            NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@", user, repositoryLocation, branchName, githubUsername, githubPassword] checkError:YES];
+            
+            if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
+                Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
+                branch.lastCommitSha = [[repositoryDict objectForKey:@"object"] objectForKey:@"sha"];
+                branch.repository.isPrivate = 1;
+                [[DPDataStore sharedInstance] saveContext];
+                return clb(YES,nil);
+            } else {
+                return clb(NO,@"Error fetching repository");
+            }
+        }
+    }];
     
-    NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
-    NSString *githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
     
-    if([githubUsername length] == 0 || [githubPassword length] == 0) return;
-    
-    NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@", user, repositoryLocation, branchName, githubUsername, githubPassword] checkError:YES];
-    
-    if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
-        Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
-        branch.lastCommitSha = [[repositoryDict objectForKey:@"object"] objectForKey:@"sha"];
-        branch.repository.isPrivate = 1;
-        [[DPDataStore sharedInstance] saveContext];
-        return clb(YES,nil);
-    } else {
-        return clb(NO,@"Error fetching repository");
-    }
 }
 
 -(void)updateBranchInfo:(NSManagedObject*)branch clb:(dashClb)clb {

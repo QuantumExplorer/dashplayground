@@ -10,7 +10,7 @@
 #import "MasternodesViewController.h"
 #import <NMSSH/NMSSH.h>
 #import "DialogAlert.h"
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 #import "MasternodeSyncStatusTransformer.h"
 #import "DPDataStore.h"
 #import "DPLocalNodeController.h"
@@ -120,12 +120,12 @@ MasternodesViewController *masternodeCon;
                 [ssh disconnect];
                 [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
                 if(isSuccess == NO) {
-                    [masternode setValue:@(MasternodeState_SettingUp) forKey:@"masternodeState"];
+                    [masternode setValue:@(DashcoreState_SettingUp) forKey:@"masternodeState"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     [[DialogAlert sharedInstance] showWarningAlert:@"Set up" message:@"Set up failed!"];
                     return;
                 }
-                [masternode setValue:@(MasternodeState_Installed) forKey:@"masternodeState"];
+                [masternode setValue:@(DashcoreState_Installed) forKey:@"masternodeState"];
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];
             });

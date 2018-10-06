@@ -10,7 +10,7 @@
 #import <NMSSH/NMSSH.h>
 #import "DialogAlert.h"
 #import "DPMasternodeController.h"
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 #import "MasternodeSyncStatusTransformer.h"
 
 @implementation SshConnection

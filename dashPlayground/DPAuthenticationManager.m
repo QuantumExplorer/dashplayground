@@ -68,13 +68,10 @@
     if ([self isAuthenticated]) {
         NSError * error = nil;
         NSData * encryptedData = self.tempCredentialData;
-        if (error) {
-            clb(NO,nil,nil);
-            return;
-        }
         NSData *data = [RNDecryptor decryptData:encryptedData withPassword:self.tempCredentialToken error:&error];
         if (error) {
-            clb(NO,nil,nil);
+            [self authenticateForMinutes:-1];
+            [self authenticateWithClb:clb];
             return;
         }
         NSDictionary * credentials = [NSKeyedUnarchiver unarchiveObjectWithData:data];

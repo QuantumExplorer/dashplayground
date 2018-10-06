@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ProjectTypeTransformer : NSValueTransformer
 
++(NSString*)directoryForProject:(NSInteger)project;
+
 @end
 
 NS_ASSUME_NONNULL_END

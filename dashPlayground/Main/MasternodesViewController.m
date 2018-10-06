@@ -16,7 +16,7 @@
 #import "DialogAlert.h"
 #import "VolumeViewController.h"
 #import "RepositoriesModalViewController.h"
-#import "MasternodeStateTransformer.h"
+#import "DashcoreStateTransformer.h"
 #import "DPMasternodeController.h"
 #import <NMSSH/NMSSH.h>
 #import "SentinelStateTransformer.h"
@@ -425,7 +425,7 @@ NSString *terminalHeadString = @"";
                     });
                 }];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [object setValue:@(MasternodeState_Stopped) forKey:@"masternodeState"];
+                    [object setValue:@(DashcoreState_Stopped) forKey:@"masternodeState"];
                     [object setValue:@(0) forKey:@"isSelected"];
                     [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                 });
@@ -907,9 +907,9 @@ NSString *terminalHeadString = @"";
 //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
 //    
 //    //Set up button
-////    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed
-////        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running
-////        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_SettingUp) {
+////    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed
+////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
+////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_SettingUp) {
 ////        self.setupButton.enabled = false;
 ////    }
 ////    else{
@@ -919,9 +919,9 @@ NSString *terminalHeadString = @"";
 //    
 //    //Create AMI button
 //    //Start button
-//    if ([[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Running
-//        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Configured
-//        || [[object valueForKey:@"masternodeState"] integerValue] == MasternodeState_Installed) {
+//    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
+//        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Configured
+//        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed) {
 //        self.startButton.enabled = true;
 //        self.createAmiButton.enabled = true;
 //    }

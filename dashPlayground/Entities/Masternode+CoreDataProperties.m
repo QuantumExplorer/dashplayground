@@ -29,7 +29,7 @@
 @dynamic instanceType;
 @dynamic isSelected;
 @dynamic key;
-@dynamic masternodeState;
+@dynamic dashcoreState;
 @dynamic operationPercentageDone;
 @dynamic publicIP;
 @dynamic repositoryUrl;
