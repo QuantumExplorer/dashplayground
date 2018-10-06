@@ -8,7 +8,7 @@
 
 #import "GithubAPI.h"
 #import "DPLocalNodeController.h"
-#import "DPDataStore.h"
+#import "DPAuthenticationManager.h"
 #import "DialogAlert.h"
 
 @implementation GithubAPI
@@ -16,18 +16,18 @@
 - (NSDictionary*)getSingleCommitDictionaryData:(NSString*)owner repository:(NSString*)repository commit:(NSString*)commitSha {
     //ex. https://api.github.com/repos/dashevo/dash/commits/73ed410715e70d43214400cfdce0186ad31468be -u 9455f27d248484a41f709b785165474680e3feb7:x-oauth-basic
     
-    if([[[DPDataStore sharedInstance] getGithubAccessToken] length] == 0) {
+    if([[[DPAuthenticationManager sharedInstance] getGithubAccessToken] length] == 0) {
         NSString *accessToken = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github access token" message:@"Please input your github access token."];
         
         if([accessToken length] == 0) {
             return nil;
         }
         else {
-            [[DPDataStore sharedInstance] setGithubAccessToken:accessToken];
+            [[DPAuthenticationManager sharedInstance] setGithubAccessToken:accessToken];
         }
     }
     
-    NSString *curlCommand = [NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/commits/%@ -u %@:x-oauth-basic", owner, repository, commitSha, [[DPDataStore sharedInstance] getGithubAccessToken]];
+    NSString *curlCommand = [NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/commits/%@ -u %@:x-oauth-basic", owner, repository, commitSha, [[DPAuthenticationManager sharedInstance] getGithubAccessToken]];
     
     NSDictionary *dict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:curlCommand checkError:YES];
     

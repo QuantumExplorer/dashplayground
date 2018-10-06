@@ -13,15 +13,24 @@ PODS:
   - AFNetworking/Security (3.2.1)
   - AFNetworking/Serialization (3.2.1)
   - NMSSH (2.3.0)
+  - RNCryptor-objc (3.0.6)
 
 DEPENDENCIES:
   - AFNetworking
   - NMSSH
+  - RNCryptor-objc
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - AFNetworking
+    - NMSSH
+    - RNCryptor-objc
 
 SPEC CHECKSUMS:
   AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
   NMSSH: 3633ce1e98bc860e309130042718d019434ddbf9
+  RNCryptor-objc: d1b228f9c02e2173df063f0617684c134aed890e
 
-PODFILE CHECKSUM: 3451c4e2cc6dd2d167094f7a24cb0755d0261f2b
+PODFILE CHECKSUM: 9ed17469b6a29a5ed00ea8c025ec1932cae2caec
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.3

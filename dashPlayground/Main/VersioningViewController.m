@@ -15,6 +15,7 @@
 #import "DPVersioningController.h"
 #import "MasternodeStateTransformer.h"
 #import "DialogAlert.h"
+#import "Masternode+CoreDataClass.h"
 
 @interface VersioningViewController ()
 
@@ -49,7 +50,7 @@
 @property (strong) IBOutlet NSButton *sentinelUpdateButton;
 @property (strong) IBOutlet NSButton *sentinelUpdateToLatestButton;
 
-@property (atomic) NSManagedObject* selectedObject;
+@property (strong,atomic) Masternode* selectedMasternode;
 
 @end
 
@@ -61,7 +62,11 @@
     [self setUpConsole];
     [self initialize];
     
-    [DPVersioningController sharedInstance].versioningViewController = self;
+    [DPVersioningController sharedInstance].delegate = self;
+}
+
+-(void)versionControllerRelayMessage:(NSString *)message {
+    [self addStringEvent:message];
 }
 
 -(void)setUpConsole {
@@ -113,13 +118,13 @@
         self.currentSentinelTextField.stringValue = @"";
         return;
     }
-    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    Masternode * masternode = [self.arrayController.arrangedObjects objectAtIndex:row];
     [self addStringEvent:@"Fetching information."];
-    self.selectedObject = object;
+    self.selectedMasternode = masternode;
     
     //Show current git head
-    if([[object valueForKey:@"gitCommit"] length] > 0) {
-        self.currentCoreTextField.stringValue = [object valueForKey:@"gitCommit"];
+    if([masternode.coreGitCommitVersion length] > 0) {
+        self.currentCoreTextField.stringValue = masternode.coreGitCommitVersion;
         self.coreUpdateButton.enabled = true;
     }
     else {
@@ -127,8 +132,8 @@
         self.currentCoreTextField.stringValue = @"";
     }
     
-    if([[object valueForKey:@"sentinelGitCommit"] length] > 0) {
-        self.currentSentinelTextField.stringValue = [object valueForKey:@"sentinelGitCommit"];
+    if([masternode.sentinelGitCommitVersion length] > 0) {
+        self.currentSentinelTextField.stringValue = masternode.sentinelGitCommitVersion;
         self.sentinelUpdateButton.enabled = true;
     }
     else {
@@ -137,17 +142,25 @@
     }
     
     //Show repositories version
-    if ([[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_Initial || [[object valueForKey:@"masternodeState"] integerValue] != MasternodeState_SettingUp) {
-        NSMutableArray *commitArrayData = [[DPVersioningController sharedInstance] getGitCommitInfo:object repositoryUrl:[object valueForKey:@"repositoryUrl"] onBranch:[object valueForKey:@"gitBranch"]];
-        [self.versionCoreButton removeAllItems];
-        if(commitArrayData != nil) [self.versionCoreButton addItemsWithTitles:commitArrayData];
+    if (masternode.masternodeState != MasternodeState_Initial || masternode.masternodeState != MasternodeState_SettingUp) {
+        [[DPVersioningController sharedInstance] fetchGitCommitInfoOnMasternode:masternode forProject:DPRepositoryProject_Core clb:^(BOOL success, NSArray *commitArrayData) {
+            if (success) {
+            [self.versionCoreButton removeAllItems];
+            if(commitArrayData != nil) [self.versionCoreButton addItemsWithTitles:commitArrayData];
+            }
+        }];
     }
     
-    //Show dapi version
-    NSMutableArray *commitArrayData = [[DPVersioningController sharedInstance] getGitCommitInfo:object repositoryUrl:@"https://github.com/dashevo/dapi.git" onBranch:@"develop"];
-    [self.dapiVersionPopUpButton removeAllItems];
-    if(commitArrayData != nil) [self.dapiVersionPopUpButton addItemsWithTitles:commitArrayData];
     
+    //Show dapi version
+    if (masternode.masternodeState != MasternodeState_Initial || masternode.masternodeState != MasternodeState_SettingUp) {
+        [[DPVersioningController sharedInstance] fetchGitCommitInfoOnMasternode:masternode forProject:DPRepositoryProject_Dapi clb:^(BOOL success, NSArray *commitArrayData) {
+            if (success) {
+                [self.versionCoreButton removeAllItems];
+                if(commitArrayData != nil) [self.dapiVersionPopUpButton addItemsWithTitles:commitArrayData];
+            }
+        }];
+    }
     [self addStringEvent:@"Fetched information."];
 }
 
@@ -168,7 +181,7 @@
         NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Warning!" message:@"Are you sure you already stopped dashd server before updating new version?"];
         
         if ([alert runModal] == NSAlertFirstButtonReturn) {
-            [[DPVersioningController sharedInstance] updateCore:[self.selectedObject valueForKey:@"publicIP"] repositoryUrl:[self.selectedObject valueForKey:@"repositoryUrl"] onBranch:[self.selectedObject valueForKey:@"gitBranch"] commitHead:[coreHead objectAtIndex:0]];
+            [[DPVersioningController sharedInstance] updateCore:[self.selectedMasternode valueForKey:@"publicIP"] repositoryUrl:[self.selectedMasternode valueForKey:@"repositoryUrl"] onBranch:[self.selectedMasternode valueForKey:@"gitBranch"] commitHead:[coreHead objectAtIndex:0]];
         }
     }
     
@@ -181,7 +194,7 @@
 
 - (IBAction)updateDapiToLatest:(id)sender {
     NSArray *dapiHead = [[self.dapiVersionPopUpButton.selectedItem title] componentsSeparatedByString:@","];
-    [[DPVersioningController sharedInstance] updateDapi:[self.selectedObject valueForKey:@"publicIP"] repositoryUrl:[self.selectedObject valueForKey:@"repositoryUrl"] onBranch:@"develop" commitHead:[dapiHead objectAtIndex:0]];
+    [[DPVersioningController sharedInstance] updateDapi:[self.selectedMasternode valueForKey:@"publicIP"] repositoryUrl:[self.selectedMasternode valueForKey:@"repositoryUrl"] onBranch:@"develop" commitHead:[dapiHead objectAtIndex:0]];
 }
 
 - (IBAction)updateDashDrive:(id)sender {

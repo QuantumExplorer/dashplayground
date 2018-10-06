@@ -12,6 +12,7 @@
 #import "DialogAlert.h"
 #import "DPLocalNodeController.h"
 #import "Branch+CoreDataClass.h"
+#import "NSData+Security.h"
 
 @implementation DPRepositoryController
 
@@ -24,7 +25,7 @@
             if ([[responseObject objectForKey:@"object"] objectForKey:@"sha"]) {
                 Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
                 branch.lastCommitSha = [[responseObject objectForKey:@"object"] objectForKey:@"sha"];
-                branch.repository.availability = isPrivate;
+                branch.repository.isPrivate = isPrivate;
                 [[DPDataStore sharedInstance] saveContext];
                 return clb(YES,nil);
             } else {
@@ -50,7 +51,7 @@
     if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
         Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
         branch.lastCommitSha = [[repositoryDict objectForKey:@"object"] objectForKey:@"sha"];
-        branch.repository.availability = 1;
+        branch.repository.isPrivate = 1;
         [[DPDataStore sharedInstance] saveContext];
         return clb(YES,nil);
     } else {

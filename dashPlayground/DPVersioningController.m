@@ -9,73 +9,53 @@
 #import "DPVersioningController.h"
 #import "DPLocalNodeController.h"
 #import "DPMasternodeController.h"
-#import "DialogAlert.h"
 #import "DPDataStore.h"
 #import "SshConnection.h"
-#import "VersioningViewController.h"
 #import "DPBuildServerController.h"
 #import "Masternode+CoreDataClass.h"
+#import "DPAuthenticationManager.h"
+#import "DialogAlert.h"
 
 @implementation DPVersioningController
 
-@synthesize versioningViewController = _versioningViewController;
-
-- (NSMutableArray*)getGitCommitInfo:(Masternode*)masternode repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch {
+- (void)fetchGitCommitInfoOnMasternode:(Masternode*)masternode forProject:(DPRepositoryProject)project clb:(dashArrayClb)clb {
+    Branch * branch = [masternode branchForProject:project];
+    Repository * repository = branch.repository;
+    if (!branch || !repository) {
+        clb(NO,nil);
+        return;
+    }
     
-    if([repositoryUrl length] > 1 && [gitBranch length] > 1) {
-        repositoryUrl = [repositoryUrl stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-        NSArray *repoArray = [repositoryUrl componentsSeparatedByString:@"/"];
-        
-        if([repoArray count] == 5) {
-            NSString *gitOwner = [repoArray objectAtIndex:3];
-            NSString *gitRepo = [repoArray objectAtIndex:4];
-            gitRepo = [gitRepo substringToIndex:[gitRepo length] - 4];
-            
-            NSDictionary *gitCommitDic = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/commits?sha=%@", gitOwner, gitRepo, gitBranch] checkError:NO];
+            NSDictionary *gitCommitDictionary = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/commits?sha=%@", repository.owner, repository.name, branch.name] checkError:NO];
             
             //if not found, let's assume this repository is private
-            if([gitCommitDic count] == 2 && [[gitCommitDic valueForKey:@"message"] isEqualToString:@"Not Found"]) {
+            if([gitCommitDictionary count] == 2 && [[gitCommitDictionary valueForKey:@"message"] isEqualToString:@"Not Found"]) {
                 
                 //Pop up to ask for Github username and password
                 
-                if([[[DPDataStore sharedInstance] githubUsername] length] <= 1 || [[[DPDataStore sharedInstance] githubPassword] length] <= 1) {
-                    [DPDataStore sharedInstance].githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
-                    [DPDataStore sharedInstance].githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
-                }
-                
-                if([[[DPDataStore sharedInstance] githubUsername] length] <= 1 || [[[DPDataStore sharedInstance] githubPassword] length] <= 1) return nil;
-                
-                gitCommitDic = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"-u %@:%@ https://api.github.com/repos/%@/%@/commits?sha=%@",[[DPDataStore sharedInstance] githubUsername], [[DPDataStore sharedInstance] githubPassword], gitOwner, gitRepo, gitBranch] checkError:NO];
-                
-                //if user put wrong username/password then reset attributes and do nothing
-                if([gitCommitDic count] == 2 && [[gitCommitDic valueForKey:@"message"] isEqualToString:@"Bad credentials"]) {
-                    [DPDataStore sharedInstance].githubUsername = @"";
-                    [DPDataStore sharedInstance].githubPassword = @"";
-                    [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"Wrong username or password."];
-                }
-                else {//if authentication passed
-                    return [self getGitCommitArrayData:gitCommitDic];
-                }
+                [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
+                    if (!authenticated) return;
+                    NSDictionary *gitCommitDictionary = [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"-u %@:%@ https://api.github.com/repos/%@/%@/commits?sha=%@",githubUsername, githubPassword, repository.owner, repository.name, branch.name] checkError:NO];
+                    
+                    //if user put wrong username/password then reset attributes and do nothing
+                    if([gitCommitDictionary count] == 2 && [[gitCommitDictionary valueForKey:@"message"] isEqualToString:@"Bad credentials"]) {
+                        //todo deal with bad credentials
+                        [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"Wrong username or password."];
+                    }
+                    else {//if authentication passed
+                        clb(YES,[self splitGitCommitArrayData:gitCommitDictionary]);
+                    }
+                }];
                 
             }
             else {//if everything's ok
-                return [self getGitCommitArrayData:gitCommitDic];
+                clb(YES,[self splitGitCommitArrayData:gitCommitDictionary]);
             }
-        }
-        else {
-            //this instance might install repository incorrent.
-            [[DialogAlert sharedInstance] showWarningAlert:@"Error" message:@"Could not access to this repository."];
-        }
-    }
-    else {//if this object has no attributes then update
-        [[DPMasternodeController sharedInstance] updateMasternodeAttributes:masternode];
-        [self getGitCommitInfo:masternode repositoryUrl:repositoryUrl onBranch:gitBranch];
-    }
     
-    return nil;
+
 }
 
-- (NSMutableArray*)getGitCommitArrayData:(NSDictionary*)dict {
+- (NSMutableArray*)splitGitCommitArrayData:(NSDictionary*)dict {
     NSMutableArray *gitCommitArray = [NSMutableArray array];
     
     int countObject = 0;
@@ -128,15 +108,15 @@
                         NSError *error = nil;
                         NSString *downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashCliCommand];
                         
-                        [self.versioningViewController addStringEvent:@"Downloading dash-cli..."];
+                        [self.delegate versionControllerRelayMessage:@"Downloading dash-cli..."];
                         [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
-                                [self.versioningViewController addStringEvent:@"Downloaded dash-cli successfully!"];
+                                [self.delegate versionControllerRelayMessage:@"Downloaded dash-cli successfully!"];
                             }
                             else {
-                                [self.versioningViewController addStringEvent:message];
+                                [self.delegate versionControllerRelayMessage:message];
                             }
                             isAllowedToContiunue = success;
                         }];
@@ -144,15 +124,15 @@
                         if(isAllowedToContiunue == NO) return;
                         
                         downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
-                        [self.versioningViewController addStringEvent:@"Downloading dashd..."];
+                        [self.delegate versionControllerRelayMessage:@"Downloading dashd..."];
                         [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
-                                [self.versioningViewController addStringEvent:@"Downloaded dashd successfully!"];
+                                [self.delegate versionControllerRelayMessage:@"Downloaded dashd successfully!"];
                             }
                             else {
-                                [self.versioningViewController addStringEvent:message];
+                                [self.delegate versionControllerRelayMessage:message];
                             }
                             isAllowedToContiunue = success;
                         }];
@@ -189,7 +169,7 @@
         }
     }
     else {
-        [self.versioningViewController addStringEvent:@"Error! There is some missing attributes. Please refresh and try again."];
+        [self.delegate versionControllerRelayMessage:@"Error! There is some missing attributes. Please refresh and try again."];
     }
 }
 
@@ -214,16 +194,16 @@
                         NSError *error = nil;
                         
                         
-                        [self.versioningViewController addStringEvent:@"Checking to see if DAPI is installed"];
+                        [self.delegate versionControllerRelayMessage:@"Checking to see if DAPI is installed"];
                         
                         [[SshConnection sharedInstance] sendExecuteCommand:checkDapiCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
-                                [self.versioningViewController addStringEvent:@"Downloaded dash-cli successfully!"];
+                                [self.delegate versionControllerRelayMessage:@"Downloaded dash-cli successfully!"];
                             }
                             else {
-                                [self.versioningViewController addStringEvent:message];
+                                [self.delegate versionControllerRelayMessage:message];
                             }
                             
                             NSString *gitCloneCommand = [NSString stringWithFormat:@"cd ~/src/ && git clone %@", repositoryUrl];
@@ -231,10 +211,10 @@
                                 NSLog(@"%@", message);
                                 
                                 if([message length] == 0) {
-                                    [self.versioningViewController addStringEvent:@"Downloaded dash-cli successfully!"];
+                                    [self.delegate versionControllerRelayMessage:@"Downloaded dash-cli successfully!"];
                                 }
                                 else {
-                                    [self.versioningViewController addStringEvent:message];
+                                    [self.delegate versionControllerRelayMessage:message];
                                 }
                             }];
                         }];
@@ -244,15 +224,15 @@
 
                         
 //                        NSString *checkDapiCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
-//                        [self.versioningViewController addStringEvent:@"Downloading dashd..."];
+//                        [self.delegate versionControllerRelayMessage:@"Downloading dashd..."];
 //                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
 //                            NSLog(@"%@", message);
 //
 //                            if([message length] == 0) {
-//                                [self.versioningViewController addStringEvent:@"Downloaded dashd successfully!"];
+//                                [self.delegate versionControllerRelayMessage:@"Downloaded dashd successfully!"];
 //                            }
 //                            else {
-//                                [self.versioningViewController addStringEvent:message];
+//                                [self.delegate versionControllerRelayMessage:message];
 //                            }
 //                            isAllowedToContiunue = success;
 //                        }];
@@ -289,7 +269,7 @@
         }
     }
     else {
-        [self.versioningViewController addStringEvent:@"Error! There is some missing attributes. Please refresh and try again."];
+        [self.delegate versionControllerRelayMessage:@"Error! There is some missing attributes. Please refresh and try again."];
     }
 }
 

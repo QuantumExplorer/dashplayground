@@ -17,8 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSFetchRequest<Repository *> *)fetchRequest;
 
 @property (nullable, nonatomic, copy) NSString *url;
+@property (nullable, nonatomic, copy) NSString *owner;
+@property (nullable, nonatomic, copy) NSString *name;
 @property (nonatomic) int16_t project;
-@property (nonatomic) int16_t availability;
+@property (nonatomic) int16_t isPrivate;
 @property (nullable, nonatomic, retain) NSSet<Branch *> *branches;
 
 @end

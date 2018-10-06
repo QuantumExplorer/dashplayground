@@ -8,8 +8,11 @@
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
 #import "DPTableView.h"
+#import "DPVersioningController.h"
 
-@interface VersioningViewController : NSViewController
+@protocol DPVersionControllerDelegate;
+
+@interface VersioningViewController : NSViewController <DPVersionControllerDelegate>
 
 @property (readonly, strong, nonatomic) AppDelegate *appDelegate;
 

@@ -18,8 +18,11 @@
 @dynamic amiId;
 @dynamic lastCommitSha;
 @dynamic name;
-@dynamic masternodes;
+@dynamic coreMasternodes;
 @dynamic repository;
-@dynamic sentinels;
+@dynamic sentinelMasternodes;
+@dynamic driveMasternodes;
+@dynamic dapiMasternodes;
+@dynamic insightMasternodes;
 
 @end

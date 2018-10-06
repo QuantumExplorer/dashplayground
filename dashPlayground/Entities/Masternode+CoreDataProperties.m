@@ -23,8 +23,7 @@
 @dynamic debugLastFetched;
 @dynamic debugLineCount;
 @dynamic debugOutput;
-@dynamic gitBranch;
-@dynamic gitCommit;
+@dynamic coreGitCommitVersion;
 @dynamic instanceId;
 @dynamic instanceState;
 @dynamic instanceType;
@@ -35,17 +34,18 @@
 @dynamic publicIP;
 @dynamic repositoryUrl;
 @dynamic rpcPassword;
-@dynamic sentinelGitBranch;
-@dynamic sentinelGitCommit;
+@dynamic sentinelGitCommitVersion;
 @dynamic sentinelState;
 @dynamic sentinelUrl;
-@dynamic sentinelVersion;
 @dynamic syncStatus;
 @dynamic transactionId;
 @dynamic transactionOutputIndex;
-@dynamic version;
-@dynamic branch;
+@dynamic coreSemanticVersion;
+@dynamic coreBranch;
 @dynamic sentinelBranch;
 @dynamic lastKnownHeight;
+@dynamic dapiBranch;
+@dynamic driveBranch;
+@dynamic insightBranch;
 
 @end

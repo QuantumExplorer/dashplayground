@@ -1616,7 +1616,60 @@
         if(error) {
             NSLog(@"%@",[error localizedDescription]);
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"Could not retieve configuration file");
+                clb(NO,nil,@"Could not retrieve configuration file");
+            });
+            return;
+        }
+        NSString *versionOutput = [ssh.channel execute:@"./src/dash/src/dash-cli --version" error:&error];
+        if(error) {
+            NSLog(@"%@",[error localizedDescription]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,nil,@"Could not retrieve version");
+            });
+            return;
+        }
+        [ssh disconnect];
+        
+        if([strOutput length] != 0 || strOutput != nil) {
+            NSArray * lines = [strOutput componentsSeparatedByString:@"\n"];
+            __block NSMutableDictionary * rDict = [NSMutableDictionary dictionary];
+            for (NSString * line in lines) {
+                if ([line hasPrefix:@"#"] || ![line containsString:@"="]) continue;
+                NSArray * valueKeys =[line componentsSeparatedByString:@"="];
+                [rDict setObject:valueKeys[1] forKey:valueKeys[0]];
+            }
+            if (versionOutput && [versionOutput containsString:@"-"]) {
+                NSString * version = [[[versionOutput componentsSeparatedByString:@"-"] lastObject] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                [rDict setObject:version forKey:@"gitversion"];
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                return clb(YES,rDict,nil);
+            });
+        }
+    });
+}
+
+-(void)retrieveVersionInfoThroughSSH:(Masternode*)masternode clb:(dashInfoClb)clb {
+    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        __block NMSSHSession *ssh;
+        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            ssh = sshSession;
+            if(!ssh.authorized) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,nil,@"Could not ssh in");
+                });
+                return;
+            }
+        }];
+        
+        NSError *error = nil;
+        NSString *strOutput = [ssh.channel execute:@"./src/dash/src/dash-cli --version" error:&error];
+        if(error) {
+            NSLog(@"%@",[error localizedDescription]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO,nil,@"Could not retrieve version");
             });
             return;
         }
@@ -1635,7 +1688,6 @@
             });
         }
     });
-    
 }
 
 #pragma mark - Masternode Checks
@@ -1823,57 +1875,60 @@
     });
 }
 
--(void)updateMasternodeAttributes:(Masternode*)masternode {
+-(void)updateMasternodeAttributes:(Masternode*)masternode clb:(dashClb)clb {
     __block NSString *publicIP = masternode.publicIP;
     __block NSString *rpcPassword = masternode.rpcPassword;
     __block NSString *chainNetwork = masternode.chainNetwork;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-            if(success != YES) return;
-            
-            NSArray *gitCommand = [NSArray array];
-            //check value "gitCommit
-            gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
-            NSDictionary * gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if(gitValues != nil) {
-                    [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
-                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                }
-                else {
-                    [masternode setValue:@"" forKey:@"gitCommit"];
-                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                }
-            });
-            
-            //check value "branch.name"
-            gitCommand = [[NSArray alloc] initWithObjects:@"branch", nil];
-            gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
-            if(gitValues != nil) {
-                NSArray *gitBranchArray = [[gitValues objectForKey:@"branch"] componentsSeparatedByString:@"\n"];
-                NSString *gitBranch = @"";
-                for(NSString *elements in gitBranchArray) {
-                    if ([elements rangeOfString:@"*"].location != NSNotFound) {
-                        NSArray *branchArray = [elements componentsSeparatedByString:@" "];
-                        if([branchArray count] >= 2) gitBranch = [branchArray objectAtIndex:1];
-                    }
-                }
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternode setValue:gitBranch forKey:@"gitBranch"];
-                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                });
+            if(success != YES) {
+                clb(NO,nil);
+                return;
             }
-            else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternode setValue:@"" forKey:@"gitBranch"];
-                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                });
-            }
+            
+            //NSArray *gitCommand = [NSArray array];
+//            //check value "gitCommit
+//            gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
+//            NSDictionary * gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                if(gitValues != nil) {
+//                    [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//                }
+//                else {
+//                    [masternode setValue:@"" forKey:@"gitCommit"];
+//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//                }
+//            });
+//
+//            //check value "branch.name"
+//            gitCommand = [[NSArray alloc] initWithObjects:@"branch", nil];
+//            gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
+//            if(gitValues != nil) {
+//                NSArray *gitBranchArray = [[gitValues objectForKey:@"branch"] componentsSeparatedByString:@"\n"];
+//                NSString *gitBranch = @"";
+//                for(NSString *elements in gitBranchArray) {
+//                    if ([elements rangeOfString:@"*"].location != NSNotFound) {
+//                        NSArray *branchArray = [elements componentsSeparatedByString:@" "];
+//                        if([branchArray count] >= 2) gitBranch = [branchArray objectAtIndex:1];
+//                    }
+//                }
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    [masternode setValue:gitBranch forKey:@"gitBranch"];
+//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//                });
+//            }
+//            else {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    [masternode setValue:@"" forKey:@"gitBranch"];
+//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+//                });
+//            }
             
             //check value "sentinelGitCommit"
-            gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
-            gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/.dashcore/sentinel"];
+            NSArray * gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
+            NSDictionary * gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/.dashcore/sentinel"];
             if(gitValues != nil) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"sentinelGitCommit"];
@@ -1927,12 +1982,14 @@
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [masternode setValue:[gitValues valueForKey:@"config --get remote.origin.url"] forKey:@"repositoryUrl"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    clb(YES,nil);
                 });
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [masternode setValue:@"" forKey:@"repositoryUrl"];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    clb(YES,nil);
                 });
             }
         }];
@@ -1945,7 +2002,9 @@
         if (success) {
             [self checkMasternode:masternode saveContext:TRUE clb:^(BOOL success, NSString *message) {
                 if (success && masternode.masternodeState == MasternodeState_Running) {
-                    [self updateMasternodeAttributes:masternode];
+                    [self updateMasternodeAttributes:masternode clb:^(BOOL success, NSString *message) {
+                        
+                    }];
                 }
             }];
         }
@@ -1961,10 +2020,13 @@
             //we most likely have access to rpc, it's running
             [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                 if (dictionary) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
                     masternode.masternodeState = MasternodeState_Running;
                     masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                        
                     clb(TRUE,nil);
+                    });
                 } else {
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                         if (value) {
@@ -1999,7 +2061,13 @@
             }];
         } else { //we don't have access to the rpc, let's ssh in and retrieve it.
             [self retrieveConfigurationInfoThroughSSH:masternode clb:^(BOOL success, NSDictionary *info, NSString *errorMessage) {
-                
+                if (info[@"gitversion"]) {
+                    __block NSString * gitVersion = info[@"gitversion"];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        masternode.coreGitCommitVersion = gitVersion;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    });
+                }
                 if (![info[@"externalip"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
                     //the masternode has never been configured
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {

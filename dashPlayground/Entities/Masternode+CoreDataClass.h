@@ -9,12 +9,16 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "Branch+CoreDataClass.h"
+#import "ProjectTypeTransformer.h"
 
 @class Branch;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Masternode : NSManagedObject
+
+-(Branch*)branchForProject:(DPRepositoryProject)project;
 
 @end
 

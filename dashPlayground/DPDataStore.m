@@ -13,30 +13,8 @@
 #import "Repository+CoreDataClass.h"
 #import "Branch+CoreDataClass.h"
 
-#define GITHUB_ACCESS_TOKEN @"GITHUB_ACCESS_TOKEN"
-#define GITHUB_SSH_PATH @"GITHUB_SSH_PATH"
-
 @implementation DPDataStore
 
--(void)setGithubAccessToken:(NSString *)githubAccessToken {
-    setKeychainString(githubAccessToken, GITHUB_ACCESS_TOKEN, YES);
-}
-
--(NSString*)getGithubAccessToken {
-    NSError * error = nil;
-    NSString * string = getKeychainString(GITHUB_ACCESS_TOKEN, &error);
-    if (!error) return string;
-    return @"";
-}
-
--(void)setGithubSSHPath:(NSString *)githubSshPath {
-    [[NSUserDefaults standardUserDefaults] setObject:githubSshPath forKey:GITHUB_SSH_PATH];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
--(NSString*)getGithubSSHPath {
-    return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_SSH_PATH];
-}
 
 #pragma mark - Repositories
 

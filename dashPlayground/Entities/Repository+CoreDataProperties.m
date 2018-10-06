@@ -17,7 +17,9 @@
 
 @dynamic url;
 @dynamic project;
-@dynamic availability;
+@dynamic isPrivate;
 @dynamic branches;
+@dynamic owner;
+@dynamic name;
 
 @end

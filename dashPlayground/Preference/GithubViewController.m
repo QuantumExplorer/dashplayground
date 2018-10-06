@@ -7,7 +7,7 @@
 //
 
 #import "GithubViewController.h"
-#import "DPDataStore.h"
+#import "DPAuthenticationManager.h"
 
 @interface GithubViewController ()
 
@@ -26,9 +26,9 @@
 }
 
 - (void)initialize {
-    if([[DPDataStore sharedInstance] getGithubAccessToken] != nil) self.accessTokenTextField.stringValue = [[DPDataStore sharedInstance] getGithubAccessToken];
+    if([[DPAuthenticationManager sharedInstance] getGithubAccessToken] != nil) self.accessTokenTextField.stringValue = [[DPAuthenticationManager sharedInstance] getGithubAccessToken];
     
-    if([[DPDataStore sharedInstance] getGithubSSHPath] != nil) self.sshPathTextField.stringValue = [[DPDataStore sharedInstance] getGithubSSHPath];
+    if([[DPAuthenticationManager sharedInstance] getGithubSSHPath] != nil) self.sshPathTextField.stringValue = [[DPAuthenticationManager sharedInstance] getGithubSSHPath];
 }
 
 - (IBAction)browseSshPath:(id)sender {
@@ -48,8 +48,8 @@
 
 
 - (IBAction)pressSave:(id)sender {
-    if([self.accessTokenTextField.stringValue length] != 0) [[DPDataStore sharedInstance] setGithubAccessToken:self.accessTokenTextField.stringValue];
-    if([self.sshPathTextField.stringValue length] != 0) [[DPDataStore sharedInstance] setGithubSSHPath:self.sshPathTextField.stringValue];
+    if([self.accessTokenTextField.stringValue length] != 0) [[DPAuthenticationManager sharedInstance] setGithubAccessToken:self.accessTokenTextField.stringValue];
+    if([self.sshPathTextField.stringValue length] != 0) [[DPAuthenticationManager sharedInstance] setGithubSSHPath:self.sshPathTextField.stringValue];
     
     [self dismissController:sender];
 }

@@ -8,6 +8,7 @@ target 'dashPlayground' do
   # Pods for dashPlayground
   pod 'AFNetworking'
   pod 'NMSSH'
+  pod 'RNCryptor-objc'
 
   target 'dashPlaygroundTests' do
     inherit! :search_paths

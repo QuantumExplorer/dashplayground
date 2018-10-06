@@ -64,7 +64,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NSString*)createSentinelConfFileForMasternode:(Masternode*)masternode;
 //-(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
 //-(void)updateMasternode:(NSManagedObject*)masternode;
--(void)updateMasternodeAttributes:(Masternode*)masternode;
+-(void)updateMasternodeAttributes:(Masternode*)masternode clb:(dashClb)clb;
 
 -(void)stopDashdOnRemote:(Masternode*)masternode onClb:(dashClb)clb;
 -(void)addNodeToLocal:(Masternode*)masternode clb:(dashClb)clb;
