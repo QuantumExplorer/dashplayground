@@ -46,14 +46,6 @@
 		FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683451E8731AD00F1AFB4 /* DPDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0683431E8731AD00F1AFB4 /* DPDataStore.m */; };
 		FB0683A91E875CDC00F1AFB4 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */; };
-		FB0683AF1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683AE1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib */; };
-		FB0683B01E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683AE1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib */; };
-		FB0683B31E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683B11E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib */; };
-		FB0683B41E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683B11E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib */; };
-		FB0683B51E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683B21E87662F00F1AFB4 /* libchilkatCocoa.a */; };
-		FB0683B61E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB0683B21E87662F00F1AFB4 /* libchilkatCocoa.a */; };
-		FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB06841C1E87674F00F1AFB4 /* empty.cpp */; };
-		FB06841F1E87674F00F1AFB4 /* empty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB06841C1E87674F00F1AFB4 /* empty.cpp */; };
 		FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */; };
 		FB0684241E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */; };
 		FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB0684261E92DA2000F1AFB4 /* RPCViewController.m */; };
@@ -77,6 +69,10 @@
 		FB3BCA312167BEE20071E4F1 /* ProjectTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA302167BEE20071E4F1 /* ProjectTypeTransformer.m */; };
 		FB3BCA332168D7690071E4F1 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB3BCA322168D7690071E4F1 /* LocalAuthentication.framework */; };
 		FB3BCA362168D7CE0071E4F1 /* DPAuthenticationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA352168D7CE0071E4F1 /* DPAuthenticationManager.m */; };
+		FB3BCA47216AD6360071E4F1 /* Branch+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA41216AD6360071E4F1 /* Branch+CoreDataClass.m */; };
+		FB3BCA48216AD6360071E4F1 /* Branch+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA42216AD6360071E4F1 /* Branch+CoreDataProperties.m */; };
+		FB3BCA49216AD6360071E4F1 /* Commit+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA45216AD6360071E4F1 /* Commit+CoreDataClass.m */; };
+		FB3BCA4A216AD6360071E4F1 /* Commit+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA46216AD6360071E4F1 /* Commit+CoreDataProperties.m */; };
 		FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB45054B1EA441C50066C6B9 /* DPTableView.m */; };
 		FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
 		FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
@@ -93,8 +89,6 @@
 		FB9EBCF61E98752500AE8AC3 /* DashcoreStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCF41E98752500AE8AC3 /* DashcoreStateTransformer.m */; };
 		FBB974C621678AEB00E2F976 /* Repository+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FBB974C021678AEB00E2F976 /* Repository+CoreDataClass.m */; };
 		FBB974C721678AEB00E2F976 /* Repository+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FBB974C121678AEB00E2F976 /* Repository+CoreDataProperties.m */; };
-		FBB974C821678AEB00E2F976 /* Branch+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FBB974C421678AEB00E2F976 /* Branch+CoreDataClass.m */; };
-		FBB974C921678AEB00E2F976 /* Branch+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FBB974C521678AEB00E2F976 /* Branch+CoreDataProperties.m */; };
 		FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */; };
 		FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
 		FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
@@ -204,111 +198,6 @@
 		FB0683A81E875CDC00F1AFB4 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = ../../../../../usr/lib/libz.1.dylib; sourceTree = "<group>"; };
 		FB0683AA1E875D0100F1AFB4 /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = ../../../../../usr/lib/libcrypto.0.9.8.dylib; sourceTree = "<group>"; };
 		FB0683AC1E875D3A00F1AFB4 /* libcrypto.35.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.35.dylib; path = ../../../../../usr/lib/libcrypto.35.dylib; sourceTree = "<group>"; };
-		FB0683AE1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcrypto.0.9.8.dylib; sourceTree = "<group>"; };
-		FB0683B11E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libchilkatCocoaDyn.dylib; sourceTree = "<group>"; };
-		FB0683B21E87662F00F1AFB4 /* libchilkatCocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libchilkatCocoa.a; sourceTree = "<group>"; };
-		FB0683B81E87663900F1AFB4 /* CkoAccounts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAccounts.h; sourceTree = "<group>"; };
-		FB0683B91E87663900F1AFB4 /* CkoAsn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAsn.h; sourceTree = "<group>"; };
-		FB0683BA1E87663900F1AFB4 /* CkoAtom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAtom.h; sourceTree = "<group>"; };
-		FB0683BB1E87663900F1AFB4 /* CkoAuthAws.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAuthAws.h; sourceTree = "<group>"; };
-		FB0683BC1E87663900F1AFB4 /* CkoAuthAzureAD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAuthAzureAD.h; sourceTree = "<group>"; };
-		FB0683BD1E87663900F1AFB4 /* CkoAuthAzureSAS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAuthAzureSAS.h; sourceTree = "<group>"; };
-		FB0683BE1E87663900F1AFB4 /* CkoAuthAzureStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAuthAzureStorage.h; sourceTree = "<group>"; };
-		FB0683BF1E87663900F1AFB4 /* CkoAuthFacebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAuthFacebook.h; sourceTree = "<group>"; };
-		FB0683C01E87663900F1AFB4 /* CkoAuthGoogle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoAuthGoogle.h; sourceTree = "<group>"; };
-		FB0683C11E87663900F1AFB4 /* CkoBaseProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoBaseProgress.h; sourceTree = "<group>"; };
-		FB0683C21E87663900F1AFB4 /* CkoBinData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoBinData.h; sourceTree = "<group>"; };
-		FB0683C31E87663900F1AFB4 /* CkoBounce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoBounce.h; sourceTree = "<group>"; };
-		FB0683C41E87663900F1AFB4 /* CkoBz2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoBz2.h; sourceTree = "<group>"; };
-		FB0683C51E87663900F1AFB4 /* CkoCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCache.h; sourceTree = "<group>"; };
-		FB0683C61E87663900F1AFB4 /* CkoCert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCert.h; sourceTree = "<group>"; };
-		FB0683C71E87663900F1AFB4 /* CkoCertChain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCertChain.h; sourceTree = "<group>"; };
-		FB0683C81E87663900F1AFB4 /* CkoCertStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCertStore.h; sourceTree = "<group>"; };
-		FB0683C91E87663900F1AFB4 /* CkoCgi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCgi.h; sourceTree = "<group>"; };
-		FB0683CA1E87663900F1AFB4 /* CkoCharset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCharset.h; sourceTree = "<group>"; };
-		FB0683CB1E87663900F1AFB4 /* CkoCompression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCompression.h; sourceTree = "<group>"; };
-		FB0683CC1E87663900F1AFB4 /* CkoCrypt2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCrypt2.h; sourceTree = "<group>"; };
-		FB0683CD1E87663900F1AFB4 /* CkoCsr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCsr.h; sourceTree = "<group>"; };
-		FB0683CE1E87663900F1AFB4 /* CkoCsv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoCsv.h; sourceTree = "<group>"; };
-		FB0683CF1E87663900F1AFB4 /* CkoDateTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoDateTime.h; sourceTree = "<group>"; };
-		FB0683D01E87663900F1AFB4 /* CkoDh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoDh.h; sourceTree = "<group>"; };
-		FB0683D11E87663900F1AFB4 /* CkoDirTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoDirTree.h; sourceTree = "<group>"; };
-		FB0683D21E87663900F1AFB4 /* CkoDkim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoDkim.h; sourceTree = "<group>"; };
-		FB0683D31E87663900F1AFB4 /* CkoDsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoDsa.h; sourceTree = "<group>"; };
-		FB0683D41E87663900F1AFB4 /* CkoDtObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoDtObj.h; sourceTree = "<group>"; };
-		FB0683D51E87663900F1AFB4 /* CkoEcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoEcc.h; sourceTree = "<group>"; };
-		FB0683D61E87663900F1AFB4 /* CkoEmail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoEmail.h; sourceTree = "<group>"; };
-		FB0683D71E87663900F1AFB4 /* CkoEmailBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoEmailBundle.h; sourceTree = "<group>"; };
-		FB0683D81E87663900F1AFB4 /* CkoFileAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoFileAccess.h; sourceTree = "<group>"; };
-		FB0683D91E87663900F1AFB4 /* CkoFtp2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoFtp2.h; sourceTree = "<group>"; };
-		FB0683DA1E87663900F1AFB4 /* CkoFtp2Progress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoFtp2Progress.h; sourceTree = "<group>"; };
-		FB0683DB1E87663900F1AFB4 /* CkoGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoGlobal.h; sourceTree = "<group>"; };
-		FB0683DC1E87663900F1AFB4 /* CkoGzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoGzip.h; sourceTree = "<group>"; };
-		FB0683DD1E87663900F1AFB4 /* CkoHashtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoHashtable.h; sourceTree = "<group>"; };
-		FB0683DE1E87663900F1AFB4 /* CkoHtmlToText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoHtmlToText.h; sourceTree = "<group>"; };
-		FB0683DF1E87663900F1AFB4 /* CkoHtmlToXml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoHtmlToXml.h; sourceTree = "<group>"; };
-		FB0683E01E87663900F1AFB4 /* CkoHttp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoHttp.h; sourceTree = "<group>"; };
-		FB0683E11E87663900F1AFB4 /* CkoHttpProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoHttpProgress.h; sourceTree = "<group>"; };
-		FB0683E21E87663900F1AFB4 /* CkoHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoHttpRequest.h; sourceTree = "<group>"; };
-		FB0683E31E87663900F1AFB4 /* CkoHttpResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoHttpResponse.h; sourceTree = "<group>"; };
-		FB0683E41E87663900F1AFB4 /* CkoImap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoImap.h; sourceTree = "<group>"; };
-		FB0683E51E87663900F1AFB4 /* CkoJavaKeyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoJavaKeyStore.h; sourceTree = "<group>"; };
-		FB0683E61E87663900F1AFB4 /* CkoJsonArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoJsonArray.h; sourceTree = "<group>"; };
-		FB0683E71E87663900F1AFB4 /* CkoJsonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoJsonObject.h; sourceTree = "<group>"; };
-		FB0683E81E87663900F1AFB4 /* CkoJwe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoJwe.h; sourceTree = "<group>"; };
-		FB0683E91E87663900F1AFB4 /* CkoJws.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoJws.h; sourceTree = "<group>"; };
-		FB0683EA1E87663900F1AFB4 /* CkoJwt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoJwt.h; sourceTree = "<group>"; };
-		FB0683EB1E87663900F1AFB4 /* CkoLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoLog.h; sourceTree = "<group>"; };
-		FB0683EC1E87663900F1AFB4 /* CkoMailboxes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoMailboxes.h; sourceTree = "<group>"; };
-		FB0683ED1E87663900F1AFB4 /* CkoMailMan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoMailMan.h; sourceTree = "<group>"; };
-		FB0683EE1E87663900F1AFB4 /* CkoMailManProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoMailManProgress.h; sourceTree = "<group>"; };
-		FB0683EF1E87663900F1AFB4 /* CkoMessageSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoMessageSet.h; sourceTree = "<group>"; };
-		FB0683F01E87663900F1AFB4 /* CkoMht.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoMht.h; sourceTree = "<group>"; };
-		FB0683F11E87663900F1AFB4 /* CkoMime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoMime.h; sourceTree = "<group>"; };
-		FB0683F21E87663900F1AFB4 /* CkoNtlm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoNtlm.h; sourceTree = "<group>"; };
-		FB0683F31E87663900F1AFB4 /* CkoOAuth1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoOAuth1.h; sourceTree = "<group>"; };
-		FB0683F41E87663900F1AFB4 /* CkoOAuth2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoOAuth2.h; sourceTree = "<group>"; };
-		FB0683F51E87663900F1AFB4 /* CkoPem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoPem.h; sourceTree = "<group>"; };
-		FB0683F61E87663900F1AFB4 /* CkoPfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoPfx.h; sourceTree = "<group>"; };
-		FB0683F71E87663900F1AFB4 /* CkoPrivateKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoPrivateKey.h; sourceTree = "<group>"; };
-		FB0683F81E87663900F1AFB4 /* CkoPrng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoPrng.h; sourceTree = "<group>"; };
-		FB0683F91E87663900F1AFB4 /* CkoProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoProgress.h; sourceTree = "<group>"; };
-		FB0683FA1E87663900F1AFB4 /* CkoPublicKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoPublicKey.h; sourceTree = "<group>"; };
-		FB0683FB1E87663900F1AFB4 /* CkoRest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoRest.h; sourceTree = "<group>"; };
-		FB0683FC1E87663900F1AFB4 /* CkoRsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoRsa.h; sourceTree = "<group>"; };
-		FB0683FD1E87663900F1AFB4 /* CkoRss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoRss.h; sourceTree = "<group>"; };
-		FB0683FE1E87663900F1AFB4 /* CkoScp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoScp.h; sourceTree = "<group>"; };
-		FB0683FF1E87663900F1AFB4 /* CkoServerSentEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoServerSentEvent.h; sourceTree = "<group>"; };
-		FB0684001E87663900F1AFB4 /* CkoSFtp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSFtp.h; sourceTree = "<group>"; };
-		FB0684011E87663900F1AFB4 /* CkoSFtpDir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSFtpDir.h; sourceTree = "<group>"; };
-		FB0684021E87663900F1AFB4 /* CkoSFtpFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSFtpFile.h; sourceTree = "<group>"; };
-		FB0684031E87663900F1AFB4 /* CkoSFtpProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSFtpProgress.h; sourceTree = "<group>"; };
-		FB0684041E87663900F1AFB4 /* CkoSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSocket.h; sourceTree = "<group>"; };
-		FB0684051E87663900F1AFB4 /* CkoSpider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSpider.h; sourceTree = "<group>"; };
-		FB0684061E87663900F1AFB4 /* CkoSsh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSsh.h; sourceTree = "<group>"; };
-		FB0684071E87663900F1AFB4 /* CkoSshKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSshKey.h; sourceTree = "<group>"; };
-		FB0684081E87663900F1AFB4 /* CkoSshTunnel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoSshTunnel.h; sourceTree = "<group>"; };
-		FB0684091E87663900F1AFB4 /* CkoStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoStream.h; sourceTree = "<group>"; };
-		FB06840A1E87663900F1AFB4 /* CkoStringArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoStringArray.h; sourceTree = "<group>"; };
-		FB06840B1E87663900F1AFB4 /* CkoStringBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoStringBuilder.h; sourceTree = "<group>"; };
-		FB06840C1E87663900F1AFB4 /* CkoStringTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoStringTable.h; sourceTree = "<group>"; };
-		FB06840D1E87663900F1AFB4 /* CkoTar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoTar.h; sourceTree = "<group>"; };
-		FB06840E1E87663900F1AFB4 /* CkoTarProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoTarProgress.h; sourceTree = "<group>"; };
-		FB06840F1E87663900F1AFB4 /* CkoTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoTask.h; sourceTree = "<group>"; };
-		FB0684101E87663900F1AFB4 /* CkoTaskChain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoTaskChain.h; sourceTree = "<group>"; };
-		FB0684111E87663900F1AFB4 /* CkoTrustedRoots.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoTrustedRoots.h; sourceTree = "<group>"; };
-		FB0684121E87663900F1AFB4 /* CkoUnixCompress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoUnixCompress.h; sourceTree = "<group>"; };
-		FB0684131E87663900F1AFB4 /* CkoUpload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoUpload.h; sourceTree = "<group>"; };
-		FB0684141E87663900F1AFB4 /* CkoUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoUrl.h; sourceTree = "<group>"; };
-		FB0684151E87663900F1AFB4 /* CkoXml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoXml.h; sourceTree = "<group>"; };
-		FB0684161E87663900F1AFB4 /* CkoXmlCertVault.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoXmlCertVault.h; sourceTree = "<group>"; };
-		FB0684171E87663900F1AFB4 /* CkoXmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoXmp.h; sourceTree = "<group>"; };
-		FB0684181E87663900F1AFB4 /* CkoZip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoZip.h; sourceTree = "<group>"; };
-		FB0684191E87663900F1AFB4 /* CkoZipCrc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoZipCrc.h; sourceTree = "<group>"; };
-		FB06841A1E87663900F1AFB4 /* CkoZipEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoZipEntry.h; sourceTree = "<group>"; };
-		FB06841B1E87663900F1AFB4 /* CkoZipProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CkoZipProgress.h; sourceTree = "<group>"; };
-		FB06841C1E87674F00F1AFB4 /* empty.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = empty.cpp; sourceTree = "<group>"; };
-		FB06841D1E87674F00F1AFB4 /* empty.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = empty.hpp; sourceTree = "<group>"; };
 		FB0684211E8CCDED00F1AFB4 /* InstanceStateTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstanceStateTransformer.h; sourceTree = "<group>"; };
 		FB0684221E8CCDED00F1AFB4 /* InstanceStateTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstanceStateTransformer.m; sourceTree = "<group>"; };
 		FB0684251E92DA2000F1AFB4 /* RPCViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCViewController.h; sourceTree = "<group>"; };
@@ -344,6 +233,15 @@
 		FB3BCA322168D7690071E4F1 /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
 		FB3BCA342168D7CE0071E4F1 /* DPAuthenticationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DPAuthenticationManager.h; sourceTree = "<group>"; };
 		FB3BCA352168D7CE0071E4F1 /* DPAuthenticationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DPAuthenticationManager.m; sourceTree = "<group>"; };
+		FB3BCA37216A613F0071E4F1 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		FB3BCA3F216AD6360071E4F1 /* Branch+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Branch+CoreDataProperties.h"; sourceTree = "<group>"; };
+		FB3BCA40216AD6360071E4F1 /* Branch+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Branch+CoreDataClass.h"; sourceTree = "<group>"; };
+		FB3BCA41216AD6360071E4F1 /* Branch+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Branch+CoreDataClass.m"; sourceTree = "<group>"; };
+		FB3BCA42216AD6360071E4F1 /* Branch+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Branch+CoreDataProperties.m"; sourceTree = "<group>"; };
+		FB3BCA43216AD6360071E4F1 /* Commit+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Commit+CoreDataProperties.h"; sourceTree = "<group>"; };
+		FB3BCA44216AD6360071E4F1 /* Commit+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Commit+CoreDataClass.h"; sourceTree = "<group>"; };
+		FB3BCA45216AD6360071E4F1 /* Commit+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Commit+CoreDataClass.m"; sourceTree = "<group>"; };
+		FB3BCA46216AD6360071E4F1 /* Commit+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Commit+CoreDataProperties.m"; sourceTree = "<group>"; };
 		FB45054A1EA441C50066C6B9 /* DPTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPTableView.h; sourceTree = "<group>"; };
 		FB45054B1EA441C50066C6B9 /* DPTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPTableView.m; sourceTree = "<group>"; };
 		FB46AE891E95618400D4B034 /* DPLocalNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPLocalNodeController.h; sourceTree = "<group>"; };
@@ -373,10 +271,6 @@
 		FBB974BF21678AEB00E2F976 /* Repository+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Repository+CoreDataClass.h"; sourceTree = "<group>"; };
 		FBB974C021678AEB00E2F976 /* Repository+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Repository+CoreDataClass.m"; sourceTree = "<group>"; };
 		FBB974C121678AEB00E2F976 /* Repository+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Repository+CoreDataProperties.m"; sourceTree = "<group>"; };
-		FBB974C221678AEB00E2F976 /* Branch+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Branch+CoreDataProperties.h"; sourceTree = "<group>"; };
-		FBB974C321678AEB00E2F976 /* Branch+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Branch+CoreDataClass.h"; sourceTree = "<group>"; };
-		FBB974C421678AEB00E2F976 /* Branch+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Branch+CoreDataClass.m"; sourceTree = "<group>"; };
-		FBB974C521678AEB00E2F976 /* Branch+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Branch+CoreDataProperties.m"; sourceTree = "<group>"; };
 		FBBAF9A41EB0562400D6F568 /* Notification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Notification.h; sourceTree = "<group>"; };
 		FBBFEB221E86B7CB00BE41BE /* PlaygroundModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PlaygroundModel.xcdatamodel; sourceTree = "<group>"; };
 		FBBFEB241E86C44E00BE41BE /* MasternodesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasternodesViewController.h; sourceTree = "<group>"; };
@@ -393,9 +287,6 @@
 			files = (
 				FB3BCA332168D7690071E4F1 /* LocalAuthentication.framework in Frameworks */,
 				FB0683A91E875CDC00F1AFB4 /* libz.1.dylib in Frameworks */,
-				FB0683B31E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
-				FB0683B51E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
-				FB0683AF1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
 				9301D4C70E08DD5AB9ABFBF9 /* libPods-dashPlayground.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -404,9 +295,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB0683B61E87662F00F1AFB4 /* libchilkatCocoa.a in Frameworks */,
-				FB0683B41E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib in Frameworks */,
-				FB0683B01E875D6800F1AFB4 /* libcrypto.0.9.8.dylib in Frameworks */,
 				EB1383B3413C8C6236CB2B47 /* libPods-dashPlaygroundTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -489,6 +377,7 @@
 		FB0683A71E875CDC00F1AFB4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FB3BCA37216A613F0071E4F1 /* Accelerate.framework */,
 				FB3BCA322168D7690071E4F1 /* LocalAuthentication.framework */,
 				FB0683AC1E875D3A00F1AFB4 /* libcrypto.35.dylib */,
 				FB0683AA1E875D0100F1AFB4 /* libcrypto.0.9.8.dylib */,
@@ -497,115 +386,6 @@
 				39A0819742DEFE84104C2F88 /* libPods-dashPlaygroundTests.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		FB0683B71E87663900F1AFB4 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				FB0683B81E87663900F1AFB4 /* CkoAccounts.h */,
-				FB0683B91E87663900F1AFB4 /* CkoAsn.h */,
-				FB0683BA1E87663900F1AFB4 /* CkoAtom.h */,
-				FB0683BB1E87663900F1AFB4 /* CkoAuthAws.h */,
-				FB0683BC1E87663900F1AFB4 /* CkoAuthAzureAD.h */,
-				FB0683BD1E87663900F1AFB4 /* CkoAuthAzureSAS.h */,
-				FB0683BE1E87663900F1AFB4 /* CkoAuthAzureStorage.h */,
-				FB0683BF1E87663900F1AFB4 /* CkoAuthFacebook.h */,
-				FB0683C01E87663900F1AFB4 /* CkoAuthGoogle.h */,
-				FB0683C11E87663900F1AFB4 /* CkoBaseProgress.h */,
-				FB0683C21E87663900F1AFB4 /* CkoBinData.h */,
-				FB0683C31E87663900F1AFB4 /* CkoBounce.h */,
-				FB0683C41E87663900F1AFB4 /* CkoBz2.h */,
-				FB0683C51E87663900F1AFB4 /* CkoCache.h */,
-				FB0683C61E87663900F1AFB4 /* CkoCert.h */,
-				FB0683C71E87663900F1AFB4 /* CkoCertChain.h */,
-				FB0683C81E87663900F1AFB4 /* CkoCertStore.h */,
-				FB0683C91E87663900F1AFB4 /* CkoCgi.h */,
-				FB0683CA1E87663900F1AFB4 /* CkoCharset.h */,
-				FB0683CB1E87663900F1AFB4 /* CkoCompression.h */,
-				FB0683CC1E87663900F1AFB4 /* CkoCrypt2.h */,
-				FB0683CD1E87663900F1AFB4 /* CkoCsr.h */,
-				FB0683CE1E87663900F1AFB4 /* CkoCsv.h */,
-				FB0683CF1E87663900F1AFB4 /* CkoDateTime.h */,
-				FB0683D01E87663900F1AFB4 /* CkoDh.h */,
-				FB0683D11E87663900F1AFB4 /* CkoDirTree.h */,
-				FB0683D21E87663900F1AFB4 /* CkoDkim.h */,
-				FB0683D31E87663900F1AFB4 /* CkoDsa.h */,
-				FB0683D41E87663900F1AFB4 /* CkoDtObj.h */,
-				FB0683D51E87663900F1AFB4 /* CkoEcc.h */,
-				FB0683D61E87663900F1AFB4 /* CkoEmail.h */,
-				FB0683D71E87663900F1AFB4 /* CkoEmailBundle.h */,
-				FB0683D81E87663900F1AFB4 /* CkoFileAccess.h */,
-				FB0683D91E87663900F1AFB4 /* CkoFtp2.h */,
-				FB0683DA1E87663900F1AFB4 /* CkoFtp2Progress.h */,
-				FB0683DB1E87663900F1AFB4 /* CkoGlobal.h */,
-				FB0683DC1E87663900F1AFB4 /* CkoGzip.h */,
-				FB0683DD1E87663900F1AFB4 /* CkoHashtable.h */,
-				FB0683DE1E87663900F1AFB4 /* CkoHtmlToText.h */,
-				FB0683DF1E87663900F1AFB4 /* CkoHtmlToXml.h */,
-				FB0683E01E87663900F1AFB4 /* CkoHttp.h */,
-				FB0683E11E87663900F1AFB4 /* CkoHttpProgress.h */,
-				FB0683E21E87663900F1AFB4 /* CkoHttpRequest.h */,
-				FB0683E31E87663900F1AFB4 /* CkoHttpResponse.h */,
-				FB0683E41E87663900F1AFB4 /* CkoImap.h */,
-				FB0683E51E87663900F1AFB4 /* CkoJavaKeyStore.h */,
-				FB0683E61E87663900F1AFB4 /* CkoJsonArray.h */,
-				FB0683E71E87663900F1AFB4 /* CkoJsonObject.h */,
-				FB0683E81E87663900F1AFB4 /* CkoJwe.h */,
-				FB0683E91E87663900F1AFB4 /* CkoJws.h */,
-				FB0683EA1E87663900F1AFB4 /* CkoJwt.h */,
-				FB0683EB1E87663900F1AFB4 /* CkoLog.h */,
-				FB0683EC1E87663900F1AFB4 /* CkoMailboxes.h */,
-				FB0683ED1E87663900F1AFB4 /* CkoMailMan.h */,
-				FB0683EE1E87663900F1AFB4 /* CkoMailManProgress.h */,
-				FB0683EF1E87663900F1AFB4 /* CkoMessageSet.h */,
-				FB0683F01E87663900F1AFB4 /* CkoMht.h */,
-				FB0683F11E87663900F1AFB4 /* CkoMime.h */,
-				FB0683F21E87663900F1AFB4 /* CkoNtlm.h */,
-				FB0683F31E87663900F1AFB4 /* CkoOAuth1.h */,
-				FB0683F41E87663900F1AFB4 /* CkoOAuth2.h */,
-				FB0683F51E87663900F1AFB4 /* CkoPem.h */,
-				FB0683F61E87663900F1AFB4 /* CkoPfx.h */,
-				FB0683F71E87663900F1AFB4 /* CkoPrivateKey.h */,
-				FB0683F81E87663900F1AFB4 /* CkoPrng.h */,
-				FB0683F91E87663900F1AFB4 /* CkoProgress.h */,
-				FB0683FA1E87663900F1AFB4 /* CkoPublicKey.h */,
-				FB0683FB1E87663900F1AFB4 /* CkoRest.h */,
-				FB0683FC1E87663900F1AFB4 /* CkoRsa.h */,
-				FB0683FD1E87663900F1AFB4 /* CkoRss.h */,
-				FB0683FE1E87663900F1AFB4 /* CkoScp.h */,
-				FB0683FF1E87663900F1AFB4 /* CkoServerSentEvent.h */,
-				FB0684001E87663900F1AFB4 /* CkoSFtp.h */,
-				FB0684011E87663900F1AFB4 /* CkoSFtpDir.h */,
-				FB0684021E87663900F1AFB4 /* CkoSFtpFile.h */,
-				FB0684031E87663900F1AFB4 /* CkoSFtpProgress.h */,
-				FB0684041E87663900F1AFB4 /* CkoSocket.h */,
-				FB0684051E87663900F1AFB4 /* CkoSpider.h */,
-				FB0684061E87663900F1AFB4 /* CkoSsh.h */,
-				FB0684071E87663900F1AFB4 /* CkoSshKey.h */,
-				FB0684081E87663900F1AFB4 /* CkoSshTunnel.h */,
-				FB0684091E87663900F1AFB4 /* CkoStream.h */,
-				FB06840A1E87663900F1AFB4 /* CkoStringArray.h */,
-				FB06840B1E87663900F1AFB4 /* CkoStringBuilder.h */,
-				FB06840C1E87663900F1AFB4 /* CkoStringTable.h */,
-				FB06840D1E87663900F1AFB4 /* CkoTar.h */,
-				FB06840E1E87663900F1AFB4 /* CkoTarProgress.h */,
-				FB06840F1E87663900F1AFB4 /* CkoTask.h */,
-				FB0684101E87663900F1AFB4 /* CkoTaskChain.h */,
-				FB0684111E87663900F1AFB4 /* CkoTrustedRoots.h */,
-				FB0684121E87663900F1AFB4 /* CkoUnixCompress.h */,
-				FB0684131E87663900F1AFB4 /* CkoUpload.h */,
-				FB0684141E87663900F1AFB4 /* CkoUrl.h */,
-				FB0684151E87663900F1AFB4 /* CkoXml.h */,
-				FB0684161E87663900F1AFB4 /* CkoXmlCertVault.h */,
-				FB0684171E87663900F1AFB4 /* CkoXmp.h */,
-				FB0684181E87663900F1AFB4 /* CkoZip.h */,
-				FB0684191E87663900F1AFB4 /* CkoZipCrc.h */,
-				FB06841A1E87663900F1AFB4 /* CkoZipEntry.h */,
-				FB06841B1E87663900F1AFB4 /* CkoZipProgress.h */,
-				FB06841C1E87674F00F1AFB4 /* empty.cpp */,
-				FB06841D1E87674F00F1AFB4 /* empty.hpp */,
-			);
-			path = include;
 			sourceTree = "<group>";
 		};
 		FB0684201E8CCDC200F1AFB4 /* Transformers */ = {
@@ -676,10 +456,6 @@
 				FB2906681E85799F00A31092 /* Supporting Files */,
 				FBBFEB211E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld */,
 				FBBFEB281E86EED600BE41BE /* Defines.h */,
-				FB0683B71E87663900F1AFB4 /* include */,
-				FB0683B11E87662F00F1AFB4 /* libchilkatCocoaDyn.dylib */,
-				FB0683B21E87662F00F1AFB4 /* libchilkatCocoa.a */,
-				FB0683AE1E875D6800F1AFB4 /* libcrypto.0.9.8.dylib */,
 				FB5A31CB1E9EAD21003D4DD8 /* DashCallbacks.h */,
 			);
 			path = dashPlayground;
@@ -767,6 +543,14 @@
 		FBB974A52167884B00E2F976 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				FB3BCA3F216AD6360071E4F1 /* Branch+CoreDataProperties.h */,
+				FB3BCA40216AD6360071E4F1 /* Branch+CoreDataClass.h */,
+				FB3BCA41216AD6360071E4F1 /* Branch+CoreDataClass.m */,
+				FB3BCA42216AD6360071E4F1 /* Branch+CoreDataProperties.m */,
+				FB3BCA43216AD6360071E4F1 /* Commit+CoreDataProperties.h */,
+				FB3BCA44216AD6360071E4F1 /* Commit+CoreDataClass.h */,
+				FB3BCA45216AD6360071E4F1 /* Commit+CoreDataClass.m */,
+				FB3BCA46216AD6360071E4F1 /* Commit+CoreDataProperties.m */,
 				FB3BCA2321678C030071E4F1 /* Masternode+CoreDataProperties.h */,
 				FB3BCA2421678C030071E4F1 /* Masternode+CoreDataClass.h */,
 				FB3BCA2521678C030071E4F1 /* Masternode+CoreDataClass.m */,
@@ -779,10 +563,6 @@
 				FBB974BF21678AEB00E2F976 /* Repository+CoreDataClass.h */,
 				FBB974C021678AEB00E2F976 /* Repository+CoreDataClass.m */,
 				FBB974C121678AEB00E2F976 /* Repository+CoreDataProperties.m */,
-				FBB974C221678AEB00E2F976 /* Branch+CoreDataProperties.h */,
-				FBB974C321678AEB00E2F976 /* Branch+CoreDataClass.h */,
-				FBB974C421678AEB00E2F976 /* Branch+CoreDataClass.m */,
-				FBB974C521678AEB00E2F976 /* Branch+CoreDataProperties.m */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -959,6 +739,7 @@
 			files = (
 				A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */,
 				A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */,
+				FB3BCA49216AD6360071E4F1 /* Commit+CoreDataClass.m in Sources */,
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,
 				FBEBB107215D5E490058E7C3 /* NSData+Security.m in Sources */,
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
@@ -967,13 +748,11 @@
 				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
 				A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,
-				FBB974C821678AEB00E2F976 /* Branch+CoreDataClass.m in Sources */,
 				A581772420DC02E9009240BD /* AWSViewController.m in Sources */,
 				A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* DashcoreStateTransformer.m in Sources */,
 				A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */,
-				FB06841E1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				A5142E7720E36259000AB18E /* DebugTypeTransformer.m in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
@@ -990,7 +769,6 @@
 				A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */,
 				A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */,
 				A516B45720908324009A59C0 /* DialogAlert.m in Sources */,
-				FBB974C921678AEB00E2F976 /* Branch+CoreDataProperties.m in Sources */,
 				FB0684231E8CCDED00F1AFB4 /* InstanceStateTransformer.m in Sources */,
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
 				A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */,
@@ -998,6 +776,7 @@
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FBB974C621678AEB00E2F976 /* Repository+CoreDataClass.m in Sources */,
 				FB3BCA2E21678C030071E4F1 /* Message+CoreDataProperties.m in Sources */,
+				FB3BCA4A216AD6360071E4F1 /* Commit+CoreDataProperties.m in Sources */,
 				A560483421143DED00DA161D /* BuildServerViewController.m in Sources */,
 				FB3BCA2C21678C030071E4F1 /* Masternode+CoreDataProperties.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
@@ -1007,6 +786,7 @@
 				FB3BCA362168D7CE0071E4F1 /* DPAuthenticationManager.m in Sources */,
 				FB3BCA2B21678C030071E4F1 /* Masternode+CoreDataClass.m in Sources */,
 				FBB974C721678AEB00E2F976 /* Repository+CoreDataProperties.m in Sources */,
+				FB3BCA48216AD6360071E4F1 /* Branch+CoreDataProperties.m in Sources */,
 				A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */,
 				FBEBB105215D5E430058E7C3 /* NSMutableData+Security.m in Sources */,
 				A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */,
@@ -1015,6 +795,7 @@
 				A52A01672126CBE900E32B56 /* GithubViewController.m in Sources */,
 				A560482B210B74E800DA161D /* DAPIStateTransformer.m in Sources */,
 				A55FC0D32099BA22004B23FE /* VolumeViewController.m in Sources */,
+				FB3BCA47216AD6360071E4F1 /* Branch+CoreDataClass.m in Sources */,
 				FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */,
 				A5604831210EE6B000DA161D /* DPVersioningController.m in Sources */,
 				A515E7CC20AA953400CB5495 /* AvailabilityViewController.m in Sources */,
@@ -1032,7 +813,6 @@
 				FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */,
 				FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */,
-				FB06841F1E87674F00F1AFB4 /* empty.cpp in Sources */,
 				FB9EBCF21E98738C00AE8AC3 /* MasternodeSyncStatusTransformer.m in Sources */,
 				FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */,
 				FB0684281E92DA2000F1AFB4 /* RPCViewController.m in Sources */,

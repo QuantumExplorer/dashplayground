@@ -20,7 +20,7 @@
     return NO;
 }
 
--(NSUInteger)typeForTypeName:(NSString*)string {
++(DPRepositoryProject)typeForTypeName:(NSString*)string {
     NSString * lowercaseString = [string lowercaseString];
     if ([lowercaseString isEqualToString:@"core"]) {
         return DPRepositoryProject_Core;
@@ -32,6 +32,8 @@
         return DPRepositoryProject_Insight;
     } else if ([string isEqualToString:@"sentinel"]) {
         return DPRepositoryProject_Sentinel;
+    } else if ([string isEqualToString:@"all"]) {
+        return DPRepositoryProject_All;
     }
     return DPRepositoryProject_Unknown;
 }
@@ -59,6 +61,33 @@
     }
 }
 
++(NSString*)developBranchForProject:(NSInteger)project {
+    switch (project) {
+        case DPRepositoryProject_Core:
+            return @"evo";
+            break;
+        case DPRepositoryProject_Dapi:
+            return @"develop";
+            break;
+        case DPRepositoryProject_Drive:
+            return @"master";
+            break;
+        case DPRepositoryProject_Insight:
+            return @"develop";
+            break;
+        case DPRepositoryProject_Sentinel:
+            return @"master";
+            break;
+        default:
+            return @"master";
+            break;
+    }
+}
+
++(NSString*)directoryForProjectName:(NSString*)string {
+    return [self directoryForProject:[self typeForTypeName:string]];
+}
+
 - (id)transformedValue:(id)value
 {
     switch ([value integerValue]) {
@@ -77,7 +106,9 @@
         case DPRepositoryProject_Sentinel:
             return @"Sentinel";
             break;
-            
+        case DPRepositoryProject_All:
+            return @"All";
+            break;
         default:
             return @"unknown";
             break;

@@ -28,18 +28,10 @@
 - (BOOL)deleteKeyPressedForTableView:(DPTableView *)tableView {
     NSInteger row = self.tableView.selectedRow;
     if (row == -1) return FALSE;
-    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-    if ([[object valueForKey:@"masternodes"] count]) {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-        dict[NSLocalizedDescriptionKey] = @"This branch has masternodes, stop them first";
-        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-        [[NSApplication sharedApplication] presentError:error];
-    } else {
-        
-        [[DPDataStore sharedInstance] deleteRepository:object]; //Toey, delete in main context
-//        [[DPDataStore sharedInstance] deleteObject:object];
-//        [[DPDataStore sharedInstance] saveContext];
-    }
+    Branch * branch = [self.arrayController.arrangedObjects objectAtIndex:row];
+
+    [[DPDataStore sharedInstance] deleteBranch:branch];
+
     return YES;
 }
 
@@ -83,10 +75,11 @@
 
 - (IBAction)pressAddRepository:(id)sender {
     NSString * branchName = [self.branchAddField stringValue];
-    if (!branchName || [branchName isEqualToString:@""]) branchName = @"master";
+
     
     NSUInteger repositoryAvailabilityIndex = [self.repositoryAvailabilityPopUpButton.objectValue integerValue];
-    NSUInteger repositoryProjectIndex = [self.repositoryProjectPopUpButton.objectValue integerValue];
+    NSString * repositoryProjectString = self.repositoryProjectPopUpButton.titleOfSelectedItem;
+    DPRepositoryProject project = [ProjectTypeTransformer typeForTypeName:repositoryProjectString];
     BOOL isPrivate = (repositoryAvailabilityIndex != 0);
     
     if ([[self.repositoryAddField stringValue] length] > 0) {
@@ -102,40 +95,40 @@
                 user = url.pathComponents[1];
             }
         } else {
-            switch (repositoryProjectIndex) {
-                case DPRepositoryProject_Core:
-                    repositoryLocation = @"dash";
-                    break;
-                case DPRepositoryProject_Dapi:
-                    repositoryLocation = @"dapi";
-                    break;
-                case DPRepositoryProject_Drive:
-                    repositoryLocation = @"dashdrive";
-                    break;
-                case DPRepositoryProject_Insight:
-                    repositoryLocation = @"insight";
-                    break;
-                case DPRepositoryProject_Sentinel:
-                    repositoryLocation = @"sentinel";
-                    break;
-                    
-                default:
-                    break;
-            }
-            
+            repositoryLocation = [ProjectTypeTransformer directoryForProjectName:repositoryProjectString];
             user = url;
         }
-        [[DPRepositoryController sharedInstance] addRepository:repositoryLocation forProject:repositoryProjectIndex forUser:user branchName:branchName isPrivate:isPrivate clb:^(BOOL success, NSString *message) {
-            if (!success) {
-                NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-                dict[NSLocalizedDescriptionKey] = message;
-                NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-                [[NSApplication sharedApplication] presentError:error];
-            } else {
-                self.repositoryAddField.stringValue = @"";
-                self.branchAddField.stringValue = @"";
+        if (project == DPRepositoryProject_All) {
+            for (project = 0;project <= DPRepositoryProject_Last;project++) {
+                if (![self.branchAddField stringValue] || [[self.branchAddField stringValue] isEqualToString:@""]) branchName = [ProjectTypeTransformer developBranchForProject:project];
+                repositoryLocation = [ProjectTypeTransformer directoryForProject:project];
+                [[DPRepositoryController sharedInstance] addRepository:repositoryLocation forProject:project forUser:user branchName:branchName isPrivate:isPrivate clb:^(BOOL success, NSString *message) {
+                    if (!success) {
+                        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                        dict[NSLocalizedDescriptionKey] = message;
+                        NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                        [[NSApplication sharedApplication] presentError:error];
+                    } else {
+                        self.repositoryAddField.stringValue = @"";
+                        self.branchAddField.stringValue = @"";
+                    }
+                }];
             }
-        }];
+        } else {
+            if (!branchName || [branchName isEqualToString:@""]) branchName = [ProjectTypeTransformer developBranchForProject:project];
+            [[DPRepositoryController sharedInstance] addRepository:repositoryLocation forProject:project forUser:user branchName:branchName isPrivate:isPrivate clb:^(BOOL success, NSString *message) {
+                if (!success) {
+                    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                    dict[NSLocalizedDescriptionKey] = message;
+                    NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                    [[NSApplication sharedApplication] presentError:error];
+                } else {
+                    self.repositoryAddField.stringValue = @"";
+                    self.branchAddField.stringValue = @"";
+                }
+            }];
+        }
+
     } else {
         NSMutableDictionary *dict = [NSMutableDictionary dictionary];
         dict[NSLocalizedDescriptionKey] = @"Fields are empty";

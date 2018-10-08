@@ -16,11 +16,15 @@
 #import "DashcoreStateTransformer.h"
 #import "DialogAlert.h"
 #import "Masternode+CoreDataClass.h"
+#import "AppDelegate.h"
 
 @interface VersioningViewController ()
 
+@property (readonly) NSManagedObjectContext * managedObjectContext;
+
 @property (strong) IBOutlet NSTableView *tableView;
 @property (strong) IBOutlet NSArrayController *arrayController;
+@property (strong) IBOutlet NSArrayController *dapiRepositoriesController;
 
 @property (strong) ConsoleEventArray * consoleEvents;
 @property (strong) IBOutlet NSTextView *consoleTextField;
@@ -40,6 +44,7 @@
 @property (strong) IBOutlet NSButton *dashDriveUpdateButton;
 @property (strong) IBOutlet NSButton *dashDriveUpdateToLatestButton;
 
+@property (strong) IBOutlet NSTextField *currentInsightVersionTextField;
 @property (strong) IBOutlet NSButton *insightUpdateButton;
 @property (strong) IBOutlet NSButton *insightUpdateToLatestButton;
 
@@ -63,6 +68,10 @@
     [self initialize];
     
     [DPVersioningController sharedInstance].delegate = self;
+}
+
+-(NSManagedObjectContext*)managedObjectContext {
+    return ((AppDelegate*)[NSApplication sharedApplication].delegate).managedObjectContext;
 }
 
 -(void)versionControllerRelayMessage:(NSString *)message {

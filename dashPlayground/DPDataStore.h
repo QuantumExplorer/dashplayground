@@ -11,7 +11,7 @@
 #import "InstanceStateTransformer.h"
 #import "Repository+CoreDataClass.h"
 
-@class Repository,Branch;
+@class Repository,Branch,Masternode;
 
 typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
@@ -23,7 +23,7 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 #pragma mark - Repositories
 
--(Branch*)branchNamed:(NSString*)string inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath;
+-(Branch*)branchNamed:(NSString*)branchName inRepository:(Repository*)repository;
 
 #pragma mark - Masternodes
 
@@ -37,7 +37,7 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(void)updateMasternode:(NSString*)masternodeId withState:(InstanceState)state;
 
-- (NSManagedObject*)addMasternode:(NSDictionary*)values saveContext:(BOOL)saveContext;
+- (Masternode*)addMasternode:(NSDictionary*)values saveContext:(BOOL)saveContext;
 
 #pragma mark - Context
 
@@ -65,9 +65,11 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(NSArray*)allRepositories;
 
--(NSManagedObject*)branchNamed:(NSString*)branchName inRepository:(NSManagedObject*)repository;
+-(Repository*)repositoryNamed:(NSString*)name forOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath;
 
--(void)deleteRepository:(NSManagedObject*)object;
+-(void)deleteRepository:(Repository*)repository;
+
+-(void)deleteBranch:(Branch*)branch;
 
 -(void)createMessageToMasternode:(NSManagedObject*)masternode dataType:(int)dataType atLine:(int)line;
 

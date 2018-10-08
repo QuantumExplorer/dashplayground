@@ -2,7 +2,7 @@
 //  Branch+CoreDataProperties.m
 //  dashPlayground
 //
-//  Created by Sam Westrich on 10/5/18.
+//  Created by Sam Westrich on 10/8/18.
 //  Copyright © 2018 dashfoundation. All rights reserved.
 //
 //
@@ -16,7 +16,7 @@
 }
 
 @dynamic amiId;
-@dynamic lastCommitSha;
+@dynamic lastCommitHash;
 @dynamic name;
 @dynamic coreMasternodes;
 @dynamic repository;
@@ -24,5 +24,6 @@
 @dynamic driveMasternodes;
 @dynamic dapiMasternodes;
 @dynamic insightMasternodes;
+@dynamic commits;
 
 @end

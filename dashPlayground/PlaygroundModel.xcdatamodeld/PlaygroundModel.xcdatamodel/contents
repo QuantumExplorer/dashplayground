@@ -2,7 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="17G65" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
     <entity name="Branch" representedClassName="Branch" syncable="YES" codeGenerationType="class">
         <attribute name="amiId" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="lastCommitSha" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastCommitHash" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
         <relationship name="coreMasternodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="coreBranch" inverseEntity="Masternode" syncable="YES"/>
         <relationship name="repository" maxCount="1" deletionRule="Nullify" destinationEntity="Repository" inverseName="branches" inverseEntity="Repository" syncable="YES"/>

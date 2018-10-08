@@ -11,10 +11,6 @@
 #import "AppDelegate.h"
 #import "NSArray+SWAdditions.h"
 #import "DPDataStore.h"
-#import "CkoSFtp.h"
-#import "CkoSsh.h"
-#import "CkoSshKey.h"
-#import "CkoStringBuilder.h"
 #import "DPLocalNodeController.h"
 #import "DashcoreStateTransformer.h"
 #import "MasternodeSyncStatusTransformer.h"
@@ -262,234 +258,234 @@
 //    return rDict;
 //}
 
--(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh error:(NSError**)error {
-    [self sendDashCommandList:commands onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
-}
-
-
--(void)sendDashCommandList:(NSArray*)commands onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts error:(NSError**)error percentageClb:(dashPercentageClb)clb {
-    [self sendCommandList:commands toPath:@"~/src/dash" onSSH:ssh commandExpectedLineCounts:expectedlineCounts error:error percentageClb:clb];
-}
-
--(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh error:(NSError**)error {
-    [self sendCommandList:commands toPath:path onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
-}
-
--(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(CkoSsh *)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts error:(NSError**)error percentageClb:(dashPercentageClb)clb {
-    //expected line counts are used to give back a percentage complete on this function;
-    
-    NSInteger channelNum = [[ssh QuickShell] integerValue];
-    if (channelNum < 0) {
-        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-        NSLog(@"%@",ssh.LastErrorText);
-        return;
-    }
-    
-    //  This is the prompt we'll be expecting to find in
-    //  the output of the remote shell.
-    NSString *myPrompt = [NSString stringWithFormat:@":%@$",path];
-    //   Run the 1st command in the remote shell, which will be to
-    //   "cd" to a subdirectory.
-    BOOL success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"cd %@\n",path] charset: @"ansi"];
-    if (success != YES) {
-        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-        NSLog(@"%@",ssh.LastErrorText);
-        return;
-    }
-    
-    //    NSNumber * v = [ssh ChannelReadAndPoll:@(channelNum) pollTimeoutMs:@(5000)];
-    //
-    //    NSString *cmdOutpu2t = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
-    //    if (ssh.LastMethodSuccess != YES) {
-    //        NSLog(@"%@",ssh.LastErrorText);
-    //        return nil;
-    //    };
-    //  Retrieve the output.
-    success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
-    if (success != YES) {
-        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-        NSLog(@"%@",ssh.LastErrorText);
-        return;
-    }
-    
-    //   Display what we've received so far.  This clears
-    //   the internal receive buffer, which is important.
-    //   After we send the command, we'll be reading until
-    //   the next command prompt.  If the command prompt
-    //   is already in the internal receive buffer, it'll think it's
-    //   already finished...
-    NSString *cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
-    if (ssh.LastMethodSuccess != YES) {
-        NSLog(@"%@",ssh.LastErrorText);
-        return;
-    };
-    NSMutableDictionary * rDict = [NSMutableDictionary dictionaryWithCapacity:commands.count];
-    for (NSUInteger index = 0;index<[commands count];index++) {
-        NSString * command = [commands objectAtIndex:index];
-        NSNumber * numberLines = ([expectedlineCounts count] > index)?[expectedlineCounts objectAtIndex:index]:nil;
-        //   Run the 2nd command in the remote shell, which will be
-        //   to "ls" the directory.
-        success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"%@\n",command] charset: @"ansi"];
-        if (success != YES) {
-            *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-            NSLog(@"%@",ssh.LastErrorText);
-            return;
-        }
-        if (numberLines && [numberLines integerValue] > 1) {
-            NSMutableString * mOutput = [NSMutableString string];
-            while (1) {
-                NSNumber * poll = [ssh ChannelReadAndPoll: @(channelNum) pollTimeoutMs:@(3000)];
-                if ([poll integerValue] == -1) {
-                    *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-                    NSLog(@"%@",ssh.LastErrorText);
-                    return;
-                } else if ([poll integerValue] > 0) {
-                    [mOutput appendString:[ssh GetReceivedText: @(channelNum) charset: @"ansi"]];
-                    NSUInteger numberOfLines, index, stringLength = [mOutput length];
-                    
-                    for (index = 0, numberOfLines = 0; index < stringLength; numberOfLines++)
-                        index = NSMaxRange([mOutput lineRangeForRange:NSMakeRange(index, 0)]);
-                    clb(command,numberOfLines / [numberLines floatValue]);
-                }
-                if ([[mOutput stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] hasSuffix:myPrompt]) {
-                    clb(command,1.0);
-                    [rDict setObject:[mOutput copy] forKey:command];
-                    break;
-                }
-            }
-        } else {
-            //  Retrieve and display the output.
-            success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
-            if (success != YES) {
-                *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-                NSLog(@"%@",ssh.LastErrorText);
-                return;
-            }
-            clb(command,1.0);
-            cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
-            if (ssh.LastMethodSuccess != YES) {
-                *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-                NSLog(@"%@",ssh.LastErrorText);
-                return;
-            }
-            [rDict setObject:cmdOutput forKey:command];
-        }
-    }
-    
-    //  Send an EOF.  This tells the server that no more data will
-    //  be sent on this channel.  The channel remains open, and
-    //  the SSH client may still receive output on this channel.
-    success = [ssh ChannelSendEof: @(channelNum)];
-    if (success != YES) {
-        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-        NSLog(@"%@",ssh.LastErrorText);
-        return;
-    }
-    
-    //  Close the channel:
-    success = [ssh ChannelSendClose: @(channelNum)];
-    if (success != YES) {
-        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
-        NSLog(@"%@",ssh.LastErrorText);
-        return;
-    }
-}
-
--(CkoSshKey *)loginPrivateKeyAtPath:(NSString*)path {
-    CkoSshKey *key = [[CkoSshKey alloc] init];
-    
-    //  Read the PEM file into a string variable:
-    //  (This does not load the PEM file into the key.  The LoadText
-    //  method is a convenience method for loading the full contents of ANY text
-    //  file into a string variable.)
-    NSString *privKey = [key LoadText:path];
-    if (key.LastMethodSuccess != YES) {
-        NSLog(@"%@",key.LastErrorText);
-        return nil;
-    }
-    
-    //  Load a private key from a PEM string:
-    //  (Private keys may be loaded from OpenSSH and Putty formats.
-    //  Both encrypted and unencrypted private key file formats
-    //  are supported.  This example loads an unencrypted private
-    //  key in OpenSSH format.  PuTTY keys typically use the .ppk
-    //  file extension, while OpenSSH keys use the PEM format.
-    //  (For PuTTY keys, call FromPuttyPrivateKey instead.)
-    BOOL success = [key FromOpenSshPrivateKey: privKey];
-    if (success != YES) {
-        NSLog(@"%@",key.LastErrorText);
-        return nil;
-    }
-    return key;
-}
-
--(CkoSFtp*)sftpIn:(NSString*)masternodeIP {
-    if (![self sshPath]) {
-        DialogAlert *dialog=[[DialogAlert alloc]init];
-        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
-        
-        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
-            //Find clicked
-            NSString *pathString = [dialog getLaunchPath];
-            [self setSshPath:pathString];
-            return [self sftpIn:masternodeIP privateKeyPath:pathString];
-        }
-    }
-    else{
-        return [self sftpIn:masternodeIP privateKeyPath:[self sshPath]];
-    }
-    
-    return nil;
-}
-
--(CkoSFtp*)sftpIn:(NSString*)masternodeIP privateKeyPath:(NSString*)privateKeyPath {
-    //  Important: It is helpful to send the contents of the
-    //  sftp.LastErrorText property when requesting support.
-    
-    CkoSFtp *sftp = [[CkoSFtp alloc] init];
-    
-    //  Any string automatically begins a fully-functional 30-day trial.
-    BOOL success = [sftp UnlockComponent: @"Anything for 30-day trial"];
-    if (success != YES) {
-        NSLog(@"%@",sftp.LastErrorText);
-        return nil;
-    }
-    
-    //  Set some timeouts, in milliseconds:
-    sftp.ConnectTimeoutMs = [NSNumber numberWithInt:15000];
-    sftp.IdleTimeoutMs = [NSNumber numberWithInt:15000];
-    
-    //  Connect to the SSH server.
-    //  The standard SSH port = 22
-    //  The hostname may be a hostname or IP address.
-    int port = 22;
-    NSString *hostname = masternodeIP;
-    success = [sftp Connect: hostname port: [NSNumber numberWithInt: port]];
-    if (success != YES) {
-        NSLog(@"%@",sftp.LastErrorText);
-        return nil;
-    }
-    
-    CkoSshKey * key = [self loginPrivateKeyAtPath:privateKeyPath];
-    if (!key) return nil;
-    //  Authenticate with the SSH server using the login and
-    //  private key.  (The corresponding public key should've
-    //  been installed on the SSH server beforehand.)
-    success = [sftp AuthenticatePk: @"ubuntu" privateKey: key];
-    if (success != YES) {
-        NSLog(@"%@",sftp.LastErrorText);
-        return nil;
-    }
-    NSLog(@"%@",@"Public-Key Authentication Successful!");
-    
-    //  After authenticating, the SFTP subsystem must be initialized:
-    success = [sftp InitializeSftp];
-    if (success != YES) {
-        NSLog(@"%@",sftp.LastErrorText);
-        return nil;
-    }
-    return sftp;
-}
+//-(void)sendDashCommandList:(NSArray*)commands onSSH:(NMSSHSession*)ssh error:(NSError**)error {
+//    [self sendDashCommandList:commands onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
+//}
+//
+//
+//-(void)sendDashCommandList:(NSArray*)commands onSSH:(NMSSHSession*)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts error:(NSError**)error percentageClb:(dashPercentageClb)clb {
+//    [self sendCommandList:commands toPath:@"~/src/dash" onSSH:ssh commandExpectedLineCounts:expectedlineCounts error:error percentageClb:clb];
+//}
+//
+//-(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(NMSSHSession*)ssh error:(NSError**)error {
+//    [self sendCommandList:commands toPath:path onSSH:ssh commandExpectedLineCounts:nil error:error percentageClb:nil];
+//}
+//
+//-(void)sendCommandList:(NSArray*)commands toPath:(NSString*)path onSSH:(NMSSHSession*)ssh commandExpectedLineCounts:(NSArray*)expectedlineCounts error:(NSError**)error percentageClb:(dashPercentageClb)clb {
+//    //expected line counts are used to give back a percentage complete on this function;
+//    
+//    NSInteger channelNum = [[ssh QuickShell] integerValue];
+//    if (channelNum < 0) {
+//        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return;
+//    }
+//    
+//    //  This is the prompt we'll be expecting to find in
+//    //  the output of the remote shell.
+//    NSString *myPrompt = [NSString stringWithFormat:@":%@$",path];
+//    //   Run the 1st command in the remote shell, which will be to
+//    //   "cd" to a subdirectory.
+//    BOOL success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"cd %@\n",path] charset: @"ansi"];
+//    if (success != YES) {
+//        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return;
+//    }
+//    
+//    //    NSNumber * v = [ssh ChannelReadAndPoll:@(channelNum) pollTimeoutMs:@(5000)];
+//    //
+//    //    NSString *cmdOutpu2t = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+//    //    if (ssh.LastMethodSuccess != YES) {
+//    //        NSLog(@"%@",ssh.LastErrorText);
+//    //        return nil;
+//    //    };
+//    //  Retrieve the output.
+//    success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+//    if (success != YES) {
+//        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return;
+//    }
+//    
+//    //   Display what we've received so far.  This clears
+//    //   the internal receive buffer, which is important.
+//    //   After we send the command, we'll be reading until
+//    //   the next command prompt.  If the command prompt
+//    //   is already in the internal receive buffer, it'll think it's
+//    //   already finished...
+//    NSString *cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+//    if (ssh.LastMethodSuccess != YES) {
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return;
+//    };
+//    NSMutableDictionary * rDict = [NSMutableDictionary dictionaryWithCapacity:commands.count];
+//    for (NSUInteger index = 0;index<[commands count];index++) {
+//        NSString * command = [commands objectAtIndex:index];
+//        NSNumber * numberLines = ([expectedlineCounts count] > index)?[expectedlineCounts objectAtIndex:index]:nil;
+//        //   Run the 2nd command in the remote shell, which will be
+//        //   to "ls" the directory.
+//        success = [ssh ChannelSendString: @(channelNum) strData:[NSString stringWithFormat:@"%@\n",command] charset: @"ansi"];
+//        if (success != YES) {
+//            *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//            NSLog(@"%@",ssh.LastErrorText);
+//            return;
+//        }
+//        if (numberLines && [numberLines integerValue] > 1) {
+//            NSMutableString * mOutput = [NSMutableString string];
+//            while (1) {
+//                NSNumber * poll = [ssh ChannelReadAndPoll: @(channelNum) pollTimeoutMs:@(3000)];
+//                if ([poll integerValue] == -1) {
+//                    *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//                    NSLog(@"%@",ssh.LastErrorText);
+//                    return;
+//                } else if ([poll integerValue] > 0) {
+//                    [mOutput appendString:[ssh GetReceivedText: @(channelNum) charset: @"ansi"]];
+//                    NSUInteger numberOfLines, index, stringLength = [mOutput length];
+//                    
+//                    for (index = 0, numberOfLines = 0; index < stringLength; numberOfLines++)
+//                        index = NSMaxRange([mOutput lineRangeForRange:NSMakeRange(index, 0)]);
+//                    clb(command,numberOfLines / [numberLines floatValue]);
+//                }
+//                if ([[mOutput stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] hasSuffix:myPrompt]) {
+//                    clb(command,1.0);
+//                    [rDict setObject:[mOutput copy] forKey:command];
+//                    break;
+//                }
+//            }
+//        } else {
+//            //  Retrieve and display the output.
+//            success = [ssh ChannelReceiveUntilMatch: @(channelNum) matchPattern: myPrompt charset: @"ansi" caseSensitive: YES];
+//            if (success != YES) {
+//                *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//                NSLog(@"%@",ssh.LastErrorText);
+//                return;
+//            }
+//            clb(command,1.0);
+//            cmdOutput = [ssh GetReceivedText: @(channelNum) charset: @"ansi"];
+//            if (ssh.LastMethodSuccess != YES) {
+//                *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//                NSLog(@"%@",ssh.LastErrorText);
+//                return;
+//            }
+//            [rDict setObject:cmdOutput forKey:command];
+//        }
+//    }
+//    
+//    //  Send an EOF.  This tells the server that no more data will
+//    //  be sent on this channel.  The channel remains open, and
+//    //  the SSH client may still receive output on this channel.
+//    success = [ssh ChannelSendEof: @(channelNum)];
+//    if (success != YES) {
+//        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return;
+//    }
+//    
+//    //  Close the channel:
+//    success = [ssh ChannelSendClose: @(channelNum)];
+//    if (success != YES) {
+//        *error = [NSError errorWithDomain:@"org.quantumexplorer.dashplayground" code:0 userInfo:@{NSLocalizedDescriptionKey:ssh.LastErrorText}];
+//        NSLog(@"%@",ssh.LastErrorText);
+//        return;
+//    }
+//}
+//
+//-(NMSSHSession *)loginPrivateKeyAtPath:(NSString*)path {
+//    CkoSshKey *key = [[CkoSshKey alloc] init];
+//    
+//    //  Read the PEM file into a string variable:
+//    //  (This does not load the PEM file into the key.  The LoadText
+//    //  method is a convenience method for loading the full contents of ANY text
+//    //  file into a string variable.)
+//    NSString *privKey = [key LoadText:path];
+//    if (key.LastMethodSuccess != YES) {
+//        NSLog(@"%@",key.LastErrorText);
+//        return nil;
+//    }
+//    
+//    //  Load a private key from a PEM string:
+//    //  (Private keys may be loaded from OpenSSH and Putty formats.
+//    //  Both encrypted and unencrypted private key file formats
+//    //  are supported.  This example loads an unencrypted private
+//    //  key in OpenSSH format.  PuTTY keys typically use the .ppk
+//    //  file extension, while OpenSSH keys use the PEM format.
+//    //  (For PuTTY keys, call FromPuttyPrivateKey instead.)
+//    BOOL success = [key FromOpenSshPrivateKey: privKey];
+//    if (success != YES) {
+//        NSLog(@"%@",key.LastErrorText);
+//        return nil;
+//    }
+//    return key;
+//}
+//
+//-(NMSSHSession*)sftpIn:(NSString*)masternodeIP {
+//    if (![self sshPath]) {
+//        DialogAlert *dialog=[[DialogAlert alloc]init];
+//        NSAlert *findPathAlert = [dialog getFindPathAlert:@"SSH_KEY.pem" exPath:@"~/Documents"];
+//        
+//        if ([findPathAlert runModal] == NSAlertFirstButtonReturn) {
+//            //Find clicked
+//            NSString *pathString = [dialog getLaunchPath];
+//            [self setSshPath:pathString];
+//            return [self sftpIn:masternodeIP privateKeyPath:pathString];
+//        }
+//    }
+//    else{
+//        return [self sftpIn:masternodeIP privateKeyPath:[self sshPath]];
+//    }
+//    
+//    return nil;
+//}
+//
+//-(NMSSHSession*)sftpIn:(NSString*)masternodeIP privateKeyPath:(NSString*)privateKeyPath {
+//    //  Important: It is helpful to send the contents of the
+//    //  sftp.LastErrorText property when requesting support.
+//    
+//    CkoSFtp *sftp = [[CkoSFtp alloc] init];
+//    
+//    //  Any string automatically begins a fully-functional 30-day trial.
+//    BOOL success = [sftp UnlockComponent: @"Anything for 30-day trial"];
+//    if (success != YES) {
+//        NSLog(@"%@",sftp.LastErrorText);
+//        return nil;
+//    }
+//    
+//    //  Set some timeouts, in milliseconds:
+//    sftp.ConnectTimeoutMs = [NSNumber numberWithInt:15000];
+//    sftp.IdleTimeoutMs = [NSNumber numberWithInt:15000];
+//    
+//    //  Connect to the SSH server.
+//    //  The standard SSH port = 22
+//    //  The hostname may be a hostname or IP address.
+//    int port = 22;
+//    NSString *hostname = masternodeIP;
+//    success = [sftp Connect: hostname port: [NSNumber numberWithInt: port]];
+//    if (success != YES) {
+//        NSLog(@"%@",sftp.LastErrorText);
+//        return nil;
+//    }
+//    
+//    CkoSshKey * key = [self loginPrivateKeyAtPath:privateKeyPath];
+//    if (!key) return nil;
+//    //  Authenticate with the SSH server using the login and
+//    //  private key.  (The corresponding public key should've
+//    //  been installed on the SSH server beforehand.)
+//    success = [sftp AuthenticatePk: @"ubuntu" privateKey: key];
+//    if (success != YES) {
+//        NSLog(@"%@",sftp.LastErrorText);
+//        return nil;
+//    }
+//    NSLog(@"%@",@"Public-Key Authentication Successful!");
+//    
+//    //  After authenticating, the SFTP subsystem must be initialized:
+//    success = [sftp InitializeSftp];
+//    if (success != YES) {
+//        NSLog(@"%@",sftp.LastErrorText);
+//        return nil;
+//    }
+//    return sftp;
+//}
 
 - (void)setUpMainNode:(Masternode*)masternode clb:(dashActiveClb)clb {
     NSError *error;
@@ -1517,50 +1513,51 @@
 #pragma mark - SSH Query Remote
 
 -(void)updateGitInfoForMasternode:(Masternode*)masternode clb:(dashInfoClb)clb {
-    __block NSString * publicIP = masternode.publicIP;
-    __block NSString * branchName = masternode.coreBranch.name;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        
-        __block NMSSHSession *ssh;
-        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-            ssh = sshSession;
-        }];
-        
-        if (!ssh.isAuthorized) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO,nil,@"SSH: error authenticating with server.");
-            });
-            return;
-        }
-        
-        NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh onPath:@"/src/dash"];
-        [ssh disconnect];
-        __block NSString * remote = nil;
-        NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
-        
-        if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
-            remote = remoteInfoLine[1];
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (remote) {
-                Branch * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] inProject:DPRepositoryProject_Core onRepositoryURLPath:remote];
-                if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        masternode.coreBranch = branch;
-                        if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
-                    });
-                    return;
-                }
-            }
-            if (![masternode.coreGitCommitVersion isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                   masternode.coreGitCommitVersion = gitValues[@"rev-parse --short HEAD"];
-                    if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
-                });
-                return;
-            }
-        });
-    });
+    if (clb) clb(YES,nil,nil);
+//    __block NSString * publicIP = masternode.publicIP;
+//    __block NSString * branchName = masternode.coreBranch.name;
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+//
+//        __block NMSSHSession *ssh;
+//        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+//            ssh = sshSession;
+//        }];
+//
+//        if (!ssh.isAuthorized) {
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                clb(NO,nil,@"SSH: error authenticating with server.");
+//            });
+//            return;
+//        }
+//
+//        NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh onPath:@"/src/dash"];
+//        [ssh disconnect];
+//        __block NSString * remote = nil;
+//        NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
+//
+//        if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
+//            remote = remoteInfoLine[1];
+//        }
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            if (remote) {
+//                Branch * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] inProject:DPRepositoryProject_Core onRepositoryURLPath:remote];
+//                if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        masternode.coreBranch = branch;
+//                        if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
+//                    });
+//                    return;
+//                }
+//            }
+//            if (![masternode.coreGitCommitVersion isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                   masternode.coreGitCommitVersion = gitValues[@"rev-parse --short HEAD"];
+//                    if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
+//                });
+//                return;
+//            }
+//        });
+//    });
 }
 
 #pragma mark - SSH in info

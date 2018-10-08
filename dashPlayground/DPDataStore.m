@@ -12,6 +12,7 @@
 #import "NSData+Security.h"
 #import "Repository+CoreDataClass.h"
 #import "Branch+CoreDataClass.h"
+#import "Masternode+CoreDataClass.h"
 
 @implementation DPDataStore
 
@@ -37,31 +38,36 @@
     }
 }
 
--(void)deleteRepository:(NSManagedObject*)object {
+-(void)deleteRepository:(Repository*)repository {
     
-    NSArray *repoData = [self allRepositories];
-    
-    for (NSUInteger i = 0; i < repoData.count; i++) {
-        NSManagedObject *repository = (NSManagedObject *)[repoData objectAtIndex:i];
-        
-        NSManagedObject *repositorySelected = (NSManagedObject *)[object valueForKey:@"repository"];
-        
-        if([[repositorySelected valueForKey:@"url"] isEqualToString:[repository valueForKey:@"url"]])
-        {
-            [self.mainContext deleteObject:repository];
-            break;
-        }
-    }
-    
-    [self.mainContext deleteObject:object];
+    [self.mainContext deleteObject:repository];
     [self saveMainContext];
 }
 
--(Branch*)branchNamed:(NSString*)string inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath {
-    return [self branchNamed:string inProject:project onRepositoryURLPath:repositoryURLPath inContext:self.mainContext];
+-(void)deleteBranch:(Branch*)branch {
+    [self.mainContext deleteObject:branch];
+    [self saveMainContext];
 }
 
--(Branch*)branchNamed:(NSString*)branchName inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath inContext:(NSManagedObjectContext*)context {
+-(Branch*)branchNamed:(NSString*)branchName inRepository:(Repository*)repository {
+    if (!repository) {
+        return nil;
+    }
+    else  {
+        NSSet * set = [repository.branches filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"name == %@",branchName]];
+        if (!set || ![set count]) {
+            return [self createBranch:branchName onRepository:repository saveContext:TRUE];
+        } else {
+             return [set anyObject];
+        }
+    }
+}
+
+-(Repository*)repositoryNamed:(NSString*)name forOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath {
+    return [self repositoryNamed:name forOwner:owner inProject:project onRepositoryURLPath:repositoryURLPath inContext:self.mainContext saveContext:NO];
+}
+
+-(Repository*)repositoryNamed:(NSString*)name forOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath inContext:(NSManagedObjectContext*)context saveContext:(BOOL)saveContext {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repository"
                                               inManagedObjectContext:context];
@@ -73,38 +79,18 @@
     
     NSArray *repositories = [self executeFetchRequest:fetchRequest inContext:context error:&error];
     if ([repositories count]) {
-        Repository * repository = [repositories firstObject];
-        return [self branchNamed:branchName inRepository:repository];
+        return [repositories firstObject];
+    } else {
+        return [self createRepositoryNamed:name withOwner:owner inProject:project onRepositoryURLPath:repositoryURLPath inContext:context saveContext:saveContext];
     }
-    Repository * repository = nil;
-    Branch * branch = nil;
-    repository = [self createRepositoryForURLPath:repositoryURLPath forProject:project inContext:context saveContext:FALSE];
-    branch = [self createBranch:branchName onRepository:repository saveContext:TRUE];
-//    if (!repositories || !repositories.count) {
-//        repo = [self createRepositoryForURLPath:repositoryURLPath inContext:context saveContext:FALSE];
-//        branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
-//    }
-//    else  {
-//        repo = [repositories firstObject];
-//        branch = [self branchNamed:branchName inRepository:repo];
-//        if (!branch) {
-//            branch = [self createBranch:branchName onRepository:repo saveContext:TRUE];
-//        }
-//    }
-    return branch;
 }
 
--(Branch*)branchNamed:(NSString*)branchName inRepository:(Repository*)repository {
-    NSSet * set = repository.branches;
-    set = [set filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"name == %@",branchName]];
-    if (!set || ![set count]) return nil;
-    return [set anyObject];
-}
-
--(Repository*)createRepositoryForURLPath:(NSString*)repositoryURLPath forProject:(DPRepositoryProject)project inContext:(NSManagedObjectContext*)context saveContext:(BOOL)saveContext {
+-(Repository*)createRepositoryNamed:(NSString*)name withOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath inContext:(NSManagedObjectContext*)context saveContext:(BOOL)saveContext {
     Repository *repository = (Repository*)[self createInsertedNewObjectForEntityNamed:@"Repository" inContext:context];
     repository.url = repositoryURLPath;
     repository.project = project;
+    repository.name = name;
+    repository.owner = owner;
     if (saveContext)
         [self saveContext:context];
     return repository;

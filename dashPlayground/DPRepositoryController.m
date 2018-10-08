@@ -14,6 +14,8 @@
 #import "Branch+CoreDataClass.h"
 #import "NSData+Security.h"
 #import "DPAuthenticationManager.h"
+#import "Repository+CoreDataClass.h"
+#import "Branch+CoreDataClass.h"
 
 @implementation DPRepositoryController
 
@@ -24,8 +26,9 @@
         AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
         [manager GET:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@",user,repositoryLocation,branchName] parameters:nil progress:nil success:^(NSURLSessionTask *task, id responseObject) {
             if ([[responseObject objectForKey:@"object"] objectForKey:@"sha"]) {
-                Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
-                branch.lastCommitSha = [[responseObject objectForKey:@"object"] objectForKey:@"sha"];
+                Repository * repository = [[DPDataStore sharedInstance] repositoryNamed:repositoryLocation forOwner:user inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
+                Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
+                branch.lastCommitHash = [[responseObject objectForKey:@"object"] objectForKey:@"sha"];
                 branch.repository.isPrivate = isPrivate;
                 [[DPDataStore sharedInstance] saveContext];
                 return clb(YES,nil);
@@ -46,9 +49,10 @@
             NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@", user, repositoryLocation, branchName, githubUsername, githubPassword] checkError:YES];
             
             if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
-                Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
-                branch.lastCommitSha = [[repositoryDict objectForKey:@"object"] objectForKey:@"sha"];
-                branch.repository.isPrivate = 1;
+                Repository * repository = [[DPDataStore sharedInstance] repositoryNamed:repositoryLocation forOwner:user inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",user,repositoryLocation]];
+                Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
+                branch.lastCommitHash = [[repositoryDict objectForKey:@"object"] objectForKey:@"sha"];
+                repository.isPrivate = 1;
                 [[DPDataStore sharedInstance] saveContext];
                 return clb(YES,nil);
             } else {

@@ -2,14 +2,20 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="17G65" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
     <entity name="Branch" representedClassName="Branch" syncable="YES">
         <attribute name="amiId" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="lastCommitSha" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastCommitHash" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
+        <relationship name="commits" toMany="YES" deletionRule="Cascade" destinationEntity="Commit" inverseName="branch" inverseEntity="Commit" syncable="YES"/>
         <relationship name="coreMasternodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="coreBranch" inverseEntity="Masternode" syncable="YES"/>
         <relationship name="dapiMasternodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="dapiBranch" inverseEntity="Masternode" syncable="YES"/>
         <relationship name="driveMasternodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="driveBranch" inverseEntity="Masternode" syncable="YES"/>
         <relationship name="insightMasternodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="insightBranch" inverseEntity="Masternode" syncable="YES"/>
         <relationship name="repository" maxCount="1" deletionRule="Nullify" destinationEntity="Repository" inverseName="branches" inverseEntity="Repository" syncable="YES"/>
         <relationship name="sentinelMasternodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Masternode" inverseName="sentinelBranch" inverseEntity="Masternode" syncable="YES"/>
+    </entity>
+    <entity name="Commit" representedClassName="Commit" syncable="YES">
+        <attribute name="commitHash" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <relationship name="branch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="commits" inverseEntity="Branch" syncable="YES"/>
     </entity>
     <entity name="Masternode" representedClassName="Masternode" syncable="YES">
         <attribute name="chainNetwork" optional="YES" attributeType="String" syncable="YES"/>
@@ -44,12 +50,13 @@
         <relationship name="dapiBranch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="dapiMasternodes" inverseEntity="Branch" syncable="YES"/>
         <relationship name="driveBranch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="driveMasternodes" inverseEntity="Branch" syncable="YES"/>
         <relationship name="insightBranch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="insightMasternodes" inverseEntity="Branch" syncable="YES"/>
+        <relationship name="messages" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Message" inverseName="masternode" inverseEntity="Message" syncable="YES"/>
         <relationship name="sentinelBranch" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Branch" inverseName="sentinelMasternodes" inverseEntity="Branch" syncable="YES"/>
     </entity>
     <entity name="Message" representedClassName="Message" syncable="YES">
         <attribute name="atLine" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="masternode" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Masternode" syncable="YES"/>
+        <relationship name="masternode" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Masternode" inverseName="messages" inverseEntity="Masternode" syncable="YES"/>
         <fetchIndex name="byTypeIndex">
             <fetchIndexElement property="type" type="Binary" order="ascending"/>
         </fetchIndex>
@@ -63,9 +70,10 @@
         <relationship name="branches" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Branch" inverseName="repository" inverseEntity="Branch" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Branch" positionX="-54" positionY="99" width="128" height="180"/>
-        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="540"/>
+        <element name="Branch" positionX="-54" positionY="99" width="128" height="195"/>
+        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="555"/>
         <element name="Message" positionX="-45" positionY="144" width="128" height="90"/>
         <element name="Repository" positionX="-63" positionY="90" width="128" height="135"/>
+        <element name="Commit" positionX="-45" positionY="144" width="128" height="90"/>
     </elements>
 </model>
