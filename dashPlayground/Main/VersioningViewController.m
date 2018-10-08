@@ -195,23 +195,25 @@
 
 - (IBAction)updateDapiToLatest:(id)sender {
     Branch * branch = [self.dapiBranchesController.selectedObjects firstObject];
-    [[DPVersioningController sharedInstance] updateDapiToLatestCommitInBranch:branch onMasternode:self.selectedMasternode];
+    [[DPVersioningController sharedInstance] updateProject:DPRepositoryProject_Dapi toLatestCommitInBranch:branch onMasternode:self.selectedMasternode];
 }
 
 - (IBAction)updateDashDrive:(id)sender {
-    
+
 }
 
 - (IBAction)updateDashDriveToLatest:(id)sender {
-    
+    Branch * branch = [self.dashDriveBranchesController.selectedObjects firstObject];
+    [[DPVersioningController sharedInstance] updateProject:DPRepositoryProject_Drive toLatestCommitInBranch:branch onMasternode:self.selectedMasternode];
 }
 
 - (IBAction)updateInsight:(id)sender {
-    
+
 }
 
 - (IBAction)updateInsightToLatest:(id)sender {
-    
+    Branch * branch = [self.insightBranchesController.selectedObjects firstObject];
+    [[DPVersioningController sharedInstance] updateProject:DPRepositoryProject_Insight toLatestCommitInBranch:branch onMasternode:self.selectedMasternode];
 }
 
 - (IBAction)updateSentinel:(id)sender {
@@ -219,7 +221,8 @@
 }
 
 - (IBAction)updateSentinelToLatest:(id)sender {
-    
+    Branch * branch = [self.sentinelBranchesController.selectedObjects firstObject];
+    [[DPVersioningController sharedInstance] updateProject:DPRepositoryProject_Sentinel toLatestCommitInBranch:branch onMasternode:self.selectedMasternode];
 }
 
 

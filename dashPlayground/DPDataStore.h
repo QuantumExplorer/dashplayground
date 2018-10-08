@@ -65,6 +65,8 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(NSArray*)allRepositories;
 
+-(Repository*)repositoryNamed:(NSString*)name forOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath inContext:(NSManagedObjectContext*)context saveContext:(BOOL)saveContext;
+
 -(Repository*)repositoryNamed:(NSString*)name forOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath;
 
 -(void)deleteRepository:(Repository*)repository;

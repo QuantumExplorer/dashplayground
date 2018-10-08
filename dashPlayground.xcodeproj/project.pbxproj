@@ -62,8 +62,6 @@
 		FB29067D1E85799F00A31092 /* dashPlaygroundTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB29067C1E85799F00A31092 /* dashPlaygroundTests.m */; };
 		FB39482C1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
 		FB39482D1E85B418009D115F /* DPMasternodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB39482B1E85B418009D115F /* DPMasternodeController.m */; };
-		FB3BCA2B21678C030071E4F1 /* Masternode+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA2521678C030071E4F1 /* Masternode+CoreDataClass.m */; };
-		FB3BCA2C21678C030071E4F1 /* Masternode+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA2621678C030071E4F1 /* Masternode+CoreDataProperties.m */; };
 		FB3BCA2D21678C030071E4F1 /* Message+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA2921678C030071E4F1 /* Message+CoreDataClass.m */; };
 		FB3BCA2E21678C030071E4F1 /* Message+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA2A21678C030071E4F1 /* Message+CoreDataProperties.m */; };
 		FB3BCA312167BEE20071E4F1 /* ProjectTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA302167BEE20071E4F1 /* ProjectTypeTransformer.m */; };
@@ -73,6 +71,10 @@
 		FB3BCA48216AD6360071E4F1 /* Branch+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA42216AD6360071E4F1 /* Branch+CoreDataProperties.m */; };
 		FB3BCA49216AD6360071E4F1 /* Commit+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA45216AD6360071E4F1 /* Commit+CoreDataClass.m */; };
 		FB3BCA4A216AD6360071E4F1 /* Commit+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA46216AD6360071E4F1 /* Commit+CoreDataProperties.m */; };
+		FB3BCA4F216B8E8D0071E4F1 /* Masternode+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA4D216B8E8D0071E4F1 /* Masternode+CoreDataClass.m */; };
+		FB3BCA50216B8E8D0071E4F1 /* Masternode+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA4E216B8E8D0071E4F1 /* Masternode+CoreDataProperties.m */; };
+		FB3BCA53216BE7800071E4F1 /* HasValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */; };
+		FB3BCA55216C1F3C0071E4F1 /* dashcore-node.json in Resources */ = {isa = PBXBuildFile; fileRef = FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */; };
 		FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB45054B1EA441C50066C6B9 /* DPTableView.m */; };
 		FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
 		FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
@@ -220,10 +222,6 @@
 		FB29067E1E85799F00A31092 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FB39482A1E85B418009D115F /* DPMasternodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPMasternodeController.h; sourceTree = "<group>"; };
 		FB39482B1E85B418009D115F /* DPMasternodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPMasternodeController.m; sourceTree = "<group>"; };
-		FB3BCA2321678C030071E4F1 /* Masternode+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Masternode+CoreDataProperties.h"; sourceTree = "<group>"; };
-		FB3BCA2421678C030071E4F1 /* Masternode+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Masternode+CoreDataClass.h"; sourceTree = "<group>"; };
-		FB3BCA2521678C030071E4F1 /* Masternode+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Masternode+CoreDataClass.m"; sourceTree = "<group>"; };
-		FB3BCA2621678C030071E4F1 /* Masternode+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Masternode+CoreDataProperties.m"; sourceTree = "<group>"; };
 		FB3BCA2721678C030071E4F1 /* Message+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Message+CoreDataProperties.h"; sourceTree = "<group>"; };
 		FB3BCA2821678C030071E4F1 /* Message+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Message+CoreDataClass.h"; sourceTree = "<group>"; };
 		FB3BCA2921678C030071E4F1 /* Message+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Message+CoreDataClass.m"; sourceTree = "<group>"; };
@@ -242,6 +240,13 @@
 		FB3BCA44216AD6360071E4F1 /* Commit+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Commit+CoreDataClass.h"; sourceTree = "<group>"; };
 		FB3BCA45216AD6360071E4F1 /* Commit+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Commit+CoreDataClass.m"; sourceTree = "<group>"; };
 		FB3BCA46216AD6360071E4F1 /* Commit+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Commit+CoreDataProperties.m"; sourceTree = "<group>"; };
+		FB3BCA4B216B8E8D0071E4F1 /* Masternode+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Masternode+CoreDataProperties.h"; sourceTree = "<group>"; };
+		FB3BCA4C216B8E8D0071E4F1 /* Masternode+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Masternode+CoreDataClass.h"; sourceTree = "<group>"; };
+		FB3BCA4D216B8E8D0071E4F1 /* Masternode+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Masternode+CoreDataClass.m"; sourceTree = "<group>"; };
+		FB3BCA4E216B8E8D0071E4F1 /* Masternode+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Masternode+CoreDataProperties.m"; sourceTree = "<group>"; };
+		FB3BCA51216BE7800071E4F1 /* HasValueTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HasValueTransformer.h; sourceTree = "<group>"; };
+		FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HasValueTransformer.m; sourceTree = "<group>"; };
+		FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dashcore-node.json"; sourceTree = "<group>"; };
 		FB45054A1EA441C50066C6B9 /* DPTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPTableView.h; sourceTree = "<group>"; };
 		FB45054B1EA441C50066C6B9 /* DPTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPTableView.m; sourceTree = "<group>"; };
 		FB46AE891E95618400D4B034 /* DPLocalNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPLocalNodeController.h; sourceTree = "<group>"; };
@@ -411,6 +416,8 @@
 				A560482D210B74F800DA161D /* DashDriveStateTransformer.m */,
 				FB3BCA2F2167BEE20071E4F1 /* ProjectTypeTransformer.h */,
 				FB3BCA302167BEE20071E4F1 /* ProjectTypeTransformer.m */,
+				FB3BCA51216BE7800071E4F1 /* HasValueTransformer.h */,
+				FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */,
 			);
 			name = Transformers;
 			sourceTree = "<group>";
@@ -467,6 +474,7 @@
 				FB1D2B551EAF552B00F7BE2D /* Images.xcassets */,
 				FBBAF9A41EB0562400D6F568 /* Notification.h */,
 				FB0684291E941DD700F1AFB4 /* dash.conf */,
+				FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */,
 				FB2906691E85799F00A31092 /* main.m */,
 			);
 			name = "Supporting Files";
@@ -543,6 +551,10 @@
 		FBB974A52167884B00E2F976 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				FB3BCA4B216B8E8D0071E4F1 /* Masternode+CoreDataProperties.h */,
+				FB3BCA4C216B8E8D0071E4F1 /* Masternode+CoreDataClass.h */,
+				FB3BCA4D216B8E8D0071E4F1 /* Masternode+CoreDataClass.m */,
+				FB3BCA4E216B8E8D0071E4F1 /* Masternode+CoreDataProperties.m */,
 				FB3BCA3F216AD6360071E4F1 /* Branch+CoreDataProperties.h */,
 				FB3BCA40216AD6360071E4F1 /* Branch+CoreDataClass.h */,
 				FB3BCA41216AD6360071E4F1 /* Branch+CoreDataClass.m */,
@@ -551,10 +563,6 @@
 				FB3BCA44216AD6360071E4F1 /* Commit+CoreDataClass.h */,
 				FB3BCA45216AD6360071E4F1 /* Commit+CoreDataClass.m */,
 				FB3BCA46216AD6360071E4F1 /* Commit+CoreDataProperties.m */,
-				FB3BCA2321678C030071E4F1 /* Masternode+CoreDataProperties.h */,
-				FB3BCA2421678C030071E4F1 /* Masternode+CoreDataClass.h */,
-				FB3BCA2521678C030071E4F1 /* Masternode+CoreDataClass.m */,
-				FB3BCA2621678C030071E4F1 /* Masternode+CoreDataProperties.m */,
 				FB3BCA2721678C030071E4F1 /* Message+CoreDataProperties.h */,
 				FB3BCA2821678C030071E4F1 /* Message+CoreDataClass.h */,
 				FB3BCA2921678C030071E4F1 /* Message+CoreDataClass.m */,
@@ -677,6 +685,7 @@
 				FB1D2B561EAF552B00F7BE2D /* Images.xcassets in Resources */,
 				A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */,
 				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
+				FB3BCA55216C1F3C0071E4F1 /* dashcore-node.json in Resources */,
 				A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */,
 				A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
@@ -765,6 +774,7 @@
 				FB3BCA2D21678C030071E4F1 /* Message+CoreDataClass.m in Sources */,
 				A581772C20E0DA28009240BD /* NetworkViewController.m in Sources */,
 				A5724D4C20A70D4A004BED71 /* ContainerViewController.m in Sources */,
+				FB3BCA53216BE7800071E4F1 /* HasValueTransformer.m in Sources */,
 				FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */,
 				A581771B20DBCEFC009240BD /* LeftContainerViewController.m in Sources */,
 				A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */,
@@ -773,19 +783,19 @@
 				FB1D2B541EA455CD00F7BE2D /* SentinelStateTransformer.m in Sources */,
 				A581771820DBCEBF009240BD /* DashCoreViewController.m in Sources */,
 				FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */,
+				FB3BCA50216B8E8D0071E4F1 /* Masternode+CoreDataProperties.m in Sources */,
 				FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */,
 				FBB974C621678AEB00E2F976 /* Repository+CoreDataClass.m in Sources */,
 				FB3BCA2E21678C030071E4F1 /* Message+CoreDataProperties.m in Sources */,
 				FB3BCA4A216AD6360071E4F1 /* Commit+CoreDataProperties.m in Sources */,
 				A560483421143DED00DA161D /* BuildServerViewController.m in Sources */,
-				FB3BCA2C21678C030071E4F1 /* Masternode+CoreDataProperties.m in Sources */,
 				FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */,
 				A560483721143E1300DA161D /* DPBuildServerController.m in Sources */,
 				A5604828210B14AF00DA161D /* VersioningViewController.m in Sources */,
 				FB29066A1E85799F00A31092 /* main.m in Sources */,
 				FB3BCA362168D7CE0071E4F1 /* DPAuthenticationManager.m in Sources */,
-				FB3BCA2B21678C030071E4F1 /* Masternode+CoreDataClass.m in Sources */,
 				FBB974C721678AEB00E2F976 /* Repository+CoreDataProperties.m in Sources */,
+				FB3BCA4F216B8E8D0071E4F1 /* Masternode+CoreDataClass.m in Sources */,
 				FB3BCA48216AD6360071E4F1 /* Branch+CoreDataProperties.m in Sources */,
 				A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */,
 				FBEBB105215D5E430058E7C3 /* NSMutableData+Security.m in Sources */,

@@ -23,12 +23,15 @@
         <attribute name="coreSemanticVersion" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="currentLogLine" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="dapiGitCommitVersion" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="dapiState" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="dashcoreState" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="dashDriveState" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="debugLastFetched" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="debugLineCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="debugOutput" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="driveGitCommitVersion" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="driveState" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="insightGitCommitVersion" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="installedNVM" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="installedPM2" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="instanceId" optional="YES" attributeType="String" syncable="YES"/>
@@ -74,7 +77,7 @@
     </entity>
     <elements>
         <element name="Branch" positionX="-54" positionY="99" width="128" height="195"/>
-        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="600"/>
+        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="645"/>
         <element name="Message" positionX="-45" positionY="144" width="128" height="90"/>
         <element name="Repository" positionX="-63" positionY="90" width="128" height="135"/>
         <element name="Commit" positionX="-45" positionY="144" width="128" height="90"/>

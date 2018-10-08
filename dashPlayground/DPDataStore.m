@@ -68,6 +68,7 @@
 }
 
 -(Repository*)repositoryNamed:(NSString*)name forOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath inContext:(NSManagedObjectContext*)context saveContext:(BOOL)saveContext {
+    if (project == DPRepositoryProject_All) return nil;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repository"
                                               inManagedObjectContext:context];

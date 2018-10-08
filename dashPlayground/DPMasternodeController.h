@@ -12,6 +12,7 @@
 #import "DPLocalNodeController.h"
 #import <NMSSH/NMSSH.h>
 #import "MasternodesViewController.h"
+#import "ProjectTypeTransformer.h"
 
 @class Masternode;
 
@@ -58,7 +59,6 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 //- (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
 
 -(void)checkMasternodeIsInstalled:(Masternode*)masternode clb:(dashBoolClb)clb;
--(void)updateGitInfoForMasternode:(Masternode*)masternode clb:(dashInfoClb)clb;
 -(void)checkMasternodeIsProperlyInstalled:(Masternode*)masternode onSSH:(NMSSHSession*)ssh;
 -(void)checkMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb;
 -(NMSSHSession*)connectInstance:(Masternode*)masternode;
@@ -97,5 +97,6 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 -(void)installDependenciesForMasternode:(Masternode*)masternode inSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb;
 -(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh dashClb:(dashClb)clb;
+-(void)updateGitInfoForMasternode:(Masternode*)masternode forProject:(DPRepositoryProject)project clb:(dashInfoClb)clb;
 
 @end

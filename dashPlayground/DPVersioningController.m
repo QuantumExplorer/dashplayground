@@ -278,7 +278,7 @@
 
 #pragma mark - Dapi
 
--(void)updateDapiToLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode {
+-(void)updateProject:(DPRepositoryProject)project toLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode {
     if (!masternode) return;
     __block NSString * repositoryPath;
     [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
@@ -296,9 +296,13 @@
             if (!success) return;
             [[DPMasternodeController sharedInstance] installDependenciesForMasternode:masternode inSession:sshSession withClb:^(BOOL success, BOOL installed) {
                 if (!success) return;
-                [[DPMasternodeController sharedInstance] gitCloneProjectWithRepositoryPath:repositoryPath toDirectory:@"~/src/dapi" andSwitchToBranch:branchName inSSHSession:sshSession dashClb:^(BOOL success, NSString *message) {
+                NSString * directory = [NSString stringWithFormat:@"~/src/%@",[ProjectTypeTransformer directoryForProject:project]];
+                [[DPMasternodeController sharedInstance] gitCloneProjectWithRepositoryPath:repositoryPath toDirectory:directory andSwitchToBranch:branchName inSSHSession:sshSession dashClb:^(BOOL success, NSString *message) {
                     if (!success) return;
-                    NSLog(@"DAPI successfully cloned");
+                    NSLog(@"%@ successfully cloned",[[[ProjectTypeTransformer alloc] init] transformedValue:@(project)]);
+                    [[DPMasternodeController sharedInstance] updateGitInfoForMasternode:masternode forProject:project clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
+                        if (!success) return;
+                    }];
                 }];
             }];
         }];
