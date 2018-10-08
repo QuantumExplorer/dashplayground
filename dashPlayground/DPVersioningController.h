@@ -18,7 +18,7 @@
 
 @end
 
-@class Masternode;
+@class Masternode,Branch;
 
 @interface DPVersioningController : NSObject
 
@@ -33,5 +33,7 @@
 - (void)updateCore:(NSString*)publicIP repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch commitHead:(NSString*)commitHead;
 
 - (void)updateDapi:(NSString*)publicIP repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch commitHead:(NSString*)commitHead;
+
+- (void)updateDapiToLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode;
 
 @end

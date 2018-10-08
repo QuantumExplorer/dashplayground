@@ -10,12 +10,14 @@
 #import "MasternodesViewController.h"
 #import "DPLocalNodeController.h"
 
+@class Masternode,Repository;
+
 @interface DPRepoModalController : NSObject
 
 +(DPRepoModalController*)sharedInstance;
 
 -(void)setViewController:(MasternodesViewController*)controller;
--(void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
+-(void)setUpMasternodeDashdWithSelectedRepo:(Masternode*)masternode repository:(Repository*)repository clb:(dashClb)clb;
 -(NSMutableArray*)getRepositoriesData;
 
 @end

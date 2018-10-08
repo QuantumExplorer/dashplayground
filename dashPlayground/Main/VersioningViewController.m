@@ -25,6 +25,16 @@
 @property (strong) IBOutlet NSTableView *tableView;
 @property (strong) IBOutlet NSArrayController *arrayController;
 @property (strong) IBOutlet NSArrayController *dapiRepositoriesController;
+@property (strong) IBOutlet NSArrayController *dapiBranchesController;
+
+@property (strong) IBOutlet NSArrayController *dashDriveRepositoriesController;
+@property (strong) IBOutlet NSArrayController *dashDriveBranchesController;
+
+@property (strong) IBOutlet NSArrayController *insightRepositoriesController;
+@property (strong) IBOutlet NSArrayController *insightBranchesController;
+
+@property (strong) IBOutlet NSArrayController *sentinelRepositoriesController;
+@property (strong) IBOutlet NSArrayController *sentinelBranchesController;
 
 @property (strong) ConsoleEventArray * consoleEvents;
 @property (strong) IBOutlet NSTextView *consoleTextField;
@@ -35,6 +45,8 @@
 @property (strong) IBOutlet NSButton *coreUpdateButton;
 
 @property (strong) IBOutlet NSTextField *currentDapiVersionTextField;
+@property (strong) IBOutlet NSComboBox * dapiRepositoriesComboBox;
+@property (strong) IBOutlet NSComboBox * dapiBranchesComboBox;
 @property (strong) IBOutlet NSPopUpButton *dapiVersionPopUpButton;
 @property (strong) IBOutlet NSButton *dapiUpdateButton;
 @property (strong) IBOutlet NSButton *dapiUpdateToLatestButton;
@@ -65,7 +77,6 @@
     [super viewDidLoad];
     // Do view setup here.
     [self setUpConsole];
-    [self initialize];
     
     [DPVersioningController sharedInstance].delegate = self;
 }
@@ -80,26 +91,6 @@
 
 -(void)setUpConsole {
     self.consoleEvents = [[ConsoleEventArray alloc] init];
-}
-
-- (void)initialize {
-    //    [self addStringEvent:@"Initializing instances from AWS."];
-    NSArray * masternodesArray = [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"instanceState == %@",@(InstanceState_Running)]];
-    for (NSManagedObject * masternode in masternodesArray) {
-        [self showTableContent:masternode];
-        //        [[DPMasternodeController sharedInstance] checkMasternode:masternode];
-    }
-    
-    [self.coreVersionPopupButton removeAllItems];
-    [self.versionSentinelButton removeAllItems];
-}
-
--(void)showTableContent:(NSManagedObject*)object
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.arrayController addObject:object];
-        [self.arrayController rearrangeObjects];
-    });
 }
 
 -(void)addStringEvent:(NSString*)string {
@@ -198,12 +189,13 @@
 }
 
 - (IBAction)updateDapi:(id)sender {
-    
+    NSArray *dapiHead = [[self.dapiVersionPopUpButton.selectedItem title] componentsSeparatedByString:@","];
+    [[DPVersioningController sharedInstance] updateDapi:[self.selectedMasternode valueForKey:@"publicIP"] repositoryUrl:[self.selectedMasternode valueForKey:@"repositoryUrl"] onBranch:@"develop" commitHead:[dapiHead objectAtIndex:0]];
 }
 
 - (IBAction)updateDapiToLatest:(id)sender {
-    NSArray *dapiHead = [[self.dapiVersionPopUpButton.selectedItem title] componentsSeparatedByString:@","];
-    [[DPVersioningController sharedInstance] updateDapi:[self.selectedMasternode valueForKey:@"publicIP"] repositoryUrl:[self.selectedMasternode valueForKey:@"repositoryUrl"] onBranch:@"develop" commitHead:[dapiHead objectAtIndex:0]];
+    Branch * branch = [self.dapiBranchesController.selectedObjects firstObject];
+    [[DPVersioningController sharedInstance] updateDapiToLatestCommitInBranch:branch onMasternode:self.selectedMasternode];
 }
 
 - (IBAction)updateDashDrive:(id)sender {

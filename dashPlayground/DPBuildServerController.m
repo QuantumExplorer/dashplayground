@@ -136,7 +136,7 @@
     
     NSError *error = nil;
     
-    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
         
         if ([message rangeOfString:@"SSH"].location == NSNotFound) {
             NSArray *directory = [message componentsSeparatedByString:@"\n"];
@@ -157,7 +157,7 @@
     
     NSError *error = nil;
     
-    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
         
         if ([message rangeOfString:@"SSH"].location == NSNotFound) {
             NSArray *branchArray = [message componentsSeparatedByString:@"\n"];
@@ -180,7 +180,7 @@
         NSString *command = [NSString stringWithFormat:@"cd /var/www/html/%@/%@-%@/%@ && ls -ldc %@", type, gitOwner, gitRepo, branch, [commit valueForKey:@"commitSha"]];
         NSError *error = nil;
         
-        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error  mainThread:NO dashClb:^(BOOL success, NSString *message) {
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
             
             if ([message rangeOfString:@"SSH:"].location == NSNotFound) {
                 NSArray *messageArray = [message componentsSeparatedByString:@" "];
@@ -237,7 +237,7 @@
     
     NSError *error = nil;
     
-    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
         
         if ([message rangeOfString:@"SSH:"].location == NSNotFound) {
             NSArray *commitArray = [message componentsSeparatedByString:@"\n"];
@@ -282,11 +282,11 @@
     NSError *error = nil;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
             
             if(success == YES) {
                 command = [NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git status", type, owner, repoName, branch];
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
                     if ([message rangeOfString:@"Your branch is up-to-date"].location != NSNotFound) {
                         if(report == YES) {
                             [self.buildServerViewController addStringEvent:message];
@@ -321,7 +321,7 @@
                 
                 command = [NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git rev-parse HEAD", type, owner, repoName, branch];
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     if([message length] == 41) {
                         [dict setValue:[message substringToIndex:7] forKey:@"gitCommit"];
                     }
@@ -352,7 +352,7 @@
     __block NSError *error = nil;
     __block NSString *command = [NSString stringWithFormat:@"ls ~/src/%@/%@-%@/%@/src/dashd", type, gitOwner, gitRepo, branch];
     
-    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
         if ([message rangeOfString:@"No such file or directory"].location != NSNotFound) {
             compileStatus = @"need to compile";
             clb(YES, compileStatus);
@@ -361,7 +361,7 @@
             
             //then check dashcli
             command = [NSString stringWithFormat:@"ls ~/src/%@/%@-%@/%@/src/dash-cli", type, gitOwner, gitRepo, branch];
-            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
                 if ([message rangeOfString:@"No such file or directory"].location != NSNotFound) {
                     compileStatus = @"need to compile";
                     clb(YES, compileStatus);
@@ -381,7 +381,7 @@
 
     
     NSError *error = nil;
-    [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git config --global credential.helper cache", projectDirectory, repository.owner, repository.name, branch.name] onSSH:buildServerSession error:error  mainThread:YES dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && git config --global credential.helper cache", projectDirectory, repository.owner, repository.name, branch.name] onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
         
     }];
 }
@@ -400,7 +400,7 @@
             
             __block NSString *command = [NSString stringWithFormat:@"git clone -b %@ %@ ~/src/%@/%@-%@/%@", branch, gitlink, type, gitOwner, gitRepo, branch];
             
-            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                 if ([message rangeOfString:@"already exists and is not an empty directory"].location != NSNotFound) {
                     [self.buildServerViewController addStringEvent:@"This repository already exists."];
                 }
@@ -454,21 +454,21 @@
                 
                 __block BOOL isSuccess = YES;
                 [self.buildServerViewController addStringEvent:@"Executing ./autogen.sh"];
-                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && ./autogen.sh", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && ./autogen.sh", type, gitOwner, gitRepo, branch] onSSH:buildServerSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     [self.buildServerViewController addStringEvent:message];
                     isSuccess = success;
                 }];
                 if(isSuccess == NO) return;
                 
                 [self.buildServerViewController addStringEvent:@"Executing ./configure"];
-                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && ./configure", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && ./configure", type, gitOwner, gitRepo, branch] onSSH:buildServerSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     [self.buildServerViewController addStringEvent:message];
                     isSuccess = success;
                 }];
                 if(isSuccess == NO) return;
                 
                 [self.buildServerViewController addStringEvent:@"Executing make --file=Makefile -j4 -l8"];
-                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && make --file=Makefile -j4 -l8", type, gitOwner, gitRepo, branch] onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/src/%@/%@-%@/%@/ && make --file=Makefile -j4 -l8", type, gitOwner, gitRepo, branch] onSSH:buildServerSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     [self.buildServerViewController addStringEvent:message];
                     isSuccess = success;
                 }];
@@ -486,7 +486,7 @@
             
             [self.buildServerViewController addStringEvent:command];
             
-            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:YES dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:YES dashClb:^(BOOL success, NSString *message,NSError * error) {
                 [self.buildServerViewController addStringEvent:message];
                 //            [self compileCheck:buildServerSession withRepository:repoObject reportConsole:NO];
                 
@@ -508,7 +508,7 @@
         
         [self.buildServerViewController addStringEvent:@"Moving dash-cli and dashd to download directory..."];
     
-        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:buildServerSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
             if([message length] == 41) {
                 command = [NSString stringWithFormat:@"sudo mkdir -p /var/www/html/%@/%@-%@/%@/%@ cd ~/src/%@/%@-%@/%@/src/ && sudo cp dashd /var/www/html/%@/%@-%@/%@/%@/", type, gitOwner, gitRepo, branch, message, type, gitOwner, gitRepo, branch, type, gitOwner, gitRepo, branch, message];
                 [buildServerSession.channel execute:command error:&error];

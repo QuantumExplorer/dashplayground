@@ -15,7 +15,7 @@
 
 @implementation SshConnection
 
--(void)sshInWithKeyPath:(NSString*)keyPath masternodeIp:(NSString*)masternodeIp openShell:(BOOL)shell clb:(dashSshClb)clb {
+-(void)sshInWithKeyPath:(NSString*)keyPath masternodeIp:(NSString*)masternodeIp openShell:(BOOL)shell clb:(dashSSHClb)clb {
     
     if (![[DPMasternodeController sharedInstance] sshPath]) {
         DialogAlert *dialog=[[DialogAlert alloc]init];
@@ -63,43 +63,6 @@
 
 #pragma mark - Connectivity
 
-//Toey
-
--(void)sendDashGitCloneCommandForRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory onSSH:(NMSSHSession *)ssh  onBranch:(NSString*)branchName error:(NSError*)error dashClb:(dashClb)clb {
-    
-    __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@",repositoryPath, directory];
-//    clb(YES,command);
-    __block BOOL clonedSuccess = NO;
-    [self sendExecuteCommand:command onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *call) {
-        if(success == NO) {
-            clb(success,call);
-        }
-        else {
-            clb(success,@"Cloning repository...");
-        }
-        clonedSuccess = success;
-    }];
-    
-    if(clonedSuccess == YES) {
-        command = [NSString stringWithFormat:@"cd %@; git checkout %@", directory, branchName];
-        clb(YES,command);
-        clonedSuccess = NO;
-        [self sendExecuteCommand:command onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-            clb(YES,command);
-            clonedSuccess = success;
-        }];
-        
-        if(clonedSuccess == YES) {
-            command = [NSString stringWithFormat:@"cd %@; git pull", directory];
-            clb(YES,command);
-            [self sendExecuteCommand:command onSSH:ssh error:error mainThread:NO dashClb:clb];
-        }
-    }
-    else {
-        clb(NO, @"Error while trying to send git clone command.");
-    }
-}
-
 -(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error dashClb:(dashClb)clb {
     
     
@@ -107,14 +70,14 @@
         NSString * command = [commands objectAtIndex:index];
         
         NSMutableString *commandStr = [NSMutableString string];
-        [commandStr appendString:path];
+        if (path) [commandStr appendString:path];
         [commandStr appendString:command];
         
 //        NSString *string = [NSString stringWithFormat:@"executing command %@...", command];
 //        clb(YES,string);
         
         __block BOOL isSucceed = YES;
-        [self sendExecuteCommand:commandStr onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+        [self sendExecuteCommand:commandStr onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
             clb(success,message);
             isSucceed = success;
         }];
@@ -144,7 +107,7 @@
     }
 }
 
--(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error mainThread:(BOOL)mainThread dashClb:(dashClb)clb {
+-(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh mainThread:(BOOL)mainThread dashClb:(dashClbWithError)clb {
     
     if(mainThread == YES) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -156,12 +119,12 @@
             if (error) {
                 //        NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
                 NSString *errorStr = [NSString stringWithFormat:@"SSH: %@", [error localizedDescription]];
-                clb(NO, errorStr);
+                clb(NO, errorStr,error);
                 return;
             }
             else {
                 //        NSLog(@"SSH: %@", response);
-                clb(YES, response);
+                clb(YES, response,nil);
             }
         });
     }
@@ -174,12 +137,12 @@
         if (error) {
             //        NSLog(@"SSH: error executing command %@ - %@", command, [error localizedDescription]);
             NSString *errorStr = [NSString stringWithFormat:@"SSH: %@", [error localizedDescription]];
-            clb(NO, errorStr);
+            clb(NO, errorStr,error);
             return;
         }
         else {
             //        NSLog(@"SSH: %@", response);
-            clb(YES, response);
+            clb(YES, response,error);
         }
     }
 } 

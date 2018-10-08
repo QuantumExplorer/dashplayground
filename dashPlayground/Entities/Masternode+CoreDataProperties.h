@@ -20,12 +20,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSDate *createdAt;
 @property (nonatomic) int32_t currentLogLine;
 
+@property (nonatomic) int16_t nodeVersion;
 //states
 @property (nonatomic) int16_t instanceState;
 @property (nonatomic) int16_t dashcoreState;
 @property (nonatomic) int16_t dapiState;
 @property (nonatomic) int16_t dashDriveState;
 @property (nonatomic) int16_t sentinelState;
+
+@property (nonatomic) BOOL installedNVM;
+@property (nonatomic) BOOL installedPM2;
 
 @property (nullable, nonatomic, copy) NSDate *debugLastFetched;
 @property (nonatomic) int32_t debugLineCount;

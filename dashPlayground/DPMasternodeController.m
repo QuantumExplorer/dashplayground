@@ -63,7 +63,16 @@
 
 #pragma mark - Connectivity
 
-//Toey
+-(void)createBackgroundSSHSessionOnMasternode:(Masternode*)masternode clb:(dashSSHClb)clb {
+    __block NSString * publicIP = masternode.publicIP;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+[[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+    clb(success,message,sshSession);
+    
+}];
+    });
+    
+}
 
 -(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error percentageClb:(dashPercentageClb)clb {
     
@@ -834,7 +843,7 @@
     else {
         command = [NSString stringWithFormat:@"cd ~/src; ./dashd"];
     }
-    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             clb(NO, message);
         });
@@ -871,165 +880,165 @@
 
 - (void)setUpMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb {
     
-    [masternode setValue:@(SentinelState_Checking) forKey:@"sentinelState"];
-    [[DPDataStore sharedInstance] saveContext];
-    
-    __block NSString *localChain = [[DPDataStore sharedInstance] chainNetwork];
-    __block NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-            if(success == YES) {
-                
-                __block BOOL isContinue = true;
-                
-                NSError *error = nil;
-                NSString *command = @"sudo apt-get update";
-                
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                    isContinue = success;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(isContinue, message);
-                    });
-                }];
-                if(isContinue == NO) return;
-                
-                command = @"sudo apt-get install -y git python-virtualenv";
-                
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                    isContinue = success;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(isContinue, message);
-                    });
-                }];
-                if(isContinue == NO) return;
-                
-                [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:@"https://github.com/dashpay/sentinel.git" toDirectory:@"~/.dashcore/sentinel" onSSH:sshSession onBranch:@"develop" error:error dashClb:^(BOOL success, NSString *message) {
-                    isContinue = success;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(isContinue, message);
-                    });
-                }];
-                if(isContinue == NO) return;
-                
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(success, message);
-                    });
-                }];
-                
-                command = @"cd ~/.dashcore/sentinel; virtualenv venv";
-                
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                    isContinue = success;
-                    if(success == NO){
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            clb(YES, message);
-                        });
-                        
-                        //if failed try another command
-                        NSString *command = @"cd ~/.dashcore/sentinel; sudo apt-get install -y virtualenv";
-                        
-                        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                            isContinue = success;
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                clb(isContinue, message);
-                            });
-                        }];
-                    }
-                    else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            clb(YES, message);
-                        });
-                    }
-                }];
-                if(isContinue == NO) return;
-                
-                command = @"cd ~/.dashcore/sentinel; venv/bin/pip install -r requirements.txt";
-                
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                    isContinue = success;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(isContinue, message);
-                    });
-                }];
-                if(isContinue == NO) return;
-                
-                //configure sentinel.conf
-                
-                
-                //                test sentinel is alive and talking to the still sync'ing wallet
-                //
-                //                venv/bin/python bin/sentinel.py
-                //
-                //                You should see: "dashd not synced with network! Awaiting full sync before running Sentinel."
-                //                This is exactly what we want to see at this stage
-                command = @"cd ~/.dashcore/sentinel; venv/bin/python bin/sentinel.py";
-                
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                    isContinue = success;
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(isContinue, message);
-                    });
-                }];
-                if(isContinue == NO) return;
-                
-                [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:[masternode valueForKey:@"publicIP"] rpcPassword:[masternode valueForKey:@"rpcPassword"] forChain:chainNetwork clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
-                    if (!success) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
-                            clb(NO,eventMsg);
-                        });
-                    } else {
-                        if (dictionary) {
-                            if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_FINISHED"]) {
-                                dispatch_async(dispatch_get_main_queue(), ^{
-                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
-                                    [[DPDataStore sharedInstance] saveContext];
-                                    [self startRemoteMasternode:masternode localChain:localChain clb:^(BOOL success, BOOL value, NSString *errorMessage) {
-                                        if (!success) {
-                                            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
-                                            clb(NO,eventMsg);
-                                        } else  if (value) {
-                                            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
-                                            clb(YES,eventMsg);
-                                        }
-                                    }];
-                                });
-                            }
-                            else {
-                                dispatch_async(dispatch_get_main_queue(), ^{
-                                    clb(NO,@"Sync in progress. Must wait until sync is complete to start Masternode.");
-                                });
-                            }
-                        }
-                    }
-                    
-                    NSString *command = @"echo \"$(echo '* * * * * cd /home/ubuntu/.dashcore/sentinel && ./venv/bin/python bin/sentinel.py 2>&1 >> sentinel-cron.log' ; crontab -l)\" | crontab -";
-                    
-                    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                        isContinue = success;
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            clb(isContinue, message);
-                        });
-                    }];
-                    if(isContinue == NO) return;
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [masternode setValue:@(SentinelState_Installed) forKey:@"sentinelState"];
-                        [[DPDataStore sharedInstance] saveContext];
-                    });
-                }];
-                
-                
-            }
-            else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    clb(NO, @"SSH: could not SSH in!");
-                });
-            }
-        }];
-    });
+//    [masternode setValue:@(SentinelState_Checking) forKey:@"sentinelState"];
+//    [[DPDataStore sharedInstance] saveContext];
+//    
+//    __block NSString *localChain = [[DPDataStore sharedInstance] chainNetwork];
+//    __block NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
+//    
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+//        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+//            if(success == YES) {
+//                
+//                __block BOOL isContinue = true;
+//                
+//                NSError *error = nil;
+//                NSString *command = @"sudo apt-get update";
+//                
+//                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                    isContinue = success;
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        clb(isContinue, message);
+//                    });
+//                }];
+//                if(isContinue == NO) return;
+//                
+//                command = @"sudo apt-get install -y git python-virtualenv";
+//                
+//                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                    isContinue = success;
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        clb(isContinue, message);
+//                    });
+//                }];
+//                if(isContinue == NO) return;
+//                
+//                [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:@"https://github.com/dashpay/sentinel.git" toDirectory:@"~/.dashcore/sentinel" onSSH:sshSession onBranch:@"develop" error:error dashClb:^(BOOL success, NSString *message) {
+//                    isContinue = success;
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        clb(isContinue, message);
+//                    });
+//                }];
+//                if(isContinue == NO) return;
+//                
+//                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        clb(success, message);
+//                    });
+//                }];
+//                
+//                command = @"cd ~/.dashcore/sentinel; virtualenv venv";
+//                
+//                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                    isContinue = success;
+//                    if(success == NO){
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            clb(YES, message);
+//                        });
+//                        
+//                        //if failed try another command
+//                        NSString *command = @"cd ~/.dashcore/sentinel; sudo apt-get install -y virtualenv";
+//                        
+//                        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                            isContinue = success;
+//                            dispatch_async(dispatch_get_main_queue(), ^{
+//                                clb(isContinue, message);
+//                            });
+//                        }];
+//                    }
+//                    else {
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            clb(YES, message);
+//                        });
+//                    }
+//                }];
+//                if(isContinue == NO) return;
+//                
+//                command = @"cd ~/.dashcore/sentinel; venv/bin/pip install -r requirements.txt";
+//                
+//                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                    isContinue = success;
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        clb(isContinue, message);
+//                    });
+//                }];
+//                if(isContinue == NO) return;
+//                
+//                //configure sentinel.conf
+//                
+//                
+//                //                test sentinel is alive and talking to the still sync'ing wallet
+//                //
+//                //                venv/bin/python bin/sentinel.py
+//                //
+//                //                You should see: "dashd not synced with network! Awaiting full sync before running Sentinel."
+//                //                This is exactly what we want to see at this stage
+//                command = @"cd ~/.dashcore/sentinel; venv/bin/python bin/sentinel.py";
+//                
+//                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                    isContinue = success;
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        clb(isContinue, message);
+//                    });
+//                }];
+//                if(isContinue == NO) return;
+//                
+//                [self sendRPCCommandJSONDictionary:@"mnsync status" toPublicIP:[masternode valueForKey:@"publicIP"] rpcPassword:[masternode valueForKey:@"rpcPassword"] forChain:chainNetwork clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
+//                    if (!success) {
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
+//                            clb(NO,eventMsg);
+//                        });
+//                    } else {
+//                        if (dictionary) {
+//                            if ([dictionary[@"AssetName"] isEqualToString:@"MASTERNODE_SYNC_FINISHED"]) {
+//                                dispatch_async(dispatch_get_main_queue(), ^{
+//                                    [masternode setValue:@([MasternodeSyncStatusTransformer typeForTypeName:dictionary[@"AssetName"]]) forKey:@"syncStatus"];
+//                                    [[DPDataStore sharedInstance] saveContext];
+//                                    [self startRemoteMasternode:masternode localChain:localChain clb:^(BOOL success, BOOL value, NSString *errorMessage) {
+//                                        if (!success) {
+//                                            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
+//                                            clb(NO,eventMsg);
+//                                        } else  if (value) {
+//                                            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], dictionary];
+//                                            clb(YES,eventMsg);
+//                                        }
+//                                    }];
+//                                });
+//                            }
+//                            else {
+//                                dispatch_async(dispatch_get_main_queue(), ^{
+//                                    clb(NO,@"Sync in progress. Must wait until sync is complete to start Masternode.");
+//                                });
+//                            }
+//                        }
+//                    }
+//                    
+//                    NSString *command = @"echo \"$(echo '* * * * * cd /home/ubuntu/.dashcore/sentinel && ./venv/bin/python bin/sentinel.py 2>&1 >> sentinel-cron.log' ; crontab -l)\" | crontab -";
+//                    
+//                    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+//                        isContinue = success;
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            clb(isContinue, message);
+//                        });
+//                    }];
+//                    if(isContinue == NO) return;
+//                    
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        [masternode setValue:@(SentinelState_Installed) forKey:@"sentinelState"];
+//                        [[DPDataStore sharedInstance] saveContext];
+//                    });
+//                }];
+//                
+//                
+//            }
+//            else {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    clb(NO, @"SSH: could not SSH in!");
+//                });
+//            }
+//        }];
+//    });
 }
 
 - (void)checkMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb {
@@ -1040,7 +1049,7 @@
                 NSError *error = nil;
                 NSString *command = @"cd ~/.dashcore/sentinel; venv/bin/python bin/sentinel.py";
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         clb(success, message);
                     });
@@ -1060,11 +1069,11 @@
             __block BOOL isSuccess = YES;
             NSError *error = nil;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                 isSuccess = success;
             }];
             if(isSuccess != YES) {
-                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     isSuccess = success;
                 }];
             }
@@ -1118,19 +1127,19 @@
             __block BOOL isSuccess = YES;
             NSError *error = nil;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/.dashcore/%@",chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/.dashcore/%@",chainNetwork] onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                 isSuccess = success;
             }];
             if(isSuccess != YES) return;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"mv ~/.dashcore/%@/wallet.dat ~/.dashcore/%@/wallet",chainNetwork,chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"mv ~/.dashcore/%@/wallet.dat ~/.dashcore/%@/wallet",chainNetwork,chainNetwork] onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
             }];
             
             
-            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/.dashcore/%@; (rm *.dat || true) && (rm *.log || true) && rm -rf blocks && rm -rf chainstate && rm -rf database && rm -rf evodb",chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"cd ~/.dashcore/%@; (rm *.dat || true) && (rm *.log || true) && rm -rf blocks && rm -rf chainstate && rm -rf database && rm -rf evodb",chainNetwork] onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
             }];
             
-            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"mv ~/.dashcore/%@/wallet ~/.dashcore/%@/wallet.dat",chainNetwork,chainNetwork] onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:[NSString stringWithFormat:@"mv ~/.dashcore/%@/wallet ~/.dashcore/%@/wallet.dat",chainNetwork,chainNetwork] onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
             }];
         }];
     });
@@ -1514,50 +1523,50 @@
 
 -(void)updateGitInfoForMasternode:(Masternode*)masternode clb:(dashInfoClb)clb {
     if (clb) clb(YES,nil,nil);
-//    __block NSString * publicIP = masternode.publicIP;
-//    __block NSString * branchName = masternode.coreBranch.name;
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-//
-//        __block NMSSHSession *ssh;
-//        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-//            ssh = sshSession;
-//        }];
-//
-//        if (!ssh.isAuthorized) {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                clb(NO,nil,@"SSH: error authenticating with server.");
-//            });
-//            return;
-//        }
-//
-//        NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh onPath:@"/src/dash"];
-//        [ssh disconnect];
-//        __block NSString * remote = nil;
-//        NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
-//
-//        if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
-//            remote = remoteInfoLine[1];
-//        }
-//        dispatch_async(dispatch_get_main_queue(), ^{
-//            if (remote) {
-//                Branch * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] inProject:DPRepositoryProject_Core onRepositoryURLPath:remote];
-//                if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
-//                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        masternode.coreBranch = branch;
-//                        if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
-//                    });
-//                    return;
-//                }
-//            }
-//            if (![masternode.coreGitCommitVersion isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                   masternode.coreGitCommitVersion = gitValues[@"rev-parse --short HEAD"];
-//                    if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
-//                });
-//                return;
-//            }
-//        });
-//    });
+    //    __block NSString * publicIP = masternode.publicIP;
+    //    __block NSString * branchName = masternode.coreBranch.name;
+    //    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+    //
+    //        __block NMSSHSession *ssh;
+    //        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+    //            ssh = sshSession;
+    //        }];
+    //
+    //        if (!ssh.isAuthorized) {
+    //            dispatch_async(dispatch_get_main_queue(), ^{
+    //                clb(NO,nil,@"SSH: error authenticating with server.");
+    //            });
+    //            return;
+    //        }
+    //
+    //        NSDictionary * gitValues = [self sendGitCommands:@[@"rev-parse --short HEAD",@"rev-parse --abbrev-ref HEAD",@"remote -v"] onSSH:ssh onPath:@"/src/dash"];
+    //        [ssh disconnect];
+    //        __block NSString * remote = nil;
+    //        NSArray * remoteInfoLine = [gitValues[@"remote -v"] componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\t "]];
+    //
+    //        if (remoteInfoLine.count > 2 && [remoteInfoLine[2] isEqualToString:@"(fetch)"]) {
+    //            remote = remoteInfoLine[1];
+    //        }
+    //        dispatch_async(dispatch_get_main_queue(), ^{
+    //            if (remote) {
+    //                Branch * branch = [[DPDataStore sharedInstance] branchNamed:gitValues[@"rev-parse --abbrev-ref HEAD"] inProject:DPRepositoryProject_Core onRepositoryURLPath:remote];
+    //                if (branch && [branchName isEqualToString:[branch valueForKey:@"name"]]) {
+    //                    dispatch_async(dispatch_get_main_queue(), ^{
+    //                        masternode.coreBranch = branch;
+    //                        if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
+    //                    });
+    //                    return;
+    //                }
+    //            }
+    //            if (![masternode.coreGitCommitVersion isEqualToString:gitValues[@"rev-parse --short HEAD"]]) {
+    //                dispatch_async(dispatch_get_main_queue(), ^{
+    //                   masternode.coreGitCommitVersion = gitValues[@"rev-parse --short HEAD"];
+    //                    if (clb) clb(YES,@{@"hasChanges":@(TRUE)},nil);
+    //                });
+    //                return;
+    //            }
+    //        });
+    //    });
 }
 
 #pragma mark - SSH in info
@@ -1708,7 +1717,7 @@
             __block BOOL isSuccess = YES;
             NSError *error = nil;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                 isSuccess = success;
             }];
             if(isSuccess != YES) {
@@ -1716,7 +1725,7 @@
                 return;
             }
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore && cat dash.conf" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore && cat dash.conf" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                 isSuccess = success;
                 if(success == YES && message != nil){
                     NSArray *dashConf = [message componentsSeparatedByString:@"\n"];
@@ -1788,7 +1797,7 @@
                 checkResult = success;
             }];
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                 NSLog(@"SSH-%@: %@", publicIP, message);
                 clb(success,message);
                 checkResult = success;
@@ -1805,7 +1814,7 @@
                     checkResult = success;
                 }];
                 
-                [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     NSLog(@"SSH-%@: %@", publicIP, message);
                     clb(success,message);
                     checkResult = success;
@@ -1816,7 +1825,7 @@
                 NSString *response = [ssh.channel execute:@"ls ~/src/dash/src/dashd" error:&error];
                 if(error || [response length] == 0) {//no
                     
-                    [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                    [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                         NSLog(@"SSH-%@: %@", publicIP, message);
                         clb(success,message);
                         checkResult = success;
@@ -1854,43 +1863,43 @@
             }
             
             //NSArray *gitCommand = [NSArray array];
-//            //check value "gitCommit
-//            gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
-//            NSDictionary * gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                if(gitValues != nil) {
-//                    [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
-//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-//                }
-//                else {
-//                    [masternode setValue:@"" forKey:@"gitCommit"];
-//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-//                }
-//            });
-//
-//            //check value "branch.name"
-//            gitCommand = [[NSArray alloc] initWithObjects:@"branch", nil];
-//            gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
-//            if(gitValues != nil) {
-//                NSArray *gitBranchArray = [[gitValues objectForKey:@"branch"] componentsSeparatedByString:@"\n"];
-//                NSString *gitBranch = @"";
-//                for(NSString *elements in gitBranchArray) {
-//                    if ([elements rangeOfString:@"*"].location != NSNotFound) {
-//                        NSArray *branchArray = [elements componentsSeparatedByString:@" "];
-//                        if([branchArray count] >= 2) gitBranch = [branchArray objectAtIndex:1];
-//                    }
-//                }
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    [masternode setValue:gitBranch forKey:@"gitBranch"];
-//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-//                });
-//            }
-//            else {
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    [masternode setValue:@"" forKey:@"gitBranch"];
-//                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-//                });
-//            }
+            //            //check value "gitCommit
+            //            gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
+            //            NSDictionary * gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
+            //            dispatch_async(dispatch_get_main_queue(), ^{
+            //                if(gitValues != nil) {
+            //                    [masternode setValue:gitValues[@"rev-parse --short HEAD"] forKey:@"gitCommit"];
+            //                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            //                }
+            //                else {
+            //                    [masternode setValue:@"" forKey:@"gitCommit"];
+            //                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            //                }
+            //            });
+            //
+            //            //check value "branch.name"
+            //            gitCommand = [[NSArray alloc] initWithObjects:@"branch", nil];
+            //            gitValues = [self sendGitCommands:gitCommand onSSH:sshSession onPath:@"/src/dash"];
+            //            if(gitValues != nil) {
+            //                NSArray *gitBranchArray = [[gitValues objectForKey:@"branch"] componentsSeparatedByString:@"\n"];
+            //                NSString *gitBranch = @"";
+            //                for(NSString *elements in gitBranchArray) {
+            //                    if ([elements rangeOfString:@"*"].location != NSNotFound) {
+            //                        NSArray *branchArray = [elements componentsSeparatedByString:@" "];
+            //                        if([branchArray count] >= 2) gitBranch = [branchArray objectAtIndex:1];
+            //                    }
+            //                }
+            //                dispatch_async(dispatch_get_main_queue(), ^{
+            //                    [masternode setValue:gitBranch forKey:@"gitBranch"];
+            //                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            //                });
+            //            }
+            //            else {
+            //                dispatch_async(dispatch_get_main_queue(), ^{
+            //                    [masternode setValue:@"" forKey:@"gitBranch"];
+            //                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            //                });
+            //            }
             
             //check value "sentinelGitCommit"
             NSArray * gitCommand = [[NSArray alloc] initWithObjects:@"rev-parse --short HEAD", nil];
@@ -1982,17 +1991,18 @@
 -(void)checkMasternode:(Masternode*)masternode saveContext:(BOOL)saveContext clb:(dashClb)clb {
     //we are going to check if a masternode is running, configured, etc...
     //first let's check to see if we have access to rpc
+    __block NSString * rpcPassword = masternode.rpcPassword;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        if ([masternode valueForKey:@"rpcPassword"]) {
+        if (rpcPassword) {
             //we most likely have access to rpc, it's running
             [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                 if (dictionary) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                    masternode.dashcoreState = DashcoreState_Running;
-                    masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
-                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                        masternode.dashcoreState = DashcoreState_Running;
+                        masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                         
-                    clb(TRUE,nil);
+                        clb(TRUE,nil);
                     });
                 } else {
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
@@ -2117,18 +2127,106 @@
     }];
     [ssh disconnect];
     
-    //    CkoSsh * ssh = [self sshIn:[masternode valueForKey:@"publicIP"]];
-    //    if (!ssh) return FALSE;
-    //    //now let's make all this shit
-    //    NSError * error = nil;
-    //    [self sendCommandList:@[@"rm -rf {banlist,fee_estimates,budget,governance,mncache,mnpayments,netfulfilled,peers}.dat"] toPath:@"~/.dashcore/" onSSH:ssh error:&error];
-    //
-    //    [ssh Disconnect];
-    
     return TRUE;
     
     
 }
+
+#pragma mark - Packages
+
+-(NSArray *)requiredPackages {
+    return @[@"npm"];
+}
+
+-(void)checkRequiredPackagesAreInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb {
+    [self checkPackages:[self requiredPackages] areInstalledOnMasternode:masternode withClb:clb];
+}
+
+-(void)checkPackages:(NSArray*)packages areInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:masternode.publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            if (success && sshSession.isAuthorized) {
+                [self checkPackages:packages areInstalledInSession:sshSession withClb:^(BOOL success, BOOL installed) {
+                    if (success && installed) {
+                        NSLog(@"Packages install on node %@",masternode.publicIP);
+                    }
+                    dispatch_async(dispatch_get_main_queue(),^{
+                        clb(success,installed);
+                    });
+                }];
+            } else {
+                dispatch_async(dispatch_get_main_queue(),^{
+                    clb(NO,NO);
+                });
+            }
+        }];
+    });
+}
+
+-(void)checkRequiredPackagesAreInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb {
+    [self checkPackages:[self requiredPackages] areInstalledInSession:sshSession withClb:clb];
+}
+
+-(void)checkPackages:(NSArray*)packages areInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb {
+    
+    NSError * error = nil;
+    NSString * command = [NSString stringWithFormat:@"sudo apt-get update; sudo apt-get install -y %@",[packages componentsJoinedByString:@" "]];
+    [[SshConnection sharedInstance] sendDashCommandsList:@[command] onSSH:sshSession onPath:nil error:error dashClb:^(BOOL success, NSString *call) {
+        clb(success,YES);
+    }];
+}
+
+-(NSString*)dependencyStringForMasternode:(Masternode*)masternode {
+    NSMutableArray * dependencies = [NSMutableArray array];
+    if (!masternode.installedNVM) {
+        [dependencies addObjectsFromArray:[self dependenciesForNVM]];
+    }
+    if (!masternode.installedPM2) {
+        [dependencies addObjectsFromArray:[self dependenciesForPM2]];
+    }
+    return [dependencies componentsJoinedByString:@";"];
+}
+
+-(NSArray*)dependenciesForPM2 {
+    return @[@"npm install pm2 -g"];
+}
+
+-(NSArray*)dependenciesForNVM {
+    return @[@"curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash; export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";nvm install 8;nvm alias default 8"];
+}
+
+-(void)installDependenciesForMasternode:(Masternode*)masternode inSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb {
+    __block NSString * command;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        command = [self dependencyStringForMasternode:masternode];
+    }];
+    if ([command isEqualToString:@""]) {
+        clb(YES,YES);
+    } else {
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError*error) {
+        [masternode.managedObjectContext performBlockAndWait:^{
+            masternode.installedNVM = TRUE;
+            masternode.installedPM2 = TRUE;
+            [[DPDataStore sharedInstance] saveContext];
+        }];
+        clb(success,YES);
+    }];
+    }
+}
+
+-(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh  dashClb:(dashClb)clb {
+    
+    __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@;cd %@;git checkout %@;git pull",repositoryPath, directory,directory,branchName];
+    
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            clb(NO,@"Error at cloning.");
+            return;
+        }
+        clb(YES,message);
+    }];
+}
+
 
 #pragma mark - Sentinel Checks
 

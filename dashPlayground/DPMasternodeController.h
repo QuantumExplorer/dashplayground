@@ -53,6 +53,8 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(NSString*)getSshName;
 -(void)setSshName:(NSString*)sshName;
 
+-(void)createBackgroundSSHSessionOnMasternode:(Masternode*)masternode clb:(dashSSHClb)clb;
+
 //- (NSDictionary *)dictionaryReferencedByKeyPath:(NSString*)key;
 
 -(void)checkMasternodeIsInstalled:(Masternode*)masternode clb:(dashBoolClb)clb;
@@ -87,5 +89,13 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashClb)clb;
 -(void)clearBannedOnNodes:(NSArray*)masternodeObjects withCallback:(dashClb)clb;
 -(void)wipeDataOnRemote:(Masternode*)masternode onClb:(dashClb)clb;
+
+-(void)checkRequiredPackagesAreInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb;
+-(void)checkPackages:(NSArray*)packages areInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb;
+-(void)checkRequiredPackagesAreInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb;
+-(void)checkPackages:(NSArray*)packages areInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb;
+
+-(void)installDependenciesForMasternode:(Masternode*)masternode inSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb;
+-(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh dashClb:(dashClb)clb;
 
 @end

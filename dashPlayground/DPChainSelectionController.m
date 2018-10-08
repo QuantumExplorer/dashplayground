@@ -65,11 +65,11 @@
             __block BOOL isSuccess = YES;
             NSError *error = nil;
             
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                 isSuccess = success;
             }];
             if(isSuccess != YES) {
-                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                     isSuccess = success;
                 }];
             }

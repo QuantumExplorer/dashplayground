@@ -17,6 +17,8 @@
 #import "DPMasternodeController.h"
 #import "SshConnection.h"
 #import "DPAuthenticationManager.h"
+#import "Repository+CoreDataClass.h"
+#import "Masternode+CoreDataClass.h"
 
 @implementation DPRepoModalController
 
@@ -24,7 +26,7 @@ MasternodesViewController *masternodeCon;
 
 #pragma mark - Set Up
 
--(void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb
+-(void)setUpMasternodeDashdWithSelectedRepo:(Masternode*)masternode repository:(Repository*)repository clb:(dashClb)clb
 {
     [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
         if (!authenticated) return;
@@ -36,99 +38,94 @@ MasternodesViewController *masternodeCon;
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
             
-            __block NMSSHSession *ssh;
+
             [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-                ssh = sshSession;
+                if (!success || !sshSession) return;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [masternodeCon addStringEventToMasternodeConsole:message];
                 });
-            }];
-            
-            if (!ssh.isAuthorized) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternodeCon addStringEventToMasternodeConsole:@"SSH: error authenticating with server."];
-                });
-                return;
-            }
-            
-            NSError *error = nil;
-            [ssh.channel write:@"cd src" error:&error];
-            if (error) {
-                error = nil;
-                [ssh.channel write:@"mkdir src" error:&error];
-                if(error)
-                {
+                if (!sshSession.isAuthorized) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        NSString *erroStr = [NSString stringWithFormat:@"SSH: error making src directory. %@", error.localizedDescription];
-                        [masternodeCon addStringEventToMasternodeConsole:erroStr];
-                        clb(NO,erroStr);
+                        [masternodeCon addStringEventToMasternodeConsole:@"SSH: error authenticating with server."];
                     });
                     return;
                 }
-            }
-            
-            //clone repository
-            if(repoType == 1) {//private repository
-                NSArray *pathComponents = [repositoryPath componentsSeparatedByString:@"//"];
-                if([pathComponents count] < 2) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [masternodeCon addStringEventToMasternodeConsole:@"Error: something went wrong with repository path."];
-                    });
-                    return;
-                }
-                repositoryPath = [NSString stringWithFormat:@"https://%@:%@@%@", githubUsername, githubPassword, pathComponents[1]];
-            }
-            __block BOOL isSuccess = YES;
-            [[SshConnection sharedInstance] sendDashGitCloneCommandForRepositoryPath:repositoryPath toDirectory:@"~/src/dash" onSSH:ssh onBranch:branchName error:error dashClb:^(BOOL success, NSString *call) {
-                isSuccess = success;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternodeCon addStringEventToMasternodeConsole:call];
-                    if(isSuccess == YES) {
-                        [masternode setValue:repositoryPath forKey:@"repositoryUrl"];
-                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                    }
-                    else {
+                
+                NSError *error = nil;
+                [sshSession.channel write:@"cd src" error:&error];
+                if (error) {
+                    error = nil;
+                    [sshSession.channel write:@"mkdir src" error:&error];
+                    if(error)
+                    {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            NSString *erroStr = [NSString stringWithFormat:@"SSH: error making src directory. %@", error.localizedDescription];
+                            [masternodeCon addStringEventToMasternodeConsole:erroStr];
+                            clb(NO,erroStr);
+                        });
                         return;
                     }
-                });
-            }];
-            if(isSuccess == NO) return;
-            
-            //now let's make all this shit
-            [[SshConnection sharedInstance] sendDashCommandsList:@[@"autogen.sh",@"configure"] onSSH:ssh onPath:@"~/src/dash/" error:error dashClb:^(BOOL success, NSString *call) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternodeCon addStringEventToMasternodeConsole:call];
-                });
-                if(success == NO) {
-                    isSuccess = NO;
-                    return;
                 }
-            }];
-            if(isSuccess == NO) return;
-            
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:ssh error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [masternodeCon addStringEventToMasternodeConsole:message];
-                });
-                if(success == NO) {
-                    isSuccess = NO;
-                    return;
+                
+                //clone repository
+                if(repoType == 1) {//private repository
+                    NSArray *pathComponents = [repositoryPath componentsSeparatedByString:@"//"];
+                    if([pathComponents count] < 2) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [masternodeCon addStringEventToMasternodeConsole:@"Error: something went wrong with repository path."];
+                        });
+                        return;
+                    }
+                    repositoryPath = [NSString stringWithFormat:@"https://%@:%@@%@", githubUsername, githubPassword, pathComponents[1]];
                 }
+                
+                [[DPMasternodeController sharedInstance]  gitCloneProjectWithRepositoryPath:repositoryPath toDirectory:@"~/src/dash" andSwitchToBranch:branchName inSSHSession:sshSession dashClb:^(BOOL success, NSString *message) {
+                    if (!success) {
+                        [sshSession disconnect];
+                        return;
+                    }
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [masternodeCon addStringEventToMasternodeConsole:message];
+                    });
+                    
+                    //now let's make all this shit
+                    [[SshConnection sharedInstance] sendDashCommandsList:@[@"autogen.sh",@"configure"] onSSH:sshSession onPath:@"~/src/dash/" error:error dashClb:^(BOOL success, NSString *call) {
+                        if (!success) {
+                            [sshSession disconnect];
+                            return;
+                        }
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [masternodeCon addStringEventToMasternodeConsole:call];
+                        });
+                        [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/src/dash/; make --file=Makefile -j4 -l8" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+                            [sshSession disconnect];
+                            if (!success) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
+                                    masternode.dashcoreState = DashcoreState_SettingUp;
+                                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                    [[DialogAlert sharedInstance] showWarningAlert:@"Set up" message:@"Set up failed!"];
+                                });
+                                return;
+                            }
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [masternodeCon addStringEventToMasternodeConsole:message];
+                                    masternode.dashcoreState = DashcoreState_SettingUp;
+                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];
+                            });
+                        }];
+                        
+                        
+                    }];
+                    
+                    
+                }];
             }];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [ssh disconnect];
-                [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
-                if(isSuccess == NO) {
-                    [masternode setValue:@(DashcoreState_SettingUp) forKey:@"masternodeState"];
-                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                    [[DialogAlert sharedInstance] showWarningAlert:@"Set up" message:@"Set up failed!"];
-                    return;
-                }
-                [masternode setValue:@(DashcoreState_Installed) forKey:@"masternodeState"];
-                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];
-            });
+            
+            
+            
             
             
             //---------

@@ -47,5 +47,8 @@
 @dynamic dapiBranch;
 @dynamic driveBranch;
 @dynamic insightBranch;
+@dynamic installedNVM;
+@dynamic installedPM2;
+@dynamic nodeVersion;
 
 @end

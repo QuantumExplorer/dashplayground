@@ -15,6 +15,8 @@
 #import "Masternode+CoreDataClass.h"
 #import "DPAuthenticationManager.h"
 #import "DialogAlert.h"
+#import "Branch+CoreDataClass.h"
+#import "Masternode+CoreDataClass.h"
 
 @implementation DPVersioningController
 
@@ -109,7 +111,7 @@
                         NSString *downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashCliCommand];
                         
                         [self.delegate versionControllerRelayMessage:@"Downloading dash-cli..."];
-                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
@@ -125,7 +127,7 @@
                         
                         downloadCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
                         [self.delegate versionControllerRelayMessage:@"Downloading dashd..."];
-                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
@@ -140,26 +142,26 @@
                         if(isAllowedToContiunue == YES) {
                             NSString *command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dash-cli"];
                             
-                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                                 
                             }];
                             
                             command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dash-cli.1 dash-cli && chmod +x dash-cli"];
                             
-                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                                 
                             }];
                             
                             //dashd
                             command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dashd"];
                             
-                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                                 
                             }];
                             
                             command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dashd.1 dashd && chmod +x dashd"];
                             
-                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                                 
                             }];
                         }
@@ -196,7 +198,7 @@
                         
                         [self.delegate versionControllerRelayMessage:@"Checking to see if DAPI is installed"];
                         
-                        [[SshConnection sharedInstance] sendExecuteCommand:checkDapiCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        [[SshConnection sharedInstance] sendExecuteCommand:checkDapiCommand onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                             NSLog(@"%@", message);
                             
                             if([message length] == 0) {
@@ -207,7 +209,7 @@
                             }
                             
                             NSString *gitCloneCommand = [NSString stringWithFormat:@"cd ~/src/ && git clone %@", repositoryUrl];
-                            [[SshConnection sharedInstance] sendExecuteCommand:gitCloneCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                            [[SshConnection sharedInstance] sendExecuteCommand:gitCloneCommand onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                                 NSLog(@"%@", message);
                                 
                                 if([message length] == 0) {
@@ -225,7 +227,7 @@
                         
                         //                        NSString *checkDapiCommand = [NSString stringWithFormat:@"cd ~/src/dash/src/ && %@", downloadDashDCommand];
                         //                        [self.delegate versionControllerRelayMessage:@"Downloading dashd..."];
-                        //                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //                        [[SshConnection sharedInstance] sendExecuteCommand:downloadCommand onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                         //                            NSLog(@"%@", message);
                         //
                         //                            if([message length] == 0) {
@@ -240,26 +242,26 @@
                         //                        if(isAllowedToContiunue == YES) {
                         //                            NSString *command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dash-cli"];
                         //
-                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                         //
                         //                            }];
                         //
                         //                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dash-cli.1 dash-cli && chmod +x dash-cli"];
                         //
-                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                         //
                         //                            }];
                         //
                         //                            //dashd
                         //                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && rm -r dashd"];
                         //
-                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                         //
                         //                            }];
                         //
                         //                            command = [NSString stringWithFormat:@"cd ~/src/dash/src/ && mv dashd.1 dashd && chmod +x dashd"];
                         //
-                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession error:error mainThread:NO dashClb:^(BOOL success, NSString *message) {
+                        //                            [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
                         //
                         //                            }];
                         //                        }
@@ -271,6 +273,36 @@
     else {
         [self.delegate versionControllerRelayMessage:@"Error! There is some missing attributes. Please refresh and try again."];
     }
+}
+
+
+#pragma mark - Dapi
+
+-(void)updateDapiToLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode {
+    if (!masternode) return;
+    __block NSString * repositoryPath;
+    [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
+        if (branch.repository.isPrivate) {
+            NSArray *pathComponents = [branch.repository.url componentsSeparatedByString:@"//"];
+            if([pathComponents count] < 2) {
+                return;
+            }
+            repositoryPath = [NSString stringWithFormat:@"https://%@:%@@%@", githubUsername, githubPassword, pathComponents[1]];
+        } else {
+            repositoryPath = branch.repository.url;
+        }
+        __block NSString * branchName = branch.name;
+        [[DPMasternodeController sharedInstance] createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            if (!success) return;
+            [[DPMasternodeController sharedInstance] installDependenciesForMasternode:masternode inSession:sshSession withClb:^(BOOL success, BOOL installed) {
+                if (!success) return;
+                [[DPMasternodeController sharedInstance] gitCloneProjectWithRepositoryPath:repositoryPath toDirectory:@"~/src/dapi" andSwitchToBranch:branchName inSSHSession:sshSession dashClb:^(BOOL success, NSString *message) {
+                    if (!success) return;
+                    NSLog(@"DAPI successfully cloned");
+                }];
+            }];
+        }];
+    }];
 }
 
 #pragma mark - Singleton methods
