@@ -31,25 +31,16 @@
         extraInformation = @" (Checking)";
     }
     state = state & ~(DPDapiState_Error | DPDapiState_Checking);
-    switch (state) {
-        case DPDapiState_Initial:
-            return [NSString stringWithFormat:@"Initial%@",extraInformation];
-            break;
-        case DPDapiState_Configured:
-            return [NSString stringWithFormat:@"Configured%@",extraInformation];;
-            break;
-        case DPDapiState_Installed:
-            return [NSString stringWithFormat:@"Installed%@",extraInformation];
-            break;
-        case DPDapiState_Running:
-            return [NSString stringWithFormat:@"Running%@",extraInformation];
-            break;
-        case DPDapiState_Error:
-            return [NSString stringWithFormat:@"Error%@",extraInformation];
-            break;
-        default:
-            return [NSString stringWithFormat:@"Unknown%@",extraInformation];
-            break;
+    if (state & DPDapiState_Running) {
+        return [NSString stringWithFormat:@"Running%@",extraInformation];
+    } else if (state & DPDapiState_Installed) {
+        return [NSString stringWithFormat:@"Installed%@",extraInformation];
+    } else if (state & DPDapiState_Configured) {
+        return [NSString stringWithFormat:@"Configured%@",extraInformation];
+    } else if (state & DPDapiState_Cloned) {
+        return [NSString stringWithFormat:@"Cloned%@",extraInformation];
+    } else {
+        return [NSString stringWithFormat:@"Initial%@",extraInformation];
     }
 }
 

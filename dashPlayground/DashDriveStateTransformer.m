@@ -31,25 +31,16 @@
         extraInformation = @" (Checking)";
     }
     state = state & ~(DPDriveState_Error | DPDriveState_Checking);
-    switch (state) {
-        case DPDriveState_Initial:
-            return [NSString stringWithFormat:@"Initial%@",extraInformation];
-            break;
-        case DPDriveState_Configured:
-            return [NSString stringWithFormat:@"Configured%@",extraInformation];;
-            break;
-        case DPDriveState_Installed:
-            return [NSString stringWithFormat:@"Installed%@",extraInformation];
-            break;
-        case DPDriveState_Running:
-            return [NSString stringWithFormat:@"Running%@",extraInformation];
-            break;
-        case DPDriveState_Error:
-            return [NSString stringWithFormat:@"Error%@",extraInformation];
-            break;
-        default:
-            return [NSString stringWithFormat:@"Unknown%@",extraInformation];
-            break;
+    if (state & DPDriveState_Running) {
+        return [NSString stringWithFormat:@"Running%@",extraInformation];
+    } else if (state & DPDriveState_Installed) {
+        return [NSString stringWithFormat:@"Installed%@",extraInformation];
+    } else if (state & DPDriveState_Configured) {
+        return [NSString stringWithFormat:@"Configured%@",extraInformation];
+    } else if (state & DPDriveState_Cloned) {
+        return [NSString stringWithFormat:@"Cloned%@",extraInformation];
+    } else {
+        return [NSString stringWithFormat:@"Initial%@",extraInformation];
     }
 }
 

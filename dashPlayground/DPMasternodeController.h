@@ -34,7 +34,7 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType;
 //- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
 - (void)setUpMasternodeDashd:(Masternode*)masternode clb:(dashClb)clb;
-- (void)setUpMasternodeConfiguration:(Masternode*)masternode onChainName:(NSString*)chainName onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey clb:(dashSuccessInfo)clb;
+- (void)setUpMasternodeConfiguration:(Masternode*)masternode onChainName:(NSString*)chainName clb:(dashSuccessInfo)clb;
 - (void)setUpMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb;
 
 - (void)startMasternodeOnRemote:(Masternode*)masternode localChain:(NSString*)localChain clb:(dashInfoClb)clb;
@@ -99,6 +99,12 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh dashClb:(dashClb)clb;
 -(void)updateGitInfoForMasternode:(Masternode*)masternode forProject:(DPRepositoryProject)project clb:(dashInfoClb)clb;
 
-- (void)configureInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
+- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb;
+- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
+- (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
+
+- (void)configureDapiOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb;
+-(void)checkDapiIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
+-(void)installDapiOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
 
 @end

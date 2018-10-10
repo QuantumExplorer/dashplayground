@@ -322,7 +322,7 @@
                             case DPRepositoryProject_Dapi:
                             {
                                 [masternode.managedObjectContext performBlockAndWait:^{
-                                    masternode.dapiState = DPDapiState_Installed | masternode.dapiState;
+                                    masternode.dapiState = DPDapiState_Cloned | masternode.dapiState;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }];
                                 break;
@@ -330,7 +330,7 @@
                             case DPRepositoryProject_Drive:
                             {
                                 [masternode.managedObjectContext performBlockAndWait:^{
-                                    masternode.driveState = DPDriveState_Installed | masternode.driveState;
+                                    masternode.driveState = DPDriveState_Cloned | masternode.driveState;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }];
                                 break;
@@ -338,7 +338,7 @@
                             case DPRepositoryProject_Insight:
                             {
                                 [masternode.managedObjectContext performBlockAndWait:^{
-                                    masternode.insightState = DPInsightState_Installed | masternode.insightState;
+                                    masternode.insightState = DPInsightState_Cloned | masternode.insightState;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }];
                                 break;
@@ -346,7 +346,7 @@
                             case DPRepositoryProject_Sentinel:
                             {
                                 [masternode.managedObjectContext performBlockAndWait:^{
-                                    masternode.sentinelState = DPSentinelState_Installed | masternode.sentinelState;
+                                    masternode.sentinelState = DPSentinelState_Cloned | masternode.sentinelState;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }];
                                 break;

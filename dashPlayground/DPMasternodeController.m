@@ -21,17 +21,23 @@
 #import "PreferenceData.h"
 #import <NMSSH/NMSSH.h>
 #import "SshConnection.h"
-#import "SentinelStateTransformer.h"
 #import "DPChainSelectionController.h"
 #import "Branch+CoreDataClass.h"
 #import "Masternode+CoreDataClass.h"
 #import "InsightStateTransformer.h"
+#import "DAPIStateTransformer.h"
+#import "DashDriveStateTransformer.h"
+#import "SentinelStateTransformer.h"
+#import "DPAuthenticationManager.h"
 
 #define MASTERNODE_PRIVATE_KEY_STRING @"[MASTERNODE_PRIVATE_KEY]"
 #define RPC_PASSWORD_STRING @"[RPC_PASSWORD]"
 #define RPC_PORT_STRING @"[RPC_PORT]"
 #define INSIGHT_PORT_STRING @"[INSIGHT_PORT]"
 #define EXTERNAL_IP_STRING @"[EXTERNAL_IP]"
+
+#define SPORK_ADDRESS @"[SPORK_ADDRESS]"
+#define SPORK_PRIVATE_KEY @"[SPORK_PRIVATE_KEY]"
 
 #define SSHPATH @"sshPath"
 #define SSH_NAME_STRING @"SSH_NAME"
@@ -677,9 +683,8 @@
     });
 }
 
-- (void)setUpMasternodeConfiguration:(Masternode*)masternode onChainName:(NSString*)chainName onSporkAddr:(NSString*)sporkAddr onSporkKey:(NSString*)sporkKey clb:(dashSuccessInfo)clb {
+- (void)setUpMasternodeConfiguration:(Masternode*)masternode onChainName:(NSString*)chainName clb:(dashSuccessInfo)clb {
     
-    __block Masternode * object = masternode;
     
     //    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: trying to start dashd on local...", [masternode valueForKey:@"instanceId"]];
     //    clb(YES,eventMsg);
@@ -694,10 +699,12 @@
         
         if ([key length] >= 51) {
             if([key length] > 51) key = [key substringToIndex:[key length] - 1];
-            [object setValue:key forKey:@"key"];
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.key = key;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-                [self setUpMasternodeConfiguration:object onChainName:chainName onSporkAddr:sporkAddr onSporkKey:sporkKey clb:clb];
+                [self setUpMasternodeConfiguration:masternode onChainName:chainName clb:clb];
             });
         }
         else {
@@ -725,21 +732,23 @@
         //        return;
     }
     
-    if ([masternode valueForKey:@"transactionId"] && [masternode valueForKey:@"transactionOutputIndex"]) {
-        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configuring masternode configuration file...", [masternode valueForKey:@"instanceId"]];
+    if (masternode.transactionId && masternode.transactionOutputIndex) {
+        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configuring masternode configuration file...", masternode.instanceId];
         dispatch_async(dispatch_get_main_queue(), ^{
             clb(YES,eventMsg,NO);
             [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
                 if (success) {
-                    [self configureRemoteMasternode:object clb:^(BOOL success, NSString *message) {
+                    [self configureRemoteMasternode:masternode clb:^(BOOL success, NSString *message) {
                         if(success != YES) {
                             return clb(success,message,NO);
                         }
                         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
-                        [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode onSporkAddr:sporkAddr onSporkKey:sporkKey];
+                        [[DPChainSelectionController sharedInstance] executeConfigurationMethod:masternode.chainNetwork onName:chainName onMasternode:masternode];
+                        [masternode.managedObjectContext performBlockAndWait:^{
+                            masternode.dashcoreState = DashcoreState_Configured;
+                            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                        }];
                         
-                        [masternode setValue:@(DashcoreState_Configured) forKey:@"masternodeState"];
-                        [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
                         
                         clb(YES,eventMsg,YES);
                     }];
@@ -782,7 +791,7 @@
                                 return clb(success,message,NO);
                             }
                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
-                            [[DPChainSelectionController sharedInstance] executeConfigurationMethod:[masternode valueForKey:@"chainNetwork"] onName:chainName onMasternode:masternode onSporkAddr:sporkAddr onSporkKey:sporkKey];
+                            [[DPChainSelectionController sharedInstance] executeConfigurationMethod:masternode.chainNetwork onName:chainName onMasternode:masternode];
                             
                             [masternode setValue:@(DashcoreState_Configured) forKey:@"masternodeState"];
                             [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
@@ -1052,34 +1061,38 @@
 
 - (void)configureRemoteMasternode:(Masternode*)masternode clb:(dashClb)clb {
     
-    [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-        if(success == YES) {
-            NSString *localFilePath = [self createConfigDashFileForMasternode:masternode];
-            NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
-            
-            __block BOOL isSuccess = YES;
-            NSError *error = nil;
-            
-            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
-                isSuccess = success;
-            }];
-            if(isSuccess != YES) {
-                [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
-                    isSuccess = success;
-                }];
-            }
-            if(isSuccess != YES) return;
-            
-            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
-            if (uploadSuccess != YES) {
-                NSLog(@"%@",[[sshSession lastError] localizedDescription]);
-                clb(NO, [[sshSession lastError] localizedDescription]);
-            }
-            else {
-                clb(YES, nil);
-            }
+    [self createDashcoreConfigFileForMasternode:masternode clb:^(BOOL success, NSString *localFilePath) {
+        if (!success) {
+            clb(success,@"Did not authenticate");
+            return;
         }
+        NSString *remoteFilePath = @"/home/ubuntu/.dashcore/dash.conf";
+        
+        [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+            [[SshConnection sharedInstance] sendExecuteCommand:@"cd ~/.dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+                if(!success) {
+                    [[SshConnection sharedInstance] sendExecuteCommand:@"mkdir .dashcore" onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+                        [self uploadFileAtPath:localFilePath toRemotePath:remoteFilePath inSSHSession:sshSession clb:clb];
+                    }];
+                } else {
+                    [self uploadFileAtPath:localFilePath toRemotePath:remoteFilePath inSSHSession:sshSession clb:clb];
+                }
+            }];
+        }];
+        
     }];
+    
+}
+
+-(void)uploadFileAtPath:(NSString*)localFilePath toRemotePath:(NSString*)remoteFilePath inSSHSession:(NMSSHSession*)sshSession clb:(dashClb)clb  {
+    BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+    if (uploadSuccess != YES) {
+        NSLog(@"%@",[[sshSession lastError] localizedDescription]);
+        clb(NO, [[sshSession lastError] localizedDescription]);
+    }
+    else {
+        clb(YES, nil);
+    }
 }
 
 - (void)configureRemoteMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb {
@@ -1534,64 +1547,67 @@
             if (!gitValues) {
                 clb(NO,nil,[NSString stringWithFormat:@"%@ is not installed",path]);
             } else {
-            __block NSString * remoteURLPath = gitValues[@"config --get remote.origin.url"];
-            __block NSString * repositoryOwner;
-            __block NSString * repositoryName;
-            if ([remoteURLPath containsString:@"@"]) { //security issue, not so great
-                remoteURLPath = [[remoteURLPath componentsSeparatedByString:@"@"] lastObject];
-            } else {
-                remoteURLPath = [remoteURLPath stringByReplacingOccurrencesOfString:@"https://" withString:@""];
-            }
-            remoteURLPath = [remoteURLPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            
-            NSArray * pathComponents = [remoteURLPath pathComponents];
-            
-            repositoryOwner = [pathComponents objectAtIndex:1];
-            repositoryName = [[pathComponents objectAtIndex:2] stringByDeletingPathExtension];
-            remoteURLPath = [@"https://" stringByAppendingString:remoteURLPath];
-            
-            __block NSString * branchName = nil;
-            if (gitValues[@"rev-parse --abbrev-ref HEAD"]) {
-                branchName = [gitValues[@"rev-parse --abbrev-ref HEAD"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            }
-            __block NSString * commit = nil;
-            if (gitValues[@"rev-parse --short HEAD"]) {
-                commit = [gitValues[@"rev-parse --short HEAD"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            }
-            [masternode.managedObjectContext performBlockAndWait:^{
-                Repository * repository = [[DPDataStore sharedInstance] repositoryNamed:repositoryName forOwner:repositoryOwner inProject:project onRepositoryURLPath:remoteURLPath inContext:masternode.managedObjectContext saveContext:NO];
-                switch (project) {
-                    case DPRepositoryProject_Core:
-                        masternode.coreBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
-                        masternode.coreGitCommitVersion = commit;
-                        break;
-                    case DPRepositoryProject_Dapi:
-                    {
-                        Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
-                        masternode.dapiBranch = branch;
-                        masternode.dapiGitCommitVersion = commit;
-                        break;
-                    }
-                    case DPRepositoryProject_Drive:
-                        masternode.driveBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
-                        masternode.driveGitCommitVersion = commit;
-                        break;
-                    case DPRepositoryProject_Insight:
-                        masternode.insightBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
-                        masternode.insightGitCommitVersion = commit;
-                        break;
-                    case DPRepositoryProject_Sentinel:
-                        masternode.sentinelBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
-                        masternode.sentinelGitCommitVersion = commit;
-                        break;
-                    default:
-                        clb(NO,nil,@"Unknown project");
-                        return;
+                __block NSString * remoteURLPath = gitValues[@"config --get remote.origin.url"];
+                __block NSString * repositoryOwner;
+                __block NSString * repositoryName;
+                if ([remoteURLPath containsString:@"@"]) { //security issue, not so great
+                    remoteURLPath = [[remoteURLPath componentsSeparatedByString:@"@"] lastObject];
+                } else {
+                    remoteURLPath = [remoteURLPath stringByReplacingOccurrencesOfString:@"https://" withString:@""];
+                }
+                remoteURLPath = [remoteURLPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                
+                NSArray * pathComponents = [remoteURLPath pathComponents];
+                
+                repositoryOwner = [pathComponents objectAtIndex:1];
+                repositoryName = [[pathComponents objectAtIndex:2] stringByDeletingPathExtension];
+                remoteURLPath = [@"https://" stringByAppendingString:remoteURLPath];
+                if (![remoteURLPath hasSuffix:@".git"]) {
+                    remoteURLPath = [remoteURLPath stringByAppendingString:@".git"];
                 }
                 
-                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                clb(YES,gitValues,nil);
-            }];
+                __block NSString * branchName = nil;
+                if (gitValues[@"rev-parse --abbrev-ref HEAD"]) {
+                    branchName = [gitValues[@"rev-parse --abbrev-ref HEAD"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                }
+                __block NSString * commit = nil;
+                if (gitValues[@"rev-parse --short HEAD"]) {
+                    commit = [gitValues[@"rev-parse --short HEAD"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                }
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    Repository * repository = [[DPDataStore sharedInstance] repositoryNamed:repositoryName forOwner:repositoryOwner inProject:project onRepositoryURLPath:remoteURLPath inContext:masternode.managedObjectContext saveContext:NO];
+                    switch (project) {
+                        case DPRepositoryProject_Core:
+                            masternode.coreBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
+                            masternode.coreGitCommitVersion = commit;
+                            break;
+                        case DPRepositoryProject_Dapi:
+                        {
+                            Branch * branch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
+                            masternode.dapiBranch = branch;
+                            masternode.dapiGitCommitVersion = commit;
+                            break;
+                        }
+                        case DPRepositoryProject_Drive:
+                            masternode.driveBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
+                            masternode.driveGitCommitVersion = commit;
+                            break;
+                        case DPRepositoryProject_Insight:
+                            masternode.insightBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
+                            masternode.insightGitCommitVersion = commit;
+                            break;
+                        case DPRepositoryProject_Sentinel:
+                            masternode.sentinelBranch = [[DPDataStore sharedInstance] branchNamed:branchName inRepository:repository];
+                            masternode.sentinelGitCommitVersion = commit;
+                            break;
+                        default:
+                            clb(NO,nil,@"Unknown project");
+                            return;
+                    }
+                    
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    clb(YES,gitValues,nil);
+                }];
             }
         }];
         
@@ -2263,29 +2279,316 @@
 
 #pragma mark - Insight
 
-- (void)configureInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
-    if (!(masternode.insightState & DPInsightState_Installed)) {
-        clb(NO,nil);
+- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb {
+    if (!(masternode.insightState & DPInsightState_Cloned)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            clb(NO,@"Error: Insight needs to be cloned first");
+        });
         return;
     }
-    [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:masternode.publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-        if(success == YES) {
-            NSString *localFilePath = [self createInsightConfigFileForMasternode:masternode];
-            NSString *remoteFilePath = @"/home/ubuntu/src/dashcore-node/dashcore-node.json";
-            
-            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
-            if (uploadSuccess != YES) {
-                NSLog(@"%@",[[sshSession lastError] localizedDescription]);
-                clb(NO, [[sshSession lastError] localizedDescription]);
+    if (!forceUpdate && (masternode.insightState & DPInsightState_Configured)) {
+        [self installInsightOnMasternode:masternode clb:clb];
+        return; //we are already configured
+    }
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(success == YES) {
+                                                     NSString *localFilePath = [self createInsightConfigFileForMasternode:masternode];
+                                                     NSString *remoteFilePath = @"/home/ubuntu/src/dashcore-node/dashcore-node.json";
+                                                     
+                                                     BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+                                                     if (uploadSuccess != YES) {
+                                                         NSLog(@"%@",[[sshSession lastError] localizedDescription]);
+                                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                                             clb(NO, [[sshSession lastError] localizedDescription]);
+                                                         });
+                                                     }
+                                                     else {
+                                                         [masternode.managedObjectContext performBlockAndWait:^{
+                                                             masternode.insightState |= DPInsightState_Configured;
+                                                             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                                         }];
+                                                         [self installInsightOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                     }
+                                                 }
+                                             }];
+}
+
+- (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+    if (!(masternode.insightState & DPInsightState_Configured)) {
+        clb(NO,@"Error: Insight needs to be configured first");
+        return;
+    }
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self installInsightOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                             }];
+}
+
+
+- (void)installInsightOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session clb:(dashClb)clb {
+    __block BOOL shouldBreak = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.insightState & DPInsightState_Configured)) {
+            if ([NSThread isMainThread]) {
+                clb(NO,@"Error: Insight needs to be configured first");
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,@"Error: Insight needs to be configured first");
+                });
             }
-            else {
-                clb(YES, nil);
+            shouldBreak = TRUE;
+        }
+    }];
+    if (shouldBreak) return;
+    
+    NSString * command = @"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\"; cd ~/src/dashcore-node; npm i; ./bin/dashcore-node install https://github.com/dashevo/insight-api/; pm2 start bin/dashcore-node -- start; pm2 save";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO, message);
+            });
+            return;
+        }
+        [masternode.managedObjectContext performBlockAndWait:^{
+            masternode.insightState |= DPInsightState_Installed;
+            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+        }];
+        //At this point lets send a query to check if it's running
+        [self checkInsightIsRunningOnMasternode:masternode inSSHSession:session clb:clb];
+    }];
+}
+
+-(void)checkInsightIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                             }];
+}
+
+- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashClb)clb {
+    __block BOOL needConfigurationCheck = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.insightState & DPInsightState_Configured)) {
+            needConfigurationCheck = YES;
+        }
+    }];
+    if (needConfigurationCheck) return;
+    
+    NSString * command = @"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";pm2 jlist";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO, message);
+            });
+            return;
+        }
+        NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *jsonError = nil;
+        NSArray *pm2InfoArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
+        BOOL found = NO;
+        for (NSDictionary * pm2InfoDictionary in pm2InfoArray) {
+            if ([pm2InfoDictionary[@"name"] isEqualToString:@"dashcore-node"]) {
+                NSDictionary * pm2Environment = pm2InfoDictionary[@"pm2_env"];
+                if ([pm2Environment[@"status"] isEqualToString:@"online"]) {
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        masternode.insightState |= DPInsightState_Running;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
+                    //At this point lets send a query to check if it's running
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        clb(YES, message);
+                    });
+                    found = TRUE;
+                }
             }
+        }
+        if (!found) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.insightState &= ~DPInsightState_Running;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(YES, message);
+            });
         }
     }];
 }
 
+#pragma mark - Dapi
 
+- (void)configureDapiOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb {
+    if (!(masternode.dapiState & DPDapiState_Cloned)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            clb(NO,@"Error: Dapi needs to be cloned first");
+        });
+        return;
+    }
+    if (!forceUpdate && (masternode.dapiState & DPDapiState_Configured)) {
+        [self installDapiOnMasternode:masternode clb:clb];
+        return; //we are already configured
+    }
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(success == YES) {
+                                                     NSString *localFilePath = [self createDapiEnvFileForMasternode:masternode];
+                                                     NSString *remoteFilePath = @"/home/ubuntu/src/dapi/.env";
+                                                     
+                                                     BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+                                                     if (uploadSuccess != YES) {
+                                                         NSLog(@"%@",[[sshSession lastError] localizedDescription]);
+                                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                                             clb(NO, [[sshSession lastError] localizedDescription]);
+                                                         });
+                                                     }
+                                                     else {
+                                                         [masternode.managedObjectContext performBlockAndWait:^{
+                                                             masternode.dapiState |= DPDapiState_Configured;
+                                                             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                                         }];
+                                                         [self installDapiOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                     }
+                                                 }
+                                             }];
+}
+
+- (void)installDapiOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+    if (!(masternode.dapiState & DPDapiState_Configured)) {
+        clb(NO,@"Error: Dapi needs to be configured first");
+        return;
+    }
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self installDapiOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                             }];
+}
+
+
+- (void)installDapiOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session clb:(dashClb)clb {
+    __block BOOL shouldBreak = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.dapiState & DPDapiState_Configured)) {
+            if ([NSThread isMainThread]) {
+                clb(NO,@"Error: Dapi needs to be configured first");
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    clb(NO,@"Error: Dapi needs to be configured first");
+                });
+            }
+            shouldBreak = TRUE;
+        }
+    }];
+    if (shouldBreak) return;
+    [[DPAuthenticationManager sharedInstance] authenticateNPMWithClb:^(BOOL authenticated, NSString *npmToken) {
+        if (!authenticated || !npmToken || [npmToken isEqualToString:@""]) {
+            clb(NO,@"Error: Dapi needs a npm token");
+        } else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+                
+                NSString * command = [NSString stringWithFormat:@"export NPM_TOKEN=\"%@\";export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\"; cd ~/src/dapi;echo \"//registry.npmjs.org/:_authToken=\\${NPM_TOKEN}\" > .npmrc; . ./.env; npm i; pm2 start index.js --name \"dapi\"; pm2 save",npmToken];
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+                    if(!success) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            clb(NO, message);
+                        });
+                        return;
+                    }
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        masternode.dapiState |= DPDapiState_Installed;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
+                    //At this point lets send a query to check if it's running
+                    [self checkDapiIsRunningOnMasternode:masternode inSSHSession:session clb:clb];
+                }];
+            });
+        }
+    }];
+    
+}
+
+-(void)checkDapiIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                             }];
+}
+
+- (void)checkDapiIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashClb)clb {
+    __block BOOL needConfigurationCheck = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.dapiState & DPDapiState_Configured)) {
+            needConfigurationCheck = YES;
+        }
+    }];
+    if (needConfigurationCheck) return;
+    
+    NSString * command = @"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";pm2 jlist";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO, message);
+            });
+            return;
+        }
+        NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *jsonError = nil;
+        NSArray *pm2InfoArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
+        BOOL found = NO;
+        for (NSDictionary * pm2InfoDictionary in pm2InfoArray) {
+            if ([pm2InfoDictionary[@"name"] isEqualToString:@"dapi"]) {
+                NSDictionary * pm2Environment = pm2InfoDictionary[@"pm2_env"];
+                if ([pm2Environment[@"status"] isEqualToString:@"online"]) {
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        masternode.dapiState |= DPDapiState_Running;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
+                    //At this point lets send a query to check if it's running
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        clb(YES, message);
+                    });
+                    found = TRUE;
+                }
+            }
+        }
+        if (!found) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dapiState &= ~DPDapiState_Running;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(YES, message);
+            });
+        }
+    }];
+}
 
 #pragma mark - Sentinel Checks
 
@@ -2831,24 +3134,60 @@
     return s;
 }
 
--(NSString*)createConfigDashFileForMasternode:(Masternode*)masternode {
+-(void)createDashcoreConfigFileForMasternode:(Masternode*)masternode clb:(dashClb)clb {
+    if (!masternode.rpcPassword) {
+        masternode.rpcPassword = [self randomPassword:15];
+        [[DPDataStore sharedInstance] saveContext];
+    }
+    [[DPAuthenticationManager sharedInstance] authenticateSporkWithClb:^(BOOL authenticated, NSString *address, NSString *privateKey) {
+        if (!authenticated) {
+            clb(NO,nil);
+            return;
+        }
+        // First we need to make a proper configuration file
+        NSString *configFilePath = [[NSBundle mainBundle] pathForResource: @"dash" ofType: @"conf"];
+        NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:MASTERNODE_PRIVATE_KEY_STRING withString:masternode.key];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:EXTERNAL_IP_STRING withString:masternode.publicIP];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:masternode.rpcPassword];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:SPORK_ADDRESS withString:address];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:SPORK_PRIVATE_KEY withString:privateKey];
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *cachesDirectory = [paths objectAtIndex:0];
+        
+        //make a file name to write the data to using the documents directory:
+        NSString *fileName = [NSString stringWithFormat:@"%@/dash.conf",
+                              cachesDirectory];
+        //create content - four lines of text
+        NSString *content = configFileContents;
+        //save content to the documents directory
+        [content writeToFile:fileName
+                  atomically:NO
+                    encoding:NSStringEncodingConversionAllowLossy
+                       error:nil];
+        clb(YES,fileName);
+    }];
+    
+}
+
+-(NSString*)createDapiEnvFileForMasternode:(Masternode*)masternode {
     if (!masternode.rpcPassword) {
         masternode.rpcPassword = [self randomPassword:15];
         [[DPDataStore sharedInstance] saveContext];
     }
     // First we need to make a proper configuration file
-    NSString *configFilePath = [[NSBundle mainBundle] pathForResource: @"dash" ofType: @"conf"];
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"dapi" ofType:@"env"];
     NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:MASTERNODE_PRIVATE_KEY_STRING withString:[masternode valueForKey:@"key"]];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:EXTERNAL_IP_STRING withString:[masternode valueForKey:@"publicIP"]];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[masternode valueForKey:@"rpcPassword"]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[NSString stringWithFormat:@"\"%@\"",masternode.rpcPassword]];
     configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *cachesDirectory = [paths objectAtIndex:0];
     
     //make a file name to write the data to using the documents directory:
-    NSString *fileName = [NSString stringWithFormat:@"%@/dash.conf",
+    NSString *fileName = [NSString stringWithFormat:@"%@/dapi.env",
                           cachesDirectory];
     //create content - four lines of text
     NSString *content = configFileContents;
@@ -3101,7 +3440,7 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
-            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+            if(masternode.isSelected) {
                 [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:[NSString stringWithFormat:@"invalidateblock %@", blockHash] toMasternode:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString * errorMessage) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         masternode.isSelected = NO;
@@ -3119,7 +3458,7 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
-            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+            if(masternode.isSelected) {
                 
                 [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:[NSString stringWithFormat:@"reconsiderblock %@", blockHash] toMasternode:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString * errorMessage) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -3137,7 +3476,7 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
-            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+            if(masternode.isSelected) {
                 
                 [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:@"clearbanned" toMasternode:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString * errorMessage) {
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -3154,7 +3493,7 @@
 - (void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
-            if([[masternode valueForKey:@"isSelected"] integerValue] == 1 ) {
+            if(masternode.isSelected) {
                 
                 [[DPMasternodeController sharedInstance] sendRPCCommandJSONDictionary:@"getblockchaininfo" toMasternode:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString * errorMessage) {
                     dispatch_async(dispatch_get_main_queue(), ^{

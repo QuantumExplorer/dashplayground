@@ -78,7 +78,7 @@ NSString *terminalHeadString = @"";
     self.terminalConsoleEvents = [[ConsoleEventArray alloc] init];
     self.masternodeConsoleEvents = [[ConsoleEventArray alloc] init];
     [self.consoleTabSegmentedControl setTrackingMode:NSSegmentSwitchTrackingSelectOne];
-//    [self.consoleTabSegmentedControl setSegmentCount:self.arrayController];
+    //    [self.consoleTabSegmentedControl setSegmentCount:self.arrayController];
 }
 
 - (void)viewDidLoad {
@@ -142,7 +142,7 @@ NSString *terminalHeadString = @"";
     
     NSArray * AllMasternodes = [NSArray arrayWithArray:[self.arrayController.arrangedObjects allObjects]];
     
-//    NSArray *AllMasternodes = [self.arrayController.arrangedObjects allObjects];
+    //    NSArray *AllMasternodes = [self.arrayController.arrangedObjects allObjects];
     
     [[DPMasternodeController sharedInstance] registerProtxForLocal:AllMasternodes];
 }
@@ -177,46 +177,46 @@ NSString *terminalHeadString = @"";
     
     [[DPMasternodeController sharedInstance] setUpMainNode:[selectedMasternodes firstObject] clb:^(BOOL active) {
         if (active) {
-                for(Masternode *selectedMasternode in selectedMasternodes)
+            for(Masternode *selectedMasternode in selectedMasternodes)
+            {
+                for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
                 {
-                    for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
-                    {
-                        if(!masternode.isSelected && masternode.publicIP) {
-                            if(![selectedMasternode.chainNetwork isEqualToString:masternode.chainNetwork]) continue;
-                            
-                            [[DPMasternodeController sharedInstance] addNodeToRemote:masternode toPublicIP:selectedMasternode.publicIP clb:^(BOOL success, NSString *message) {
-                                if(message == nil) {
-                                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: unable to connect dash core server.", masternode.publicIP]];
-                                }
-                                else if([message length] == 0 || [message length] == 1) {
-                                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", masternode.publicIP, selectedMasternode.publicIP]];
-                                }
-                                else {
-                                    [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: %@", masternode.publicIP, message]];
-                                }
-                            }];
-                        }
+                    if(!masternode.isSelected && masternode.publicIP) {
+                        if(![selectedMasternode.chainNetwork isEqualToString:masternode.chainNetwork]) continue;
+                        
+                        [[DPMasternodeController sharedInstance] addNodeToRemote:masternode toPublicIP:selectedMasternode.publicIP clb:^(BOOL success, NSString *message) {
+                            if(message == nil) {
+                                [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: unable to connect dash core server.", masternode.publicIP]];
+                            }
+                            else if([message length] == 0 || [message length] == 1) {
+                                [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: added node %@ successfully.", masternode.publicIP, selectedMasternode.publicIP]];
+                            }
+                            else {
+                                [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[REMOTE-%@]: %@", masternode.publicIP, message]];
+                            }
+                        }];
                     }
                 }
-                
-                for(Masternode *selectedMasternode in selectedMasternodes)
-                {
-                    [[DPMasternodeController sharedInstance] addNodeToLocal:selectedMasternode clb:^(BOOL success, NSString *message) {
-                        if([message length] == 0 || [message length] == 1) {
-                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: added node %@ successfully.", [selectedMasternode valueForKey:@"publicIP"]]];
-                        }
-                        else {
-                            [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: %@ : %@", [selectedMasternode valueForKey:@"publicIP"], message]];
-                        }
-                    }];
-                }
             }
+            
+            for(Masternode *selectedMasternode in selectedMasternodes)
+            {
+                [[DPMasternodeController sharedInstance] addNodeToLocal:selectedMasternode clb:^(BOOL success, NSString *message) {
+                    if([message length] == 0 || [message length] == 1) {
+                        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: added node %@ successfully.", [selectedMasternode valueForKey:@"publicIP"]]];
+                    }
+                    else {
+                        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"[LOCAL]: %@ : %@", [selectedMasternode valueForKey:@"publicIP"], message]];
+                    }
+                }];
+            }
+        }
         
     }];
-
     
     
-//    [self deSelectAll];
+    
+    //    [self deSelectAll];
 }
 
 
@@ -276,7 +276,7 @@ NSString *terminalHeadString = @"";
         [self addStringEvent:@"Refreshed instances."];
         [self deSelectAll];
     }];
-
+    
 }
 
 - (IBAction)connectInstance:(id)sender {
@@ -336,33 +336,53 @@ NSString *terminalHeadString = @"";
     NSArray *masternodes = [self.arrayController.arrangedObjects allObjects];
     RepositoriesModalViewController *repoController = [[RepositoriesModalViewController alloc] init];
     [repoController showRepoWindow:masternodes controller:masternodeController];
-//    [self deSelectAll];
+    //    [self deSelectAll];
     
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1) return;
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//    self.setupButton.enabled = false;
-//    RepositoriesModalViewController *repoController = [[RepositoriesModalViewController alloc] init];
-//    [repoController showRepoWindow:object controller:masternodeController];
+    //    NSInteger row = self.tableView.selectedRow;
+    //    if (row == -1) return;
+    //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    //    self.setupButton.enabled = false;
+    //    RepositoriesModalViewController *repoController = [[RepositoriesModalViewController alloc] init];
+    //    [repoController showRepoWindow:object controller:masternodeController];
 }
 
 - (IBAction)configure:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"configuring remotes..."];
     
-    NSArray *masternodes = [self.arrayController.arrangedObjects allObjects];
-    ChainSelectionViewController *chainView = [[ChainSelectionViewController alloc] init];
-    [chainView showChainSelectionWindow:masternodes];
-//    [self deSelectAll];
+    NSArray *masternodes = [self selectedMasternodes];
+    NSString * chainNetwork = @"";
+    for (Masternode * masternode in masternodes) {
+        if ([chainNetwork isEqualToString:@""] && masternode.chainNetwork) chainNetwork = masternode.chainNetwork;
+        if (masternode.chainNetwork && ![chainNetwork isEqualToString:masternode.chainNetwork]) {
+            [self addStringEventToMasternodeConsole:@"Error: Masternodes need to be on same network"];
+            return;
+        }
+    }
+    if ([chainNetwork isEqualToString:@""]) {
+        ChainSelectionViewController *chainView = [[ChainSelectionViewController alloc] init];
+        [chainView showChainSelectionWindow:masternodes];
+    } else {
+        for (Masternode * masternode in masternodes) {
+            [[DPMasternodeController sharedInstance] setUpMasternodeConfiguration:masternode onChainName:chainNetwork clb:^(BOOL success, NSString *message, BOOL isFinished) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //                        [masternode setValue:@(0) forKey:@"isSelected"];
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    [[[DPMasternodeController sharedInstance] masternodeViewController] addStringEventToMasternodeConsole:message];
+                });
+            }];
+        }
+    }
+    //    [self deSelectAll];
     
     
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1) return;
-//    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//
-//    ChainSelectionViewController *chainView = [[ChainSelectionViewController alloc] init];
-//    [chainView showChainSelectionWindow:object];
+    //    NSInteger row = self.tableView.selectedRow;
+    //    if (row == -1) return;
+    //    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    //
+    //    ChainSelectionViewController *chainView = [[ChainSelectionViewController alloc] init];
+    //    [chainView showChainSelectionWindow:object];
 }
 
 - (IBAction)pressSelectAll:(id)sender {
@@ -374,20 +394,20 @@ NSString *terminalHeadString = @"";
         stateValue = @(0);
     }
     
-    for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+    for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
     {
-        if(![object valueForKey:@"publicIP"] || [[object valueForKey:@"instanceState"] integerValue] == InstanceState_Stopped
-           || [[object valueForKey:@"instanceState"] integerValue] == InstanceState_Pending
-           || [[object valueForKey:@"instanceState"] integerValue] == InstanceState_Terminated) continue;
-        [object setValue:stateValue forKey:@"isSelected"];
+        if(!masternode.publicIP || masternode.instanceState == InstanceState_Stopped
+           || masternode.instanceState == InstanceState_Pending
+           || masternode.instanceState == InstanceState_Terminated) continue;
+        masternode.isSelected = TRUE;
     }
 }
 
 -(void)deSelectAll {
     self.selectAllButton.state = 0;
-    for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+    for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
     {
-        [object setValue:@(0) forKey:@"isSelected"];
+        masternode.isSelected = NO;
     }
 }
 
@@ -396,18 +416,18 @@ NSString *terminalHeadString = @"";
     [self addStringEventToMasternodeConsole:@"Starting dashd server on remotes..."];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+        for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
         {
-            if([[object valueForKey:@"isSelected"] integerValue] == 1) {
-                [[DPMasternodeController sharedInstance] startDashdOnRemote:object onClb:^(BOOL success, NSString *message) {
+            if(masternode.isSelected) {
+                [[DPMasternodeController sharedInstance] startDashdOnRemote:masternode onClb:^(BOOL success, NSString *message) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self addStringEventToMasternodeConsole:message];
                     });
                 }];
-                dispatch_async(dispatch_get_main_queue(), ^{
-//                    [object setValue:@(0) forKey:@"isSelected"];
-                    [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-                });
+                //                dispatch_async(dispatch_get_main_queue(), ^{
+                ////                    [object setValue:@(0) forKey:@"isSelected"];
+                //                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                //                });
             }
         }
     });
@@ -419,23 +439,23 @@ NSString *terminalHeadString = @"";
     [self addStringEventToMasternodeConsole:@"Stopping dashd on remotes..."];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+        for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
         {
-            if([[object valueForKey:@"isSelected"] integerValue] == 1) {
-                [[DPMasternodeController sharedInstance] stopDashdOnRemote:object onClb:^(BOOL success, NSString *message) {
+            if(masternode.isSelected) {
+                [[DPMasternodeController sharedInstance] stopDashdOnRemote:masternode onClb:^(BOOL success, NSString *message) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self addStringEventToMasternodeConsole:message];
                     });
                 }];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [object setValue:@(DashcoreState_Stopped) forKey:@"masternodeState"];
-                    [object setValue:@(0) forKey:@"isSelected"];
-                    [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-                });
+                //                dispatch_async(dispatch_get_main_queue(), ^{
+                //                    [object setValue:@(DashcoreState_Stopped) forKey:@"masternodeState"];
+                //                    [object setValue:@(0) forKey:@"isSelected"];
+                //                    [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                //                });
             }
         }
     });
-//    [self deSelectAll];
+    //    [self deSelectAll];
 }
 
 - (IBAction)wipeRemote:(id)sender {
@@ -445,13 +465,13 @@ NSString *terminalHeadString = @"";
         for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
         {
             if(masternode.isSelected) {
-//                [[DPMasternodeController sharedInstance] stopDashdOnRemote:object onClb:^(BOOL success, NSString *message) {
-                    [[DPMasternodeController sharedInstance] wipeDataOnRemote:masternode onClb:^(BOOL success, NSString *message) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [self addStringEventToMasternodeConsole:message];
-                        });
-                    }];
-//                }];
+                //                [[DPMasternodeController sharedInstance] stopDashdOnRemote:object onClb:^(BOOL success, NSString *message) {
+                [[DPMasternodeController sharedInstance] wipeDataOnRemote:masternode onClb:^(BOOL success, NSString *message) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self addStringEventToMasternodeConsole:message];
+                    });
+                }];
+                //                }];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     masternode.lastKnownHeight = 0;
                     masternode.isSelected = NO;
@@ -503,10 +523,10 @@ NSString *terminalHeadString = @"";
                         dispatch_async(dispatch_get_main_queue(), ^{
                             eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: This remote must first have a key for the masternode before you can start it.", [object valueForKey:@"instanceId"]];
                             [self addStringEventToMasternodeConsole:eventMsg];
-//                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-//                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
-//                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-//                            [[NSApplication sharedApplication] presentError:error];
+                            //                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                            //                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
+                            //                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                            //                            [[NSApplication sharedApplication] presentError:error];
                             return;
                         });
                     }
@@ -514,10 +534,10 @@ NSString *terminalHeadString = @"";
                         dispatch_async(dispatch_get_main_queue(), ^{
                             eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: This remote is not available.", [object valueForKey:@"instanceId"]];
                             [self addStringEventToMasternodeConsole:eventMsg];
-//                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-//                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
-//                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-//                            [[NSApplication sharedApplication] presentError:error];
+                            //                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                            //                            dict[NSLocalizedDescriptionKey] = @"You must first have a key for the masternode before you can start it.";
+                            //                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                            //                            [[NSApplication sharedApplication] presentError:error];
                             return;
                         });
                     }
@@ -525,10 +545,10 @@ NSString *terminalHeadString = @"";
                         dispatch_async(dispatch_get_main_queue(), ^{
                             eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: This remote must first have a rpc password for the masternode before you can start it.", [object valueForKey:@"instanceId"]];
                             [self addStringEventToMasternodeConsole:eventMsg];
-//                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-//                            dict[NSLocalizedDescriptionKey] = @"You must first have a rpc password for the masternode before you can start it.";
-//                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
-//                            [[NSApplication sharedApplication] presentError:error];
+                            //                            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+                            //                            dict[NSLocalizedDescriptionKey] = @"You must first have a rpc password for the masternode before you can start it.";
+                            //                            NSError * error = [NSError errorWithDomain:@"DASH_PLAYGROUND" code:10 userInfo:dict];
+                            //                            [[NSApplication sharedApplication] presentError:error];
                             return;
                         });
                     }
@@ -586,20 +606,20 @@ NSString *terminalHeadString = @"";
             }];
         }
     }
-//    [self deSelectAll];
+    //    [self deSelectAll];
     
-            
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1)
-//    {
-//        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to start instance!" message:@"Please make sure you already select an instance."];
-//        return;
-//    }
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//    [self addStringEvent:FS(@"Starting instance %@",[object valueForKey:@"instanceId"])];
-//    [[DPMasternodeController sharedInstance] startInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
-//        [self addStringEvent:FS(@"Instance in boot up process : %@",[object valueForKey:@"instanceId"])];
-//    }];
+    
+    //    NSInteger row = self.tableView.selectedRow;
+    //    if (row == -1)
+    //    {
+    //        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to start instance!" message:@"Please make sure you already select an instance."];
+    //        return;
+    //    }
+    //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    //    [self addStringEvent:FS(@"Starting instance %@",[object valueForKey:@"instanceId"])];
+    //    [[DPMasternodeController sharedInstance] startInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
+    //        [self addStringEvent:FS(@"Instance in boot up process : %@",[object valueForKey:@"instanceId"])];
+    //    }];
 }
 
 
@@ -620,27 +640,27 @@ NSString *terminalHeadString = @"";
             }
         }
     }
-//    [self deSelectAll];
+    //    [self deSelectAll];
     
     
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1)
-//    {
-//        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to stop instance!" message:@"Please make sure you already select an instance."];
-//        return;
-//    }
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//
-//    NSString *msgAlert = FS(@"Are you sure you want to stop instance id %@?", [object valueForKey:@"instanceId"]);
-//
-//    NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Stop instance" message:msgAlert];
-//
-//    if ([alert runModal] == NSAlertFirstButtonReturn) {
-//        [self addStringEvent:FS(@"Trying to stop instance %@",[object valueForKey:@"instanceId"])];
-//        [[DPMasternodeController sharedInstance] stopInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
-//            [self addStringEvent:FS(@"Stopping instance %@",[object valueForKey:@"instanceId"])];
-//        }];
-//    }
+    //    NSInteger row = self.tableView.selectedRow;
+    //    if (row == -1)
+    //    {
+    //        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to stop instance!" message:@"Please make sure you already select an instance."];
+    //        return;
+    //    }
+    //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    //
+    //    NSString *msgAlert = FS(@"Are you sure you want to stop instance id %@?", [object valueForKey:@"instanceId"]);
+    //
+    //    NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Stop instance" message:msgAlert];
+    //
+    //    if ([alert runModal] == NSAlertFirstButtonReturn) {
+    //        [self addStringEvent:FS(@"Trying to stop instance %@",[object valueForKey:@"instanceId"])];
+    //        [[DPMasternodeController sharedInstance] stopInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
+    //            [self addStringEvent:FS(@"Stopping instance %@",[object valueForKey:@"instanceId"])];
+    //        }];
+    //    }
 }
 
 - (IBAction)terminateInstance:(id)sender {
@@ -661,27 +681,27 @@ NSString *terminalHeadString = @"";
             }
         }
     }
-        
-                
-                
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1)
-//    {
-//        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to terminate instance!" message:@"Please make sure you already select an instance."];
-//        return;
-//    }
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//
-//    NSString *msgAlert = FS(@"Are you sure you want to terminate instance id %@?", [object valueForKey:@"instanceId"]);
-//
-//    NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Terminate instance" message:msgAlert];
-//
-//    if ([alert runModal] == NSAlertFirstButtonReturn) {
-//        [self addStringEvent:FS(@"Trying to terminate %@",[object valueForKey:@"instanceId"])];
-//        [[DPMasternodeController sharedInstance] terminateInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
-//            [self addStringEvent:FS(@"Terminating instance %@",[object valueForKey:@"instanceId"])];
-//        }];
-//    }
+    
+    
+    
+    //    NSInteger row = self.tableView.selectedRow;
+    //    if (row == -1)
+    //    {
+    //        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to terminate instance!" message:@"Please make sure you already select an instance."];
+    //        return;
+    //    }
+    //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    //
+    //    NSString *msgAlert = FS(@"Are you sure you want to terminate instance id %@?", [object valueForKey:@"instanceId"]);
+    //
+    //    NSAlert *alert = [[DialogAlert sharedInstance] showAlertWithYesNoButton:@"Terminate instance" message:msgAlert];
+    //
+    //    if ([alert runModal] == NSAlertFirstButtonReturn) {
+    //        [self addStringEvent:FS(@"Trying to terminate %@",[object valueForKey:@"instanceId"])];
+    //        [[DPMasternodeController sharedInstance] terminateInstance:[object valueForKey:@"instanceId"] clb:^(BOOL success,InstanceState state, NSString *message) {
+    //            [self addStringEvent:FS(@"Terminating instance %@",[object valueForKey:@"instanceId"])];
+    //        }];
+    //    }
     
 }
 
@@ -705,13 +725,13 @@ NSString *terminalHeadString = @"";
 }
 
 - (IBAction)createAMI:(id)sender {
-//    NSInteger row = self.tableView.selectedRow;
-//    if (row == -1)
-//    {
-//        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create new AMI!" message:@"Please make sure you already select an instance."];
-//        return;
-//    }
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    //    NSInteger row = self.tableView.selectedRow;
+    //    if (row == -1)
+    //    {
+    //        [[DialogAlert sharedInstance] showAlertWithOkButton:@"Unable to create new AMI!" message:@"Please make sure you already select an instance."];
+    //        return;
+    //    }
+    //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     
     int countSelected = 0;
     NSManagedObject *selectedInstance = nil;
@@ -722,9 +742,9 @@ NSString *terminalHeadString = @"";
             selectedInstance = object;
             countSelected = countSelected+1;
             
-//            [object setValue:nil forKey:@"transactionId"];
-//                [object setValue:nil forKey:@"transactionOutputIndex"];
-//            [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+            //            [object setValue:nil forKey:@"transactionId"];
+            //                [object setValue:nil forKey:@"transactionOutputIndex"];
+            //            [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
             //    dispatch_async(dispatch_get_main_queue(), ^{
             //        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             //
@@ -753,21 +773,60 @@ NSString *terminalHeadString = @"";
 
 #pragma mark - DAPI
 
+- (IBAction)configureMasternodeDapi:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configuring dapi on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] configureDapiOnMasternode:masternode forceUpdate:NO clb:^(BOOL success, NSString *message) {
+            if (!success) {
+                [self addStringEventToMasternodeConsole:message];
+            }
+        }];
+    }
+    
+}
+
+- (IBAction)checkMasternodeDapi:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking insight on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] checkDapiIsRunningOnMasternode:masternode clb:^(BOOL success, NSString *message) {
+            if (!success) {
+                [self addStringEventToMasternodeConsole:message];
+            }
+        }];
+    }
+}
+
 #pragma mark - Insight
 
 - (IBAction)configureMasternodeInsight:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
-    [self addStringEventToMasternodeConsole:@"Configuring insight on remotes..."];
     
     for (Masternode * masternode in [self selectedMasternodes]) {
-        [[DPMasternodeController sharedInstance] configureInsightOnMasternode:masternode clb:^(BOOL success, NSString *message) {
-            [masternode.managedObjectContext performBlockAndWait:^{
-                masternode.insightState |= DPInsightState_Configured;
-                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-            }];
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configuring insight on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] configureInsightOnMasternode:masternode forceUpdate:NO clb:^(BOOL success, NSString *message) {
+            if (!success) {
+                [self addStringEventToMasternodeConsole:message];
+            }
         }];
     }
     
+}
+
+- (IBAction)checkMasternodeInsight:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking insight on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] checkInsightIsRunningOnMasternode:masternode clb:^(BOOL success, NSString *message) {
+            if (!success) {
+                [self addStringEventToMasternodeConsole:message];
+            }
+        }];
+    }
 }
 
 
@@ -808,10 +867,10 @@ NSString *terminalHeadString = @"";
         
         if(self.consoleTabSegmentedControl.selectedSegment == 1)
         {
-//            NSInteger row = self.tableView.selectedRow;
-//            if (row == -1) return;
-//            NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//            self.consoleTextView.string = @"Select a running masternode";
+            //            NSInteger row = self.tableView.selectedRow;
+            //            if (row == -1) return;
+            //            NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+            //            self.consoleTextView.string = @"Select a running masternode";
             
             [self setTerminalCommandState:[NSNumber numberWithInt:0]];
             
@@ -920,38 +979,38 @@ NSString *terminalHeadString = @"";
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
-//    NSInteger row = self.tableView.selectedRow;
-//    if(row == -1) {
-//        //clear all button state
-//        self.setupButton.enabled = false;
-//        self.createAmiButton.enabled = false;
-//        return;
-//    }
-//    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
-//    
-//    //Set up button
-////    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed
-////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
-////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_SettingUp) {
-////        self.setupButton.enabled = false;
-////    }
-////    else{
-////        self.setupButton.enabled = true;
-////    }
-//    self.setupButton.enabled = true;
-//    
-//    //Create AMI button
-//    //Start button
-//    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
-//        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Configured
-//        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed) {
-//        self.startButton.enabled = true;
-//        self.createAmiButton.enabled = true;
-//    }
-//    else{
-//        self.startButton.enabled = false;
-//        self.createAmiButton.enabled = false;
-//    }
+    //    NSInteger row = self.tableView.selectedRow;
+    //    if(row == -1) {
+    //        //clear all button state
+    //        self.setupButton.enabled = false;
+    //        self.createAmiButton.enabled = false;
+    //        return;
+    //    }
+    //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
+    //
+    //    //Set up button
+    ////    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed
+    ////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
+    ////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_SettingUp) {
+    ////        self.setupButton.enabled = false;
+    ////    }
+    ////    else{
+    ////        self.setupButton.enabled = true;
+    ////    }
+    //    self.setupButton.enabled = true;
+    //
+    //    //Create AMI button
+    //    //Start button
+    //    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
+    //        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Configured
+    //        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed) {
+    //        self.startButton.enabled = true;
+    //        self.createAmiButton.enabled = true;
+    //    }
+    //    else{
+    //        self.startButton.enabled = false;
+    //        self.createAmiButton.enabled = false;
+    //    }
 }
 
 #pragma mark - Block Control
@@ -994,17 +1053,17 @@ NSString *terminalHeadString = @"";
 
 - (IBAction)pressClearBannedButton:(id)sender {
     
-
-        [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Clear Banned for Nodes:"];
-        
-        NSArray *masternodeObjects = [self.arrayController.arrangedObjects allObjects];
-        
-        [[DPMasternodeController sharedInstance] clearBannedOnNodes:masternodeObjects withCallback:^(BOOL success, NSString *message) {
-            if(success == YES) {
-                [self addStringEventToMasternodeConsole:message];
-            }
-        }];
+    
+    NSArray *masternodeObjects = [self.arrayController.arrangedObjects allObjects];
+    
+    [[DPMasternodeController sharedInstance] clearBannedOnNodes:masternodeObjects withCallback:^(BOOL success, NSString *message) {
+        if(success == YES) {
+            [self addStringEventToMasternodeConsole:message];
+        }
+    }];
 }
 
 

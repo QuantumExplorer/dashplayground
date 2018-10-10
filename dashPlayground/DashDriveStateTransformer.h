@@ -11,10 +11,11 @@
 typedef NS_ENUM(NSUInteger,DPDriveState) {
     DPDriveState_Initial = 0,
     DPDriveState_Checking = 1 << 0,
-    DPDriveState_Installed = 1 << 1,
+    DPDriveState_Cloned = 1 << 1,
     DPDriveState_Configured = 1 << 2,
-    DPDriveState_Running = 1 << 3,
-    DPDriveState_Error = 1 << 4,
+    DPDriveState_Installed = 1 << 3,
+    DPDriveState_Running = 1 << 4,
+    DPDriveState_Error = 1 << 5,
 };
 
 @interface DashDriveStateTransformer : NSValueTransformer

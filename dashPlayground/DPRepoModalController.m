@@ -79,7 +79,7 @@ MasternodesViewController *masternodeCon;
                     repositoryPath = [NSString stringWithFormat:@"https://%@:%@@%@", githubUsername, githubPassword, pathComponents[1]];
                 }
                 
-                [[DPMasternodeController sharedInstance]  gitCloneProjectWithRepositoryPath:repositoryPath toDirectory:@"~/src/dash" andSwitchToBranch:branchName inSSHSession:sshSession dashClb:^(BOOL success, NSString *message) {
+                [[DPMasternodeController sharedInstance] gitCloneProjectWithRepositoryPath:repositoryPath toDirectory:@"~/src/dash" andSwitchToBranch:branchName inSSHSession:sshSession dashClb:^(BOOL success, NSString *message) {
                     if (!success) {
                         [sshSession disconnect];
                         return;

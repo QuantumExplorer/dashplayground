@@ -76,6 +76,7 @@
 		FB3BCA53216BE7800071E4F1 /* HasValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */; };
 		FB3BCA55216C1F3C0071E4F1 /* dashcore-node.json in Resources */ = {isa = PBXBuildFile; fileRef = FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */; };
 		FB3BCA58216D50EB0071E4F1 /* InsightStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA57216D50EB0071E4F1 /* InsightStateTransformer.m */; };
+		FB3BCA5A216E32DE0071E4F1 /* dapi.env in Resources */ = {isa = PBXBuildFile; fileRef = FB3BCA59216E32DE0071E4F1 /* dapi.env */; };
 		FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB45054B1EA441C50066C6B9 /* DPTableView.m */; };
 		FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
 		FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
@@ -250,6 +251,7 @@
 		FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dashcore-node.json"; sourceTree = "<group>"; };
 		FB3BCA56216D50EB0071E4F1 /* InsightStateTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InsightStateTransformer.h; sourceTree = "<group>"; };
 		FB3BCA57216D50EB0071E4F1 /* InsightStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InsightStateTransformer.m; sourceTree = "<group>"; };
+		FB3BCA59216E32DE0071E4F1 /* dapi.env */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dapi.env; sourceTree = "<group>"; };
 		FB45054A1EA441C50066C6B9 /* DPTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPTableView.h; sourceTree = "<group>"; };
 		FB45054B1EA441C50066C6B9 /* DPTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPTableView.m; sourceTree = "<group>"; };
 		FB46AE891E95618400D4B034 /* DPLocalNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPLocalNodeController.h; sourceTree = "<group>"; };
@@ -478,6 +480,7 @@
 			children = (
 				FB1D2B551EAF552B00F7BE2D /* Images.xcassets */,
 				FBBAF9A41EB0562400D6F568 /* Notification.h */,
+				FB3BCA59216E32DE0071E4F1 /* dapi.env */,
 				FB0684291E941DD700F1AFB4 /* dash.conf */,
 				FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */,
 				FB2906691E85799F00A31092 /* main.m */,
@@ -688,6 +691,7 @@
 				FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */,
 				A515E7C020AA904E00CB5495 /* AvailabilityZoneWindow.xib in Resources */,
 				FB1D2B561EAF552B00F7BE2D /* Images.xcassets in Resources */,
+				FB3BCA5A216E32DE0071E4F1 /* dapi.env in Resources */,
 				A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */,
 				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
 				FB3BCA55216C1F3C0071E4F1 /* dashcore-node.json in Resources */,

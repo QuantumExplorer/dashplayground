@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define GITHUB_USERNAME_KEY @"GITHUB_USERNAME_KEY"
 #define GITHUB_PASSWORD_KEY @"GITHUB_PASSWORD_KEY"
+#define SPORK_ADDRESS_KEY @"SPORK_ADDRESS_KEY"
+#define SPORK_PRIVATE_KEY @"SPORK_PRIVATE_KEY"
 
 @interface DPAuthenticationManager : NSObject
 
@@ -21,6 +23,10 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Security
 
 -(void)authenticateWithClb:(dashCredentialsClb)clb;
+
+-(void)authenticateNPMWithClb:(dashClb)clb;
+
+-(void)authenticateSporkWithClb:(dashCredentialsClb)clb;
 
 -(void)encodeCredentials:(NSDictionary*)dictionary withPasscode:(NSString*)passcode;
 

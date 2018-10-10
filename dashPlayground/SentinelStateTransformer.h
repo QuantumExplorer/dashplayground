@@ -11,10 +11,11 @@
 typedef NS_ENUM(NSUInteger,DPSentinelState) {
     DPSentinelState_Initial = 0,
     DPSentinelState_Checking = 1 << 0,
-    DPSentinelState_Installed = 1 << 1,
+    DPSentinelState_Cloned = 1 << 1,
     DPSentinelState_Configured = 1 << 2,
-    DPSentinelState_Running = 1 << 3,
-    DPSentinelState_Error = 1 << 4,
+    DPSentinelState_Installed = 1 << 3,
+    DPSentinelState_Running = 1 << 4,
+    DPSentinelState_Error = 1 << 5,
 };
 
 @interface SentinelStateTransformer : NSValueTransformer

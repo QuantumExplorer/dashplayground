@@ -34,10 +34,12 @@
     
     if (state & DPInsightState_Running) {
         return [NSString stringWithFormat:@"Running%@",extraInformation];
-    } else if (state & DPInsightState_Configured) {
-        return [NSString stringWithFormat:@"Configured%@",extraInformation];
     } else if (state & DPInsightState_Installed) {
         return [NSString stringWithFormat:@"Installed%@",extraInformation];
+    } else if (state & DPInsightState_Configured) {
+        return [NSString stringWithFormat:@"Configured%@",extraInformation];
+    } else if (state & DPInsightState_Cloned) {
+        return [NSString stringWithFormat:@"Cloned%@",extraInformation];
     } else {
         return [NSString stringWithFormat:@"Initial%@",extraInformation];
     }

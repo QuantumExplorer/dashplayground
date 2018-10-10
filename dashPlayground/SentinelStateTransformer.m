@@ -31,25 +31,16 @@
         extraInformation = @" (Checking)";
     }
     state = state & ~(DPSentinelState_Error | DPSentinelState_Checking);
-    switch (state) {
-        case DPSentinelState_Initial:
-            return [NSString stringWithFormat:@"Initial%@",extraInformation];
-            break;
-        case DPSentinelState_Configured:
-            return [NSString stringWithFormat:@"Configured%@",extraInformation];;
-            break;
-        case DPSentinelState_Installed:
-            return [NSString stringWithFormat:@"Installed%@",extraInformation];
-            break;
-        case DPSentinelState_Running:
-            return [NSString stringWithFormat:@"Running%@",extraInformation];
-            break;
-        case DPSentinelState_Error:
-            return [NSString stringWithFormat:@"Error%@",extraInformation];
-            break;
-        default:
-            return [NSString stringWithFormat:@"Unknown%@",extraInformation];
-            break;
+    if (state & DPSentinelState_Running) {
+        return [NSString stringWithFormat:@"Running%@",extraInformation];
+    } else if (state & DPSentinelState_Installed) {
+        return [NSString stringWithFormat:@"Installed%@",extraInformation];
+    } else if (state & DPSentinelState_Configured) {
+        return [NSString stringWithFormat:@"Configured%@",extraInformation];
+    } else if (state & DPSentinelState_Cloned) {
+        return [NSString stringWithFormat:@"Cloned%@",extraInformation];
+    } else {
+        return [NSString stringWithFormat:@"Initial%@",extraInformation];
     }
 }
 
