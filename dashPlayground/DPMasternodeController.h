@@ -99,4 +99,6 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh dashClb:(dashClb)clb;
 -(void)updateGitInfoForMasternode:(Masternode*)masternode forProject:(DPRepositoryProject)project clb:(dashInfoClb)clb;
 
+- (void)configureInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
+
 @end

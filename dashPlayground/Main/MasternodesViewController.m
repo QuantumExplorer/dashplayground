@@ -22,6 +22,10 @@
 #import "SentinelStateTransformer.h"
 #import "ChainSelectionViewController.h"
 #import "Masternode+CoreDataClass.h"
+#import "InsightStateTransformer.h"
+#import "DapiStateTransformer.h"
+#import "DashDriveStateTransformer.h"
+#import "SentinelStateTransformer.h"
 
 @interface MasternodesViewController ()
 
@@ -143,36 +147,35 @@ NSString *terminalHeadString = @"";
     [[DPMasternodeController sharedInstance] registerProtxForLocal:AllMasternodes];
 }
 
+-(NSArray<Masternode*>*)selectedMasternodes {
+    NSMutableArray <Masternode*> * selectedMasternodes = [NSMutableArray array];
+    
+    for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
+    {
+        if(masternode.isSelected) {
+            [selectedMasternodes addObject:masternode];
+        }
+    }
+    return selectedMasternodes;
+}
+
 
 - (IBAction)pressAddNode:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Adding node to local..."];
+    NSArray <Masternode*> * selectedMasternodes = [self selectedMasternodes];
     
-    NSMutableArray <Masternode*> * selectedMasternodes = [NSMutableArray array];
-    Masternode *masternode = nil;
-    int countMasternode = 0;
-    
-    for(Masternode *object in [self.arrayController.arrangedObjects allObjects])
-    {
-        if([[object valueForKey:@"isSelected"] integerValue] == 1) {
-            [selectedMasternodes addObject:object];
-            countMasternode = countMasternode+1;
-            masternode = (Masternode*)object;
-        }
-    }
-    if (!masternode || ![selectedMasternodes count]) return;
-    
-    if(countMasternode > 1) {
+    if([selectedMasternodes count] > 1) {
         [self addStringEventToMasternodeConsole:@"Main node can be chosen only 1."];
         return;
     }
     
-    if(countMasternode == 0) {
-        [self addStringEventToMasternodeConsole:@"Please make sure you already select masternode."];
+    if([selectedMasternodes count] == 0) {
+        [self addStringEventToMasternodeConsole:@"Please make sure you selected a masternode."];
         return;
     }
     
-    [[DPMasternodeController sharedInstance] setUpMainNode:masternode clb:^(BOOL active) {
+    [[DPMasternodeController sharedInstance] setUpMainNode:[selectedMasternodes firstObject] clb:^(BOOL active) {
         if (active) {
                 for(Masternode *selectedMasternode in selectedMasternodes)
                 {
@@ -748,7 +751,27 @@ NSString *terminalHeadString = @"";
     return [NSApplication sharedApplication].delegate;
 }
 
-#pragma mark Console
+#pragma mark - DAPI
+
+#pragma mark - Insight
+
+- (IBAction)configureMasternodeInsight:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    [self addStringEventToMasternodeConsole:@"Configuring insight on remotes..."];
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [[DPMasternodeController sharedInstance] configureInsightOnMasternode:masternode clb:^(BOOL success, NSString *message) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.insightState |= DPInsightState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+        }];
+    }
+    
+}
+
+
+#pragma mark - Console
 
 -(void)addStringEvent:(NSString*)string {
     ConsoleEvent * consoleEvent = [ConsoleEvent consoleEventWithString:string];

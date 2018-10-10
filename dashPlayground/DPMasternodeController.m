@@ -25,9 +25,12 @@
 #import "DPChainSelectionController.h"
 #import "Branch+CoreDataClass.h"
 #import "Masternode+CoreDataClass.h"
+#import "InsightStateTransformer.h"
 
 #define MASTERNODE_PRIVATE_KEY_STRING @"[MASTERNODE_PRIVATE_KEY]"
 #define RPC_PASSWORD_STRING @"[RPC_PASSWORD]"
+#define RPC_PORT_STRING @"[RPC_PORT]"
+#define INSIGHT_PORT_STRING @"[INSIGHT_PORT]"
 #define EXTERNAL_IP_STRING @"[EXTERNAL_IP]"
 
 #define SSHPATH @"sshPath"
@@ -2258,6 +2261,31 @@
     }];
 }
 
+#pragma mark - Insight
+
+- (void)configureInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+    if (!(masternode.insightState & DPInsightState_Installed)) {
+        clb(NO,nil);
+        return;
+    }
+    [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:masternode.publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        if(success == YES) {
+            NSString *localFilePath = [self createInsightConfigFileForMasternode:masternode];
+            NSString *remoteFilePath = @"/home/ubuntu/src/dashcore-node/dashcore-node.json";
+            
+            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+            if (uploadSuccess != YES) {
+                NSLog(@"%@",[[sshSession lastError] localizedDescription]);
+                clb(NO, [[sshSession lastError] localizedDescription]);
+            }
+            else {
+                clb(YES, nil);
+            }
+        }
+    }];
+}
+
+
 
 #pragma mark - Sentinel Checks
 
@@ -2804,8 +2832,8 @@
 }
 
 -(NSString*)createConfigDashFileForMasternode:(Masternode*)masternode {
-    if (![masternode valueForKey:@"rpcPassword"]) {
-        [masternode setValue:[self randomPassword:15] forKey:@"rpcPassword"];
+    if (!masternode.rpcPassword) {
+        masternode.rpcPassword = [self randomPassword:15];
         [[DPDataStore sharedInstance] saveContext];
     }
     // First we need to make a proper configuration file
@@ -2814,12 +2842,42 @@
     configFileContents = [configFileContents stringByReplacingOccurrencesOfString:MASTERNODE_PRIVATE_KEY_STRING withString:[masternode valueForKey:@"key"]];
     configFileContents = [configFileContents stringByReplacingOccurrencesOfString:EXTERNAL_IP_STRING withString:[masternode valueForKey:@"publicIP"]];
     configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[masternode valueForKey:@"rpcPassword"]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *cachesDirectory = [paths objectAtIndex:0];
     
     //make a file name to write the data to using the documents directory:
     NSString *fileName = [NSString stringWithFormat:@"%@/dash.conf",
+                          cachesDirectory];
+    //create content - four lines of text
+    NSString *content = configFileContents;
+    //save content to the documents directory
+    [content writeToFile:fileName
+              atomically:NO
+                encoding:NSStringEncodingConversionAllowLossy
+                   error:nil];
+    
+    return fileName;
+}
+
+-(NSString*)createInsightConfigFileForMasternode:(Masternode*)masternode {
+    if (!masternode.rpcPassword) {
+        masternode.rpcPassword = [self randomPassword:15];
+        [[DPDataStore sharedInstance] saveContext];
+    }
+    // First we need to make a proper configuration file
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"dashcore-node" ofType:@"json"];
+    NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[NSString stringWithFormat:@"\"%@\"",masternode.rpcPassword]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:INSIGHT_PORT_STRING withString:@"3001"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachesDirectory = [paths objectAtIndex:0];
+    
+    //make a file name to write the data to using the documents directory:
+    NSString *fileName = [NSString stringWithFormat:@"%@/dashcore-node.json",
                           cachesDirectory];
     //create content - four lines of text
     NSString *content = configFileContents;

@@ -31,25 +31,15 @@
         extraInformation = @" (Checking)";
     }
     state = state & ~(DPInsightState_Error | DPInsightState_Checking);
-    switch (state) {
-        case DPInsightState_Initial:
-            return [NSString stringWithFormat:@"Initial%@",extraInformation];
-            break;
-        case DPInsightState_Configured:
-            return [NSString stringWithFormat:@"Configured%@",extraInformation];;
-            break;
-        case DPInsightState_Installed:
-            return [NSString stringWithFormat:@"Installed%@",extraInformation];
-            break;
-        case DPInsightState_Running:
-            return [NSString stringWithFormat:@"Running%@",extraInformation];
-            break;
-        case DPInsightState_Error:
-            return [NSString stringWithFormat:@"Error%@",extraInformation];
-            break;
-        default:
-            return [NSString stringWithFormat:@"Unknown%@",extraInformation];
-            break;
+    
+    if (state & DPInsightState_Running) {
+        return [NSString stringWithFormat:@"Running%@",extraInformation];
+    } else if (state & DPInsightState_Configured) {
+        return [NSString stringWithFormat:@"Configured%@",extraInformation];
+    } else if (state & DPInsightState_Installed) {
+        return [NSString stringWithFormat:@"Installed%@",extraInformation];
+    } else {
+        return [NSString stringWithFormat:@"Initial%@",extraInformation];
     }
 }
 
