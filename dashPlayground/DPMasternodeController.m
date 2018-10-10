@@ -2242,7 +2242,7 @@
 
 -(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh  dashClb:(dashClb)clb {
     
-    __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@;cd %@;git checkout %@;git pull",repositoryPath, directory,directory,branchName];
+    __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@;cd %@;git checkout %@;git pull %@ %@",repositoryPath, directory,directory,branchName,repositoryPath,branchName];
     
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {

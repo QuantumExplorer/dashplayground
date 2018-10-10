@@ -61,6 +61,29 @@
     }
 }
 
++(NSString*)developRepositoryOwnerForProject:(NSInteger)project {
+    switch (project) {
+        case DPRepositoryProject_Core:
+            return @"dashevo";
+            break;
+        case DPRepositoryProject_Dapi:
+            return @"dashevo";
+            break;
+        case DPRepositoryProject_Drive:
+            return @"dashevo";
+            break;
+        case DPRepositoryProject_Insight:
+            return @"dashevo";
+            break;
+        case DPRepositoryProject_Sentinel:
+            return @"dashpay";
+            break;
+        default:
+            return @"dashevo";
+            break;
+    }
+}
+
 +(NSString*)developBranchForProject:(NSInteger)project {
     switch (project) {
         case DPRepositoryProject_Core:

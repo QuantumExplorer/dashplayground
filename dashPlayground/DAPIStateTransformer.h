@@ -8,12 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger,SentinelState) {
-    DAPIState_Initial = 0,
-    DAPIState_Checking = 1,
-    DAPIState_Installed = 2,
-    DAPIState_Running = 4,
-    DAPIState_Error = 5
+typedef NS_ENUM(NSUInteger,DPDapiState) {
+    DPDapiState_Initial = 0,
+    DPDapiState_Checking = 1 << 0,
+    DPDapiState_Installed = 1 << 1,
+    DPDapiState_Configured = 1 << 2,
+    DPDapiState_Running = 1 << 3,
+    DPDapiState_Error = 1 << 4,
 };
 
 @interface DAPIStateTransformer : NSValueTransformer

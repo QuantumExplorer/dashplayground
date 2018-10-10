@@ -17,6 +17,10 @@
 #import "DialogAlert.h"
 #import "Branch+CoreDataClass.h"
 #import "Masternode+CoreDataClass.h"
+#import "DAPIStateTransformer.h"
+#import "DashDriveStateTransformer.h"
+#import "SentinelStateTransformer.h"
+#import "InsightStateTransformer.h"
 
 @implementation DPVersioningController
 
@@ -278,7 +282,7 @@
 
 #pragma mark - Dapi
 
--(void)updateProject:(DPRepositoryProject)project toLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode {
+-(void)updateProject:(DPRepositoryProject)project toLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode clb:(dashErrorClb)dashClb {
     if (!masternode) return;
     __block NSString * repositoryPath;
     [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
@@ -293,15 +297,64 @@
         }
         __block NSString * branchName = branch.name;
         [[DPMasternodeController sharedInstance] createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-            if (!success) return;
+            if (!success) {
+                dashClb(NO,nil);
+                return;
+            }
             [[DPMasternodeController sharedInstance] installDependenciesForMasternode:masternode inSession:sshSession withClb:^(BOOL success, BOOL installed) {
-                if (!success) return;
+                if (!success) {
+                    dashClb(NO,nil);
+                    return;
+                }
                 NSString * directory = [NSString stringWithFormat:@"~/src/%@",[ProjectTypeTransformer directoryForProject:project]];
                 [[DPMasternodeController sharedInstance] gitCloneProjectWithRepositoryPath:repositoryPath toDirectory:directory andSwitchToBranch:branchName inSSHSession:sshSession dashClb:^(BOOL success, NSString *message) {
-                    if (!success) return;
+                    if (!success) {
+                        dashClb(NO,nil);
+                        return;
+                    }
                     NSLog(@"%@ successfully cloned",[[[ProjectTypeTransformer alloc] init] transformedValue:@(project)]);
                     [[DPMasternodeController sharedInstance] updateGitInfoForMasternode:masternode forProject:project clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
-                        if (!success) return;
+                        if (!success) {
+                            dashClb(NO,nil);
+                            return;
+                        }
+                        switch (project) {
+                            case DPRepositoryProject_Dapi:
+                            {
+                                [masternode.managedObjectContext performBlockAndWait:^{
+                                    masternode.dapiState = DPDapiState_Installed | masternode.dapiState;
+                                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                }];
+                                break;
+                            }
+                            case DPRepositoryProject_Drive:
+                            {
+                                [masternode.managedObjectContext performBlockAndWait:^{
+                                    masternode.driveState = DPDriveState_Installed | masternode.driveState;
+                                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                }];
+                                break;
+                            }
+                            case DPRepositoryProject_Insight:
+                            {
+                                [masternode.managedObjectContext performBlockAndWait:^{
+                                    masternode.insightState = DPInsightState_Installed | masternode.insightState;
+                                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                }];
+                                break;
+                            }
+                            case DPRepositoryProject_Sentinel:
+                            {
+                                [masternode.managedObjectContext performBlockAndWait:^{
+                                    masternode.sentinelState = DPSentinelState_Installed | masternode.sentinelState;
+                                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                }];
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                        dashClb(YES,nil);
                     }];
                 }];
             }];

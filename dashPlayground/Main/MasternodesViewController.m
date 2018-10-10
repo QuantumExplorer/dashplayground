@@ -236,17 +236,17 @@ NSString *terminalHeadString = @"";
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Checking sentinel on remotes..."];
     
-    for(NSManagedObject *object in [self.arrayController.arrangedObjects allObjects])
+    for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
     {
-        if([[object valueForKey:@"isSelected"] integerValue] == 1) {
-            [[DPMasternodeController sharedInstance] checkMasternodeSentinel:object clb:^(BOOL success, NSString *message) {
+        if(masternode.isSelected) {
+            [[DPMasternodeController sharedInstance] checkMasternodeSentinel:masternode clb:^(BOOL success, NSString *message) {
                 if([message length] == 0) {
                     [self addStringEventToMasternodeConsole:@"sentinel is now working."];
-                    [object setValue:@(SentinelState_Running) forKey:@"sentinelState"];
+                    masternode.sentinelState |= DPSentinelState_Running;
                     [[DPDataStore sharedInstance] saveContext];
                 }
                 else if (success != YES){
-                    [object setValue:@(SentinelState_Error) forKey:@"sentinelState"];
+                    masternode.sentinelState |= DPSentinelState_Error;
                     [[DPDataStore sharedInstance] saveContext];
                     [self addStringEventToMasternodeConsole:message];
                 }

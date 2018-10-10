@@ -34,6 +34,6 @@
 
 - (void)updateDapi:(NSString*)publicIP repositoryUrl:(NSString*)repositoryUrl onBranch:(NSString*)gitBranch commitHead:(NSString*)commitHead;
 
--(void)updateProject:(DPRepositoryProject)project toLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode;
+-(void)updateProject:(DPRepositoryProject)project toLatestCommitInBranch:(Branch*)branch onMasternode:(Masternode*)masternode clb:(dashErrorClb)dashClb;
 
 @end

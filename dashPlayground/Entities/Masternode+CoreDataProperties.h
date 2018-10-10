@@ -17,7 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSFetchRequest<Masternode *> *)fetchRequest;
 
 @property (nonatomic) int32_t currentLogLine;
-@property (nonatomic) int16_t driveState;
 @property (nullable, nonatomic, copy) NSDate *debugLastFetched;
 @property (nonatomic) int32_t debugLineCount;
 @property (nullable, nonatomic, copy) NSString *debugOutput;
@@ -27,13 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int16_t instanceType;
 @property (nonatomic) BOOL isSelected;
 @property (nullable, nonatomic, copy) NSString *key;
-@property (nonatomic) int16_t dashcoreState;
+
 @property (nonatomic) float operationPercentageDone;
 @property (nullable, nonatomic, copy) NSString *publicIP;
 @property (nullable, nonatomic, copy) NSString *repositoryUrl;
 @property (nullable, nonatomic, copy) NSString *rpcPassword;
-@property (nullable, nonatomic, copy) NSString *sentinelGitCommitVersion;
-@property (nonatomic) int16_t sentinelState;
+
+
 @property (nullable, nonatomic, copy) NSString *sentinelUrl;
 @property (nullable, nonatomic, copy) NSString *sentinelVersion;
 @property (nonatomic) int16_t syncStatus;
@@ -43,13 +42,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int64_t lastKnownHeight;
 @property (nullable, nonatomic, copy) NSString *chainNetwork;
 @property (nullable, nonatomic, copy) NSDate *createdAt;
-@property (nonatomic) int16_t dapiState;
+
 @property (nonatomic) int16_t nodeVersion;
 @property (nonatomic) BOOL installedNVM;
 @property (nonatomic) BOOL installedPM2;
+
+@property (nonatomic) int16_t dashcoreState;
+@property (nonatomic) int16_t dapiState;
+@property (nonatomic) int16_t driveState;
+@property (nonatomic) int16_t insightState;
+@property (nonatomic) int16_t sentinelState;
+
 @property (nullable, nonatomic, copy) NSString *dapiGitCommitVersion;
 @property (nullable, nonatomic, copy) NSString *driveGitCommitVersion;
 @property (nullable, nonatomic, copy) NSString *insightGitCommitVersion;
+@property (nullable, nonatomic, copy) NSString *sentinelGitCommitVersion;
 @property (nullable, nonatomic, retain) Branch *coreBranch;
 @property (nullable, nonatomic, retain) Branch *sentinelBranch;
 @property (nullable, nonatomic, retain) Branch *dapiBranch;

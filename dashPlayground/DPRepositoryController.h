@@ -11,13 +11,15 @@
 #import "DashCallbacks.h"
 #import "Repository+CoreDataClass.h"
 
+@class Branch, Repository;
+
 @interface DPRepositoryController : NSObject
 
 -(void)addRepository:(NSString*)repositoryLocation forProject:(DPRepositoryProject)project forUser:(NSString*)user branchName:(NSString*)branchName isPrivate:(BOOL)isPrivate clb:(dashClb)clb;
 
--(void)updateBranchInfo:(NSManagedObject*)branch clb:(dashClb)clb;
+-(void)updateBranchInfo:(Branch*)branch clb:(dashClb)clb;
 
-- (void)setAMIForRepository:(NSManagedObject*)repository clb:(dashClb)clb;
+- (void)setAMIForRepository:(Repository*)repository clb:(dashClb)clb;
 
 +(DPRepositoryController*)sharedInstance;
 

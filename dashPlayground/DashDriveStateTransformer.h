@@ -8,12 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger,SentinelState) {
-    DashDriveState_Initial = 0,
-    DashDriveState_Checking = 1,
-    DashDriveState_Installed = 2,
-    DashDriveState_Running = 4,
-    DashDriveState_Error = 5
+typedef NS_ENUM(NSUInteger,DPDriveState) {
+    DPDriveState_Initial = 0,
+    DPDriveState_Checking = 1 << 0,
+    DPDriveState_Installed = 1 << 1,
+    DPDriveState_Configured = 1 << 2,
+    DPDriveState_Running = 1 << 3,
+    DPDriveState_Error = 1 << 4,
 };
 
 @interface DashDriveStateTransformer : NSValueTransformer

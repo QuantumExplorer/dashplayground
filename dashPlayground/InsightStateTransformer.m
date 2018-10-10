@@ -1,14 +1,14 @@
 //
-//  DAPIStateTransformer.m
+//  InsightStateTransformer.m
 //  dashPlayground
 //
-//  Created by NATTAPON AIEMLAOR on 27/7/18.
-//  Copyright © 2018 dashfoundation. All rights reserved.
+//  Created by Sam Westrich on 4/17/17.
+//  Copyright © 2017 dashfoundation. All rights reserved.
 //
 
-#import "DAPIStateTransformer.h"
+#import "InsightStateTransformer.h"
 
-@implementation DAPIStateTransformer
+@implementation InsightStateTransformer
 
 + (Class)transformedValueClass
 {
@@ -22,29 +22,29 @@
 
 - (id)transformedValue:(id)value
 {
-    DPDapiState state = [value integerValue];
+    DPInsightState state = [value integerValue];
     NSString * extraInformation = @"";
-    if (state & DPDapiState_Error) {
+    if (state & DPInsightState_Error) {
         extraInformation = @" (Error)";
     }
-    if (state & DPDapiState_Checking) {
+    if (state & DPInsightState_Checking) {
         extraInformation = @" (Checking)";
     }
-    state = state & ~(DPDapiState_Error | DPDapiState_Checking);
+    state = state & ~(DPInsightState_Error | DPInsightState_Checking);
     switch (state) {
-        case DPDapiState_Initial:
+        case DPInsightState_Initial:
             return [NSString stringWithFormat:@"Initial%@",extraInformation];
             break;
-        case DPDapiState_Configured:
+        case DPInsightState_Configured:
             return [NSString stringWithFormat:@"Configured%@",extraInformation];;
             break;
-        case DPDapiState_Installed:
+        case DPInsightState_Installed:
             return [NSString stringWithFormat:@"Installed%@",extraInformation];
             break;
-        case DPDapiState_Running:
+        case DPInsightState_Running:
             return [NSString stringWithFormat:@"Running%@",extraInformation];
             break;
-        case DPDapiState_Error:
+        case DPInsightState_Error:
             return [NSString stringWithFormat:@"Error%@",extraInformation];
             break;
         default:

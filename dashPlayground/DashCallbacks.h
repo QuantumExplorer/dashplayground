@@ -12,6 +12,7 @@
 #import <NMSSH/NMSSH.h>
 
 typedef void (^dashClb)(BOOL success,NSString * message);
+typedef void (^dashErrorClb)(BOOL success,NSError* error);
 typedef void (^dashClbWithError)(BOOL success,NSString * message,NSError* error);
 typedef void (^dashInfoClb)(BOOL success,NSDictionary * object,NSString* errorMessage);
 typedef void (^dashBoolClb)(BOOL success,BOOL value,NSString* errorMessage);

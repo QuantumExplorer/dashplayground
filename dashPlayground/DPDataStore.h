@@ -77,6 +77,6 @@ typedef void(^FetchRequestCompletion)(NSArray * requestArray, NSError** error);
 
 -(NSArray*)getMessageObjectsFromMasternode:(NSManagedObject *)masternode;
 
-
+-(Branch*)defaultBranchForProject:(DPRepositoryProject)project;
 
 @end

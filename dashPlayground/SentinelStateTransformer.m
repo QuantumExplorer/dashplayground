@@ -22,27 +22,35 @@
 
 - (id)transformedValue:(id)value
 {
-    switch ([value integerValue]) {
-        case SentinelState_Initial:
-            return @"Initial";
+    DPSentinelState state = [value integerValue];
+    NSString * extraInformation = @"";
+    if (state & DPSentinelState_Error) {
+        extraInformation = @" (Error)";
+    }
+    if (state & DPSentinelState_Checking) {
+        extraInformation = @" (Checking)";
+    }
+    state = state & ~(DPSentinelState_Error | DPSentinelState_Checking);
+    switch (state) {
+        case DPSentinelState_Initial:
+            return [NSString stringWithFormat:@"Initial%@",extraInformation];
             break;
-        case SentinelState_Checking:
-            return @"Checking";
+        case DPSentinelState_Configured:
+            return [NSString stringWithFormat:@"Configured%@",extraInformation];;
             break;
-        case SentinelState_Installed:
-            return @"Installed";
+        case DPSentinelState_Installed:
+            return [NSString stringWithFormat:@"Installed%@",extraInformation];
             break;
-        case SentinelState_Running:
-            return @"Running";
+        case DPSentinelState_Running:
+            return [NSString stringWithFormat:@"Running%@",extraInformation];
             break;
-        case SentinelState_Error:
-            return @"Error";
+        case DPSentinelState_Error:
+            return [NSString stringWithFormat:@"Error%@",extraInformation];
             break;
         default:
-            return @"Unknown";
+            return [NSString stringWithFormat:@"Unknown%@",extraInformation];
             break;
     }
 }
-
 
 @end

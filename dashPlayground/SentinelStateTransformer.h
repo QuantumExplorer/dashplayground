@@ -8,12 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger,SentinelState) {
-    SentinelState_Initial = 0,
-    SentinelState_Checking = 1,
-    SentinelState_Installed = 2,
-    SentinelState_Running = 4,
-    SentinelState_Error = 5
+typedef NS_ENUM(NSUInteger,DPSentinelState) {
+    DPSentinelState_Initial = 0,
+    DPSentinelState_Checking = 1 << 0,
+    DPSentinelState_Installed = 1 << 1,
+    DPSentinelState_Configured = 1 << 2,
+    DPSentinelState_Running = 1 << 3,
+    DPSentinelState_Error = 1 << 4,
 };
 
 @interface SentinelStateTransformer : NSValueTransformer

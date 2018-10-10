@@ -63,6 +63,19 @@
     }
 }
 
+-(Branch*)defaultBranchForProject:(DPRepositoryProject)project {
+    return [self defaultBranchForProject:project inContext:self.mainContext];
+}
+
+-(Branch*)defaultBranchForProject:(DPRepositoryProject)project inContext:(NSManagedObjectContext*)context {
+    NSString * developBranch = [ProjectTypeTransformer developBranchForProject:project];
+    NSString * developRepositoryOwner = [ProjectTypeTransformer developRepositoryOwnerForProject:project];
+    NSString * developRepositoryName = [ProjectTypeTransformer directoryForProject:project];
+    Repository * repository = [self repositoryNamed:developRepositoryName forOwner:developRepositoryOwner inProject:project onRepositoryURLPath:[NSString stringWithFormat:@"https://github.com/%@/%@.git",developRepositoryOwner,developRepositoryName] inContext:context saveContext:NO];
+    Branch * branch = [self branchNamed:developBranch inRepository:repository];
+    return branch;
+}
+
 -(Repository*)repositoryNamed:(NSString*)name forOwner:(NSString*)owner inProject:(DPRepositoryProject)project onRepositoryURLPath:(NSString*)repositoryURLPath {
     return [self repositoryNamed:name forOwner:owner inProject:project onRepositoryURLPath:repositoryURLPath inContext:self.mainContext saveContext:NO];
 }

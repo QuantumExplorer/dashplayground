@@ -75,6 +75,7 @@
 		FB3BCA50216B8E8D0071E4F1 /* Masternode+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA4E216B8E8D0071E4F1 /* Masternode+CoreDataProperties.m */; };
 		FB3BCA53216BE7800071E4F1 /* HasValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */; };
 		FB3BCA55216C1F3C0071E4F1 /* dashcore-node.json in Resources */ = {isa = PBXBuildFile; fileRef = FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */; };
+		FB3BCA58216D50EB0071E4F1 /* InsightStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3BCA57216D50EB0071E4F1 /* InsightStateTransformer.m */; };
 		FB45054C1EA441C50066C6B9 /* DPTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB45054B1EA441C50066C6B9 /* DPTableView.m */; };
 		FB46AE8B1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
 		FB46AE8C1E95618400D4B034 /* DPLocalNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB46AE8A1E95618400D4B034 /* DPLocalNodeController.m */; };
@@ -247,6 +248,8 @@
 		FB3BCA51216BE7800071E4F1 /* HasValueTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HasValueTransformer.h; sourceTree = "<group>"; };
 		FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HasValueTransformer.m; sourceTree = "<group>"; };
 		FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "dashcore-node.json"; sourceTree = "<group>"; };
+		FB3BCA56216D50EB0071E4F1 /* InsightStateTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InsightStateTransformer.h; sourceTree = "<group>"; };
+		FB3BCA57216D50EB0071E4F1 /* InsightStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InsightStateTransformer.m; sourceTree = "<group>"; };
 		FB45054A1EA441C50066C6B9 /* DPTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPTableView.h; sourceTree = "<group>"; };
 		FB45054B1EA441C50066C6B9 /* DPTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPTableView.m; sourceTree = "<group>"; };
 		FB46AE891E95618400D4B034 /* DPLocalNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPLocalNodeController.h; sourceTree = "<group>"; };
@@ -418,6 +421,8 @@
 				FB3BCA302167BEE20071E4F1 /* ProjectTypeTransformer.m */,
 				FB3BCA51216BE7800071E4F1 /* HasValueTransformer.h */,
 				FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */,
+				FB3BCA56216D50EB0071E4F1 /* InsightStateTransformer.h */,
+				FB3BCA57216D50EB0071E4F1 /* InsightStateTransformer.m */,
 			);
 			name = Transformers;
 			sourceTree = "<group>";
@@ -747,6 +752,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A50FB29E20A2F9E6008EFD32 /* DPRepoModalController.m in Sources */,
+				FB3BCA58216D50EB0071E4F1 /* InsightStateTransformer.m in Sources */,
 				A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */,
 				FB3BCA49216AD6360071E4F1 /* Commit+CoreDataClass.m in Sources */,
 				FB29066D1E85799F00A31092 /* RepositoriesViewController.m in Sources */,

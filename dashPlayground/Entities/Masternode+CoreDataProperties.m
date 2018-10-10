@@ -34,6 +34,7 @@
 @dynamic sentinelGitCommitVersion;
 @dynamic sentinelState;
 @dynamic sentinelUrl;
+@dynamic insightState;
 @dynamic sentinelVersion;
 @dynamic syncStatus;
 @dynamic transactionId;

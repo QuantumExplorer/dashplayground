@@ -64,21 +64,21 @@
     
 }
 
--(void)updateBranchInfo:(NSManagedObject*)branch clb:(dashClb)clb {
+-(void)updateBranchInfo:(Branch*)branch clb:(dashClb)clb {
+    Repository * repository = branch.repository;
+    NSUInteger isPrivate = repository.isPrivate;
     
-    NSUInteger repoType = [[branch valueForKey:@"repoType"] integerValue];
-    
-    NSString * url = [branch valueForKeyPath:@"repository.url"];
+    NSString * url = branch.repository.url;
     NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
     NSArray *matches = [linkDetector matchesInString:url options:0 range:NSMakeRange(0, [url length])];
     if ([matches count] && [matches[0] isKindOfClass:[NSTextCheckingResult class]] && ((NSTextCheckingResult*)matches[0]).resultType == NSTextCheckingTypeLink) {
         NSURL * url = ((NSTextCheckingResult*)matches[0]).URL;
         if ([url.host isEqualToString:@"github.com"] && [url.pathExtension isEqualToString:@"git"] && url.pathComponents.count > 2) {
-            if(repoType == 0) {
+            if(!isPrivate) {
                 AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-                [manager GET:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@",url.pathComponents[1],[url.lastPathComponent stringByDeletingPathExtension],[branch valueForKey:@"name"]] parameters:nil progress:nil success:^(NSURLSessionTask *task, id responseObject) {
+                [manager GET:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@",repository.owner,repository.name,branch.name] parameters:nil progress:nil success:^(NSURLSessionTask *task, id responseObject) {
                     if ([[responseObject objectForKey:@"object"] objectForKey:@"sha"]) {
-                        [branch setValue:[[responseObject objectForKey:@"object"] objectForKey:@"sha"] forKey:@"lastCommitSha"];
+                        branch.lastCommitHash = [[responseObject objectForKey:@"object"] objectForKey:@"sha"];
                         [[DPDataStore sharedInstance] saveContext];
                         return clb(YES,nil);
                     } else {
@@ -91,20 +91,18 @@
                 }];
             }
             else {
-                NSString *githubUsername = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
-                NSString *githubPassword = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
-                
-                if([githubUsername length] == 0 || [githubPassword length] == 0) return;
-                
-                NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@",url.pathComponents[1],[url.lastPathComponent stringByDeletingPathExtension],[branch valueForKey:@"name"], githubUsername, githubPassword] checkError:YES];
-                
-                if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
-                    [branch setValue:[[repositoryDict objectForKey:@"object"] objectForKey:@"sha"] forKey:@"lastCommitSha"];
-                    [[DPDataStore sharedInstance] saveContext];
-                    return clb(YES,nil);
-                } else {
-                    return clb(NO,@"Error fetching repository");
-                }
+                [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
+                    if (!authenticated) return;
+                    NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@",url.pathComponents[1],[url.lastPathComponent stringByDeletingPathExtension],[branch valueForKey:@"name"], githubUsername, githubPassword] checkError:YES];
+                    
+                    if ([[repositoryDict objectForKey:@"object"] objectForKey:@"sha"]) {
+                        branch.lastCommitHash = [[repositoryDict objectForKey:@"object"] objectForKey:@"sha"];
+                        [[DPDataStore sharedInstance] saveContext];
+                        return clb(YES,nil);
+                    } else {
+                        return clb(NO,@"Error fetching repository");
+                    }
+                }];
             }
         }
     }

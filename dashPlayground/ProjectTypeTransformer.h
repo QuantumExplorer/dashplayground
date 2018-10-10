@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ProjectTypeTransformer : NSValueTransformer
 
++(NSString*)developRepositoryOwnerForProject:(NSInteger)project;
 +(NSString*)directoryForProjectName:(NSString*)string;
 +(DPRepositoryProject)typeForTypeName:(NSString*)string;
 +(NSString*)directoryForProject:(NSInteger)project;
