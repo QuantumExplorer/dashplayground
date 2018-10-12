@@ -15,7 +15,7 @@
 
 @implementation DPNetworkController
 
--(void)getDebugLogFileFromMasternode:(NSManagedObject*)masternode clb:(dashClb)clb {
+-(void)getDebugLogFileFromMasternode:(NSManagedObject*)masternode clb:(dashMessageClb)clb {
     __block NSString *publicIP = [masternode valueForKey:@"publicIP"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
@@ -41,7 +41,7 @@
     });
 }
 
-- (void)findSpecificDataType:(NSString*)log datatype:(NSString*)type onClb:(dashClb)clb {
+- (void)findSpecificDataType:(NSString*)log datatype:(NSString*)type onClb:(dashMessageClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
         NSArray *logSubLine = [log componentsSeparatedByString:@"\n"];

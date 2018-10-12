@@ -7,7 +7,6 @@
 //
 
 #import "ChainSelectionViewController.h"
-#import "DPChainSelectionController.h"
 #import "DPMasternodeController.h"
 #import "DPDataStore.h"
 #import "Masternode+CoreDataClass.h"
@@ -52,7 +51,7 @@ NSArray* _masternodeArrayObjects;
     else if([self.chainPopUp.objectValue integerValue] == 2) {
         //devnet=DRA -> this is local devnet name
         //TODO: find out a way to get local devnet name -> finished
-        chainNetwork = [NSString stringWithFormat:@"devnet=%@", chainNetworkName];
+        chainNetwork = [NSString stringWithFormat:@"devnet-%@", chainNetworkName];
     }
     [_chainSelectionWindow close];
     

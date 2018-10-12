@@ -20,36 +20,30 @@
     return NO;
 }
 
-- (id)transformedValue:(id)value
-{
-    switch ([value integerValue]) {
-        case DashcoreState_Initial:
-            return @"Initial";
-            break;
-        case DashcoreState_Checking:
-            return @"Checking";
-            break;
-        case DashcoreState_Installed:
-            return @"Installed";
-            break;
-        case DashcoreState_Configured:
-            return @"Configured";
-            break;
-        case DashcoreState_Running:
-            return @"Running";
-            break;
-        case DashcoreState_Error:
-            return @"Error";
-            break;
-        case DashcoreState_SettingUp:
-            return @"Setting up";
-            break;
-        case DashcoreState_Stopped:
-            return @"Stopped";
-            break;
-        default:
-            return @"Unknown";
-            break;
+- (id)transformedValue:(id)value {
+    DPDashcoreState state = [value integerValue];
+    NSString * extraInformation = @"";
+    if (state && (!(state & DPDashcoreState_Running)) && (state & DPDashcoreState_Configured)) {
+        extraInformation = @" (Stopped)";
+    }
+    if (state & DPDashcoreState_Error) {
+        extraInformation = @" (Error)";
+    }
+    if (state & DPDashcoreState_Checking) {
+        extraInformation = @" (Checking)";
+    }
+    
+    state = state & ~(DPDashcoreState_Error | DPDashcoreState_Checking);
+    if (state & DPDashcoreState_Running) {
+        return [NSString stringWithFormat:@"Running%@",extraInformation];
+    } else if (state & DPDashcoreState_Installed) {
+        return [NSString stringWithFormat:@"Installed%@",extraInformation];
+    } else if (state & DPDashcoreState_Configured) {
+        return [NSString stringWithFormat:@"Configured%@",extraInformation];
+    } else if (state & DPDashcoreState_SettingUp) {
+        return [NSString stringWithFormat:@"Setting up%@",extraInformation];
+    } else {
+        return [NSString stringWithFormat:@"Initial%@",extraInformation];
     }
 }
 

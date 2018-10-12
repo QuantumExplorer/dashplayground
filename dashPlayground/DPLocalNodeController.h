@@ -20,9 +20,9 @@
 @property (nonatomic,copy) NSString * dashCliPath;
 @property (nonatomic,copy) NSString * dashDPath;
 
-- (void)startDash:(dashClb)clb forChain:(NSString*)chainNetwork;
+- (void)startDash:(dashMessageClb)clb forChain:(NSString*)chainNetwork;
 
-- (void)stopDash:(dashClb)clb forChain:(NSString*)chainNetwork;
+- (void)stopDash:(dashMessageClb)clb forChain:(NSString*)chainNetwork;
 
 - (void)checkDash:(dashActiveClb)clb forChain:(NSString*)chainNetwork;
 
@@ -34,7 +34,7 @@
 
 - (NSData *)runDashRPCCommand:(NSString *)commandToRun checkError:(BOOL)withError onClb:(dashDataClb)clb;
 
-- (void)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork onClb:(dashClb)clb;
+- (void)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork onClb:(dashMessageClb)clb;
 
 - (NSString*)runDashRPCCommandString:(NSString *)commandToRun forChain:(NSString*)chainNetwork;
 
@@ -46,7 +46,7 @@
 
 -(NSDictionary*)masternodeInfoInMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode;
 
--(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashClb)clb;
+-(void)updateMasternodeConfigurationFileForMasternode:(NSManagedObject*)masternode clb:(dashMessageClb)clb;
 
 +(DPLocalNodeController*)sharedInstance;
 

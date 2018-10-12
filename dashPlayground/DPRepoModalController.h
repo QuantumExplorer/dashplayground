@@ -17,7 +17,7 @@
 +(DPRepoModalController*)sharedInstance;
 
 -(void)setViewController:(MasternodesViewController*)controller;
--(void)setUpMasternodeDashdWithSelectedRepo:(Masternode*)masternode repository:(Repository*)repository clb:(dashClb)clb;
+-(void)setUpMasternodeDashdWithSelectedRepo:(Masternode*)masternode repository:(Repository*)repository clb:(dashMessageClb)clb;
 -(NSMutableArray*)getRepositoriesData;
 
 @end

@@ -30,18 +30,17 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 - (void)startInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)stopInstance:(NSString*)instanceId clb:(dashStateClb)clb;
 - (void)terminateInstance:(NSString*)instanceId clb:(dashStateClb)clb;
-- (void)getInstancesClb:(dashClb)clb;
+- (void)getInstancesClb:(dashMessageClb)clb;
 - (void)createInstanceWithInitialAMI:(dashStateClb)clb serverType:(NSString*)serverType;
 //- (void)setUpMasternodeDashdWithSelectedRepo:(NSManagedObject*)masternode repository:(NSManagedObject*)repository clb:(dashClb)clb;
-- (void)setUpMasternodeDashd:(Masternode*)masternode clb:(dashClb)clb;
+- (void)setUpMasternodeDashd:(Masternode*)masternode clb:(dashMessageClb)clb;
 - (void)setUpMasternodeConfiguration:(Masternode*)masternode onChainName:(NSString*)chainName clb:(dashSuccessInfo)clb;
-- (void)setUpMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb;
+- (void)setUpMasternodeSentinel:(Masternode*)masternode clb:(dashMessageClb)clb;
 
 - (void)startMasternodeOnRemote:(Masternode*)masternode localChain:(NSString*)localChain clb:(dashInfoClb)clb;
--(void)startDashdOnRemote:(Masternode*)masternode onClb:(dashClb)clb;
 
 -(void)checkMasternode:(Masternode*)masternode;
--(void)checkMasternodeChainNetwork:(Masternode*)masternode clb:(dashClb)clb;
+-(void)checkMasternodeChainNetwork:(Masternode*)masternode clb:(dashMessageClb)clb;
 
 //-(NSDictionary*)retrieveConfigurationInfoThroughSSH:(NSManagedObject*)masternode;
 
@@ -60,22 +59,24 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 -(void)checkMasternodeIsInstalled:(Masternode*)masternode clb:(dashBoolClb)clb;
 -(void)checkMasternodeIsProperlyInstalled:(Masternode*)masternode onSSH:(NMSSHSession*)ssh;
--(void)checkMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb;
+-(void)checkMasternodeSentinel:(Masternode*)masternode clb:(dashMessageClb)clb;
 -(NMSSHSession*)connectInstance:(Masternode*)masternode;
 -(NSString*)getResponseExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh error:(NSError*)error;
 -(NSString*)createSentinelConfFileForMasternode:(Masternode*)masternode;
 //-(void)checkMasternodeChainNetwork:(NSManagedObject*)masternode;
 //-(void)updateMasternode:(NSManagedObject*)masternode;
--(void)updateMasternodeAttributes:(Masternode*)masternode clb:(dashClb)clb;
+-(void)updateMasternodeAttributes:(Masternode*)masternode clb:(dashMessageClb)clb;
 
--(void)stopDashdOnRemote:(Masternode*)masternode onClb:(dashClb)clb;
--(void)addNodeToLocal:(Masternode*)masternode clb:(dashClb)clb;
--(void)addNodeToRemote:(Masternode*)masternode toPublicIP:(NSString*)publicIP clb:(dashClb)clb;
--(void)sendRPCCommandString:(NSString*)command toMasternode:(Masternode*)masternode clb:(dashClb)clb;
+-(void)startDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)stopDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+
+-(void)addNodeToLocal:(Masternode*)masternode clb:(dashMessageClb)clb;
+-(void)addNodeToRemote:(Masternode*)masternode toPublicIP:(NSString*)publicIP clb:(dashMessageClb)clb;
+-(void)sendRPCCommandString:(NSString*)command toMasternode:(Masternode*)masternode clb:(dashMessageClb)clb;
 -(void)getInfo:(Masternode*)masternode clb:(dashInfoClb)clb;
 
 -(void)configureMasternodeSentinel:(NSArray*)AllMasternodes;
--(void)registerProtxForLocal:(NSString*)publicIP localChain:(NSString*)localChain onClb:(dashClb)clb;
+-(void)registerProtxForLocal:(NSString*)publicIP localChain:(NSString*)localChain onClb:(dashMessageClb)clb;
 -(void)registerProtxForLocal:(NSArray*)AllMasternodes;
 
 -(void)setUpDevnet:(NSArray*)allMasternodes;
@@ -84,27 +85,33 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 
 -(InstanceState)stateForStateName:(NSString*)string;
 
--(void)validateMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb;
--(void)reconsiderMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb;
--(void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashClb)clb;
--(void)clearBannedOnNodes:(NSArray*)masternodeObjects withCallback:(dashClb)clb;
--(void)wipeDataOnRemote:(Masternode*)masternode onClb:(dashClb)clb;
+-(void)validateMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashMessageClb)clb;
+-(void)reconsiderMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashMessageClb)clb;
+-(void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashMessageClb)clb;
+-(void)clearBannedOnNodes:(NSArray*)masternodeObjects withCallback:(dashMessageClb)clb;
+-(void)wipeDataOnRemote:(Masternode*)masternode onClb:(dashMessageClb)clb;
 
--(void)checkRequiredPackagesAreInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb;
--(void)checkPackages:(NSArray*)packages areInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb;
--(void)checkRequiredPackagesAreInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb;
--(void)checkPackages:(NSArray*)packages areInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb;
+-(void)checkRequiredPackagesAreInstalledOnMasternode:(Masternode*)masternode withClb:(dashActionClb)clb;
+-(void)checkPackages:(NSArray*)packages areInstalledOnMasternode:(Masternode*)masternode withClb:(dashActionClb)clb;
+-(void)checkRequiredPackagesAreInstalledInSession:(NMSSHSession*)sshSession withClb:(dashActionClb)clb;
+-(void)checkPackages:(NSArray*)packages areInstalledInSession:(NMSSHSession*)sshSession withClb:(dashActionClb)clb;
 
--(void)installDependenciesForMasternode:(Masternode*)masternode inSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb;
--(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh dashClb:(dashClb)clb;
+-(void)installDependenciesForMasternode:(Masternode*)masternode inSession:(NMSSHSession*)sshSession withClb:(dashActionClb)clb;
+-(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh dashClb:(dashMessageClb)clb;
 -(void)updateGitInfoForMasternode:(Masternode*)masternode forProject:(DPRepositoryProject)project clb:(dashInfoClb)clb;
 
-- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb;
-- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
-- (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
+- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashMessageClb)clb;
+- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActiveClb)clb messageClb:(dashMessageClb)clb;
+- (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashMessageClb)clb;
 
-- (void)configureDapiOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb;
--(void)checkDapiIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
--(void)installDapiOnMasternode:(Masternode*)masternode clb:(dashClb)clb;
+-(void)configureDapiOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)checkDapiIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)checkDapiIsConfiguredOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
+-(void)installDapiOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+
+-(void)configureDriveOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)checkDriveIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)checkDriveIsConfiguredOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
+-(void)installDriveOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
 
 @end

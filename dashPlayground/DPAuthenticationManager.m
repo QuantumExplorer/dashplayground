@@ -74,16 +74,16 @@
 
 -(void)requestGithubCredentialsWithClb:(dashCredentialsClb)clb {
     dispatch_async(dispatch_get_main_queue(), ^{
-    @autoreleasepool {
-    NSString * username = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
-    NSString * password = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
-    NSString * passcode = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Encryption passcode" message:@"Please enter a passcode"];
-    NSDictionary * credentials = @{GITHUB_USERNAME_KEY:username,GITHUB_PASSWORD_KEY:password};
-    [self encodeCredentials:credentials withPasscode:passcode];
-    [self authenticateForMinutes:DEFAULT_AUTHENTICATION_TIME_MINUTES];
-    clb(YES,username,password);
-    }
-        });
+        @autoreleasepool {
+            NSString * username = [[DialogAlert sharedInstance] showAlertWithTextField:@"Github username" message:@"Please enter your Github username" placeHolder:@""];
+            NSString * password = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Github password" message:@"Please enter your Github password"];
+            NSString * passcode = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Encryption passcode" message:@"Please enter a passcode"];
+            NSDictionary * credentials = @{GITHUB_USERNAME_KEY:username,GITHUB_PASSWORD_KEY:password};
+            [self encodeCredentials:credentials withPasscode:passcode];
+            [self authenticateForMinutes:DEFAULT_AUTHENTICATION_TIME_MINUTES];
+            clb(YES,username,password);
+        }
+    });
 }
 
 -(void)requestSporkCredentialsWithClb:(dashCredentialsClb)clb {
@@ -93,14 +93,14 @@
             NSString * privateKey = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Spork Private Key" message:@"Please enter your Spork private key"];
             NSString * passcode = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Encryption passcode" message:@"Please enter a passcode"];
             NSDictionary * credentials = @{SPORK_ADDRESS_KEY:address,SPORK_PRIVATE_KEY:privateKey};
-            [self encodeCredentials:credentials withPasscode:passcode];
+            [self encodeSporkCredentials:credentials withPasscode:passcode];
             [self authenticateForMinutes:DEFAULT_AUTHENTICATION_TIME_MINUTES];
             clb(YES,address,privateKey);
         }
     });
 }
 
--(void)requestNPMTokenWithClb:(dashClb)clb {
+-(void)requestNPMTokenWithClb:(dashMessageClb)clb {
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
             NSString * npmToken = [[DialogAlert sharedInstance] showAlertWithTextField:@"NPM token" message:@"Please enter your NPM token" placeHolder:@""];
@@ -115,40 +115,44 @@
 
 -(void)authenticateWithClb:(dashCredentialsClb)clb {
     @autoreleasepool {
-    if ([self isAuthenticated]) {
-        NSError * error = nil;
-        NSData * encryptedData = self.tempCredentialData;
-        NSData *data = [RNDecryptor decryptData:encryptedData withPassword:self.tempCredentialToken error:&error];
-        if (error) {
-            [self authenticateForMinutes:-1];
-            [self authenticateWithClb:clb];
+        if ([self isAuthenticated] && self.tempCredentialData) {
+            NSError * error = nil;
+            NSData * encryptedData = self.tempCredentialData;
+            NSData *data = [RNDecryptor decryptData:encryptedData withPassword:self.tempCredentialToken error:&error];
+            if (error) {
+                [self authenticateForMinutes:-1];
+                [self authenticateWithClb:clb];
+                return;
+            }
+            NSDictionary * credentials = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            clb(YES,[credentials objectForKey:GITHUB_USERNAME_KEY],[credentials objectForKey:GITHUB_PASSWORD_KEY]);
             return;
         }
-        NSDictionary * credentials = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-        clb(YES,[credentials objectForKey:GITHUB_USERNAME_KEY],[credentials objectForKey:GITHUB_PASSWORD_KEY]);
-        return;
-    }
-    if (![self hasGithubCredentials]) {
-        [self requestGithubCredentialsWithClb:clb];
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-        NSString * passcode = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Encryption passcode" message:@"Please enter your passcode"];
-        NSDictionary * credentials = [self credentialsDecodedWithPasscode:passcode];
-        self.tempCredentialToken = [self randomPassword];
-        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:credentials];
-        NSError *error;
-        self.tempCredentialData = [RNEncryptor encryptData:data
-                                            withSettings:kRNCryptorAES256Settings
-                                                password:self.tempCredentialToken
-                                                   error:&error];
-        [self authenticateForMinutes:DEFAULT_AUTHENTICATION_TIME_MINUTES];
-        clb(YES,[credentials objectForKey:GITHUB_USERNAME_KEY],[credentials objectForKey:GITHUB_PASSWORD_KEY]);
+        if (![self hasGithubCredentials]) {
+            [self requestGithubCredentialsWithClb:clb];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString * passcode = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Encryption passcode" message:@"Please enter your passcode"];
+                NSDictionary * credentials = [self credentialsDecodedWithPasscode:passcode];
+                if (![credentials objectForKey:GITHUB_USERNAME_KEY] || ![credentials objectForKey:GITHUB_PASSWORD_KEY]) {
+                    [self requestGithubCredentialsWithClb:clb];
+                    return;
+                }
+                self.tempCredentialToken = [self randomPassword];
+                NSData *data = [NSKeyedArchiver archivedDataWithRootObject:credentials];
+                NSError *error;
+                self.tempCredentialData = [RNEncryptor encryptData:data
+                                                      withSettings:kRNCryptorAES256Settings
+                                                          password:self.tempCredentialToken
+                                                             error:&error];
+                [self authenticateForMinutes:DEFAULT_AUTHENTICATION_TIME_MINUTES];
+                clb(YES,[credentials objectForKey:GITHUB_USERNAME_KEY],[credentials objectForKey:GITHUB_PASSWORD_KEY]);
             });
-    }
+        }
     }
 }
 
--(void)authenticateNPMWithClb:(dashClb)clb {
+-(void)authenticateNPMWithClb:(dashMessageClb)clb {
     @autoreleasepool {
         if ([self isAuthenticated]) {
             NSError * error = nil;
@@ -167,17 +171,17 @@
             [self requestNPMTokenWithClb:clb];
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
-            NSString * passcode = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Encryption passcode" message:@"Please enter your passcode"];
-            NSDictionary * credentials = [self npmCredentialsDecodedWithPasscode:passcode];
-            self.tempCredentialNPMToken = [self randomPassword];
-            NSData *data = [NSKeyedArchiver archivedDataWithRootObject:credentials];
-            NSError *error;
-            self.tempCredentialNPMData = [RNEncryptor encryptData:data
-                                                  withSettings:kRNCryptorAES256Settings
-                                                      password:self.tempCredentialNPMToken
-                                                         error:&error];
-            [self authenticateForMinutes:DEFAULT_AUTHENTICATION_TIME_MINUTES];
-            clb(YES,[credentials objectForKey:NPM_TOKEN]);
+                NSString * passcode = [[DialogAlert sharedInstance] showAlertWithSecureTextField:@"Encryption passcode" message:@"Please enter your passcode"];
+                NSDictionary * credentials = [self npmCredentialsDecodedWithPasscode:passcode];
+                self.tempCredentialNPMToken = [self randomPassword];
+                NSData *data = [NSKeyedArchiver archivedDataWithRootObject:credentials];
+                NSError *error;
+                self.tempCredentialNPMData = [RNEncryptor encryptData:data
+                                                         withSettings:kRNCryptorAES256Settings
+                                                             password:self.tempCredentialNPMToken
+                                                                error:&error];
+                [self authenticateForMinutes:DEFAULT_AUTHENTICATION_TIME_MINUTES];
+                clb(YES,[credentials objectForKey:NPM_TOKEN]);
             });
         }
     }
@@ -207,7 +211,7 @@
                 self.tempCredentialSporkToken = [self randomPassword];
                 NSData *data = [NSKeyedArchiver archivedDataWithRootObject:credentials];
                 NSError *error;
-                self.tempCredentialNPMData = [RNEncryptor encryptData:data
+                self.tempCredentialSporkData = [RNEncryptor encryptData:data
                                                          withSettings:kRNCryptorAES256Settings
                                                              password:self.tempCredentialSporkToken
                                                                 error:&error];

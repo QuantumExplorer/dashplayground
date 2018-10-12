@@ -345,7 +345,7 @@
     });
 }
 
-- (void)checkExistingOfDashdInRepo:(NMSSHSession*)buildServerSession type:(NSString*)type Owner:(NSString*)gitOwner RepoName:(NSString*)gitRepo onBranch:(NSString*)branch clb:(dashClb)clb {
+- (void)checkExistingOfDashdInRepo:(NMSSHSession*)buildServerSession type:(NSString*)type Owner:(NSString*)gitOwner RepoName:(NSString*)gitRepo onBranch:(NSString*)branch clb:(dashMessageClb)clb {
     
     __block NSString *compileStatus = @"";
     

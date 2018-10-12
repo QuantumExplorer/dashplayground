@@ -158,7 +158,7 @@
     }
     
     //Show repositories version
-    if (masternode.dashcoreState != DashcoreState_Initial || masternode.dashcoreState != DashcoreState_SettingUp) {
+    if (masternode.dashcoreState != DPDashcoreState_Initial || masternode.dashcoreState != DPDashcoreState_SettingUp) {
         [[DPVersioningController sharedInstance] fetchGitCommitInfoOnMasternode:masternode forProject:DPRepositoryProject_Core clb:^(BOOL success, NSArray *commitArrayData) {
             if (success) {
                 [self.coreVersionPopupButton removeAllItems];
@@ -169,7 +169,7 @@
     
     
     //Show dapi version
-    if (masternode.dashcoreState != DashcoreState_Initial || masternode.dashcoreState != DashcoreState_SettingUp) {
+    if (masternode.dashcoreState != DPDashcoreState_Initial || masternode.dashcoreState != DPDashcoreState_SettingUp) {
         [[DPVersioningController sharedInstance] fetchGitCommitInfoOnMasternode:masternode forProject:DPRepositoryProject_Dapi clb:^(BOOL success, NSArray *commitArrayData) {
             if (success) {
                 [self.dapiVersionPopUpButton removeAllItems];

@@ -11,13 +11,13 @@
 
 #import <NMSSH/NMSSH.h>
 
-typedef void (^dashClb)(BOOL success,NSString * message);
+typedef void (^dashMessageClb)(BOOL success,NSString * message);
 typedef void (^dashErrorClb)(BOOL success,NSError* error);
 typedef void (^dashClbWithError)(BOOL success,NSString * message,NSError* error);
 typedef void (^dashInfoClb)(BOOL success,NSDictionary * object,NSString* errorMessage);
 typedef void (^dashBoolClb)(BOOL success,BOOL value,NSString* errorMessage);
 typedef void (^dashActiveClb)(BOOL active);
-typedef void (^dashInstalledClb)(BOOL success,BOOL installed);
+typedef void (^dashActionClb)(BOOL success,BOOL actionSuccess);
 typedef void (^dashSyncClb)(BOOL active);
 typedef void (^dashCredentialsClb)(BOOL authenticated,NSString* userName,NSString* password);
 typedef void (^dashMutaArrayInfoClb)(BOOL success,NSMutableArray * object);

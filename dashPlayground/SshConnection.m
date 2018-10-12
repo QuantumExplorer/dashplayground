@@ -63,7 +63,7 @@
 
 #pragma mark - Connectivity
 
--(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error dashClb:(dashClb)clb {
+-(void)sendDashCommandsList:(NSArray*)commands onSSH:(NMSSHSession*)ssh onPath:(NSString*)path error:(NSError*)error dashClb:(dashMessageClb)clb {
     
     
     for (NSUInteger index = 0;index<[commands count];index++) {

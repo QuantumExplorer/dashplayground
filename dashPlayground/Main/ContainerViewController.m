@@ -50,7 +50,7 @@
     else if([self.chainNetworkButton.objectValue integerValue] == 2){
         //devnet=DRA
         self.chainNameField.hidden = false;
-        dataStore.chainNetwork = [NSString stringWithFormat:@"devnet=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
+        dataStore.chainNetwork = [NSString stringWithFormat:@"devnet-%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
         if([[DPMasternodeController sharedInstance] masternodeViewController] != nil) {
             [[[DPMasternodeController sharedInstance] masternodeViewController] devnetBox].hidden = false;
         }
@@ -64,7 +64,7 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     DPDataStore *dataStore = [DPDataStore sharedInstance];
-    dataStore.chainNetwork = [NSString stringWithFormat:@"devnet=%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
+    dataStore.chainNetwork = [NSString stringWithFormat:@"devnet-%@", [[NSUserDefaults standardUserDefaults] stringForKey:@"chainNetworkName"]];
     
 //    [[DialogAlert sharedInstance] showAlertWithOkButton:@"Chain Network" message:[NSString stringWithFormat:@"The chain network name was set to %@", self.chainNameField.stringValue]];
 }

@@ -419,15 +419,12 @@ NSString *terminalHeadString = @"";
         for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
         {
             if(masternode.isSelected) {
-                [[DPMasternodeController sharedInstance] startDashdOnRemote:masternode onClb:^(BOOL success, NSString *message) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self addStringEventToMasternodeConsole:message];
-                    });
+                [[DPMasternodeController sharedInstance] startDashdOnRemote:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+                    
+                } messageClb:^(BOOL success, NSString *message) {
+                    [self addStringEventToMasternodeConsole:message];
                 }];
-                //                dispatch_async(dispatch_get_main_queue(), ^{
-                ////                    [object setValue:@(0) forKey:@"isSelected"];
-                //                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                //                });
+
             }
         }
     });
@@ -442,16 +439,11 @@ NSString *terminalHeadString = @"";
         for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
         {
             if(masternode.isSelected) {
-                [[DPMasternodeController sharedInstance] stopDashdOnRemote:masternode onClb:^(BOOL success, NSString *message) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self addStringEventToMasternodeConsole:message];
-                    });
+                [[DPMasternodeController sharedInstance] stopDashdOnRemote:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+                    
+                } messageClb:^(BOOL success, NSString *message) {
+                    [self addStringEventToMasternodeConsole:message];
                 }];
-                //                dispatch_async(dispatch_get_main_queue(), ^{
-                //                    [object setValue:@(DashcoreState_Stopped) forKey:@"masternodeState"];
-                //                    [object setValue:@(0) forKey:@"isSelected"];
-                //                    [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-                //                });
             }
         }
     });
@@ -778,10 +770,10 @@ NSString *terminalHeadString = @"";
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configuring dapi on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] configureDapiOnMasternode:masternode forceUpdate:NO clb:^(BOOL success, NSString *message) {
-            if (!success) {
-                [self addStringEventToMasternodeConsole:message];
-            }
+        [[DPMasternodeController sharedInstance] configureDapiOnMasternode:masternode forceUpdate:NO completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
         }];
     }
     
@@ -791,11 +783,19 @@ NSString *terminalHeadString = @"";
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     
     for (Masternode * masternode in [self selectedMasternodes]) {
-        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking insight on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] checkDapiIsRunningOnMasternode:masternode clb:^(BOOL success, NSString *message) {
-            if (!success) {
-                [self addStringEventToMasternodeConsole:message];
-            }
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking dapi on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] checkDapiIsRunningOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+//            if (success && !actionSuccess) { //it's not running, let's see if we are configured
+//                if (!(masternode.dapiState & DPDapiState_Configured)) {
+//                    [[DPMasternodeController sharedInstance] checkDapiIsConfiguredOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+//
+//                    } messageClb:^(BOOL success, NSString *message) {
+//                        [self addStringEventToMasternodeConsole:message];
+//                    }];
+//                }
+//            }
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
         }];
     }
 }
@@ -821,10 +821,10 @@ NSString *terminalHeadString = @"";
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking insight on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] checkInsightIsRunningOnMasternode:masternode clb:^(BOOL success, NSString *message) {
-            if (!success) {
-                [self addStringEventToMasternodeConsole:message];
-            }
+        [[DPMasternodeController sharedInstance] checkInsightIsRunningOnMasternode:masternode completionClb:^(BOOL active) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
         }];
     }
 }
@@ -989,9 +989,9 @@ NSString *terminalHeadString = @"";
     //    NSManagedObject * object = [self.arrayController.arrangedObjects objectAtIndex:row];
     //
     //    //Set up button
-    ////    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed
-    ////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
-    ////        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_SettingUp) {
+    ////    if ([[object valueForKey:@"masternodeState"] integerValue] == DPDashcoreState_Installed
+    ////        || [[object valueForKey:@"masternodeState"] integerValue] == DPDashcoreState_Running
+    ////        || [[object valueForKey:@"masternodeState"] integerValue] == DPDashcoreState_SettingUp) {
     ////        self.setupButton.enabled = false;
     ////    }
     ////    else{
@@ -1001,9 +1001,9 @@ NSString *terminalHeadString = @"";
     //
     //    //Create AMI button
     //    //Start button
-    //    if ([[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Running
-    //        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Configured
-    //        || [[object valueForKey:@"masternodeState"] integerValue] == DashcoreState_Installed) {
+    //    if ([[object valueForKey:@"masternodeState"] integerValue] == DPDashcoreState_Running
+    //        || [[object valueForKey:@"masternodeState"] integerValue] == DPDashcoreState_Configured
+    //        || [[object valueForKey:@"masternodeState"] integerValue] == DPDashcoreState_Installed) {
     //        self.startButton.enabled = true;
     //        self.createAmiButton.enabled = true;
     //    }

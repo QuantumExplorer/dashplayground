@@ -23,7 +23,6 @@
 		A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A52EFCF6209AF44100B0586A /* RepositoriesModalViewController.m */; };
 		A532618420A42413004678E8 /* UnspentOutputViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A532618320A42413004678E8 /* UnspentOutputViewController.m */; };
 		A544ADDC20CA78000036AE29 /* ChainSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */; };
-		A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */; };
 		A558E0C620B54E3C00E853DB /* SshConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A558E0C520B54E3C00E853DB /* SshConnection.m */; };
 		A55DFCC720D775BF006E9890 /* PreferenceWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55DFCC620D775BF006E9890 /* PreferenceWindowController.m */; };
 		A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = A55FC0CF20998BDC004B23FE /* DPPreferenceController.m */; };
@@ -157,8 +156,6 @@
 		A532618320A42413004678E8 /* UnspentOutputViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnspentOutputViewController.m; sourceTree = "<group>"; };
 		A544ADDA20CA77FF0036AE29 /* ChainSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChainSelectionViewController.h; sourceTree = "<group>"; };
 		A544ADDB20CA78000036AE29 /* ChainSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChainSelectionViewController.m; sourceTree = "<group>"; };
-		A544ADDD20CA78520036AE29 /* DPChainSelectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPChainSelectionController.h; sourceTree = "<group>"; };
-		A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPChainSelectionController.m; sourceTree = "<group>"; };
 		A558E0C420B54E3C00E853DB /* SshConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SshConnection.h; sourceTree = "<group>"; };
 		A558E0C520B54E3C00E853DB /* SshConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SshConnection.m; sourceTree = "<group>"; };
 		A55DFCC520D775BF006E9890 /* PreferenceWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreferenceWindowController.h; sourceTree = "<group>"; };
@@ -550,8 +547,6 @@
 				A50FB29D20A2F9E6008EFD32 /* DPRepoModalController.m */,
 				A515E7CD20AA96B800CB5495 /* DPAvailabilityController.h */,
 				A515E7CE20AA96B800CB5495 /* DPAvailabilityController.m */,
-				A544ADDD20CA78520036AE29 /* DPChainSelectionController.h */,
-				A544ADDE20CA78520036AE29 /* DPChainSelectionController.m */,
 			);
 			name = "Server Controllers";
 			sourceTree = "<group>";
@@ -771,7 +766,6 @@
 				A515E7CF20AA96B800CB5495 /* DPAvailabilityController.m in Sources */,
 				FB0684271E92DA2000F1AFB4 /* RPCViewController.m in Sources */,
 				FB9EBCF51E98752500AE8AC3 /* DashcoreStateTransformer.m in Sources */,
-				A544ADDF20CA78520036AE29 /* DPChainSelectionController.m in Sources */,
 				A5142E7720E36259000AB18E /* DebugTypeTransformer.m in Sources */,
 				FBBFEB231E86B7CB00BE41BE /* PlaygroundModel.xcdatamodeld in Sources */,
 				FBBFEB261E86C44E00BE41BE /* MasternodesViewController.m in Sources */,

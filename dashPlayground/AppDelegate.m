@@ -20,7 +20,6 @@
 #import "SshConnection.h"
 #import "DPMasternodeController.h"
 #import "InstanceStateTransformer.h"
-#import "DPChainSelectionController.h"
 #import "PreferenceWindowController.h"
 #import "DPVersioningController.h"
 #import "GithubAPI.h"
@@ -61,10 +60,10 @@
         
         if(![masternode valueForKey:@"publicIP"] || [[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Shutting_Down) continue;
 
-        if ([[masternode valueForKey:@"dashcoreState"] integerValue] == DashcoreState_Checking) {
+        if ([[masternode valueForKey:@"dashcoreState"] integerValue] == DPDashcoreState_Checking) {
             [[DPMasternodeController sharedInstance] checkMasternode:masternode];
         }
-        else if ([[masternode valueForKey:@"dashcoreState"] integerValue] == DashcoreState_SettingUp) {
+        else if ([[masternode valueForKey:@"dashcoreState"] integerValue] == DPDashcoreState_SettingUp) {
             if([[masternode valueForKey:@"instanceState"] integerValue] == InstanceState_Terminated) return;
             [[SshConnection sharedInstance] sshInWithKeyPath:[[DPMasternodeController sharedInstance] sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                 if (success) {

@@ -19,7 +19,7 @@
 
 @implementation DPRepositoryController
 
--(void)addRepository:(NSString*)repositoryLocation forProject:(DPRepositoryProject)project forUser:(NSString*)user branchName:(NSString*)branchName isPrivate:(BOOL)isPrivate clb:(dashClb)clb {
+-(void)addRepository:(NSString*)repositoryLocation forProject:(DPRepositoryProject)project forUser:(NSString*)user branchName:(NSString*)branchName isPrivate:(BOOL)isPrivate clb:(dashMessageClb)clb {
     if (isPrivate) {
         [self addPrivateRepository:repositoryLocation forUser:user forProject:project branchName:branchName clb:clb];
     } else {
@@ -43,7 +43,7 @@
     
 }
 
--(void)addPrivateRepository:(NSString*)repositoryLocation forUser:(NSString*)user forProject:(DPRepositoryProject)project branchName:(NSString*)branchName clb:(dashClb)clb {
+-(void)addPrivateRepository:(NSString*)repositoryLocation forUser:(NSString*)user forProject:(DPRepositoryProject)project branchName:(NSString*)branchName clb:(dashMessageClb)clb {
     [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
         if (authenticated) {
             NSDictionary *repositoryDict =  [[DPLocalNodeController sharedInstance] runCurlCommandJSON:[NSString stringWithFormat:@"https://api.github.com/repos/%@/%@/git/refs/heads/%@ -u %@:%@", user, repositoryLocation, branchName, githubUsername, githubPassword] checkError:YES];
@@ -64,7 +64,7 @@
     
 }
 
--(void)updateBranchInfo:(Branch*)branch clb:(dashClb)clb {
+-(void)updateBranchInfo:(Branch*)branch clb:(dashMessageClb)clb {
     Repository * repository = branch.repository;
     NSUInteger isPrivate = repository.isPrivate;
     
@@ -108,7 +108,7 @@
     }
 }
 
-- (void)setAMIForRepository:(NSManagedObject*)repository clb:(dashClb)clb {
+- (void)setAMIForRepository:(NSManagedObject*)repository clb:(dashMessageClb)clb {
     NSString *amiID = [[DialogAlert sharedInstance] showAlertWithTextField:@"Set AMI for repository" message:@"Please fill in ami-id" placeHolder:@""];
     if([amiID length] == 0 || amiID == nil) return clb(NO, nil);
     

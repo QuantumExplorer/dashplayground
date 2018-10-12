@@ -8,15 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger,DashcoreState) {
-    DashcoreState_Initial = 0,
-    DashcoreState_Checking = 1,
-    DashcoreState_Installed = 2,
-    DashcoreState_Configured = 3,
-    DashcoreState_Running = 4,
-    DashcoreState_Error = 5,
-    DashcoreState_SettingUp = 6,
-    DashcoreState_Stopped = 7
+typedef NS_ENUM(NSUInteger,DPDashcoreState) {
+    DPDashcoreState_Initial = 0,
+    DPDashcoreState_Checking = 1 << 0,
+    DPDashcoreState_Installed = 1 << 1,
+    DPDashcoreState_Configured = 1 << 2,
+    DPDashcoreState_Running = 1 << 3,
+    DPDashcoreState_Error = 1 << 4,
+    DPDashcoreState_SettingUp = 1 << 5
 };
 
 @interface DashcoreStateTransformer : NSValueTransformer

@@ -1248,7 +1248,7 @@
                                         </tableView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" verticalHuggingPriority="750" doubleValue="0.97014925373134331" horizontal="YES" id="HZa-kj-gRf">
+                                <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="HZa-kj-gRf">
                                     <rect key="frame" x="1" y="216" width="886" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>

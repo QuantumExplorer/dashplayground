@@ -21,7 +21,6 @@
 #import "PreferenceData.h"
 #import <NMSSH/NMSSH.h>
 #import "SshConnection.h"
-#import "DPChainSelectionController.h"
 #import "Branch+CoreDataClass.h"
 #import "Masternode+CoreDataClass.h"
 #import "InsightStateTransformer.h"
@@ -36,8 +35,9 @@
 #define INSIGHT_PORT_STRING @"[INSIGHT_PORT]"
 #define EXTERNAL_IP_STRING @"[EXTERNAL_IP]"
 
-#define SPORK_ADDRESS @"[SPORK_ADDRESS]"
-#define SPORK_PRIVATE_KEY @"[SPORK_PRIVATE_KEY]"
+#define SPORK_ADDRESS_STRING @"[SPORK_ADDRESS]"
+#define SPORK_PRIVATE_KEY_STRING @"[SPORK_PRIVATE_KEY]"
+#define NETWORK_LINE @"[NETWORK_LINE]"
 
 #define SSHPATH @"sshPath"
 #define SSH_NAME_STRING @"SSH_NAME"
@@ -526,7 +526,7 @@
     }];
 }
 
-- (void)addNodeToLocal:(Masternode*)masternode clb:(dashClb)clb {
+- (void)addNodeToLocal:(Masternode*)masternode clb:(dashMessageClb)clb {
     
     NSString *port = @"19998";
     NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
@@ -539,7 +539,7 @@
     clb(YES, response);
 }
 
-- (void)addNodeToRemote:(Masternode*)masternode toPublicIP:(NSString*)publicIP clb:(dashClb)clb {
+- (void)addNodeToRemote:(Masternode*)masternode toPublicIP:(NSString*)publicIP clb:(dashMessageClb)clb {
     NSString *port = @"19998";
     NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
     if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
@@ -579,7 +579,7 @@
 }
 
 
-- (void)setUpMasternodeDashd:(Masternode*)masternode clb:(dashClb)clb
+- (void)setUpMasternodeDashd:(Masternode*)masternode clb:(dashMessageClb)clb
 {
     //    __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     //    __block NSString * repositoryPath = [masternode valueForKeyPath:@"branch.repository.url"];
@@ -655,7 +655,7 @@
     //        [ssh Disconnect];
     //
     //        dispatch_async(dispatch_get_main_queue(), ^{
-    //            if ([[masternode valueForKey:@"masternodeState"] integerValue] == DashcoreState_Initial) {
+    //            if ([[masternode valueForKey:@"masternodeState"] integerValue] == DPDashcoreState_Initial) {
     //                [masternode setValue:@(DashcoreState_Installed) forKey:@"masternodeState"];
     //            }
     //            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
@@ -695,7 +695,7 @@
             clb(YES,eventMsg,NO);
         });
         
-        NSString * key = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[NSString stringWithFormat:@"-%@ masternode genkey", [masternode valueForKey:@"chainNetwork"]] forChain:[masternode valueForKey:@"chainNetwork"]];
+        NSString * key = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[NSString stringWithFormat:@"-%@ masternode genkey", masternode.chainNetwork] forChain:masternode.chainNetwork];
         
         if ([key length] >= 51) {
             if([key length] > 51) key = [key substringToIndex:[key length] - 1];
@@ -710,26 +710,6 @@
         else {
             return clb(FALSE,@"Error generating masternode key",NO);
         }
-        
-        
-        //        [[DPLocalNodeController sharedInstance] startDash:^(BOOL success, NSString *message) {
-        //            if (!success) return clb(success,message);
-        //
-        //            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -%@ masternode genkey", [masternode valueForKey:@"chainNetwork"], [masternode valueForKey:@"instanceId"]];
-        //            clb(YES,eventMsg);
-        //
-        //            NSString * key = [[DPLocalNodeController sharedInstance] runDashRPCCommandString:[NSString stringWithFormat:@"-%@ masternode genkey", [masternode valueForKey:@"chainNetwork"]] forChain:[masternode valueForKey:@"chainNetwork"]];
-        //            if ([key length] >= 51) {
-        //                if([key length] > 51) key = [key substringToIndex:[key length] - 1];
-        //                [object setValue:key forKey:@"key"];
-        //                [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
-        //                [self setUpMasternodeConfiguration:object onChainName:chainName clb:clb];
-        //            }
-        //            else {
-        //                if (!success) return clb(FALSE,@"Error generating masternode key");
-        //            }
-        //        } forChain:[masternode valueForKey:@"chainNetwork"]];
-        //        return;
     }
     
     if (masternode.transactionId && masternode.transactionOutputIndex) {
@@ -739,13 +719,12 @@
             [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
                 if (success) {
                     [self configureRemoteMasternode:masternode clb:^(BOOL success, NSString *message) {
-                        if(success != YES) {
+                        if(!success) {
                             return clb(success,message,NO);
                         }
                         NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
-                        [[DPChainSelectionController sharedInstance] executeConfigurationMethod:masternode.chainNetwork onName:chainName onMasternode:masternode];
                         [masternode.managedObjectContext performBlockAndWait:^{
-                            masternode.dashcoreState = DashcoreState_Configured;
+                            masternode.dashcoreState |= DPDashcoreState_Configured;
                             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                         }];
                         
@@ -762,7 +741,7 @@
             clb(YES,eventMsg,NO);
         });
         
-        NSMutableArray * outputs = [[[DPLocalNodeController sharedInstance] outputs:[masternode valueForKey:@"chainNetwork"]] mutableCopy];
+        NSMutableArray * outputs = [[[DPLocalNodeController sharedInstance] outputs:masternode.chainNetwork] mutableCopy];
         
         if(outputs == nil || [outputs count] == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -786,15 +765,15 @@
                 [[DPDataStore sharedInstance] saveContext];
                 [[DPLocalNodeController sharedInstance] updateMasternodeConfigurationFileForMasternode:masternode clb:^(BOOL success, NSString *message) {
                     if (success) {
-                        [self configureRemoteMasternode:object clb:^(BOOL success, NSString *message) {
+                        [self configureRemoteMasternode:masternode clb:^(BOOL success, NSString *message) {
                             if(success != YES) {
                                 return clb(success,message,NO);
                             }
                             NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: configure masternode configuration file successfully. Please wait for updating dash.conf file...", [masternode valueForKey:@"instanceId"]];
-                            [[DPChainSelectionController sharedInstance] executeConfigurationMethod:masternode.chainNetwork onName:chainName onMasternode:masternode];
-                            
-                            [masternode setValue:@(DashcoreState_Configured) forKey:@"masternodeState"];
-                            [[DPDataStore sharedInstance] saveContext:object.managedObjectContext];
+                            [masternode.managedObjectContext performBlockAndWait:^{
+                                masternode.dashcoreState |= DPDashcoreState_Configured;
+                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                            }];
                             clb(YES,eventMsg,YES);
                         }];
                     }
@@ -807,78 +786,78 @@
     }
 }
 
--(void)startDashdOnRemote:(Masternode*)masternode onClb:(dashClb)clb {
+-(void)startDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb {
     
-    if(![masternode valueForKey:@"chainNetwork"]) {
+    if(!masternode.chainNetwork) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: please configure this instance before start it.", [masternode valueForKey:@"instanceId"]];
-            clb(NO, eventMsg);
+            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: please configure this instance before starting it.", [masternode valueForKey:@"instanceId"]];
+            messageClb(NO, eventMsg);
+            clb(NO,NO);
         });
         return;
     }
-    
-    //start dashd
-    __block NMSSHSession *ssh;
-    [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-        ssh = sshSession;
-        
-    }];
-    if(!ssh.authorized) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            clb(NO,@"Could not SSH in");
-        });
-        return;
-    }
-    
-    NSError *error = nil;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd...", [masternode valueForKey:@"instanceId"]];
-        clb(NO, eventMsg);
-    });
-    NSString *command;
-    NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
-    if ([chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
-        command = [NSString stringWithFormat:@"cd ~/src/dash/src; ./dashd -%@ -rpcport=12998 -port=12999", chainNetwork];
-    }
-    else {
-        command = [NSString stringWithFormat:@"cd ~/src; ./dashd"];
-    }
-    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            clb(NO, message);
-        });
-    }];
-    
-    if(error != nil) {
-        NSLog(@"%@",[error localizedDescription]);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], [error localizedDescription]];
-            clb(NO, eventMsg);
+    [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        if (!success || !sshSession.authorized) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                messageClb(NO,@"Could not SSH in");
+                clb(NO,NO);
+            });
             return;
-        });
-    }
-    else {
+        }
+        
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Dash Core server is starting...", [masternode valueForKey:@"instanceId"]];
-            clb(YES, eventMsg);
+            NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: running dashd...", [masternode valueForKey:@"instanceId"]];
+            messageClb(NO, eventMsg);
         });
-    }
+        NSString *command;
+        if ([masternode.chainNetwork rangeOfString:@"devnet"].location != NSNotFound) {
+            command = [NSString stringWithFormat:@"cd ~/src/dash/src; ./dashd -devnet=%@ -rpcport=12998 -port=12999", [masternode.chainNetwork stringByReplacingOccurrencesOfString:@"devnet-" withString:@""]];
+        }
+        else {
+            command = [NSString stringWithFormat:@"cd ~/src/dash/src; ./dashd"];
+        }
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError * error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                messageClb(NO, message);
+            });
+            if(error) {
+                NSLog(@"%@",[error localizedDescription]);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], [error localizedDescription]];
+                    messageClb(NO, eventMsg);
+                    return;
+                });
+            }
+            else {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    masternode.dashcoreState |= DPDashcoreState_Running;
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: Dash Core server is starting...", [masternode valueForKey:@"instanceId"]];
+                    messageClb(YES, eventMsg);
+                });
+            }
+        }];
+    }];
 }
 
--(void)stopDashdOnRemote:(Masternode*)masternode onClb:(dashClb)clb {
+-(void)stopDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb {
+    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ stop",masternode.instanceId, masternode.chainNetwork, masternode.publicIP, masternode.rpcPassword];
+    messageClb(NO, eventMsg);
     
-    NSString *chainNetwork = [masternode valueForKey:@"chainNetwork"];
-    NSString *publicIP = [masternode valueForKey:@"publicIP"];
-    NSString *rpcPassword = [masternode valueForKey:@"rpcPassword"];
-    
-    NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: -%@ -rpcconnect=%@ -rpcuser=dash -rpcpassword=%@ stop",[masternode valueForKey:@"instanceId"], chainNetwork, publicIP, rpcPassword];
-    clb(NO, eventMsg);
-    
-    [self sendRPCCommandString:@"stop" toMasternode:masternode clb:clb];
+    [self sendRPCCommandString:@"stop" toMasternode:masternode clb:^(BOOL success, NSString *message) {
+        if ([message hasPrefix:@"error: couldn't connect to server"] || [message hasPrefix:@"Dash Core server stopping"]) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dashcoreState &= ~DPDashcoreState_Running;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+        }
+    }];
     
 }
 
-- (void)setUpMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb {
+- (void)setUpMasternodeSentinel:(Masternode*)masternode clb:(dashMessageClb)clb {
     
     //    [masternode setValue:@(SentinelState_Checking) forKey:@"sentinelState"];
     //    [[DPDataStore sharedInstance] saveContext];
@@ -1041,7 +1020,7 @@
     //    });
 }
 
-- (void)checkMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb {
+- (void)checkMasternodeSentinel:(Masternode*)masternode clb:(dashMessageClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
             if(success == YES) {
@@ -1059,7 +1038,7 @@
     });
 }
 
-- (void)configureRemoteMasternode:(Masternode*)masternode clb:(dashClb)clb {
+- (void)configureRemoteMasternode:(Masternode*)masternode clb:(dashMessageClb)clb {
     
     [self createDashcoreConfigFileForMasternode:masternode clb:^(BOOL success, NSString *localFilePath) {
         if (!success) {
@@ -1084,7 +1063,7 @@
     
 }
 
--(void)uploadFileAtPath:(NSString*)localFilePath toRemotePath:(NSString*)remoteFilePath inSSHSession:(NMSSHSession*)sshSession clb:(dashClb)clb  {
+-(void)uploadFileAtPath:(NSString*)localFilePath toRemotePath:(NSString*)remoteFilePath inSSHSession:(NMSSHSession*)sshSession clb:(dashMessageClb)clb  {
     BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
     if (uploadSuccess != YES) {
         NSLog(@"%@",[[sshSession lastError] localizedDescription]);
@@ -1095,7 +1074,7 @@
     }
 }
 
-- (void)configureRemoteMasternodeSentinel:(Masternode*)masternode clb:(dashClb)clb {
+- (void)configureRemoteMasternodeSentinel:(Masternode*)masternode clb:(dashMessageClb)clb {
     
     [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:[masternode valueForKey:@"publicIP"] openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
         if(success == YES) {
@@ -1117,7 +1096,7 @@
 
 #pragma mark - Reseting Data
 
--(void)wipeDataOnRemote:(Masternode*)masternode onClb:(dashClb)clb {
+-(void)wipeDataOnRemote:(Masternode*)masternode onClb:(dashMessageClb)clb {
     if([masternode valueForKey:@"publicIP"] == nil) return;
     __block NSString * chainNetwork = [masternode valueForKey:@"chainNetwork"];
     if (!chainNetwork || [chainNetwork isEqualToString:@""]) return;
@@ -1181,10 +1160,10 @@
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
                     clb(FALSE,nil,eventMsg);
                 } else {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [masternode setValue:@(DashcoreState_Running) forKey:@"masternodeState"];
-                        [[DPDataStore sharedInstance] saveContext];
-                    });
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        masternode.dashcoreState = DPDashcoreState_Running;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
                     NSString *eventMsg = [NSString stringWithFormat:@"[instance-id: %@]: %@", [masternode valueForKey:@"instanceId"], errorMessage];
                     clb(TRUE,nil,eventMsg);
                 }
@@ -1465,7 +1444,7 @@
 }
 
 -(void)sendRPCCommand:(NSString*)command toMasternode:(Masternode*)masternode clb:(dashDataClb)clb {
-    return [self sendRPCCommand:command toPublicIP:[masternode valueForKey:@"publicIP"] rpcPassword:[masternode valueForKey:@"rpcPassword"] forChain:[masternode valueForKey:@"chainNetwork"] clb:clb];
+    return [self sendRPCCommand:command toPublicIP:masternode.publicIP rpcPassword:masternode.rpcPassword forChain:masternode.chainNetwork clb:clb];
 }
 
 -(void)sendRPCCommandJSONDictionary:(NSString*)command toPublicIP:(NSString*)publicIP rpcPassword:(NSString*)rpcPassword
@@ -1498,19 +1477,9 @@
     }];
 }
 
--(void)sendRPCCommandString:(NSString*)command toMasternode:(Masternode*)masternode clb:(dashClb)clb {
+-(void)sendRPCCommandString:(NSString*)command toMasternode:(Masternode*)masternode clb:(dashMessageClb)clb {
     [self sendRPCCommand:command toMasternode:masternode clb:^(BOOL success, NSString *message, NSData *data) {
-        if (!success) {
-            clb(NO,message);
-            return;
-        }
-        NSError * error = nil;
-        NSDictionary * dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        if (!error && dictionary) {
-            clb(YES,[NSString stringWithFormat:@"%@",dictionary]);
-        } else {
-            clb(NO,[error localizedDescription]);
-        }
+        clb(success,message);
     }];
 }
 
@@ -1747,7 +1716,7 @@
     return TRUE;
 }
 
--(void)checkMasternodeChainNetwork:(Masternode*)masternode clb:(dashClb)clb {
+-(void)checkMasternodeChainNetwork:(Masternode*)masternode clb:(dashMessageClb)clb {
     
     if([masternode valueForKey:@"publicIP"] == nil) return;
     
@@ -1791,10 +1760,10 @@
                         {
                             NSArray *netArray = [line componentsSeparatedByString:@"="];
                             if([netArray count] == 2) {
-                                chainString = [NSString stringWithFormat:@"devnet=%@",[netArray objectAtIndex:1]];
+                                chainString = [NSString stringWithFormat:@"devnet-%@",[netArray objectAtIndex:1]];
                             }
                             else {
-                                chainString = @"devnet=none";
+                                chainString = @"devnet-none";
                             }
                             break;
                         }
@@ -1825,7 +1794,7 @@
     }];
 }
 
--(void)checkMasternodeIsProperlyInstalled:(Masternode*)masternode onSSH:(NMSSHSession*)ssh dashClb:(dashClb)clb {
+-(void)checkMasternodeIsProperlyInstalled:(Masternode*)masternode onSSH:(NMSSHSession*)ssh dashClb:(dashMessageClb)clb {
     __block NSString * publicIP = [masternode valueForKey:@"publicIP"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
@@ -1884,18 +1853,16 @@
             }
         }
         
-        if(checkResult == YES) {
-            [masternode setValue:@(DashcoreState_Installed) forKey:@"masternodeState"];
+        
+        [masternode.managedObjectContext performBlockAndWait:^{
+            masternode.dashcoreState = checkResult?DPDashcoreState_Installed:DPDashcoreState_SettingUp;
             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-        }
-        else {
-            [masternode setValue:@(DashcoreState_SettingUp) forKey:@"masternodeState"];
-            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-        }
+        }];
+        
     });
 }
 
--(void)updateMasternodeAttributes:(Masternode*)masternode clb:(dashClb)clb {
+-(void)updateMasternodeAttributes:(Masternode*)masternode clb:(dashMessageClb)clb {
     __block NSString *publicIP = masternode.publicIP;
     __block NSString *rpcPassword = masternode.rpcPassword;
     __block NSString *chainNetwork = masternode.chainNetwork;
@@ -2022,7 +1989,7 @@
     [self checkMasternodeChainNetwork:masternode clb:^(BOOL success, NSString *message) {
         if (success) {
             [self checkMasternode:masternode saveContext:TRUE clb:^(BOOL success, NSString *message) {
-                if (success && masternode.dashcoreState == DashcoreState_Running) {
+                if (success && masternode.dashcoreState == DPDashcoreState_Running) {
                     [self updateMasternodeAttributes:masternode clb:^(BOOL success, NSString *message) {
                         
                     }];
@@ -2033,7 +2000,7 @@
     
 }
 
--(void)checkMasternode:(Masternode*)masternode saveContext:(BOOL)saveContext clb:(dashClb)clb {
+-(void)checkMasternode:(Masternode*)masternode saveContext:(BOOL)saveContext clb:(dashMessageClb)clb {
     //we are going to check if a masternode is running, configured, etc...
     //first let's check to see if we have access to rpc
     __block NSString * rpcPassword = masternode.rpcPassword;
@@ -2043,7 +2010,7 @@
             [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                 if (dictionary) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        masternode.dashcoreState = DashcoreState_Running;
+                        masternode.dashcoreState = DPDashcoreState_Running;
                         masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                         
@@ -2055,7 +2022,7 @@
                             NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
                             if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
                                 [masternode setValuesForKeysWithDictionary:dictionary];
-                                masternode.dashcoreState = DashcoreState_Configured;
+                                masternode.dashcoreState = DPDashcoreState_Configured;
                                 if ([masternode hasChanges]) {
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
@@ -2063,8 +2030,8 @@
                                     clb(success,errorMessage);
                                 }];
                             } else {
-                                if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Installed) {
-                                    masternode.dashcoreState = DashcoreState_Installed;
+                                if (masternode.dashcoreState != DPDashcoreState_Installed) {
+                                    masternode.dashcoreState = DPDashcoreState_Installed;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 }
                                 [self updateGitInfoForMasternode:masternode forProject:DPRepositoryProject_Dapi clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
@@ -2072,8 +2039,8 @@
                                 }];
                             }
                         } else {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Initial) {
-                                masternode.dashcoreState = DashcoreState_Initial;
+                            if (masternode.dashcoreState != DPDashcoreState_Initial) {
+                                masternode.dashcoreState = DPDashcoreState_Initial;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 clb(TRUE,nil);
                             }
@@ -2094,16 +2061,16 @@
                     //the masternode has never been configured
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                         if (value) {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Installed) {
-                                masternode.dashcoreState = DashcoreState_Installed;
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DPDashcoreState_Installed) {
+                                masternode.dashcoreState = DPDashcoreState_Installed;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                             }
                             [self updateGitInfoForMasternode:masternode forProject:DPRepositoryProject_Dapi clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
                                 clb(success,errorMessage);
                             }];
                         } else {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Initial) {
-                                masternode.dashcoreState = DashcoreState_Initial;
+                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DPDashcoreState_Initial) {
+                                masternode.dashcoreState = DPDashcoreState_Initial;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 clb(TRUE,nil);
                             }
@@ -2115,7 +2082,7 @@
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     [self getInfo:masternode clb:^(BOOL success, NSDictionary *dictionary, NSString *errorMessage) {
                         if (dictionary) {
-                            masternode.dashcoreState = DashcoreState_Running;
+                            masternode.dashcoreState = DPDashcoreState_Running;
                             masternode.lastKnownHeight = [dictionary[@"blocks"] longLongValue];
                             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                             [self updateGitInfoForMasternode:masternode forProject:DPRepositoryProject_Dapi clb:^(BOOL success, NSDictionary *object, NSString *errorMessage) {
@@ -2127,9 +2094,9 @@
                                     NSDictionary * dictionary = [[DPLocalNodeController sharedInstance] masternodeInfoInMasternodeConfigurationFileForMasternode:masternode];
                                     if (dictionary && [dictionary[@"publicIP"] isEqualToString:[masternode valueForKey:@"publicIP"]]) {
                                         [masternode setValuesForKeysWithDictionary:dictionary];
-                                        masternode.dashcoreState = DashcoreState_Configured;
+                                        masternode.dashcoreState = DPDashcoreState_Configured;
                                     } else {
-                                        masternode.dashcoreState = DashcoreState_Installed;
+                                        masternode.dashcoreState = DPDashcoreState_Installed;
                                     }
                                     if ([masternode hasChanges]) {
                                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
@@ -2138,8 +2105,8 @@
                                         clb(success,errorMessage);
                                     }];
                                 } else {
-                                    if ([[masternode valueForKey:@"masternodeState"] integerValue] != DashcoreState_Initial) {
-                                        masternode.dashcoreState = DashcoreState_Initial;
+                                    if ([[masternode valueForKey:@"masternodeState"] integerValue] != DPDashcoreState_Initial) {
+                                        masternode.dashcoreState = DPDashcoreState_Initial;
                                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                         clb(YES,nil);
                                     }
@@ -2183,11 +2150,11 @@
     return @[@"npm"];
 }
 
--(void)checkRequiredPackagesAreInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb {
+-(void)checkRequiredPackagesAreInstalledOnMasternode:(Masternode*)masternode withClb:(dashActionClb)clb {
     [self checkPackages:[self requiredPackages] areInstalledOnMasternode:masternode withClb:clb];
 }
 
--(void)checkPackages:(NSArray*)packages areInstalledOnMasternode:(Masternode*)masternode withClb:(dashInstalledClb)clb {
+-(void)checkPackages:(NSArray*)packages areInstalledOnMasternode:(Masternode*)masternode withClb:(dashActionClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         [[SshConnection sharedInstance] sshInWithKeyPath:[self sshPath] masternodeIp:masternode.publicIP openShell:NO clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
             if (success && sshSession.isAuthorized) {
@@ -2208,11 +2175,11 @@
     });
 }
 
--(void)checkRequiredPackagesAreInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb {
+-(void)checkRequiredPackagesAreInstalledInSession:(NMSSHSession*)sshSession withClb:(dashActionClb)clb {
     [self checkPackages:[self requiredPackages] areInstalledInSession:sshSession withClb:clb];
 }
 
--(void)checkPackages:(NSArray*)packages areInstalledInSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb {
+-(void)checkPackages:(NSArray*)packages areInstalledInSession:(NMSSHSession*)sshSession withClb:(dashActionClb)clb {
     
     NSError * error = nil;
     NSString * command = [NSString stringWithFormat:@"sudo apt-get update; sudo apt-get install -y %@",[packages componentsJoinedByString:@" "]];
@@ -2240,7 +2207,7 @@
     return @[@"curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash; export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";nvm install 8;nvm alias default 8"];
 }
 
--(void)installDependenciesForMasternode:(Masternode*)masternode inSession:(NMSSHSession*)sshSession withClb:(dashInstalledClb)clb {
+-(void)installDependenciesForMasternode:(Masternode*)masternode inSession:(NMSSHSession*)sshSession withClb:(dashActionClb)clb {
     __block NSString * command;
     [masternode.managedObjectContext performBlockAndWait:^{
         command = [self dependencyStringForMasternode:masternode];
@@ -2259,7 +2226,7 @@
     }
 }
 
--(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh  dashClb:(dashClb)clb {
+-(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh  dashClb:(dashMessageClb)clb {
     
     __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@;cd %@;git checkout %@;git pull %@ %@",repositoryPath, directory,directory,branchName,repositoryPath,branchName];
     
@@ -2279,7 +2246,11 @@
 
 #pragma mark - Insight
 
-- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb {
+
+
+#pragma mark - Insight
+
+- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashMessageClb)clb {
     if (!(masternode.insightState & DPInsightState_Cloned)) {
         dispatch_async(dispatch_get_main_queue(), ^{
             clb(NO,@"Error: Insight needs to be cloned first");
@@ -2315,7 +2286,7 @@
                                              }];
 }
 
-- (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+- (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashMessageClb)clb {
     if (!(masternode.insightState & DPInsightState_Configured)) {
         clb(NO,@"Error: Insight needs to be configured first");
         return;
@@ -2333,7 +2304,7 @@
 }
 
 
-- (void)installInsightOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session clb:(dashClb)clb {
+- (void)installInsightOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session clb:(dashMessageClb)clb {
     __block BOOL shouldBreak = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
         if (!(masternode.insightState & DPInsightState_Configured)) {
@@ -2349,7 +2320,7 @@
     }];
     if (shouldBreak) return;
     
-    NSString * command = @"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\"; cd ~/src/dashcore-node; npm i; ./bin/dashcore-node install https://github.com/dashevo/insight-api/; pm2 start bin/dashcore-node -- start; pm2 save";
+    NSString * command = @"cat /home/ubuntu/src/dashcore-node/dashcore-node.json";
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2366,7 +2337,7 @@
     }];
 }
 
--(void)checkInsightIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+-(void)checkInsightIsConfiguredOnMasternode:(Masternode*)masternode clb:(dashMessageClb)clb {
     [self createBackgroundSSHSessionOnMasternode:masternode
                                              clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                                                  
@@ -2375,18 +2346,99 @@
                                                          clb(NO,@"Error: Could not create SSH tunnel.");
                                                      });
                                                  }
-                                                 [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                 [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession clb:clb];
                                              }];
 }
 
-- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashClb)clb {
+- (void)checkInsightIsConfiguredOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashMessageClb)clb {
+    
+    NSString * command = @"cat /home/ubuntu/src/dashcore-node/dashcore-node.json";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO, message);
+            });
+            return;
+        }
+        NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *jsonError = nil;
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
+        if (!dictionary) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(NO, message);
+            });
+            return;
+        }
+        dictionary = dictionary[@"servicesConfig"];
+        dictionary = dictionary[@"dashd"];
+        dictionary = dictionary[@"connect"][0];
+        NSString * rpcPasswordInConfigFile = dictionary[@"rpcpassword"];
+        __block NSString * masternodeRpcPassword;
+        [masternode.managedObjectContext performBlockAndWait:^{
+            masternodeRpcPassword = masternode.rpcPassword;
+        }];
+        if ([rpcPasswordInConfigFile isEqualToString:masternodeRpcPassword]) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.insightState |= DPInsightState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(YES, message);
+            });
+        } else {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.insightState &= ~DPInsightState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                clb(YES, @"Error: rpc password of insight configuration does not match");
+            });
+        }
+        
+    }];
+}
+
+-(void)checkInsightIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActiveClb)clb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession clb:messageClb];
+                                             }];
+}
+
+- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashMessageClb)clb {
     __block BOOL needConfigurationCheck = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
         if (!(masternode.insightState & DPInsightState_Configured)) {
             needConfigurationCheck = YES;
         }
     }];
-    if (needConfigurationCheck) return;
+    if (needConfigurationCheck) {
+        [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession clb:^(BOOL success, NSString *message) {
+            if (success) {
+                needConfigurationCheck = NO;
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    if (!(masternode.insightState & DPInsightState_Configured)) {
+                        needConfigurationCheck = YES;
+                    }
+                }];
+                if (!needConfigurationCheck) {
+                    [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                } else {
+                    clb(success,message);
+                }
+            } else {
+                clb(success,message);
+            }
+        }];
+        return;
+    }
     
     NSString * command = @"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";pm2 jlist";
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
@@ -2431,45 +2483,45 @@
 
 #pragma mark - Dapi
 
-- (void)configureDapiOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashClb)clb {
+- (void)configureDapiOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb  {
     if (!(masternode.dapiState & DPDapiState_Cloned)) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            clb(NO,@"Error: Dapi needs to be cloned first");
+            completionClb(NO,NO);
+            messageClb(NO,@"Error: Dapi needs to be cloned first");
         });
         return;
     }
     if (!forceUpdate && (masternode.dapiState & DPDapiState_Configured)) {
-        [self installDapiOnMasternode:masternode clb:clb];
+        [self installDapiOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
         return; //we are already configured
     }
-    [self createBackgroundSSHSessionOnMasternode:masternode
-                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
-                                                 
-                                                 if(success == YES) {
-                                                     NSString *localFilePath = [self createDapiEnvFileForMasternode:masternode];
-                                                     NSString *remoteFilePath = @"/home/ubuntu/src/dapi/.env";
-                                                     
-                                                     BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
-                                                     if (uploadSuccess != YES) {
-                                                         NSLog(@"%@",[[sshSession lastError] localizedDescription]);
-                                                         dispatch_async(dispatch_get_main_queue(), ^{
-                                                             clb(NO, [[sshSession lastError] localizedDescription]);
-                                                         });
-                                                     }
-                                                     else {
-                                                         [masternode.managedObjectContext performBlockAndWait:^{
-                                                             masternode.dapiState |= DPDapiState_Configured;
-                                                             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                                                         }];
-                                                         [self installDapiOnMasternode:masternode inSSHSession:sshSession clb:clb];
-                                                     }
-                                                 }
-                                             }];
+    [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        if(success == YES) {
+            NSString *localFilePath = [self createDapiEnvFileForMasternode:masternode];
+            NSString *remoteFilePath = @"/home/ubuntu/src/dapi/.env";
+            
+            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+            if (uploadSuccess != YES) {
+                NSLog(@"%@",[[sshSession lastError] localizedDescription]);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    messageClb(NO, @"Error: Error uploading dapi environment variables");
+                });
+            }
+            else {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    masternode.dapiState |= DPDapiState_Configured;
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+                [self installDapiOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+            }
+        }
+    }];
 }
 
-- (void)installDapiOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+- (void)installDapiOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     if (!(masternode.dapiState & DPDapiState_Configured)) {
-        clb(NO,@"Error: Dapi needs to be configured first");
+        completionClb(NO,NO);
+        messageClb(NO,@"Error: Dapi needs to be configured first");
         return;
     }
     [self createBackgroundSSHSessionOnMasternode:masternode
@@ -2477,23 +2529,23 @@
                                                  
                                                  if(!success) {
                                                      dispatch_async(dispatch_get_main_queue(), ^{
-                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
                                                      });
                                                  }
-                                                 [self installDapiOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                 [self installDapiOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
                                              }];
 }
 
 
-- (void)installDapiOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session clb:(dashClb)clb {
+- (void)installDapiOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     __block BOOL shouldBreak = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
         if (!(masternode.dapiState & DPDapiState_Configured)) {
             if ([NSThread isMainThread]) {
-                clb(NO,@"Error: Dapi needs to be configured first");
+                messageClb(NO,@"Error: Dapi needs to be configured first");
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    clb(NO,@"Error: Dapi needs to be configured first");
+                    messageClb(NO,@"Error: Dapi needs to be configured first");
                 });
             }
             shouldBreak = TRUE;
@@ -2502,7 +2554,7 @@
     if (shouldBreak) return;
     [[DPAuthenticationManager sharedInstance] authenticateNPMWithClb:^(BOOL authenticated, NSString *npmToken) {
         if (!authenticated || !npmToken || [npmToken isEqualToString:@""]) {
-            clb(NO,@"Error: Dapi needs a npm token");
+            messageClb(NO,@"Error: Dapi needs a npm token");
         } else {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
                 
@@ -2510,7 +2562,7 @@
                 [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
                     if(!success) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            clb(NO, message);
+                            messageClb(NO, message);
                         });
                         return;
                     }
@@ -2519,7 +2571,7 @@
                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     }];
                     //At this point lets send a query to check if it's running
-                    [self checkDapiIsRunningOnMasternode:masternode inSSHSession:session clb:clb];
+                    [self checkDapiIsRunningOnMasternode:masternode inSSHSession:session completionClb:completionClb messageClb:messageClb];
                 }];
             });
         }
@@ -2527,33 +2579,113 @@
     
 }
 
--(void)checkDapiIsRunningOnMasternode:(Masternode*)masternode clb:(dashClb)clb {
+
+-(void)checkDapiIsConfiguredOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     [self createBackgroundSSHSessionOnMasternode:masternode
                                              clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                                                  
                                                  if(!success) {
                                                      dispatch_async(dispatch_get_main_queue(), ^{
-                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                         completionClb(NO,NO);
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
                                                      });
+                                                     return;
                                                  }
-                                                 [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                 [self checkDapiIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
                                              }];
 }
 
-- (void)checkDapiIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashClb)clb {
+- (void)checkDapiIsConfiguredOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    
+    NSString * command = @"cat /home/ubuntu/src/dapi/.env";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(NO,NO);
+                messageClb(NO, message);
+            });
+            return;
+        }
+        NSArray * info = [message componentsSeparatedByString:@"\n"];
+        NSString * rpcPasswordInConfigFile = nil;
+        for (NSString * infoString in info) {
+            if ([infoString containsString:@"DASHCORE_RPC_PASS"]) {
+                rpcPasswordInConfigFile = [[infoString componentsSeparatedByString:@"="][1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            }
+        }
+        __block NSString * masternodeRpcPassword;
+        [masternode.managedObjectContext performBlockAndWait:^{
+            masternodeRpcPassword = masternode.rpcPassword;
+        }];
+        if ([rpcPasswordInConfigFile isEqualToString:masternodeRpcPassword]) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dapiState |= DPDapiState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(YES, message);
+            });
+        } else {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dapiState &= ~DPDapiState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,NO);
+                messageClb(YES, @"Error: rpc password of dapi configuration does not match");
+            });
+        }
+        
+    }];
+}
+
+
+-(void)checkDapiIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         completionClb(NO,NO);
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                     return;
+                                                 }
+                                                 [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+- (void)checkDapiIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     __block BOOL needConfigurationCheck = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
         if (!(masternode.dapiState & DPDapiState_Configured)) {
             needConfigurationCheck = YES;
         }
     }];
-    if (needConfigurationCheck) return;
+    if (needConfigurationCheck) {
+        messageClb(NO,[NSString stringWithFormat:@"Info: Could not tell if DAPI is configured on %@, checking now.",sshSession.host]);
+        [self checkDapiIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL configured) {
+            if (success) {
+                if (configured) {
+                    [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                } else {
+                    completionClb(YES,NO);
+                }
+            } else {
+                completionClb(NO,NO);
+            }
+        } messageClb:messageClb];
+        return;
+    }
     
     NSString * command = @"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";pm2 jlist";
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO, message);
+                completionClb(NO,NO);
+                messageClb(NO, message);
             });
             return;
         }
@@ -2571,7 +2703,8 @@
                     }];
                     //At this point lets send a query to check if it's running
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(YES, message);
+                        completionClb(YES,YES);
+                        messageClb(YES, message);
                     });
                     found = TRUE;
                 }
@@ -2584,13 +2717,387 @@
             }];
             //At this point lets send a query to check if it's running
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(YES, message);
+                completionClb(YES,NO);
+                messageClb(YES, message);
+            });
+        }
+    }];
+}
+
+#pragma mark - Dash Drive
+
+- (void)configureDriveOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb  {
+    if (!(masternode.dapiState & DPDriveState_Cloned)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionClb(NO,NO);
+            messageClb(NO,@"Error: Drive needs to be cloned first");
+        });
+        return;
+    }
+    if (!forceUpdate && (masternode.dapiState & DPDriveState_Configured)) {
+        [self installDriveOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
+        return; //we are already configured
+    }
+    [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        if(success == YES) {
+            NSString *localFilePath = [self createDriveEnvFileForMasternode:masternode];
+            NSString *remoteFilePath = @"/home/ubuntu/src/dapi/.env";
+            
+            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+            if (uploadSuccess != YES) {
+                NSLog(@"%@",[[sshSession lastError] localizedDescription]);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    messageClb(NO, @"Error: Error uploading dapi environment variables");
+                });
+            }
+            else {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    masternode.dapiState |= DPDriveState_Configured;
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+                [self installDriveOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+            }
+        }
+    }];
+}
+
+- (void)installDriveOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    if (!(masternode.dapiState & DPDriveState_Configured)) {
+        completionClb(NO,NO);
+        messageClb(NO,@"Error: Drive needs to be configured first");
+        return;
+    }
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self installDriveOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+
+- (void)installDriveOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    __block BOOL shouldBreak = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.dapiState & DPDriveState_Configured)) {
+            if ([NSThread isMainThread]) {
+                messageClb(NO,@"Error: Drive needs to be configured first");
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    messageClb(NO,@"Error: Drive needs to be configured first");
+                });
+            }
+            shouldBreak = TRUE;
+        }
+    }];
+    if (shouldBreak) return;
+    [[DPAuthenticationManager sharedInstance] authenticateNPMWithClb:^(BOOL authenticated, NSString *npmToken) {
+        if (!authenticated || !npmToken || [npmToken isEqualToString:@""]) {
+            messageClb(NO,@"Error: Drive needs a npm token");
+        } else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+                
+                NSString * command = [NSString stringWithFormat:@"export NPM_TOKEN=\"%@\";export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\"; cd ~/src/dapi;echo \"//registry.npmjs.org/:_authToken=\\${NPM_TOKEN}\" > .npmrc; . ./.env; npm i; pm2 start index.js --name \"dapi\"; pm2 save",npmToken];
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+                    if(!success) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            messageClb(NO, message);
+                        });
+                        return;
+                    }
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        masternode.dapiState |= DPDriveState_Installed;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
+                    //At this point lets send a query to check if it's running
+                    [self checkDriveIsRunningOnMasternode:masternode inSSHSession:session completionClb:completionClb messageClb:messageClb];
+                }];
+            });
+        }
+    }];
+    
+}
+
+
+-(void)checkDriveIsConfiguredOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         completionClb(NO,NO);
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                     return;
+                                                 }
+                                                 [self checkDriveIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+- (void)checkDriveIsConfiguredOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    
+    NSString * command = @"cat /home/ubuntu/src/dapi/.env";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(NO,NO);
+                messageClb(NO, message);
+            });
+            return;
+        }
+        NSArray * info = [message componentsSeparatedByString:@"\n"];
+        NSString * rpcPasswordInConfigFile = nil;
+        for (NSString * infoString in info) {
+            if ([infoString containsString:@"DASHCORE_RPC_PASS"]) {
+                rpcPasswordInConfigFile = [[infoString componentsSeparatedByString:@"="][1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            }
+        }
+        __block NSString * masternodeRpcPassword;
+        [masternode.managedObjectContext performBlockAndWait:^{
+            masternodeRpcPassword = masternode.rpcPassword;
+        }];
+        if ([rpcPasswordInConfigFile isEqualToString:masternodeRpcPassword]) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dapiState |= DPDriveState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(YES, message);
+            });
+        } else {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dapiState &= ~DPDriveState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,NO);
+                messageClb(YES, @"Error: rpc password of dapi configuration does not match");
+            });
+        }
+        
+    }];
+}
+
+
+-(void)checkDriveIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         completionClb(NO,NO);
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                     return;
+                                                 }
+                                                 [self checkDriveIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+- (void)checkDriveIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    __block BOOL needConfigurationCheck = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.dapiState & DPDriveState_Configured)) {
+            needConfigurationCheck = YES;
+        }
+    }];
+    if (needConfigurationCheck) {
+        messageClb(NO,[NSString stringWithFormat:@"Info: Could not tell if DAPI is configured on %@, checking now.",sshSession.host]);
+        [self checkDriveIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL configured) {
+            if (success) {
+                if (configured) {
+                    [self checkDriveIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                } else {
+                    completionClb(YES,NO);
+                }
+            } else {
+                completionClb(NO,NO);
+            }
+        } messageClb:messageClb];
+        return;
+    }
+    
+    NSString * command = @"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";pm2 jlist";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(NO,NO);
+                messageClb(NO, message);
+            });
+            return;
+        }
+        NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *jsonError = nil;
+        NSArray *pm2InfoArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
+        BOOL found = NO;
+        for (NSDictionary * pm2InfoDictionary in pm2InfoArray) {
+            if ([pm2InfoDictionary[@"name"] isEqualToString:@"dapi"]) {
+                NSDictionary * pm2Environment = pm2InfoDictionary[@"pm2_env"];
+                if ([pm2Environment[@"status"] isEqualToString:@"online"]) {
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        masternode.dapiState |= DPDriveState_Running;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
+                    //At this point lets send a query to check if it's running
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        completionClb(YES,YES);
+                        messageClb(YES, message);
+                    });
+                    found = TRUE;
+                }
+            }
+        }
+        if (!found) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dapiState &= ~DPDriveState_Running;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,NO);
+                messageClb(YES, message);
             });
         }
     }];
 }
 
 #pragma mark - Sentinel Checks
+
+
+#pragma mark - Configuration File Creations
+
+-(void)createDashcoreConfigFileForMasternode:(Masternode*)masternode clb:(dashMessageClb)clb {
+    if (!masternode.rpcPassword) {
+        masternode.rpcPassword = [self randomPassword:15];
+        [[DPDataStore sharedInstance] saveContext];
+    }
+    [[DPAuthenticationManager sharedInstance] authenticateSporkWithClb:^(BOOL authenticated, NSString *address, NSString *privateKey) {
+        if (!authenticated) {
+            clb(NO,nil);
+            return;
+        }
+        // First we need to make a proper configuration file
+        NSString *configFilePath = [[NSBundle mainBundle] pathForResource: @"dash" ofType: @"conf"];
+        NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:MASTERNODE_PRIVATE_KEY_STRING withString:masternode.key];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:EXTERNAL_IP_STRING withString:masternode.publicIP];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:masternode.rpcPassword];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:SPORK_ADDRESS_STRING withString:address];
+        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:SPORK_PRIVATE_KEY_STRING withString:privateKey];
+        if ([masternode.chainNetwork hasPrefix:@"devnet"]) {
+            configFileContents = [configFileContents stringByReplacingOccurrencesOfString:NETWORK_LINE withString:[NSString stringWithFormat:@"devnet=%@",[masternode.chainNetwork stringByReplacingOccurrencesOfString:@"devnet-" withString:@""]]];
+        } else {
+            configFileContents = [configFileContents stringByReplacingOccurrencesOfString:NETWORK_LINE withString:@"testnet=1"];
+        }
+        
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *cachesDirectory = [paths objectAtIndex:0];
+        
+        //make a file name to write the data to using the documents directory:
+        NSString *fileName = [NSString stringWithFormat:@"%@/dash.conf",
+                              cachesDirectory];
+        //create content - four lines of text
+        NSString *content = configFileContents;
+        //save content to the documents directory
+        [content writeToFile:fileName
+                  atomically:NO
+                    encoding:NSStringEncodingConversionAllowLossy
+                       error:nil];
+        clb(YES,fileName);
+    }];
+    
+}
+
+-(NSString*)createDapiEnvFileForMasternode:(Masternode*)masternode {
+    if (!masternode.rpcPassword) {
+        masternode.rpcPassword = [self randomPassword:15];
+        [[DPDataStore sharedInstance] saveContext];
+    }
+    // First we need to make a proper configuration file
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"dapi" ofType:@"env"];
+    NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[NSString stringWithFormat:@"\"%@\"",masternode.rpcPassword]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachesDirectory = [paths objectAtIndex:0];
+    
+    //make a file name to write the data to using the documents directory:
+    NSString *fileName = [NSString stringWithFormat:@"%@/dapi.env",
+                          cachesDirectory];
+    //create content - four lines of text
+    NSString *content = configFileContents;
+    //save content to the documents directory
+    [content writeToFile:fileName
+              atomically:NO
+                encoding:NSStringEncodingConversionAllowLossy
+                   error:nil];
+    
+    return fileName;
+}
+
+-(NSString*)createInsightConfigFileForMasternode:(Masternode*)masternode {
+    if (!masternode.rpcPassword) {
+        masternode.rpcPassword = [self randomPassword:15];
+        [[DPDataStore sharedInstance] saveContext];
+    }
+    // First we need to make a proper configuration file
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"dashcore-node" ofType:@"json"];
+    NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[NSString stringWithFormat:@"\"%@\"",masternode.rpcPassword]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:INSIGHT_PORT_STRING withString:@"3001"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachesDirectory = [paths objectAtIndex:0];
+    
+    //make a file name to write the data to using the documents directory:
+    NSString *fileName = [NSString stringWithFormat:@"%@/dashcore-node.json",
+                          cachesDirectory];
+    //create content - four lines of text
+    NSString *content = configFileContents;
+    //save content to the documents directory
+    [content writeToFile:fileName
+              atomically:NO
+                encoding:NSStringEncodingConversionAllowLossy
+                   error:nil];
+    
+    return fileName;
+}
+
+-(NSString*)createSentinelConfFileForMasternode:(Masternode*)masternode {
+    
+    NSString *chainNetwork = @"network=mainnet\n";
+    if ([[masternode valueForKey:@"chainNetwork"] rangeOfString:@"testnet"].location != NSNotFound
+        || [[masternode valueForKey:@"chainNetwork"] rangeOfString:@"devnet"].location != NSNotFound) {
+        chainNetwork = @"network=testnet\n";
+    }
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    //make a file name to write the data to using the documents directory:
+    NSString *fileName = [NSString stringWithFormat:@"%@/sentinel.conf",
+                          documentsDirectory];
+    //create content - four lines of text
+    NSString *content = [NSString stringWithFormat:@"# specify path to dash.conf or leave blankult=mainnet)\n# default is the same as DashCore\n#dash_conf=/home/evan82/.dashcore/dash.conf\n\n# valid options are mainnet, testnet (default=mainnet)\n%@\n# database connection details\ndb_name=database/sentinel.db\ndb_driver=sqlite\n", chainNetwork];
+    //save content to the documents directory
+    [content writeToFile:fileName
+              atomically:NO
+                encoding:NSStringEncodingConversionAllowLossy
+                   error:nil];
+    
+    return fileName;
+}
 
 
 #pragma mark - AWS Core
@@ -2771,7 +3278,7 @@
             for (NSDictionary * dictionary in output[@"Instances"]) {
                 NSDictionary * rDict = [NSMutableDictionary dictionary];
                 [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-                [rDict setValue:@(DashcoreState_Initial)  forKey:@"masternodeState"];
+                [rDict setValue:@(DPDashcoreState_Initial)  forKey:@"masternodeState"];
                 [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
                 [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
             }
@@ -2988,7 +3495,7 @@
             for (NSDictionary * dictionary in output[@"Instances"]) {
                 NSDictionary * rDict = [NSMutableDictionary dictionary];
                 [rDict setValue:[dictionary valueForKey:@"InstanceId"] forKey:@"instanceId"];
-                [rDict setValue:@(DashcoreState_Initial)  forKey:@"masternodeState"];
+                [rDict setValue:@(DPDashcoreState_Initial)  forKey:@"masternodeState"];
                 [rDict setValue:@([self stateForStateName:[dictionary valueForKeyPath:@"State.Name"]]) forKey:@"instanceState"];
                 [instances setObject:rDict forKey:[dictionary valueForKey:@"InstanceId"]];
             }
@@ -3088,7 +3595,7 @@
 
 
 
-- (void)getInstancesClb:(dashClb)clb {
+- (void)getInstancesClb:(dashMessageClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
         NSDictionary *output = [self runAWSCommandJSON:[NSString stringWithFormat:@"ec2 describe-instances --filter Name=key-name,Values=%@",
@@ -3134,126 +3641,8 @@
     return s;
 }
 
--(void)createDashcoreConfigFileForMasternode:(Masternode*)masternode clb:(dashClb)clb {
-    if (!masternode.rpcPassword) {
-        masternode.rpcPassword = [self randomPassword:15];
-        [[DPDataStore sharedInstance] saveContext];
-    }
-    [[DPAuthenticationManager sharedInstance] authenticateSporkWithClb:^(BOOL authenticated, NSString *address, NSString *privateKey) {
-        if (!authenticated) {
-            clb(NO,nil);
-            return;
-        }
-        // First we need to make a proper configuration file
-        NSString *configFilePath = [[NSBundle mainBundle] pathForResource: @"dash" ofType: @"conf"];
-        NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
-        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:MASTERNODE_PRIVATE_KEY_STRING withString:masternode.key];
-        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:EXTERNAL_IP_STRING withString:masternode.publicIP];
-        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:masternode.rpcPassword];
-        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
-        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:SPORK_ADDRESS withString:address];
-        configFileContents = [configFileContents stringByReplacingOccurrencesOfString:SPORK_PRIVATE_KEY withString:privateKey];
-        
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *cachesDirectory = [paths objectAtIndex:0];
-        
-        //make a file name to write the data to using the documents directory:
-        NSString *fileName = [NSString stringWithFormat:@"%@/dash.conf",
-                              cachesDirectory];
-        //create content - four lines of text
-        NSString *content = configFileContents;
-        //save content to the documents directory
-        [content writeToFile:fileName
-                  atomically:NO
-                    encoding:NSStringEncodingConversionAllowLossy
-                       error:nil];
-        clb(YES,fileName);
-    }];
-    
-}
 
--(NSString*)createDapiEnvFileForMasternode:(Masternode*)masternode {
-    if (!masternode.rpcPassword) {
-        masternode.rpcPassword = [self randomPassword:15];
-        [[DPDataStore sharedInstance] saveContext];
-    }
-    // First we need to make a proper configuration file
-    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"dapi" ofType:@"env"];
-    NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[NSString stringWithFormat:@"\"%@\"",masternode.rpcPassword]];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
-    
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cachesDirectory = [paths objectAtIndex:0];
-    
-    //make a file name to write the data to using the documents directory:
-    NSString *fileName = [NSString stringWithFormat:@"%@/dapi.env",
-                          cachesDirectory];
-    //create content - four lines of text
-    NSString *content = configFileContents;
-    //save content to the documents directory
-    [content writeToFile:fileName
-              atomically:NO
-                encoding:NSStringEncodingConversionAllowLossy
-                   error:nil];
-    
-    return fileName;
-}
-
--(NSString*)createInsightConfigFileForMasternode:(Masternode*)masternode {
-    if (!masternode.rpcPassword) {
-        masternode.rpcPassword = [self randomPassword:15];
-        [[DPDataStore sharedInstance] saveContext];
-    }
-    // First we need to make a proper configuration file
-    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"dashcore-node" ofType:@"json"];
-    NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[NSString stringWithFormat:@"\"%@\"",masternode.rpcPassword]];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
-    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:INSIGHT_PORT_STRING withString:@"3001"];
-    
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cachesDirectory = [paths objectAtIndex:0];
-    
-    //make a file name to write the data to using the documents directory:
-    NSString *fileName = [NSString stringWithFormat:@"%@/dashcore-node.json",
-                          cachesDirectory];
-    //create content - four lines of text
-    NSString *content = configFileContents;
-    //save content to the documents directory
-    [content writeToFile:fileName
-              atomically:NO
-                encoding:NSStringEncodingConversionAllowLossy
-                   error:nil];
-    
-    return fileName;
-}
-
--(NSString*)createSentinelConfFileForMasternode:(Masternode*)masternode {
-    
-    NSString *chainNetwork = @"network=mainnet\n";
-    if ([[masternode valueForKey:@"chainNetwork"] rangeOfString:@"testnet"].location != NSNotFound
-        || [[masternode valueForKey:@"chainNetwork"] rangeOfString:@"devnet"].location != NSNotFound) {
-        chainNetwork = @"network=testnet\n";
-    }
-    
-    NSArray *paths = NSSearchPathForDirectoriesInDomains
-    (NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    
-    //make a file name to write the data to using the documents directory:
-    NSString *fileName = [NSString stringWithFormat:@"%@/sentinel.conf",
-                          documentsDirectory];
-    //create content - four lines of text
-    NSString *content = [NSString stringWithFormat:@"# specify path to dash.conf or leave blankult=mainnet)\n# default is the same as DashCore\n#dash_conf=/home/evan82/.dashcore/dash.conf\n\n# valid options are mainnet, testnet (default=mainnet)\n%@\n# database connection details\ndb_name=database/sentinel.db\ndb_driver=sqlite\n", chainNetwork];
-    //save content to the documents directory
-    [content writeToFile:fileName
-              atomically:NO
-                encoding:NSStringEncodingConversionAllowLossy
-                   error:nil];
-    
-    return fileName;
-}
+#pragma mark - Devnet
 
 - (void)registerProtxForLocal:(NSArray*)AllMasternodes {
     NSString *chainNetwork = [[DPDataStore sharedInstance] chainNetwork];
@@ -3279,7 +3668,7 @@
     });
 }
 
-- (void)registerProtxForLocal:(NSString*)publicIP localChain:(NSString*)localChain onClb:(dashClb)clb {
+- (void)registerProtxForLocal:(NSString*)publicIP localChain:(NSString*)localChain onClb:(dashMessageClb)clb {
     
     //    protx register yZJg3ocKiCEZEWgag7YgLhtQ9iYnEbu8J6 1000 54.169.150.160:12999 0 yhXupqeWSenszCCHyXLUsBB7fBjEqQ2ssz 0 0 0 yZJg3ocKiCEZEWgag7YgLhtQ9iYnEbu8J6
     __block NSString *chainNetwork = localChain;
@@ -3410,7 +3799,7 @@
             return;
         }
         
-        NSString *chainNetwork = [NSString stringWithFormat:@"devnet=%@", chainName];
+        NSString *chainNetwork = [NSString stringWithFormat:@"devnet-%@", chainName];
         __block BOOL devnetAlreadyFailed = NO;
         long blockHeight = [[localInfoDict valueForKey:@"blocks"] longValue];
         
@@ -3436,7 +3825,7 @@
 }
 
 #pragma mark - Block Control
-- (void)validateMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb {
+- (void)validateMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashMessageClb)clb {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
@@ -3454,7 +3843,7 @@
     });
 }
 
-- (void)reconsiderMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashClb)clb {
+- (void)reconsiderMasternodeBlock:(NSArray*)masternodeObjects blockHash:(NSString*)blockHash clb:(dashMessageClb)clb {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
@@ -3472,7 +3861,7 @@
     });
 }
 
-- (void)clearBannedOnNodes:(NSArray*)masternodeObjects withCallback:(dashClb)clb {
+- (void)clearBannedOnNodes:(NSArray*)masternodeObjects withCallback:(dashMessageClb)clb {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
@@ -3490,7 +3879,7 @@
     });
 }
 
-- (void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashClb)clb {
+- (void)getBlockchainInfoForNodes:(NSArray*)masternodeObjects clb:(dashMessageClb)clb {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         for(Masternode* masternode in masternodeObjects) {
             if(masternode.isSelected) {

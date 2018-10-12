@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(void)authenticateWithClb:(dashCredentialsClb)clb;
 
--(void)authenticateNPMWithClb:(dashClb)clb;
+-(void)authenticateNPMWithClb:(dashMessageClb)clb;
 
 -(void)authenticateSporkWithClb:(dashCredentialsClb)clb;
 

@@ -26,7 +26,7 @@ MasternodesViewController *masternodeCon;
 
 #pragma mark - Set Up
 
--(void)setUpMasternodeDashdWithSelectedRepo:(Masternode*)masternode repository:(Repository*)repository clb:(dashClb)clb
+-(void)setUpMasternodeDashdWithSelectedRepo:(Masternode*)masternode repository:(Repository*)repository clb:(dashMessageClb)clb
 {
     [[DPAuthenticationManager sharedInstance] authenticateWithClb:^(BOOL authenticated, NSString *githubUsername, NSString *githubPassword) {
         if (!authenticated) return;
@@ -102,7 +102,7 @@ MasternodesViewController *masternodeCon;
                             if (!success) {
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     [masternodeCon addStringEventToMasternodeConsole:[NSString stringWithFormat:@"SSH: disconnected from %@", publicIP]];
-                                    masternode.dashcoreState = DashcoreState_SettingUp;
+                                    masternode.dashcoreState = DPDashcoreState_SettingUp;
                                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                     [[DialogAlert sharedInstance] showWarningAlert:@"Set up" message:@"Set up failed!"];
                                 });
@@ -110,7 +110,7 @@ MasternodesViewController *masternodeCon;
                             }
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 [masternodeCon addStringEventToMasternodeConsole:message];
-                                    masternode.dashcoreState = DashcoreState_SettingUp;
+                                    masternode.dashcoreState = DPDashcoreState_SettingUp;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 [[DialogAlert sharedInstance] showAlertWithOkButton:@"Set up" message:@"Set up successfully!"];
                             });

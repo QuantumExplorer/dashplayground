@@ -15,11 +15,11 @@
 
 @interface DPRepositoryController : NSObject
 
--(void)addRepository:(NSString*)repositoryLocation forProject:(DPRepositoryProject)project forUser:(NSString*)user branchName:(NSString*)branchName isPrivate:(BOOL)isPrivate clb:(dashClb)clb;
+-(void)addRepository:(NSString*)repositoryLocation forProject:(DPRepositoryProject)project forUser:(NSString*)user branchName:(NSString*)branchName isPrivate:(BOOL)isPrivate clb:(dashMessageClb)clb;
 
--(void)updateBranchInfo:(Branch*)branch clb:(dashClb)clb;
+-(void)updateBranchInfo:(Branch*)branch clb:(dashMessageClb)clb;
 
-- (void)setAMIForRepository:(Repository*)repository clb:(dashClb)clb;
+- (void)setAMIForRepository:(Repository*)repository clb:(dashMessageClb)clb;
 
 +(DPRepositoryController*)sharedInstance;
 

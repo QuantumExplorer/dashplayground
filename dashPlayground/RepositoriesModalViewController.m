@@ -17,6 +17,7 @@
 #import "DashcoreStateTransformer.h"
 #import "MasternodeSyncStatusTransformer.h"
 #import "DPRepoModalController.h"
+#import "Masternode+CoreDataClass.h"
 
 @interface RepositoriesModalViewController ()
 
@@ -163,14 +164,13 @@ MasternodesViewController *masternodeCon2;
 //maybe do some auth here
         }
         
-        for(NSManagedObject *masternode in masternodeArrayObjects)
+        for(Masternode *masternode in masternodeArrayObjects)
         {
-            if([[masternode valueForKey:@"isSelected"] integerValue] != 1) continue;
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [masternode setValue:@(DashcoreState_SettingUp) forKey:@"masternodeState"];
+            if(!masternode.isSelected) continue;
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.dashcoreState = DPDashcoreState_SettingUp;
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-            });
+            }];
             
             [masternodeCon2.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
             

@@ -16,7 +16,7 @@
 
 +(DPNetworkController*)sharedInstance;
 
-- (void)getDebugLogFileFromMasternode:(NSManagedObject*)masternode clb:(dashClb)clb;
-- (void)findSpecificDataType:(NSString*)log datatype:(NSString*)type onClb:(dashClb)clb;
+- (void)getDebugLogFileFromMasternode:(NSManagedObject*)masternode clb:(dashMessageClb)clb;
+- (void)findSpecificDataType:(NSString*)log datatype:(NSString*)type onClb:(dashMessageClb)clb;
 
 @end
