@@ -97,6 +97,7 @@
 		FBBFEB271E86C44E00BE41BE /* MasternodesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB251E86C44E00BE41BE /* MasternodesViewController.m */; };
 		FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */; };
 		FBBFEB5D1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */; };
+		FBE9BAED21711EC4000102A5 /* drive.env in Resources */ = {isa = PBXBuildFile; fileRef = FBE9BAEC21711EC4000102A5 /* drive.env */; };
 		FBEBB105215D5E430058E7C3 /* NSMutableData+Security.m in Sources */ = {isa = PBXBuildFile; fileRef = FB670633215D59C2005A658E /* NSMutableData+Security.m */; };
 		FBEBB107215D5E490058E7C3 /* NSData+Security.m in Sources */ = {isa = PBXBuildFile; fileRef = FB67062F215D58B0005A658E /* NSData+Security.m */; };
 /* End PBXBuildFile section */
@@ -285,6 +286,7 @@
 		FBBFEB281E86EED600BE41BE /* Defines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Defines.h; sourceTree = "<group>"; };
 		FBBFEB5A1E86FDA700BE41BE /* NSArray+SWAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SWAdditions.h"; sourceTree = "<group>"; };
 		FBBFEB5B1E86FDA700BE41BE /* NSArray+SWAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SWAdditions.m"; sourceTree = "<group>"; };
+		FBE9BAEC21711EC4000102A5 /* drive.env */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = drive.env; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -477,6 +479,7 @@
 			children = (
 				FB1D2B551EAF552B00F7BE2D /* Images.xcassets */,
 				FBBAF9A41EB0562400D6F568 /* Notification.h */,
+				FBE9BAEC21711EC4000102A5 /* drive.env */,
 				FB3BCA59216E32DE0071E4F1 /* dapi.env */,
 				FB0684291E941DD700F1AFB4 /* dash.conf */,
 				FB3BCA54216C1F3C0071E4F1 /* dashcore-node.json */,
@@ -692,6 +695,7 @@
 				FB3BCA55216C1F3C0071E4F1 /* dashcore-node.json in Resources */,
 				A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */,
 				A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */,
+				FBE9BAED21711EC4000102A5 /* drive.env in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -114,4 +114,6 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)checkDriveIsConfiguredOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
 -(void)installDriveOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
 
+-(void)turnProjectInPM2:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
+
 @end

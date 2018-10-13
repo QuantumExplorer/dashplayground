@@ -2228,7 +2228,7 @@
 
 -(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh  dashClb:(dashMessageClb)clb {
     
-    __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@;cd %@;git checkout %@;git pull %@ %@",repositoryPath, directory,directory,branchName,repositoryPath,branchName];
+    __block NSString *command = [NSString stringWithFormat:@"git clone %@ %@;cd %@;git checkout %@;git reset --hard;git pull %@ %@",repositoryPath, directory,directory,branchName,repositoryPath,branchName];
     
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:ssh mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {
@@ -2724,35 +2724,171 @@
     }];
 }
 
+-(void)turnProjectInPM2:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         completionClb(NO,NO);
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                     return;
+                                                 }
+                                                 [self turnProjectInPM2:project onOrOff:onOff onMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+-(BOOL)projectNeedsConfigurationCheck:(DPRepositoryProject)project onMasternode:(Masternode*)masternode messageClb:(dashMessageClb)messageClb {
+    __block BOOL needsConfigurationCheck = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        switch (project) {
+            case DPRepositoryProject_Core:
+                if (!(masternode.dashcoreState & DPDashcoreState_Installed)) {
+                    needsConfigurationCheck = YES;
+                }
+                break;
+            case DPRepositoryProject_Dapi:
+                if (!(masternode.dapiState & DPDapiState_Installed)) {
+                    needsConfigurationCheck = YES;
+                }
+                break;
+            case DPRepositoryProject_Drive:
+                if (!(masternode.driveState & DPDriveState_Installed)) {
+                    needsConfigurationCheck = YES;
+                }
+                break;
+            case DPRepositoryProject_Insight:
+                if (!(masternode.insightState & DPInsightState_Installed)) {
+                    needsConfigurationCheck = YES;
+                }
+                break;
+            case DPRepositoryProject_Sentinel:
+                if (!(masternode.sentinelState & DPSentinelState_Installed)) {
+                    needsConfigurationCheck = YES;
+                }
+                break;
+                
+            default:
+                break;
+        }
+        
+    }];
+    return needsConfigurationCheck;
+
+}
+
+- (void)turnProjectInPM2:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    
+//    if (needConfigurationCheck) {
+//        messageClb(NO,[NSString stringWithFormat:@"Info: Could not tell if DAPI is configured on %@, checking now.",sshSession.host]);
+//        [self checkDapiIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL configured) {
+//            if (success) {
+//                if (configured) {
+//                    [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL onStatus) {
+//                        if (onStatus != onOff) {
+//                            [self turnProjectInPM2:project onOrOff:onOff onMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+//                        }
+//                    } messageClb:messageClb];
+//                } else {
+//                    completionClb(YES,NO);
+//                }
+//            } else {
+//                completionClb(NO,NO);
+//            }
+//        } messageClb:messageClb];
+//        return;
+//    }
+    NSString * pm2Command = @"";
+    switch (project) {
+        case DPRepositoryProject_Dapi:
+            pm2Command = [NSString stringWithFormat:@"pm2 %@ dapi",onOff?@"start":@"stop"];
+            break;
+        case DPRepositoryProject_Drive:
+            pm2Command = [NSString stringWithFormat:@"pm2 %@ drive-api;pm2 %@ drive-sync",onOff?@"start":@"stop",onOff?@"start":@"stop"];
+            break;
+        case DPRepositoryProject_Insight:
+            pm2Command = [NSString stringWithFormat:@"pm2 %@ dashcore-node",onOff?@"start":@"stop"];
+            break;
+            
+        default:
+            break;
+    }
+    NSString * command = [NSString stringWithFormat:@"export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";%@",pm2Command];
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(NO,NO);
+                messageClb(NO, message);
+            });
+            return;
+        }
+        switch (project) {
+            case DPRepositoryProject_Dapi:
+                {
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        if (onOff) {
+                            masternode.dapiState |= DPDapiState_Running;
+                        } else {
+                            masternode.dapiState &= ~DPDapiState_Running;
+                        }
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
+                }
+                break;
+            case DPRepositoryProject_Drive:
+            {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    if (onOff) {
+                        masternode.driveState |= DPDriveState_Running;
+                    } else {
+                        masternode.driveState &= ~DPDriveState_Running;
+                    }
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+            }
+                break;
+                
+            default:
+                break;
+        }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,NO);
+                messageClb(YES, message);
+            });
+    }];
+}
+
+
 #pragma mark - Dash Drive
 
 - (void)configureDriveOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb  {
-    if (!(masternode.dapiState & DPDriveState_Cloned)) {
+    if (!(masternode.driveState & DPDriveState_Cloned)) {
         dispatch_async(dispatch_get_main_queue(), ^{
             completionClb(NO,NO);
             messageClb(NO,@"Error: Drive needs to be cloned first");
         });
         return;
     }
-    if (!forceUpdate && (masternode.dapiState & DPDriveState_Configured)) {
+    if (!forceUpdate && (masternode.driveState & DPDriveState_Configured)) {
         [self installDriveOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
         return; //we are already configured
     }
     [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
         if(success == YES) {
             NSString *localFilePath = [self createDriveEnvFileForMasternode:masternode];
-            NSString *remoteFilePath = @"/home/ubuntu/src/dapi/.env";
+            NSString *remoteFilePath = @"/home/ubuntu/src/dashdrive/.env";
             
             BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
             if (uploadSuccess != YES) {
                 NSLog(@"%@",[[sshSession lastError] localizedDescription]);
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    messageClb(NO, @"Error: Error uploading dapi environment variables");
+                    messageClb(NO, @"Error: Error uploading drive environment variables");
                 });
             }
             else {
                 [masternode.managedObjectContext performBlockAndWait:^{
-                    masternode.dapiState |= DPDriveState_Configured;
+                    masternode.driveState |= DPDriveState_Configured;
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 }];
                 [self installDriveOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
@@ -2762,7 +2898,7 @@
 }
 
 - (void)installDriveOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
-    if (!(masternode.dapiState & DPDriveState_Configured)) {
+    if (!(masternode.driveState & DPDriveState_Configured)) {
         completionClb(NO,NO);
         messageClb(NO,@"Error: Drive needs to be configured first");
         return;
@@ -2783,7 +2919,7 @@
 - (void)installDriveOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     __block BOOL shouldBreak = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
-        if (!(masternode.dapiState & DPDriveState_Configured)) {
+        if (!(masternode.driveState & DPDriveState_Configured)) {
             if ([NSThread isMainThread]) {
                 messageClb(NO,@"Error: Drive needs to be configured first");
             } else {
@@ -2801,7 +2937,7 @@
         } else {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
                 
-                NSString * command = [NSString stringWithFormat:@"export NPM_TOKEN=\"%@\";export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\"; cd ~/src/dapi;echo \"//registry.npmjs.org/:_authToken=\\${NPM_TOKEN}\" > .npmrc; . ./.env; npm i; pm2 start index.js --name \"dapi\"; pm2 save",npmToken];
+                NSString * command = [NSString stringWithFormat:@"sudo dpkg --configure -a; sudo apt-get update; sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common; curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -; sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"; sudo apt-get update; sudo apt-get install -y docker-ce; sudo curl -L \"https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose; sudo chmod +x /usr/local/bin/docker-compose; cd ~/src/dashdrive; sudo docker-compose up -d; export NPM_TOKEN=\"%@\"; export NVM_DIR=\"$HOME/.nvm\";[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\";[ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\";echo \"//registry.npmjs.org/:_authToken=\\${NPM_TOKEN}\" > .npmrc; npm i; pm2 start scripts/api.js --name \"drive-api\"; pm2 start scripts/sync.js --name \"drive-sync\"; pm2 save",npmToken];
                 [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
                     if(!success) {
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -2810,7 +2946,7 @@
                         return;
                     }
                     [masternode.managedObjectContext performBlockAndWait:^{
-                        masternode.dapiState |= DPDriveState_Installed;
+                        masternode.driveState |= DPDriveState_Installed;
                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     }];
                     //At this point lets send a query to check if it's running
@@ -2862,7 +2998,7 @@
         }];
         if ([rpcPasswordInConfigFile isEqualToString:masternodeRpcPassword]) {
             [masternode.managedObjectContext performBlockAndWait:^{
-                masternode.dapiState |= DPDriveState_Configured;
+                masternode.driveState |= DPDriveState_Configured;
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             }];
             //At this point lets send a query to check if it's running
@@ -2872,7 +3008,7 @@
             });
         } else {
             [masternode.managedObjectContext performBlockAndWait:^{
-                masternode.dapiState &= ~DPDriveState_Configured;
+                masternode.driveState &= ~DPDriveState_Configured;
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             }];
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2903,7 +3039,7 @@
 - (void)checkDriveIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     __block BOOL needConfigurationCheck = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
-        if (!(masternode.dapiState & DPDriveState_Configured)) {
+        if (!(masternode.driveState & DPDriveState_Configured)) {
             needConfigurationCheck = YES;
         }
     }];
@@ -2941,7 +3077,7 @@
                 NSDictionary * pm2Environment = pm2InfoDictionary[@"pm2_env"];
                 if ([pm2Environment[@"status"] isEqualToString:@"online"]) {
                     [masternode.managedObjectContext performBlockAndWait:^{
-                        masternode.dapiState |= DPDriveState_Running;
+                        masternode.driveState |= DPDriveState_Running;
                         [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                     }];
                     //At this point lets send a query to check if it's running
@@ -2955,7 +3091,7 @@
         }
         if (!found) {
             [masternode.managedObjectContext performBlockAndWait:^{
-                masternode.dapiState &= ~DPDriveState_Running;
+                masternode.driveState &= ~DPDriveState_Running;
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             }];
             //At this point lets send a query to check if it's running
@@ -3033,6 +3169,34 @@
     //make a file name to write the data to using the documents directory:
     NSString *fileName = [NSString stringWithFormat:@"%@/dapi.env",
                           cachesDirectory];
+    //create content - four lines of text
+    NSString *content = configFileContents;
+    //save content to the documents directory
+    [content writeToFile:fileName
+              atomically:NO
+                encoding:NSStringEncodingConversionAllowLossy
+                   error:nil];
+    
+    return fileName;
+}
+
+-(NSString*)createDriveEnvFileForMasternode:(Masternode*)masternode {
+    if (!masternode.rpcPassword) {
+        masternode.rpcPassword = [self randomPassword:15];
+        [[DPDataStore sharedInstance] saveContext];
+    }
+    // First we need to make a proper configuration file
+    NSString *configFilePath = [[NSBundle mainBundle] pathForResource:@"drive" ofType:@"env"];
+    NSString *configFileContents = [NSString stringWithContentsOfFile:configFilePath encoding:NSUTF8StringEncoding error:NULL];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PASSWORD_STRING withString:[NSString stringWithFormat:@"\"%@\"",masternode.rpcPassword]];
+    configFileContents = [configFileContents stringByReplacingOccurrencesOfString:RPC_PORT_STRING withString:@"12998"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachesDirectory = [paths objectAtIndex:0];
+    
+    //make a file name to write the data to using the documents directory:
+    NSString *fileName = [NSString stringWithFormat:@"%@/%@-drive.env",
+                          cachesDirectory,masternode.instanceId];
     //create content - four lines of text
     NSString *content = configFileContents;
     //save content to the documents directory

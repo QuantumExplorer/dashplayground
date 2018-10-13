@@ -770,7 +770,7 @@ NSString *terminalHeadString = @"";
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configuring dapi on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] configureDapiOnMasternode:masternode forceUpdate:NO completionClb:^(BOOL success, BOOL actionSuccess) {
+        [[DPMasternodeController sharedInstance] configureDapiOnMasternode:masternode forceUpdate:YES completionClb:^(BOOL success, BOOL actionSuccess) {
             
         } messageClb:^(BOOL success, NSString *message) {
             [self addStringEventToMasternodeConsole:message];
@@ -785,15 +785,88 @@ NSString *terminalHeadString = @"";
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking dapi on remote %@",masternode.publicIP]];
         [[DPMasternodeController sharedInstance] checkDapiIsRunningOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
-//            if (success && !actionSuccess) { //it's not running, let's see if we are configured
-//                if (!(masternode.dapiState & DPDapiState_Configured)) {
-//                    [[DPMasternodeController sharedInstance] checkDapiIsConfiguredOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
-//
-//                    } messageClb:^(BOOL success, NSString *message) {
-//                        [self addStringEventToMasternodeConsole:message];
-//                    }];
-//                }
-//            }
+
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+- (IBAction)startMasternodeDapi:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Starting dapi on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Dapi onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+- (IBAction)stopMasternodeDapi:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Stopping dapi on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Dapi onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+- (IBAction)startMasternodeDrive:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Starting drive on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Drive onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+- (IBAction)stopMasternodeDrive:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Stopping drive on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Drive onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+#pragma mark - Drive
+
+- (IBAction)configureMasternodeDrive:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configuring drive on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] configureDriveOnMasternode:masternode forceUpdate:YES completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+    
+}
+
+- (IBAction)checkMasternodeDrive:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking drive on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] checkDriveIsRunningOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
         } messageClb:^(BOOL success, NSString *message) {
             [self addStringEventToMasternodeConsole:message];
         }];

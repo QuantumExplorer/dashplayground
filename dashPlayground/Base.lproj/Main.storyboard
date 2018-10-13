@@ -2514,17 +2514,43 @@
                                                 <action selector="checkMasternodeDapi:" target="Inw-N2-PBT" id="3Ef-xg-Y9m"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pmf-qM-se1">
+                                            <rect key="frame" x="13" y="91" width="130" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Start Dapi" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="BiG-u9-8Ql">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="startMasternodeDapi:" target="Inw-N2-PBT" id="7Pl-aA-yxo"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JDP-ZH-Ity">
+                                            <rect key="frame" x="13" y="65" width="130" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Stop Dapi" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cuC-VH-mbW">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="stopMasternodeDapi:" target="Inw-N2-PBT" id="Z94-wV-ewM"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="ETe-SU-DIp" firstAttribute="top" secondItem="R1S-oG-HKa" secondAttribute="top" constant="10" id="277-Cw-dba"/>
+                                        <constraint firstItem="pmf-qM-se1" firstAttribute="leading" secondItem="AeL-os-AyD" secondAttribute="leading" id="2KC-gu-qLZ"/>
                                         <constraint firstItem="AeL-os-AyD" firstAttribute="leading" secondItem="R1S-oG-HKa" secondAttribute="leading" constant="19" id="4XO-zy-XuB"/>
+                                        <constraint firstItem="pmf-qM-se1" firstAttribute="leading" secondItem="JDP-ZH-Ity" secondAttribute="leading" id="ApK-EC-aBx"/>
                                         <constraint firstItem="AeL-os-AyD" firstAttribute="top" secondItem="Pw7-0N-GpR" secondAttribute="bottom" constant="4" id="Qrf-bk-sxM"/>
                                         <constraint firstAttribute="trailing" secondItem="ETe-SU-DIp" secondAttribute="trailing" constant="20" id="Xus-at-ZCa"/>
                                         <constraint firstItem="Pw7-0N-GpR" firstAttribute="leading" secondItem="R1S-oG-HKa" secondAttribute="leading" constant="19" id="hdE-cC-5j9"/>
                                         <constraint firstAttribute="trailing" secondItem="Pw7-0N-GpR" secondAttribute="trailing" constant="20" id="i3h-hy-Tku"/>
+                                        <constraint firstItem="pmf-qM-se1" firstAttribute="trailing" secondItem="JDP-ZH-Ity" secondAttribute="trailing" id="kcF-LQ-K6L"/>
                                         <constraint firstItem="Pw7-0N-GpR" firstAttribute="top" secondItem="ETe-SU-DIp" secondAttribute="bottom" constant="4" id="kj6-Vl-Blb"/>
                                         <constraint firstItem="ETe-SU-DIp" firstAttribute="leading" secondItem="R1S-oG-HKa" secondAttribute="leading" constant="19" id="knN-NK-F1h"/>
+                                        <constraint firstItem="JDP-ZH-Ity" firstAttribute="top" secondItem="pmf-qM-se1" secondAttribute="bottom" constant="5" id="lCU-Dm-1ET"/>
                                         <constraint firstAttribute="trailing" secondItem="AeL-os-AyD" secondAttribute="trailing" constant="20" id="lET-yZ-3wb"/>
+                                        <constraint firstItem="pmf-qM-se1" firstAttribute="top" secondItem="AeL-os-AyD" secondAttribute="bottom" constant="5" id="nCQ-Dl-n5b"/>
+                                        <constraint firstItem="pmf-qM-se1" firstAttribute="trailing" secondItem="AeL-os-AyD" secondAttribute="trailing" id="tU6-ny-JnU"/>
                                     </constraints>
                                 </view>
                             </box>
@@ -2547,6 +2573,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="configureMasternodeDrive:" target="Inw-N2-PBT" id="6Eb-14-aO5"/>
+                                            </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="M9l-lE-HmO">
                                             <rect key="frame" x="13" y="117" width="130" height="32"/>
@@ -2554,17 +2583,46 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="checkMasternodeDrive:" target="Inw-N2-PBT" id="F68-XH-iIW"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pcn-eT-LKU">
+                                            <rect key="frame" x="13" y="92" width="130" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Start Drive" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="V2k-nU-Gzk">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="startMasternodeDrive:" target="Inw-N2-PBT" id="s2Z-6x-fnP"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kua-Tm-Fac">
+                                            <rect key="frame" x="13" y="67" width="130" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Stop Drive" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lF1-xY-fST">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="stopMasternodeDrive:" target="Inw-N2-PBT" id="4Fu-Gb-1q5"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="mWY-xR-jjJ" firstAttribute="top" secondItem="eH9-g8-dmi" secondAttribute="top" constant="10" id="0O6-aV-HaA"/>
                                         <constraint firstAttribute="trailing" secondItem="mWY-xR-jjJ" secondAttribute="trailing" constant="20" id="4Io-CK-B3X"/>
+                                        <constraint firstItem="kua-Tm-Fac" firstAttribute="top" secondItem="Pcn-eT-LKU" secondAttribute="bottom" constant="4" id="6E5-a3-3Iu"/>
+                                        <constraint firstItem="Pcn-eT-LKU" firstAttribute="leading" secondItem="kua-Tm-Fac" secondAttribute="leading" id="Ai4-lm-d9n"/>
                                         <constraint firstAttribute="trailing" secondItem="TMa-5M-qam" secondAttribute="trailing" constant="20" id="AvE-vo-qta"/>
+                                        <constraint firstItem="Pcn-eT-LKU" firstAttribute="leading" secondItem="M9l-lE-HmO" secondAttribute="leading" id="Cgl-08-bAO"/>
                                         <constraint firstAttribute="trailing" secondItem="M9l-lE-HmO" secondAttribute="trailing" constant="20" id="EYe-Dm-apz"/>
                                         <constraint firstItem="TMa-5M-qam" firstAttribute="top" secondItem="mWY-xR-jjJ" secondAttribute="bottom" constant="4" id="TdU-zv-T3Z"/>
+                                        <constraint firstItem="Pcn-eT-LKU" firstAttribute="top" secondItem="M9l-lE-HmO" secondAttribute="bottom" constant="4" id="dgr-95-svv"/>
                                         <constraint firstItem="TMa-5M-qam" firstAttribute="leading" secondItem="eH9-g8-dmi" secondAttribute="leading" constant="19" id="elm-d6-dbj"/>
                                         <constraint firstItem="M9l-lE-HmO" firstAttribute="leading" secondItem="eH9-g8-dmi" secondAttribute="leading" constant="19" id="gRu-3M-LyT"/>
                                         <constraint firstItem="mWY-xR-jjJ" firstAttribute="leading" secondItem="eH9-g8-dmi" secondAttribute="leading" constant="19" id="p4r-hQ-5gN"/>
+                                        <constraint firstItem="Pcn-eT-LKU" firstAttribute="trailing" secondItem="kua-Tm-Fac" secondAttribute="trailing" id="tmX-We-dAr"/>
+                                        <constraint firstItem="Pcn-eT-LKU" firstAttribute="trailing" secondItem="M9l-lE-HmO" secondAttribute="trailing" id="uPd-KX-4mT"/>
                                         <constraint firstItem="M9l-lE-HmO" firstAttribute="top" secondItem="TMa-5M-qam" secondAttribute="bottom" constant="4" id="umw-nu-6L2"/>
                                     </constraints>
                                 </view>
