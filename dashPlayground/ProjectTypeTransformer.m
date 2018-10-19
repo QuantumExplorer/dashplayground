@@ -55,6 +55,9 @@
         case DPRepositoryProject_Sentinel:
             return @"sentinel";
             break;
+        case DPRepositoryProject_Ipfs:
+            return @"go-ipfs";
+            break;
         default:
             return @"unknown";
             break;

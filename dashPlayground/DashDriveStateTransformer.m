@@ -24,13 +24,17 @@
 {
     DPDriveState state = [value integerValue];
     NSString * extraInformation = @"";
-    if (state & DPDriveState_Error) {
+    if ((state & DPDriveState_FullError) == DPDriveState_FullError) {
         extraInformation = @" (Error)";
+    } else if (state & DPDriveState_SyncError) {
+        extraInformation = @" (SyncError)";
+    } else if (state & DPDriveState_ApiError) {
+        extraInformation = @" (ApiError)";
     }
     if (state & DPDriveState_Checking) {
         extraInformation = @" (Checking)";
     }
-    state = state & ~(DPDriveState_Error | DPDriveState_Checking);
+    state = state & ~(DPDriveState_FullError | DPDriveState_Checking);
     if (state & DPDriveState_Running) {
         return [NSString stringWithFormat:@"Running%@",extraInformation];
     } else if (state & DPDriveState_Installed) {

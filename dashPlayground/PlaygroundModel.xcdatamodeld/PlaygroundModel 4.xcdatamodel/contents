@@ -38,6 +38,9 @@
         <attribute name="instanceId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="instanceState" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="instanceType" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="ipfsPublicKey" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ipfsState" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="ipfsVersion" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="isSelected" optional="YES" transient="YES" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="key" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="lastKnownHeight" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -79,7 +82,7 @@
     <elements>
         <element name="Branch" positionX="-54" positionY="99" width="128" height="195"/>
         <element name="Commit" positionX="-45" positionY="144" width="128" height="90"/>
-        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="660"/>
+        <element name="Masternode" positionX="-63" positionY="-18" width="128" height="705"/>
         <element name="Message" positionX="-45" positionY="144" width="128" height="90"/>
         <element name="Repository" positionX="-63" positionY="90" width="128" height="135"/>
     </elements>

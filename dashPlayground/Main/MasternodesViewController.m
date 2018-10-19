@@ -797,7 +797,7 @@ NSString *terminalHeadString = @"";
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Starting dapi on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Dapi onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Dapi onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
             
         } messageClb:^(BOOL success, NSString *message) {
             [self addStringEventToMasternodeConsole:message];
@@ -810,7 +810,7 @@ NSString *terminalHeadString = @"";
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Stopping dapi on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Dapi onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Dapi onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
             
         } messageClb:^(BOOL success, NSString *message) {
             [self addStringEventToMasternodeConsole:message];
@@ -818,12 +818,14 @@ NSString *terminalHeadString = @"";
     }
 }
 
+#pragma mark - Drive
+
 - (IBAction)startMasternodeDrive:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Starting drive on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Drive onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Drive onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
             
         } messageClb:^(BOOL success, NSString *message) {
             [self addStringEventToMasternodeConsole:message];
@@ -836,15 +838,13 @@ NSString *terminalHeadString = @"";
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Stopping drive on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] turnProjectInPM2:DPRepositoryProject_Drive onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Drive onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
             
         } messageClb:^(BOOL success, NSString *message) {
             [self addStringEventToMasternodeConsole:message];
         }];
     }
 }
-
-#pragma mark - Drive
 
 - (IBAction)configureMasternodeDrive:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
@@ -875,15 +875,42 @@ NSString *terminalHeadString = @"";
 
 #pragma mark - Insight
 
+- (IBAction)startMasternodeInsight:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Starting insight on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Insight onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+- (IBAction)stopMasternodeInsight:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Stopping insight on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Insight onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+
 - (IBAction)configureMasternodeInsight:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configuring insight on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] configureInsightOnMasternode:masternode forceUpdate:NO clb:^(BOOL success, NSString *message) {
-            if (!success) {
-                [self addStringEventToMasternodeConsole:message];
-            }
+        [[DPMasternodeController sharedInstance] configureInsightOnMasternode:masternode forceUpdate:NO completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
         }];
     }
     
@@ -894,13 +921,97 @@ NSString *terminalHeadString = @"";
     
     for (Masternode * masternode in [self selectedMasternodes]) {
         [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking insight on remote %@",masternode.publicIP]];
-        [[DPMasternodeController sharedInstance] checkInsightIsRunningOnMasternode:masternode completionClb:^(BOOL active) {
+        [[DPMasternodeController sharedInstance] checkInsightIsRunningOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
             
         } messageClb:^(BOOL success, NSString *message) {
             [self addStringEventToMasternodeConsole:message];
         }];
     }
 }
+
+#pragma mark - IPFS
+
+- (IBAction)startMasternodeIpfs:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Starting ipfs on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Ipfs onOrOff:TRUE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+- (IBAction)stopMasternodeIpfs:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Stopping ipfs on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] turnProject:DPRepositoryProject_Ipfs onOrOff:FALSE onMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+- (IBAction)installMasternodeIpfs:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Installing IPFS on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] installIpfsOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+    
+}
+
+- (IBAction)configureMasternodeIpfs:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Configuring ipfs on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] configureIpfsOnMasternode:masternode forceUpdate:YES completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+             [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+    
+}
+
+- (IBAction)checkMasternodeIpfs:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    
+    for (Masternode * masternode in [self selectedMasternodes]) {
+        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking ipfs on remote %@",masternode.publicIP]];
+        [[DPMasternodeController sharedInstance] checkIpfsIsRunningOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+            
+        } messageClb:^(BOOL success, NSString *message) {
+            [self addStringEventToMasternodeConsole:message];
+        }];
+    }
+}
+
+
+//- (IBAction)checkMasternodeIpfs:(id)sender {
+//    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+//
+//    for (Masternode * masternode in [self selectedMasternodes]) {
+//        [self addStringEventToMasternodeConsole:[NSString stringWithFormat:@"Checking ipfs on remote %@",masternode.publicIP]];
+//        [[DPMasternodeController sharedInstance] checkIPFSIsRunningOnMasternode:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+//
+//        } messageClb:^(BOOL success, NSString *message) {
+//            [self addStringEventToMasternodeConsole:message];
+//        }];
+//    }
+//}
+
 
 
 #pragma mark - Console

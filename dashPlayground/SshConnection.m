@@ -109,7 +109,7 @@
 
 -(void)sendExecuteCommand:(NSString*)command onSSH:(NMSSHSession*)ssh mainThread:(BOOL)mainThread dashClb:(dashClbWithError)clb {
     
-    if(mainThread == YES) {
+    if(mainThread) {
         dispatch_async(dispatch_get_main_queue(), ^{
             //    NSString *executeStr = [NSString stringWithFormat:@"executing command %@", command];
             //    clb(YES, executeStr);

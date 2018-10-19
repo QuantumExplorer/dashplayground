@@ -56,5 +56,8 @@
 @dynamic driveBranch;
 @dynamic insightBranch;
 @dynamic messages;
+@dynamic ipfsVersion;
+@dynamic ipfsState;
+@dynamic ipfsPublicKey;
 
 @end

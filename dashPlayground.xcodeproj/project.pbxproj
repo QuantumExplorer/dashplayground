@@ -82,6 +82,8 @@
 		FB5A31C21E9D2F04003D4DD8 /* TrackingTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C11E9D2F04003D4DD8 /* TrackingTransformer.m */; };
 		FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */; };
 		FB5A31CA1E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */; };
+		FB5B15CC2173E8A6001F6DA0 /* IpfsStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5B15CB2173E8A6001F6DA0 /* IpfsStateTransformer.m */; };
+		FB5B15CE217A07DC001F6DA0 /* start_ipfs.sh in Resources */ = {isa = PBXBuildFile; fileRef = FB5B15CD217A07DC001F6DA0 /* start_ipfs.sh */; };
 		FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96BFB71F0B90D900220B4B /* ConsoleEventArray.m */; };
 		FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */; };
 		FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
@@ -259,6 +261,9 @@
 		FB5A31C71E9EA97E003D4DD8 /* DPRepositoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPRepositoryController.h; sourceTree = "<group>"; };
 		FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DPRepositoryController.m; sourceTree = "<group>"; };
 		FB5A31CB1E9EAD21003D4DD8 /* DashCallbacks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DashCallbacks.h; sourceTree = "<group>"; };
+		FB5B15CA2173E8A6001F6DA0 /* IpfsStateTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IpfsStateTransformer.h; sourceTree = "<group>"; };
+		FB5B15CB2173E8A6001F6DA0 /* IpfsStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IpfsStateTransformer.m; sourceTree = "<group>"; };
+		FB5B15CD217A07DC001F6DA0 /* start_ipfs.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = start_ipfs.sh; sourceTree = "<group>"; };
 		FB67062F215D58B0005A658E /* NSData+Security.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Security.m"; sourceTree = "<group>"; };
 		FB670630215D58B0005A658E /* NSData+Security.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Security.h"; sourceTree = "<group>"; };
 		FB670632215D58CC005A658E /* IntTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntTypes.h; sourceTree = "<group>"; };
@@ -424,6 +429,8 @@
 				FB3BCA52216BE7800071E4F1 /* HasValueTransformer.m */,
 				FB3BCA56216D50EB0071E4F1 /* InsightStateTransformer.h */,
 				FB3BCA57216D50EB0071E4F1 /* InsightStateTransformer.m */,
+				FB5B15CA2173E8A6001F6DA0 /* IpfsStateTransformer.h */,
+				FB5B15CB2173E8A6001F6DA0 /* IpfsStateTransformer.m */,
 			);
 			name = Transformers;
 			sourceTree = "<group>";
@@ -479,6 +486,7 @@
 			children = (
 				FB1D2B551EAF552B00F7BE2D /* Images.xcassets */,
 				FBBAF9A41EB0562400D6F568 /* Notification.h */,
+				FB5B15CD217A07DC001F6DA0 /* start_ipfs.sh */,
 				FBE9BAEC21711EC4000102A5 /* drive.env */,
 				FB3BCA59216E32DE0071E4F1 /* dapi.env */,
 				FB0684291E941DD700F1AFB4 /* dash.conf */,
@@ -694,6 +702,7 @@
 				FB06842A1E941DD700F1AFB4 /* dash.conf in Resources */,
 				FB3BCA55216C1F3C0071E4F1 /* dashcore-node.json in Resources */,
 				A5153E7C20CA5CEE00D6902B /* ChainSelectionWindow.xib in Resources */,
+				FB5B15CE217A07DC001F6DA0 /* start_ipfs.sh in Resources */,
 				A518295D20CEDBEC003BFE73 /* Preference.storyboard in Resources */,
 				FBE9BAED21711EC4000102A5 /* drive.env in Resources */,
 				FB2906721E85799F00A31092 /* Main.storyboard in Resources */,
@@ -763,6 +772,7 @@
 				FB5A31C91E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */,
 				FBBFEB5C1E86FDA700BE41BE /* NSArray+SWAdditions.m in Sources */,
 				A52EFCF7209AF44100B0586A /* RepositoriesModalViewController.m in Sources */,
+				FB5B15CC2173E8A6001F6DA0 /* IpfsStateTransformer.m in Sources */,
 				FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */,
 				A55FC0D020998BDC004B23FE /* DPPreferenceController.m in Sources */,
 				FB0683441E8731AD00F1AFB4 /* DPDataStore.m in Sources */,

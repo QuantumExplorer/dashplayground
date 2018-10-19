@@ -16,7 +16,8 @@ typedef NS_ENUM(NSUInteger,DPRepositoryProject) {
     DPRepositoryProject_Drive = 2,
     DPRepositoryProject_Insight = 3,
     DPRepositoryProject_Sentinel = 4,
-    DPRepositoryProject_Last = DPRepositoryProject_Sentinel
+    DPRepositoryProject_Ipfs = 5,
+    DPRepositoryProject_Last = DPRepositoryProject_Ipfs
 };
 
 NS_ASSUME_NONNULL_BEGIN

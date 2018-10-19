@@ -24,6 +24,7 @@
 #import "Branch+CoreDataClass.h"
 #import "Masternode+CoreDataClass.h"
 #import "InsightStateTransformer.h"
+#import "IpfsStateTransformer.h"
 #import "DAPIStateTransformer.h"
 #import "DashDriveStateTransformer.h"
 #import "SentinelStateTransformer.h"
@@ -1985,22 +1986,37 @@
 }
 
 -(void)checkMasternode:(Masternode*)masternode {
-    if(![masternode valueForKey:@"publicIP"]) return;
+    if(!masternode.publicIP) return;
     [self checkMasternodeChainNetwork:masternode clb:^(BOOL success, NSString *message) {
         if (success) {
-            [self checkMasternode:masternode saveContext:TRUE clb:^(BOOL success, NSString *message) {
+            [self checkDashcoreOnMasternode:masternode saveContext:TRUE clb:^(BOOL success, NSString *message) {
                 if (success && masternode.dashcoreState == DPDashcoreState_Running) {
                     [self updateMasternodeAttributes:masternode clb:^(BOOL success, NSString *message) {
                         
                     }];
                 }
+                [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                    [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL actionSuccess) {
+                        [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL actionSuccess) {
+                            [self checkDriveIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL actionSuccess) {
+                                
+                            } messageClb:^(BOOL success, NSString *message) {
+                                
+                            }];
+                        } messageClb:^(BOOL success, NSString *message) {
+                            
+                        }];
+                    } messageClb:^(BOOL success, NSString *message) {
+                        
+                    }];
+                }];
             }];
         }
     }];
     
 }
 
--(void)checkMasternode:(Masternode*)masternode saveContext:(BOOL)saveContext clb:(dashMessageClb)clb {
+-(void)checkDashcoreOnMasternode:(Masternode*)masternode saveContext:(BOOL)saveContext clb:(dashMessageClb)clb {
     //we are going to check if a masternode is running, configured, etc...
     //first let's check to see if we have access to rpc
     __block NSString * rpcPassword = masternode.rpcPassword;
@@ -2061,7 +2077,7 @@
                     //the masternode has never been configured
                     [self checkMasternodeIsInstalled:masternode clb:^(BOOL success, BOOL value, NSString *errorMessage) {
                         if (value) {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DPDashcoreState_Installed) {
+                            if (masternode.dashcoreState != DPDashcoreState_Installed) {
                                 masternode.dashcoreState = DPDashcoreState_Installed;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                             }
@@ -2069,7 +2085,7 @@
                                 clb(success,errorMessage);
                             }];
                         } else {
-                            if ([[masternode valueForKey:@"masternodeState"] integerValue] != DPDashcoreState_Initial) {
+                            if (masternode.dashcoreState != DPDashcoreState_Initial) {
                                 masternode.dashcoreState = DPDashcoreState_Initial;
                                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                 clb(TRUE,nil);
@@ -2244,21 +2260,40 @@
     }];
 }
 
-#pragma mark - Insight
-
-
 
 #pragma mark - Insight
 
-- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashMessageClb)clb {
-    if (!(masternode.insightState & DPInsightState_Cloned)) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            clb(NO,@"Error: Insight needs to be cloned first");
-        });
+- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    __block BOOL needsCloneCheck = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.insightState & DPInsightState_Cloned)) {
+            needsCloneCheck = YES;
+        }
+    }];
+    if (needsCloneCheck) {
+        [self checkInsightIsClonedOnMasternode:masternode completionClb:^(BOOL success, BOOL cloned) {
+            if (cloned) {
+                needsCloneCheck = NO;
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    if (!(masternode.insightState & DPInsightState_Cloned)) {
+                        needsCloneCheck = YES;
+                    }
+                }];
+                if (!needsCloneCheck) {
+                    [self configureInsightOnMasternode:masternode forceUpdate:forceUpdate completionClb:completionClb messageClb:messageClb];
+                } else {
+                    messageClb(success,@"Error: Insight needs to be cloned first");
+                }
+            } else {
+                messageClb(success,@"Error: Insight needs to be cloned first");
+            }
+            
+        } messageClb:messageClb];
+        
         return;
     }
     if (!forceUpdate && (masternode.insightState & DPInsightState_Configured)) {
-        [self installInsightOnMasternode:masternode clb:clb];
+        [self installInsightOnMasternode:masternode clb:messageClb];
         return; //we are already configured
     }
     [self createBackgroundSSHSessionOnMasternode:masternode
@@ -2272,7 +2307,7 @@
                                                      if (uploadSuccess != YES) {
                                                          NSLog(@"%@",[[sshSession lastError] localizedDescription]);
                                                          dispatch_async(dispatch_get_main_queue(), ^{
-                                                             clb(NO, [[sshSession lastError] localizedDescription]);
+                                                             messageClb(NO, [[sshSession lastError] localizedDescription]);
                                                          });
                                                      }
                                                      else {
@@ -2280,15 +2315,15 @@
                                                              masternode.insightState |= DPInsightState_Configured;
                                                              [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                                                          }];
-                                                         [self installInsightOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                         [self installInsightOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
                                                      }
                                                  }
                                              }];
 }
 
-- (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashMessageClb)clb {
+- (void)installInsightOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     if (!(masternode.insightState & DPInsightState_Configured)) {
-        clb(NO,@"Error: Insight needs to be configured first");
+        messageClb(NO,@"Error: Insight needs to be configured first");
         return;
     }
     [self createBackgroundSSHSessionOnMasternode:masternode
@@ -2296,23 +2331,23 @@
                                                  
                                                  if(!success) {
                                                      dispatch_async(dispatch_get_main_queue(), ^{
-                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
                                                      });
                                                  }
-                                                 [self installInsightOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                 [self installInsightOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
                                              }];
 }
 
 
-- (void)installInsightOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session clb:(dashMessageClb)clb {
+- (void)installInsightOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     __block BOOL shouldBreak = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
         if (!(masternode.insightState & DPInsightState_Configured)) {
             if ([NSThread isMainThread]) {
-                clb(NO,@"Error: Insight needs to be configured first");
+                messageClb(NO,@"Error: Insight needs to be configured first");
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    clb(NO,@"Error: Insight needs to be configured first");
+                    messageClb(NO,@"Error: Insight needs to be configured first");
                 });
             }
             shouldBreak = TRUE;
@@ -2324,7 +2359,7 @@
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO, message);
+                messageClb(NO, message);
             });
             return;
         }
@@ -2333,30 +2368,106 @@
             [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
         }];
         //At this point lets send a query to check if it's running
-        [self checkInsightIsRunningOnMasternode:masternode inSSHSession:session clb:clb];
+        [self checkInsightIsRunningOnMasternode:masternode inSSHSession:session completionClb:completionClb messageClb:messageClb];
     }];
 }
 
--(void)checkInsightIsConfiguredOnMasternode:(Masternode*)masternode clb:(dashMessageClb)clb {
+-(void)checkInsightIsClonedOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     [self createBackgroundSSHSessionOnMasternode:masternode
                                              clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                                                  
                                                  if(!success) {
                                                      dispatch_async(dispatch_get_main_queue(), ^{
-                                                         clb(NO,@"Error: Could not create SSH tunnel.");
+                                                         completionClb(NO,NO);
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
                                                      });
                                                  }
-                                                 [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                                                 [self checkInsightIsClonedOnMasternode:masternode inSSHSession:sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb];
                                              }];
 }
 
-- (void)checkInsightIsConfiguredOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashMessageClb)clb {
+- (void)checkInsightIsClonedOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     
+    NSString * command = @"if test -d ~/src/dashcore-node; then echo \"dashcore-node\"; fi";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                messageClb(NO, @"Could not execute command");
+            });
+            return;
+        }
+        if ([message hasPrefix:@"dashcore-node"]) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.insightState |= DPInsightState_Cloned;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(YES, [NSString stringWithFormat:@"Info: Insight is cloned on %@",sshSession.host]);
+            });
+        } else {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.insightState &= ~DPInsightState_Cloned;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,NO);
+                messageClb(YES, [NSString stringWithFormat:@"Info: Insight is not yet cloned on %@",sshSession.host]);
+            });
+        }
+        
+    }];
+}
+
+-(void)checkInsightIsConfiguredOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb];
+                                             }];
+}
+
+- (void)checkInsightIsConfiguredOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    __block BOOL needsCloneCheck = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.insightState & DPInsightState_Cloned)) {
+            needsCloneCheck = YES;
+        }
+    }];
+    if (needsCloneCheck) {
+        [self checkInsightIsClonedOnMasternode:masternode completionClb:^(BOOL success, BOOL cloned) {
+            if (cloned) {
+                needsCloneCheck = NO;
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    if (!(masternode.insightState & DPInsightState_Cloned)) {
+                        needsCloneCheck = YES;
+                    }
+                }];
+                if (!needsCloneCheck) {
+                    [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                } else {
+                    messageClb(success,@"Error: Insight needs to be cloned first");
+                }
+            } else {
+                messageClb(success,@"Error: Insight needs to be cloned first");
+            }
+            
+        } messageClb:messageClb];
+        
+        return;
+    }
     NSString * command = @"cat /home/ubuntu/src/dashcore-node/dashcore-node.json";
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO, message);
+                messageClb(NO, message);
             });
             return;
         }
@@ -2365,7 +2476,7 @@
         NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
         if (!dictionary) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO, message);
+                messageClb(NO, @"Error: Insight message was not valid JSON");
             });
             return;
         }
@@ -2384,7 +2495,8 @@
             }];
             //At this point lets send a query to check if it's running
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(YES, message);
+                completionClb(YES,YES);
+                messageClb(YES, message);
             });
         } else {
             [masternode.managedObjectContext performBlockAndWait:^{
@@ -2392,14 +2504,15 @@
                 [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
             }];
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(YES, @"Error: rpc password of insight configuration does not match");
+                completionClb(YES,NO);
+                messageClb(YES, @"Error: rpc password of insight configuration does not match");
             });
         }
         
     }];
 }
 
--(void)checkInsightIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActiveClb)clb messageClb:(dashMessageClb)messageClb {
+-(void)checkInsightIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     [self createBackgroundSSHSessionOnMasternode:masternode
                                              clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                                                  
@@ -2408,11 +2521,11 @@
                                                          messageClb(NO,@"Error: Could not create SSH tunnel.");
                                                      });
                                                  }
-                                                 [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession clb:messageClb];
+                                                 [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:(dashMessageClb)messageClb];
                                              }];
 }
 
-- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession clb:(dashMessageClb)clb {
+- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     __block BOOL needConfigurationCheck = NO;
     [masternode.managedObjectContext performBlockAndWait:^{
         if (!(masternode.insightState & DPInsightState_Configured)) {
@@ -2420,7 +2533,7 @@
         }
     }];
     if (needConfigurationCheck) {
-        [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession clb:^(BOOL success, NSString *message) {
+        [self checkInsightIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL actionSuccess) {
             if (success) {
                 needConfigurationCheck = NO;
                 [masternode.managedObjectContext performBlockAndWait:^{
@@ -2429,14 +2542,14 @@
                     }
                 }];
                 if (!needConfigurationCheck) {
-                    [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession clb:clb];
+                    [self checkInsightIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
                 } else {
-                    clb(success,message);
+                    messageClb(success,@"Error: Insight needs to be configured first.");
                 }
             } else {
-                clb(success,message);
+                messageClb(success,@"Error: Insight needs to be configured first.");
             }
-        }];
+        } messageClb:messageClb];
         return;
     }
     
@@ -2444,7 +2557,7 @@
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(NO, message);
+                messageClb(NO, message);
             });
             return;
         }
@@ -2462,7 +2575,7 @@
                     }];
                     //At this point lets send a query to check if it's running
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        clb(YES, message);
+                        messageClb(YES, message);
                     });
                     found = TRUE;
                 }
@@ -2475,7 +2588,7 @@
             }];
             //At this point lets send a query to check if it's running
             dispatch_async(dispatch_get_main_queue(), ^{
-                clb(YES, message);
+                messageClb(YES, message);
             });
         }
     }];
@@ -2611,6 +2724,7 @@
         for (NSString * infoString in info) {
             if ([infoString containsString:@"DASHCORE_RPC_PASS"]) {
                 rpcPasswordInConfigFile = [[infoString componentsSeparatedByString:@"="][1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                rpcPasswordInConfigFile = [rpcPasswordInConfigFile stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\"\\"]];
             }
         }
         __block NSString * masternodeRpcPassword;
@@ -2724,7 +2838,7 @@
     }];
 }
 
--(void)turnProjectInPM2:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+-(void)turnProject:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     [self createBackgroundSSHSessionOnMasternode:masternode
                                              clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
                                                  
@@ -2735,7 +2849,18 @@
                                                      });
                                                      return;
                                                  }
-                                                 [self turnProjectInPM2:project onOrOff:onOff onMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                                 if (project == DPRepositoryProject_Dapi || project == DPRepositoryProject_Drive || project == DPRepositoryProject_Insight) {
+                                                     [self turnProjectInPM2:project onOrOff:onOff onMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                                 } else if (project == DPRepositoryProject_Ipfs) {
+                                                     if (onOff) {
+                                                         [self startIpfsOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
+                                                     } else {
+                                                         [self stopIpfsOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
+                                                     }
+                                                 } 
+                                                     
+                
+                                                 
                                              }];
 }
 
@@ -2775,30 +2900,30 @@
         
     }];
     return needsConfigurationCheck;
-
+    
 }
 
 - (void)turnProjectInPM2:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     
-//    if (needConfigurationCheck) {
-//        messageClb(NO,[NSString stringWithFormat:@"Info: Could not tell if DAPI is configured on %@, checking now.",sshSession.host]);
-//        [self checkDapiIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL configured) {
-//            if (success) {
-//                if (configured) {
-//                    [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL onStatus) {
-//                        if (onStatus != onOff) {
-//                            [self turnProjectInPM2:project onOrOff:onOff onMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
-//                        }
-//                    } messageClb:messageClb];
-//                } else {
-//                    completionClb(YES,NO);
-//                }
-//            } else {
-//                completionClb(NO,NO);
-//            }
-//        } messageClb:messageClb];
-//        return;
-//    }
+    //    if (needConfigurationCheck) {
+    //        messageClb(NO,[NSString stringWithFormat:@"Info: Could not tell if DAPI is configured on %@, checking now.",sshSession.host]);
+    //        [self checkDapiIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL configured) {
+    //            if (success) {
+    //                if (configured) {
+    //                    [self checkDapiIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL onStatus) {
+    //                        if (onStatus != onOff) {
+    //                            [self turnProjectInPM2:project onOrOff:onOff onMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+    //                        }
+    //                    } messageClb:messageClb];
+    //                } else {
+    //                    completionClb(YES,NO);
+    //                }
+    //            } else {
+    //                completionClb(NO,NO);
+    //            }
+    //        } messageClb:messageClb];
+    //        return;
+    //    }
     NSString * pm2Command = @"";
     switch (project) {
         case DPRepositoryProject_Dapi:
@@ -2825,16 +2950,16 @@
         }
         switch (project) {
             case DPRepositoryProject_Dapi:
-                {
-                    [masternode.managedObjectContext performBlockAndWait:^{
-                        if (onOff) {
-                            masternode.dapiState |= DPDapiState_Running;
-                        } else {
-                            masternode.dapiState &= ~DPDapiState_Running;
-                        }
-                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                    }];
-                }
+            {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    if (onOff) {
+                        masternode.dapiState |= DPDapiState_Running;
+                    } else {
+                        masternode.dapiState &= ~DPDapiState_Running;
+                    }
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+            }
                 break;
             case DPRepositoryProject_Drive:
             {
@@ -2847,15 +2972,26 @@
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 }];
             }
+            case DPRepositoryProject_Insight:
+            {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    if (onOff) {
+                        masternode.insightState |= DPInsightState_Running;
+                    } else {
+                        masternode.insightState &= ~DPInsightState_Running;
+                    }
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+            }
                 break;
                 
             default:
                 break;
         }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completionClb(YES,NO);
-                messageClb(YES, message);
-            });
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionClb(YES,NO);
+            messageClb(YES, message);
+        });
     }];
 }
 
@@ -2976,7 +3112,7 @@
 
 - (void)checkDriveIsConfiguredOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     
-    NSString * command = @"cat /home/ubuntu/src/dapi/.env";
+    NSString * command = @"cat /home/ubuntu/src/dashdrive/.env";
     [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
         if(!success) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2988,8 +3124,9 @@
         NSArray * info = [message componentsSeparatedByString:@"\n"];
         NSString * rpcPasswordInConfigFile = nil;
         for (NSString * infoString in info) {
-            if ([infoString containsString:@"DASHCORE_RPC_PASS"]) {
+            if ([infoString containsString:@"DASHCORE_JSON_RPC_PASS"]) {
                 rpcPasswordInConfigFile = [[infoString componentsSeparatedByString:@"="][1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                rpcPasswordInConfigFile = [rpcPasswordInConfigFile stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\"\\"]];
             }
         }
         __block NSString * masternodeRpcPassword;
@@ -3013,7 +3150,7 @@
             }];
             dispatch_async(dispatch_get_main_queue(), ^{
                 completionClb(YES,NO);
-                messageClb(YES, @"Error: rpc password of dapi configuration does not match");
+                messageClb(YES, @"Error: rpc password of drive configuration does not match");
             });
         }
         
@@ -3071,6 +3208,310 @@
         NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
         NSError *jsonError = nil;
         NSArray *pm2InfoArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
+        BOOL syncFound = NO;
+        BOOL apiFound = NO;
+        BOOL syncRunning = NO;
+        BOOL apiRunning = NO;
+        BOOL syncErrored = NO;
+        BOOL apiErrored = NO;
+        for (NSDictionary * pm2InfoDictionary in pm2InfoArray) {
+            if ([pm2InfoDictionary[@"name"] isEqualToString:@"drive-sync"]) {
+                NSDictionary * pm2Environment = pm2InfoDictionary[@"pm2_env"];
+                syncFound = TRUE;
+                syncRunning = [pm2Environment[@"status"] isEqualToString:@"online"];
+                syncErrored = [pm2Environment[@"status"] isEqualToString:@"errored"];
+            } else if ([pm2InfoDictionary[@"name"] isEqualToString:@"drive-api"]) {
+                NSDictionary * pm2Environment = pm2InfoDictionary[@"pm2_env"];
+                apiFound = TRUE;
+                apiRunning = [pm2Environment[@"status"] isEqualToString:@"online"];
+                apiErrored = [pm2Environment[@"status"] isEqualToString:@"errored"];
+            }
+        }
+        if (syncRunning && apiRunning) {
+        [masternode.managedObjectContext performBlockAndWait:^{
+            masternode.driveState |= DPDriveState_Running;
+            masternode.driveState &= ~DPDriveState_ApiError;
+            masternode.driveState &= ~DPDriveState_SyncError;
+            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+        }];
+        //At this point lets send a query to check if it's running
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionClb(YES,YES);
+            messageClb(YES, [NSString stringWithFormat:@"Info : Drive is running on remote %@",sshSession.host]);
+        });
+        } else if (syncRunning ^ apiRunning) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.driveState &= ~DPDriveState_Running;
+                if (apiErrored) {
+                    masternode.driveState |= DPDriveState_ApiError;
+                } else if (apiFound) {
+                    masternode.driveState &= ~DPDriveState_ApiError;
+                }
+                if (syncErrored) {
+                    masternode.driveState |= DPDriveState_SyncError;
+                } else if (syncFound) {
+                    masternode.driveState &= ~DPDriveState_SyncError;
+                }
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(YES, [NSString stringWithFormat:@"Info : Drive-api is %@running, Drive-sync is %@running on remote %@",apiRunning?@"":@"not ",syncRunning?@"":@"not ",sshSession.host]);
+            });
+        } else if (!syncFound || !apiFound) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.driveState &= ~DPDriveState_Running;
+                masternode.driveState &= ~DPDriveState_Configured;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,NO);
+                messageClb(YES, [NSString stringWithFormat:@"Info : Drive is not running or configured on remote %@",sshSession.host]);
+            });
+        } else if (!syncRunning && !apiRunning) {
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.driveState &= ~DPDriveState_Running;
+                if (apiErrored) {
+                    masternode.driveState |= DPDriveState_ApiError;
+                }
+                if (syncErrored) {
+                    masternode.driveState |= DPDriveState_SyncError;
+                }
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(YES, [NSString stringWithFormat:@"Info : Drive is not running on remote %@",sshSession.host]);
+            });
+        }
+    }];
+}
+
+#pragma mark - IPFS
+
+
+- (void)installIpfsOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self installIpfsOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+
+- (void)installIpfsOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        NSString * command = [NSString stringWithFormat:@"cd src; wget -qO- https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-386.tar.gz | tar xz; cd go-ipfs/; sudo ./install.sh > /dev/null; ipfs init > /dev/null; ipfs bootstrap rm --all; grep -oP '(?<=\"PeerID\": \")[^\"]*' ~/.ipfs/config; sudo apt-get install monit"];
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+            if(!success) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionClb(NO,NO);
+                    messageClb(NO, [NSString stringWithFormat:@"Error : Could not install IPFS on remote %@",session.host]);
+                });
+                return;
+            }
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.ipfsState |= DPDriveState_Installed;
+                masternode.ipfsPublicKey = [message stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(NO, [NSString stringWithFormat:@"Info : Installed IPFS on remote %@",session.host]);
+            });
+        }];
+    });
+}
+
+- (void)configureIpfsOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb  {
+    if (!(masternode.ipfsState & DPIpfsState_Installed)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionClb(NO,NO);
+            messageClb(NO,@"Error: Ipfs needs to be installed first");
+        });
+        return;
+    }
+    if (!forceUpdate && (masternode.ipfsState & DPIpfsState_Configured)) {
+        [self installIpfsOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
+        return; //we are already configured
+    }
+    __block NSMutableArray * masternodeSwarmPaths = [NSMutableArray array];
+    for (Masternode * otherMasternode in [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"ipfsPublicKey != nil"]]) {
+        if (otherMasternode == masternode) continue;
+        NSString * swarmPath = [NSString stringWithFormat:@"ipfs bootstrap add /ip4/%@/tcp/4001/ipfs/%@",otherMasternode.publicIP,otherMasternode.ipfsPublicKey];
+        [masternodeSwarmPaths addObject:swarmPath];
+    }
+    if (![masternodeSwarmPaths count]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionClb(NO,NO);
+            messageClb(NO,@"Error: Ipfs needs to be installed first on at least one node");
+        });
+        return;
+    }
+    
+    [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+        if(success == YES) {
+            NSString *localFilePath = [NSString stringWithFormat:@"%@/.ipfs/swarm.key",NSHomeDirectory()];
+            NSString *remoteFilePath = @"/home/ubuntu/.ipfs/swarm.key";
+            
+            BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+            if (!uploadSuccess) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionClb(NO,NO);
+                    messageClb(NO, @"Error: Error uploading ipfs swarm key");
+                });
+            }
+            else {
+                NSString *localFilePath = [[NSBundle mainBundle] pathForResource:@"start_ipfs" ofType:@"sh"];
+                NSString *remoteFilePath = @"/home/ubuntu/.ipfs/start_ipfs.sh";
+                BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+                if (!uploadSuccess) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        completionClb(NO,NO);
+                        messageClb(NO, @"Error: Error uploading ipfs swarm key");
+                    });
+                }
+                else {
+                NSString * command = [NSString stringWithFormat:@"ipfs bootstrap rm --all; "];
+                command = [command stringByAppendingString:[masternodeSwarmPaths componentsJoinedByString:@"; "]];
+                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+                    if(!success) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            completionClb(NO,NO);
+                            messageClb(NO, message);
+                        });
+                        return;
+                    }
+                    [masternode.managedObjectContext performBlockAndWait:^{
+                        masternode.ipfsState |= DPIpfsState_Configured;
+                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                    }];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        completionClb(YES,YES);
+                        messageClb(NO, [NSString stringWithFormat:@"Info : Configured IPFS on remote %@",sshSession.host]);
+                    });
+                    //At this point lets send a query to check if it's running
+                    //[self checkDriveIsRunningOnMasternode:masternode inSSHSession:session completionClb:completionClb messageClb:messageClb];
+                }];
+                }
+            }
+        }
+    }];
+}
+
+- (void)startIpfsOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self startIpfsOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+- (void)startIpfsOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        
+        NSString * command = [NSString stringWithFormat:@"LIBP2P_FORCE_PNET=1 ipfs daemon --enable-gc --migrate --enable-pubsub-experiment > ~/.ipfs/ipfs.log&; IPFS_PID=$!"];
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+            if(!success) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionClb(NO,NO);
+                    messageClb(NO, [NSString stringWithFormat:@"Error : Could not run IPFS on remote %@",session.host]);
+                });
+                return;
+            }
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.ipfsState |= DPIpfsState_Running;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(NO, [NSString stringWithFormat:@"Info : IPFS Running on remote %@",session.host]);
+            });
+        }];
+    });
+}
+
+- (void)stopIpfsOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                 }
+                                                 [self stopIpfsOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+- (void)stopIpfsOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
+        NSString * command = [NSString stringWithFormat:@"kill IPFS_PID"];
+        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+            if(!success) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionClb(NO,NO);
+                    messageClb(NO, [NSString stringWithFormat:@"Error : Could not stop IPFS on remote %@",session.host]);
+                });
+                return;
+            }
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.ipfsState &= ~DPIpfsState_Running;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(NO, [NSString stringWithFormat:@"Info : IPFS Stopped on remote %@",session.host]);
+            });
+        }];
+    });
+}
+
+
+-(void)checkIpfsIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    [self createBackgroundSSHSessionOnMasternode:masternode
+                                             clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
+                                                 
+                                                 if(!success) {
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         completionClb(NO,NO);
+                                                         messageClb(NO,@"Error: Could not create SSH tunnel.");
+                                                     });
+                                                     return;
+                                                 }
+                                                 [self checkIpfsIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                                             }];
+}
+
+- (void)checkIpfsIsConfiguredOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    
+    NSString * command = @"ipfs bootstrap list";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(NO,NO);
+                messageClb(NO, message);
+            });
+            return;
+        }
+        NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *jsonError = nil;
+        NSArray *pm2InfoArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
         BOOL found = NO;
         for (NSDictionary * pm2InfoDictionary in pm2InfoArray) {
             if ([pm2InfoDictionary[@"name"] isEqualToString:@"dapi"]) {
@@ -3102,6 +3543,81 @@
         }
     }];
 }
+
+- (void)checkIpfsIsRunningOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)sshSession completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
+    __block BOOL needConfigurationCheck = NO;
+    [masternode.managedObjectContext performBlockAndWait:^{
+        if (!(masternode.ipfsState & DPIpfsState_Configured)) {
+            needConfigurationCheck = YES;
+        }
+    }];
+    if (needConfigurationCheck) {
+        messageClb(NO,[NSString stringWithFormat:@"Info: Could not tell if Ipfs is configured on %@, checking now.",sshSession.host]);
+        [self checkIpfsIsConfiguredOnMasternode:masternode inSSHSession:sshSession completionClb:^(BOOL success, BOOL configured) {
+            if (success) {
+                if (configured) {
+                    [self checkIpfsIsRunningOnMasternode:masternode inSSHSession:sshSession completionClb:completionClb messageClb:messageClb];
+                } else {
+                    completionClb(YES,NO);
+                }
+            } else {
+                completionClb(NO,NO);
+            }
+        } messageClb:messageClb];
+        return;
+    }
+    
+    NSString * command = @"ipfs diag sys";
+    [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+        if(!success) {
+            if ([message containsString:@"Error: api not running"]) {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    masternode.ipfsState &= ~DPIpfsState_Running;
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionClb(YES,NO);
+                    messageClb(YES, [NSString stringWithFormat:@"Info : Ipfs is not running on remote %@",sshSession.host]);
+                });
+            } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(NO,NO);
+                messageClb(NO, [NSString stringWithFormat:@"Error : Could not connect to remote %@",sshSession.host]);
+            });
+            }
+            return;
+        }
+        NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *jsonError = nil;
+        NSDictionary *ipfsInfo = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:&jsonError];
+        if (ipfsInfo[@"net"] && ipfsInfo[@"net"][@"online"]) {
+            BOOL online = [ipfsInfo[@"net"][@"online"] boolValue];
+            if (!online) {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    masternode.ipfsState &= ~DPIpfsState_Running;
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+            } else {
+                [masternode.managedObjectContext performBlockAndWait:^{
+                    masternode.ipfsState |= DPIpfsState_Running;
+                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                }];
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,online);
+                messageClb(YES, [NSString stringWithFormat:@"Info : Ipfs is %@running on node %@",online?@"":@"not ",sshSession.host]);
+            });
+
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(NO,NO);
+                messageClb(YES, [NSString stringWithFormat:@"Error: Could not check if Ipfs is running on node %@",sshSession.host]);
+            });
+        }
+        
+    }];
+}
+
 
 #pragma mark - Sentinel Checks
 
@@ -3781,7 +4297,7 @@
             for (Masternode * masternode in newMasternodes) {
                 [self checkMasternode:masternode];
             }
-            if([newMasternodes count] == 0) {
+            if(![newMasternodes count]) {
                 NSArray * checkingMasternodes = [[DPDataStore sharedInstance] allMasternodes];
                 for (Masternode * masternode in checkingMasternodes) {
                     [self checkMasternode:masternode];

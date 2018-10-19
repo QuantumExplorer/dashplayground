@@ -44,6 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSDate *createdAt;
 
 @property (nonatomic) int16_t nodeVersion;
+@property (nullable, nonatomic, copy) NSString *ipfsVersion;
+@property (nullable, nonatomic, copy) NSString *ipfsPublicKey;
 @property (nonatomic) BOOL installedNVM;
 @property (nonatomic) BOOL installedPM2;
 
@@ -52,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int16_t driveState;
 @property (nonatomic) int16_t insightState;
 @property (nonatomic) int16_t sentinelState;
+@property (nonatomic) int16_t ipfsState;
 
 @property (nullable, nonatomic, copy) NSString *dapiGitCommitVersion;
 @property (nullable, nonatomic, copy) NSString *driveGitCommitVersion;

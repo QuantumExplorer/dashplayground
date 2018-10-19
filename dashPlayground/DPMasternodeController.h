@@ -100,8 +100,8 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)gitCloneProjectWithRepositoryPath:(NSString*)repositoryPath toDirectory:(NSString*)directory andSwitchToBranch:(NSString*)branchName inSSHSession:(NMSSHSession *)ssh dashClb:(dashMessageClb)clb;
 -(void)updateGitInfoForMasternode:(Masternode*)masternode forProject:(DPRepositoryProject)project clb:(dashInfoClb)clb;
 
-- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate clb:(dashMessageClb)clb;
-- (void)checkInsightIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActiveClb)clb messageClb:(dashMessageClb)clb;
+- (void)configureInsightOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
+-(void)checkInsightIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
 - (void)installInsightOnMasternode:(Masternode*)masternode clb:(dashMessageClb)clb;
 
 -(void)configureDapiOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
@@ -114,6 +114,10 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 -(void)checkDriveIsConfiguredOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
 -(void)installDriveOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
 
--(void)turnProjectInPM2:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
+-(void)installIpfsOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)checkIpfsIsRunningOnMasternode:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)configureIpfsOnMasternode:(Masternode*)masternode forceUpdate:(BOOL)forceUpdate completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+
+-(void)turnProject:(DPRepositoryProject)project onOrOff:(BOOL)onOff onMasternode:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
 
 @end
