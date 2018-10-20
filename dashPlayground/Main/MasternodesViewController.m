@@ -386,20 +386,12 @@ NSString *terminalHeadString = @"";
 }
 
 - (IBAction)pressSelectAll:(id)sender {
-    NSNumber *stateValue;
-    if(self.selectAllButton.state == 1){
-        stateValue = @(1);
-    }
-    else{
-        stateValue = @(0);
-    }
-    
     for(Masternode *masternode in [self.arrayController.arrangedObjects allObjects])
     {
         if(!masternode.publicIP || masternode.instanceState == InstanceState_Stopped
            || masternode.instanceState == InstanceState_Pending
            || masternode.instanceState == InstanceState_Terminated) continue;
-        masternode.isSelected = TRUE;
+        masternode.isSelected = self.selectAllButton.state;
     }
 }
 

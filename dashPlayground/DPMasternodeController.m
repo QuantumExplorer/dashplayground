@@ -2857,9 +2857,9 @@
                                                      } else {
                                                          [self stopIpfsOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
                                                      }
-                                                 } 
-                                                     
-                
+                                                 }
+                                                 
+                                                 
                                                  
                                              }];
 }
@@ -2971,6 +2971,7 @@
                     }
                     [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
                 }];
+                break;
             }
             case DPRepositoryProject_Insight:
             {
@@ -3228,17 +3229,17 @@
             }
         }
         if (syncRunning && apiRunning) {
-        [masternode.managedObjectContext performBlockAndWait:^{
-            masternode.driveState |= DPDriveState_Running;
-            masternode.driveState &= ~DPDriveState_ApiError;
-            masternode.driveState &= ~DPDriveState_SyncError;
-            [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-        }];
-        //At this point lets send a query to check if it's running
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionClb(YES,YES);
-            messageClb(YES, [NSString stringWithFormat:@"Info : Drive is running on remote %@",sshSession.host]);
-        });
+            [masternode.managedObjectContext performBlockAndWait:^{
+                masternode.driveState |= DPDriveState_Running;
+                masternode.driveState &= ~DPDriveState_ApiError;
+                masternode.driveState &= ~DPDriveState_SyncError;
+                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+            }];
+            //At this point lets send a query to check if it's running
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionClb(YES,YES);
+                messageClb(YES, [NSString stringWithFormat:@"Info : Drive is running on remote %@",sshSession.host]);
+            });
         } else if (syncRunning ^ apiRunning) {
             [masternode.managedObjectContext performBlockAndWait:^{
                 masternode.driveState &= ~DPDriveState_Running;
@@ -3311,7 +3312,7 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
-        NSString * command = [NSString stringWithFormat:@"cd src; wget -qO- https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-386.tar.gz | tar xz; cd go-ipfs/; sudo ./install.sh > /dev/null; ipfs init > /dev/null; ipfs bootstrap rm --all; grep -oP '(?<=\"PeerID\": \")[^\"]*' ~/.ipfs/config; sudo apt-get install monit"];
+        NSString * command = [NSString stringWithFormat:@"cd src; wget -qO- https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-386.tar.gz | tar xz; cd go-ipfs/; sudo ./install.sh > /dev/null; ipfs init > /dev/null; ipfs bootstrap rm --all > /dev/null; grep -oP '(?<=\"PeerID\": \")[^\"]*' ~/.ipfs/config; sudo apt-get install -y monit > /dev/null"];
         [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
             if(!success) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -3345,19 +3346,6 @@
         [self installIpfsOnMasternode:masternode completionClb:completionClb messageClb:messageClb];
         return; //we are already configured
     }
-    __block NSMutableArray * masternodeSwarmPaths = [NSMutableArray array];
-    for (Masternode * otherMasternode in [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"ipfsPublicKey != nil"]]) {
-        if (otherMasternode == masternode) continue;
-        NSString * swarmPath = [NSString stringWithFormat:@"ipfs bootstrap add /ip4/%@/tcp/4001/ipfs/%@",otherMasternode.publicIP,otherMasternode.ipfsPublicKey];
-        [masternodeSwarmPaths addObject:swarmPath];
-    }
-    if (![masternodeSwarmPaths count]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionClb(NO,NO);
-            messageClb(NO,@"Error: Ipfs needs to be installed first on at least one node");
-        });
-        return;
-    }
     
     [self createBackgroundSSHSessionOnMasternode:masternode clb:^(BOOL success, NSString *message, NMSSHSession *sshSession) {
         if(success == YES) {
@@ -3372,37 +3360,62 @@
                 });
             }
             else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    messageClb(NO, @"Info: Uploaded ipfs swarm key");
+                });
                 NSString *localFilePath = [[NSBundle mainBundle] pathForResource:@"start_ipfs" ofType:@"sh"];
                 NSString *remoteFilePath = @"/home/ubuntu/.ipfs/start_ipfs.sh";
                 BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
                 if (!uploadSuccess) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         completionClb(NO,NO);
-                        messageClb(NO, @"Error: Error uploading ipfs swarm key");
+                        messageClb(NO, @"Error: Error uploading start_ipfs");
                     });
                 }
                 else {
-                NSString * command = [NSString stringWithFormat:@"ipfs bootstrap rm --all; "];
-                command = [command stringByAppendingString:[masternodeSwarmPaths componentsJoinedByString:@"; "]];
-                [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
-                    if(!success) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        messageClb(NO, @"Info: Uploaded start_ipfs");
+                    });
+                    NSString *localFilePath = [[NSBundle mainBundle] pathForResource:@"monitrc" ofType:@"conf"];
+                    NSString *remoteFilePath = @"/home/ubuntu/monitrc";
+                    BOOL uploadSuccess = [sshSession.channel uploadFile:localFilePath to:remoteFilePath];
+                    if (!uploadSuccess) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             completionClb(NO,NO);
-                            messageClb(NO, message);
+                            messageClb(NO, @"Error: Error uploading monitrc");
                         });
-                        return;
                     }
-                    [masternode.managedObjectContext performBlockAndWait:^{
-                        masternode.ipfsState |= DPIpfsState_Configured;
-                        [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
-                    }];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        completionClb(YES,YES);
-                        messageClb(NO, [NSString stringWithFormat:@"Info : Configured IPFS on remote %@",sshSession.host]);
-                    });
-                    //At this point lets send a query to check if it's running
-                    //[self checkDriveIsRunningOnMasternode:masternode inSSHSession:session completionClb:completionClb messageClb:messageClb];
-                }];
+                    else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            messageClb(NO, @"Info: Uploaded monitrc");
+                        });
+                        sleep(5);
+                        NSString * command = [NSString stringWithFormat:@"chmod 755 /home/ubuntu/.ipfs/start_ipfs.sh; sudo chmod 600 /home/ubuntu/monitrc; sudo mv /home/ubuntu/monitrc /etc/monit/monitrc; sudo chown root:root /etc/monit/monitrc; sudo /usr/bin/monit; sudo /usr/bin/monit reload;"];
+                        
+                        [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:sshSession mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
+                            if(!success) {
+                                [masternode.managedObjectContext performBlockAndWait:^{
+                                    masternode.ipfsState &= ~DPIpfsState_Configured;
+                                    [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                                }];
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    completionClb(NO,NO);
+                                    messageClb(NO, [NSString stringWithFormat:@"Error: Error configuring IPFS on remote %@",sshSession.host]);
+                                });
+                                return;
+                            }
+                            [masternode.managedObjectContext performBlockAndWait:^{
+                                masternode.ipfsState |= DPIpfsState_Configured;
+                                [[DPDataStore sharedInstance] saveContext:masternode.managedObjectContext];
+                            }];
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                completionClb(YES,YES);
+                                messageClb(NO, [NSString stringWithFormat:@"Info : Configured IPFS on remote %@",sshSession.host]);
+                            });
+                            //At this point lets send a query to check if it's running
+                            //[self checkDriveIsRunningOnMasternode:masternode inSSHSession:session completionClb:completionClb messageClb:messageClb];
+                        }];
+                    }
                 }
             }
         }
@@ -3422,10 +3435,23 @@
 }
 
 - (void)startIpfsOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
-    
+    __block NSMutableArray * masternodeSwarmPaths = [NSMutableArray array];
+    for (Masternode * otherMasternode in [[DPDataStore sharedInstance] allMasternodesWithPredicate:[NSPredicate predicateWithFormat:@"ipfsPublicKey != nil"]]) {
+        if (otherMasternode == masternode) continue;
+        NSString * swarmPath = [NSString stringWithFormat:@"ipfs bootstrap add /ip4/%@/tcp/4001/ipfs/%@",otherMasternode.publicIP,otherMasternode.ipfsPublicKey];
+        [masternodeSwarmPaths addObject:swarmPath];
+    }
+    if (![masternodeSwarmPaths count]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionClb(NO,NO);
+            messageClb(NO,@"Error: Ipfs needs to be installed first on at least one node");
+        });
+        return;
+    }
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
-        NSString * command = [NSString stringWithFormat:@"LIBP2P_FORCE_PNET=1 ipfs daemon --enable-gc --migrate --enable-pubsub-experiment > ~/.ipfs/ipfs.log&; IPFS_PID=$!"];
+        NSString * command = [NSString stringWithFormat:@"/home/ubuntu/.ipfs/start_ipfs.sh; ipfs bootstrap rm --all;"];
+        command = [command stringByAppendingString:[masternodeSwarmPaths componentsJoinedByString:@"; "]];
         [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
             if(!success) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -3461,7 +3487,7 @@
 - (void)stopIpfsOnMasternode:(Masternode*)masternode inSSHSession:(NMSSHSession *)session completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
-        NSString * command = [NSString stringWithFormat:@"kill IPFS_PID"];
+        NSString * command = [NSString stringWithFormat:@"sudo monit stop ipfs"];
         [[SshConnection sharedInstance] sendExecuteCommand:command onSSH:session mainThread:NO dashClb:^(BOOL success, NSString *message,NSError *error) {
             if(!success) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -3580,10 +3606,10 @@
                     messageClb(YES, [NSString stringWithFormat:@"Info : Ipfs is not running on remote %@",sshSession.host]);
                 });
             } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completionClb(NO,NO);
-                messageClb(NO, [NSString stringWithFormat:@"Error : Could not connect to remote %@",sshSession.host]);
-            });
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionClb(NO,NO);
+                    messageClb(NO, [NSString stringWithFormat:@"Error : Could not connect to remote %@",sshSession.host]);
+                });
             }
             return;
         }
@@ -3607,7 +3633,7 @@
                 completionClb(YES,online);
                 messageClb(YES, [NSString stringWithFormat:@"Info : Ipfs is %@running on node %@",online?@"":@"not ",sshSession.host]);
             });
-
+            
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 completionClb(NO,NO);

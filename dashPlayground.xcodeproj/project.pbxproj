@@ -84,6 +84,7 @@
 		FB5A31CA1E9EA97E003D4DD8 /* DPRepositoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5A31C81E9EA97E003D4DD8 /* DPRepositoryController.m */; };
 		FB5B15CC2173E8A6001F6DA0 /* IpfsStateTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB5B15CB2173E8A6001F6DA0 /* IpfsStateTransformer.m */; };
 		FB5B15CE217A07DC001F6DA0 /* start_ipfs.sh in Resources */ = {isa = PBXBuildFile; fileRef = FB5B15CD217A07DC001F6DA0 /* start_ipfs.sh */; };
+		FB5B15D0217A2293001F6DA0 /* monitrc.conf in Resources */ = {isa = PBXBuildFile; fileRef = FB5B15CF217A2292001F6DA0 /* monitrc.conf */; };
 		FB96BFB81F0B90D900220B4B /* ConsoleEventArray.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96BFB71F0B90D900220B4B /* ConsoleEventArray.m */; };
 		FB96BFBB1F0B90F200220B4B /* ConsoleEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = FB96BFBA1F0B90F200220B4B /* ConsoleEvent.m */; };
 		FB9EBCED1E96F22200AE8AC3 /* InstanceTypeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9EBCEC1E96F22200AE8AC3 /* InstanceTypeTransformer.m */; };
@@ -264,6 +265,7 @@
 		FB5B15CA2173E8A6001F6DA0 /* IpfsStateTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IpfsStateTransformer.h; sourceTree = "<group>"; };
 		FB5B15CB2173E8A6001F6DA0 /* IpfsStateTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IpfsStateTransformer.m; sourceTree = "<group>"; };
 		FB5B15CD217A07DC001F6DA0 /* start_ipfs.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = start_ipfs.sh; sourceTree = "<group>"; };
+		FB5B15CF217A2292001F6DA0 /* monitrc.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = monitrc.conf; sourceTree = "<group>"; };
 		FB67062F215D58B0005A658E /* NSData+Security.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Security.m"; sourceTree = "<group>"; };
 		FB670630215D58B0005A658E /* NSData+Security.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Security.h"; sourceTree = "<group>"; };
 		FB670632215D58CC005A658E /* IntTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntTypes.h; sourceTree = "<group>"; };
@@ -486,6 +488,7 @@
 			children = (
 				FB1D2B551EAF552B00F7BE2D /* Images.xcassets */,
 				FBBAF9A41EB0562400D6F568 /* Notification.h */,
+				FB5B15CF217A2292001F6DA0 /* monitrc.conf */,
 				FB5B15CD217A07DC001F6DA0 /* start_ipfs.sh */,
 				FBE9BAEC21711EC4000102A5 /* drive.env */,
 				FB3BCA59216E32DE0071E4F1 /* dapi.env */,
@@ -696,6 +699,7 @@
 				A5EC6BD92099BF0E00B14BAD /* VolumeWindow.xib in Resources */,
 				FB29066F1E85799F00A31092 /* Assets.xcassets in Resources */,
 				A515E7C020AA904E00CB5495 /* AvailabilityZoneWindow.xib in Resources */,
+				FB5B15D0217A2293001F6DA0 /* monitrc.conf in Resources */,
 				FB1D2B561EAF552B00F7BE2D /* Images.xcassets in Resources */,
 				FB3BCA5A216E32DE0071E4F1 /* dapi.env in Resources */,
 				A52EFCF4209AF1EB00B0586A /* RepositoryWindow.xib in Resources */,
