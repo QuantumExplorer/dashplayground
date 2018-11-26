@@ -42,7 +42,7 @@
             
             session.channel.ptyTerminalType = NMSSHChannelPtyTerminalAnsi;
             
-            if(shell == YES)
+            if(shell)
             {
                 session.channel.requestPty = YES;
                 NSError *error = nil;

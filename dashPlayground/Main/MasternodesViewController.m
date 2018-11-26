@@ -442,6 +442,22 @@ NSString *terminalHeadString = @"";
     //    [self deSelectAll];
 }
 
+- (IBAction)killRemote:(id)sender {
+    [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
+    [self addStringEventToMasternodeConsole:@"Killing dashd on remotes..."];
+    
+        for(Masternode *masternode in [self selectedMasternodes])
+        {
+            if(masternode.isSelected) {
+                [[DPMasternodeController sharedInstance] killDashdOnRemote:masternode completionClb:^(BOOL success, BOOL actionSuccess) {
+                    
+                } messageClb:^(BOOL success, NSString *message) {
+                    [self addStringEventToMasternodeConsole:message];
+                }];
+            }
+        }
+}
+
 - (IBAction)wipeRemote:(id)sender {
     [self.consoleTabSegmentedControl setSelectedSegment:1];//set console tab to masternode segment.
     [self addStringEventToMasternodeConsole:@"Wiping all dash data on remotes..."];

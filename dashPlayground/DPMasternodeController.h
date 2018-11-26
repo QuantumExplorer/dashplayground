@@ -67,8 +67,9 @@ typedef void (^dashPercentageClb)(NSString * message,float percentage);
 //-(void)updateMasternode:(NSManagedObject*)masternode;
 -(void)updateMasternodeAttributes:(Masternode*)masternode clb:(dashMessageClb)clb;
 
--(void)startDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
--(void)stopDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)clb messageClb:(dashMessageClb)messageClb;
+-(void)startDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
+-(void)stopDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
+-(void)killDashdOnRemote:(Masternode*)masternode completionClb:(dashActionClb)completionClb messageClb:(dashMessageClb)messageClb;
 
 -(void)addNodeToLocal:(Masternode*)masternode clb:(dashMessageClb)clb;
 -(void)addNodeToRemote:(Masternode*)masternode toPublicIP:(NSString*)publicIP clb:(dashMessageClb)clb;
